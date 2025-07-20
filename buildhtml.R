@@ -470,7 +470,7 @@ pagina_completa <- tags$html(lang = "mk",
                              )
 )
 
-ruta_salida_html <- file.path(Sys.getenv("HOME"), "Downloads", "informe_liga_mk_final.html")
+ruta_salida_html <- "index.html"
 save_html(pagina_completa, file = ruta_salida_html)
 
 message(paste("\nHTML ИЗВЕШТАЈОТ Е УСПЕШНО КРЕИРАН!"))
