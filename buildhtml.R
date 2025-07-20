@@ -435,6 +435,30 @@ paginas_arbitros_html <- map(unique(arbitros_df$ime),function(arb){id_a<-generar
 
 paginas_estadios_html <- map(unique(na.omit(estadios_df$estadio)),function(est){id_e<-generar_id_seguro(est);historial<-estadios_df%>%filter(estadio==est)%>%arrange(jornada);tags$div(id=paste0("стадион-",id_e),class="page",tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"),tags$h2(est),tags$h3("Историја"),tags$table(tags$thead(tags$tr(tags$th("Коло"),tags$th("Натпревар"),tags$th("Резултат"))),tags$tbody(if(nrow(historial)>0){map(1:nrow(historial),function(p){partido<-historial[p,];tags$tr(tags$td(partido$jornada),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('partido-%s')",partido$id_partido),paste(partido$local,"vs",partido$visitante))),tags$td(paste(partido$goles_local,"-",partido$goles_visitante)))})}else tags$tr(tags$td(colspan="3","Нема одиграни натпревари.")))),tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"))})
 
+
+# --- PASO 9.4: AÑADIR SCRIPT DE CONTRASEÑA ---
+script_contraseña <- tags$script(HTML(
+  "
+  (function() {
+    // --- ¡¡¡CAMBIA ESTA CONTRASEÑA POR LA QUE TÚ QUIERAS!!! ---
+    var contraseñaCorrecta = 'FuckYouFFM'; 
+    // ---------------------------------------------------------
+    
+    var contraseñaIngresada = sessionStorage.getItem('zfudbalmk-password-ok');
+    
+    if (contraseñaIngresada !== contraseñaCorrecta) {
+      var input = prompt('За да пристапите до извештајот, внесете ја лозинката:', '');
+      if (input !== contraseñaCorrecta) {
+        document.body.innerHTML = '<div style=\"text-align:center; padding: 50px; font-family: sans-serif;\"><h1>Пристапот е одбиен</h1><p>Погрешна лозинка.</p></div>';
+        alert('Погрешна лозинка.');
+      } else {
+        sessionStorage.setItem('zfudbalmk-password-ok', input);
+      }
+    }
+  })();
+  "
+))
+
 # -------------------------------------------------------------------------
 # PASO 10: CONSTRUIR Y GUARDAR EL ARCHIVO HTML FINAL
 # -------------------------------------------------------------------------
@@ -447,6 +471,7 @@ pagina_completa <- tags$html(lang = "mk",
                                tags$style(HTML(estilo_css))
                              ),
                              tags$body(
+                               script_contraseña,
                                tags$div(class = "container",
                                         tags$h1("Фудбалски портал МК"),
                                         tags$div(class = "search-container",
