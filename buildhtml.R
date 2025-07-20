@@ -10,7 +10,43 @@ pacman::p_load(
   dplyr, tidyr, purrr, htmltools, stringr, jsonlite
 )
 
+# =========================================================================
+# FUNCIÓN AUXILIAR PARA GENERAR TÉRMINOS DE BÚSQUEDA MULTI-ALFABETO
+# =========================================================================
+generar_terminos_busqueda <- function(nombre) {
+  # Convertir a minúsculas para consistencia
+  nombre_lower <- tolower(nombre)
+  
+  # Mapeo 1: Cirílico a Latino (varias opciones)
+  map_cyr_to_lat <- c(
+    'а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj g dj', 'е'='e',
+    'ж'='z zh ž', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l',
+    'љ'='lj l', 'м'='m', 'н'='n', 'њ'='nj n', 'о'='o', 'п'='p', 'р'='r',
+    'с'='s', 'т'='t', 'ќ'='kj k c ć', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c ts',
+    'ч'='c ch č', 'џ'='dz dzh dž', 'ш'='s sh š'
+  )
+  
+  # Mapeo 2: Latinos con diacríticos a latinos simples (para nombres ya en latino)
+  map_diacritic_to_simple <- c(
+    'š'='s sh', 'č'='c ch', 'ž'='z zh', 'đ'='dj d', 'ć'='c'
+  )
+  
+  # Aplicar el segundo mapeo primero para normalizar cualquier diacrítico existente
+  nombre_lower <- str_replace_all(nombre_lower, map_diacritic_to_simple)
+  
+  # Aplicar el mapeo principal de cirílico a latino
+  nombre_latin <- str_replace_all(nombre_lower, map_cyr_to_lat)
+  
+  # Combinar el nombre original con sus variantes latinas
+  terminos_combinados <- paste(nombre_lower, nombre_latin)
+  
+  # Limpiar espacios múltiples y devolver una única cadena de búsqueda
+  return(str_squish(terminos_combinados))
+}
+
+
 message("Започнување со генерирање на HTML извештајот...")
+
 
 # -------------------------------------------------------------------------
 # PASO 7: PREPARACIÓN DE DATOS
@@ -90,14 +126,45 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
 arbitros_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$arbitro_principal)) NULL else data.frame(id_partido=.x$partido_info$id_partido,arbitro_principal=.x$arbitro_principal,arbitro_asist_1=.x$arbitro_asist_1,arbitro_asist_2=.x$arbitro_asist_2)) %>% pivot_longer(cols=starts_with("arbitro_"),names_to="uloga",values_to="ime",values_drop_na=T) %>% mutate(uloga=case_when(uloga=="arbitro_principal"~"Главен судија",uloga=="arbitro_asist_1"~"1-ви помошник",uloga=="arbitro_asist_2"~"2-ри помошник",T~uloga))
 estadios_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$estadio)) NULL else data.frame(id_partido=.x$partido_info$id_partido,estadio=.x$estadio)) %>% left_join(partidos_df,by="id_partido")
 
-# --- 7.4: Crear índice de búsqueda unificado ---
-message("Креирање на индекс за пребарување...")
-search_jugadoras <- jugadoras_stats_df %>% select(Име = Играч, id) %>% mutate(Тип = "Играч", target_id = paste0("jugadora-", id)) %>% select(Име, Тип, target_id)
-search_equipos <- data.frame(Име = unique(c(partidos_df$local,partidos_df$visitante))) %>% mutate(Тип = "Тим", target_id = paste0("equipo-", generar_id_seguro(Име)))
-search_arbitros <- data.frame(Име = unique(arbitros_df$ime)) %>% mutate(Тип = "Судија", target_id = paste0("arbitro-", generar_id_seguro(Име)))
-search_competiciones <- competiciones_unicas_df %>% mutate(Име = nombre_completo, Тип = "Натпреварување", target_id = paste0("menu-competicion-", competicion_id)) %>% select(Име, Тип, target_id)
-search_index_df <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones) %>% arrange(Име)
+
+# --- 7.4: CORREGIDO - Crear índice de búsqueda unificado (con soporte multi-alfabeto) ---
+message("Креирање на индекс за пребарување со поддршка за латиница...")
+
+search_jugadoras <- jugadoras_stats_df %>% 
+  select(Име = Играч, id) %>% 
+  mutate(
+    Тип = "Играч", 
+    target_id = paste0("jugadora-", id),
+    search_terms = sapply(Име, generar_terminos_busqueda, USE.NAMES = FALSE)
+  ) %>% select(Име, Тип, target_id, search_terms)
+
+search_equipos <- data.frame(Име = unique(c(partidos_df$local,partidos_df$visitante))) %>% 
+  mutate(
+    Тип = "Тим", 
+    target_id = paste0("equipo-", generar_id_seguro(Име)),
+    search_terms = sapply(Име, generar_terminos_busqueda, USE.NAMES = FALSE)
+  )
+
+search_arbitros <- data.frame(Име = unique(arbitros_df$ime)) %>% 
+  mutate(
+    Тип = "Судија", 
+    target_id = paste0("arbitro-", generar_id_seguro(Име)),
+    search_terms = sapply(Име, generar_terminos_busqueda, USE.NAMES = FALSE)
+  )
+
+search_competiciones <- competiciones_unicas_df %>% 
+  mutate(
+    Име = nombre_completo, 
+    Тип = "Натпреварување", 
+    target_id = paste0("menu-competicion-", competicion_id),
+    search_terms = sapply(Име, generar_terminos_busqueda, USE.NAMES = FALSE)
+  ) %>% select(Име, Тип, target_id, search_terms)
+
+search_index_df <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones) %>% 
+  arrange(Име)
+
 search_data_json <- toJSON(search_index_df, auto_unbox = TRUE)
+
 
 # -------------------------------------------------------------------------
 # PASO 8 y 9: CSS, JS y Generación de HTML
@@ -188,7 +255,7 @@ script_js <- paste(
   "  const suggestionsContainer = document.getElementById('search-suggestions');",
   "  const query = input.value.trim().toLowerCase();",
   "  if (query.length < 2) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }",
-  "  const filteredResults = searchData.filter(item => item.Име.toLowerCase().includes(query));",
+  "  const filteredResults = searchData.filter(item => item.search_terms.includes(query));",
   "  const top5 = filteredResults.slice(0, 5);",
   "  if (top5.length === 0) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }",
   "  suggestionsContainer.innerHTML = top5.map(item => `<a href='#' onclick=\\\"mostrarPagina('${item.target_id}'); document.getElementById('search-suggestions').style.display='none'; return false;\\\"><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');",
@@ -206,7 +273,7 @@ script_js <- paste(
   "    resultsTitle.innerText = 'Резултати од пребарувањето';",
   "    mostrarPagina('search-results'); return;",
   "  }",
-  "  const filteredResults = searchData.filter(item => item.Име.toLowerCase().includes(query));",
+  "  const filteredResults = searchData.filter(item => item.search_terms.includes(query));",
   "  resultsTitle.innerText = `Резултати за: \\\"${input.value}\\\" (${filteredResults.length} пронајдени)`;",
   "  if (filteredResults.length === 0) { resultsList.innerHTML = '<p>Нема пронајдени резултати.</p>'; }",
   "  else { resultsList.innerHTML = '<ul>' + filteredResults.map(item =>`<li><a href='#' onclick=\\\"mostrarPagina('${item.target_id}')\\\">${item.Име} <span class='search-result-type'>(${item.Тип})</span></a></li>`).join('') + '</ul>'; }",
@@ -245,6 +312,7 @@ script_js <- paste(
   "}",
   collapse = "\n"
 )
+
 
 # --- 9.1: Página del Portal (Página de inicio) ---
 pagina_portal <- tags$div(
