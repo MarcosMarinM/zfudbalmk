@@ -1,5 +1,5 @@
 # =========================================================================
-# SCRIPT DE GENERACIÓN DE INFORME HTML (VERSIÓN MULTI-COMPETICIÓN FINAL CORREGIDA)
+# SCRIPT DE GENERACIÓN DE INFORME HTML
 # =========================================================================
 
 # -------------------------------------------------------------------------
@@ -11,37 +11,58 @@ pacman::p_load(
 )
 
 # =========================================================================
-# FUNCIÓN AUXILIAR PARA GENERAR TÉRMINOS DE BÚSQUEDA MULTI-ALFABETO
+# FUNCIÓN AUXILIAR PARA GENERAR TÉRMINOS DE BÚSQUEDA
 # =========================================================================
 generar_terminos_busqueda <- function(nombre) {
-  # Convertir a minúsculas para consistencia
   nombre_lower <- tolower(nombre)
   
-  # Mapeo 1: Cirílico a Latino (varias opciones)
-  map_cyr_to_lat <- c(
-    'а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj g dj', 'е'='e',
-    'ж'='z zh ž', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l',
-    'љ'='lj l', 'м'='m', 'н'='n', 'њ'='nj n', 'о'='o', 'п'='p', 'р'='r',
-    'с'='s', 'т'='t', 'ќ'='kj k c ć', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c ts',
-    'ч'='c ch č', 'џ'='dz dzh dž', 'ш'='s sh š'
-  )
+  # Mapas de transliteración por "filosofía"
+  map_base <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 
+                'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
+                'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 
+                'с'='s', 'т'='t', 'ќ'='k', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
+                'ч'='c', 'џ'='dz', 'ш'='s')
   
-  # Mapeo 2: Latinos con diacríticos a latinos simples (para nombres ya en latino)
-  map_diacritic_to_simple <- c(
-    'š'='s sh', 'č'='c ch', 'ž'='z zh', 'đ'='dj d', 'ć'='c'
-  )
+  map_diacritic <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='đ', 'е'='e', 
+                     'ж'='ž', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
+                     'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
+                     'с'='s', 'т'='t', 'ќ'='ć', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
+                     'ч'='č', 'џ'='dž', 'ш'='š')
   
-  # Aplicar el segundo mapeo primero para normalizar cualquier diacrítico existente
-  nombre_lower <- str_replace_all(nombre_lower, map_diacritic_to_simple)
+  map_digraph <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj', 'е'='e', 
+                   'ж'='zh', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
+                   'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
+                   'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
+                   'ч'='ch', 'џ'='dzh', 'ш'='sh')
   
-  # Aplicar el mapeo principal de cirílico a latino
-  nombre_latin <- str_replace_all(nombre_lower, map_cyr_to_lat)
+  map_alternate <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='dj', 'е'='e', 
+                     'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
+                     'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
+                     'с'='s', 'т'='t', 'ќ'='c', 'у'='u', 'ф'='f', 'х'='h', 'ц'='ts', 
+                     'ч'='ch', 'џ'='dz', 'ш'='sh')
   
-  # Combinar el nombre original con sus variantes latinas
-  terminos_combinados <- paste(nombre_lower, nombre_latin)
+  # Mapas para caracteres especiales solicitados
+  map_k_rare <- c('ќ' = 'ḱ')
+  map_n_rare1 <- c('њ' = 'ń')
+  map_n_rare2 <- c('њ' = 'ñ')
   
-  # Limpiar espacios múltiples y devolver una única cadena de búsqueda
-  return(str_squish(terminos_combinados))
+  # Generar las diferentes versiones completas del nombre
+  v_base <- str_replace_all(nombre_lower, map_base)
+  v_diacritic <- str_replace_all(nombre_lower, map_diacritic)
+  v_digraph <- str_replace_all(nombre_lower, map_digraph)
+  v_alternate <- str_replace_all(nombre_lower, map_alternate)
+  v_k_rare <- str_replace_all(nombre_lower, map_k_rare)
+  v_n_rare1 <- str_replace_all(nombre_lower, map_n_rare1)
+  v_n_rare2 <- str_replace_all(nombre_lower, map_n_rare2)
+  
+  # Normalizar diacríticos que ya pudieran existir en el nombre original (ej. de serbio)
+  map_norm_diacritics <- c('š'='s', 'č'='c', 'ž'='z', 'đ'='dj', 'ć'='c', 'ń'='n', 'ñ'='n', 'ḱ'='k')
+  nombre_norm <- str_replace_all(nombre_lower, map_norm_diacritics)
+  
+  # Unir todas las versiones únicas en una sola cadena
+  all_terms <- unique(c(nombre_lower, nombre_norm, v_base, v_diacritic, v_digraph, v_alternate, v_k_rare, v_n_rare1, v_n_rare2))
+  
+  return(paste(all_terms, collapse = " "))
 }
 
 
@@ -116,24 +137,24 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
 
 # --- 7.3: Preparar datos globales para perfiles ---
 if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
-  jugadoras_stats_df <- data.frame(id=character(), Играч=character(), Тим=character(), Повикана=integer(), Одиграни_натпревари=integer(), Почетен_состав=integer(), Минути=numeric(), Голови=numeric(), Жолти=integer(), Црвени=integer(), stringsAsFactors = FALSE)
+  jugadoras_stats_df <- data.frame(id=character(), Фудбалерка=character(), Тим=character(), Повикана=integer(), Одиграни_натпревари=integer(), Почетен_состав=integer(), Минути=numeric(), Голови=numeric(), Жолти=integer(), Црвени=integer(), stringsAsFactors = FALSE)
 } else {
-  stats_generales <- apariciones_df %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Играч=first(nombre),Тим=last(equipo),Повикана=n_distinct(id_partido),Почетен_состав=sum(tipo=="Titular",na.rm=T),Минути=sum(minutos_jugados,na.rm=T),Одиграни_натпревари=sum(minutos_jugados>0,na.rm=T),.groups='drop')
+  stats_generales <- apariciones_df %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Фудбалерка=first(nombre),Тим=last(equipo),Повикана=n_distinct(id_partido),Почетен_состав=sum(tipo=="Titular",na.rm=T),Минути=sum(minutos_jugados,na.rm=T),Одиграни_натпревари=sum(minutos_jugados>0,na.rm=T),.groups='drop')
   goles_por_jugadora_global <- goles_df_unificado %>% filter(!is.na(id), tipo == "Normal") %>% group_by(id) %>% summarise(Голови = n(), .groups = 'drop')
   tarjetas_por_jugadora_global <- tarjetas_df_unificado %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Жолти=sum(tipo=="Amarilla",na.rm=T),Црвени=sum(tipo=="Roja",na.rm=T),.groups='drop')
-  jugadoras_stats_df <- stats_generales %>% left_join(goles_por_jugadora_global, by="id") %>% left_join(tarjetas_por_jugadora_global, by="id") %>% mutate(Голови=replace_na(Голови,0), Жолти=replace_na(Жолти,0), Црвени=replace_na(Црвени,0)) %>% select(id, Играч, Тим, Повикана, Одиграни_натпревари, Почетен_состав, Минути, Голови, Жолти, Црвени) %>% arrange(desc(Голови), desc(Минути))
+  jugadoras_stats_df <- stats_generales %>% left_join(goles_por_jugadora_global, by="id") %>% left_join(tarjetas_por_jugadora_global, by="id") %>% mutate(Голови=replace_na(Голови,0), Жолти=replace_na(Жолти,0), Црвени=replace_na(Црвени,0)) %>% select(id, Фудбалерка, Тим, Повикана, Одиграни_натпревари, Почетен_состав, Минути, Голови, Жолти, Црвени) %>% arrange(desc(Голови), desc(Минути))
 }
 arbitros_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$arbitro_principal)) NULL else data.frame(id_partido=.x$partido_info$id_partido,arbitro_principal=.x$arbitro_principal,arbitro_asist_1=.x$arbitro_asist_1,arbitro_asist_2=.x$arbitro_asist_2)) %>% pivot_longer(cols=starts_with("arbitro_"),names_to="uloga",values_to="ime",values_drop_na=T) %>% mutate(uloga=case_when(uloga=="arbitro_principal"~"Главен судија",uloga=="arbitro_asist_1"~"1-ви помошник",uloga=="arbitro_asist_2"~"2-ри помошник",T~uloga))
 estadios_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$estadio)) NULL else data.frame(id_partido=.x$partido_info$id_partido,estadio=.x$estadio)) %>% left_join(partidos_df,by="id_partido")
 
 
-# --- 7.4: CORREGIDO - Crear índice de búsqueda unificado (con soporte multi-alfabeto) ---
+# --- 7.4: Crear índice de búsqueda unificado (con soporte multi-alfabeto) ---
 message("Креирање на индекс за пребарување со поддршка за латиница...")
 
 search_jugadoras <- jugadoras_stats_df %>% 
-  select(Име = Играч, id) %>% 
+  select(Име = Фудбалерка, id) %>% 
   mutate(
-    Тип = "Играч", 
+    Тип = "Фудбалерка", 
     target_id = paste0("jugadora-", id),
     search_terms = sapply(Име, generar_terminos_busqueda, USE.NAMES = FALSE)
   ) %>% select(Име, Тип, target_id, search_terms)
@@ -164,6 +185,7 @@ search_index_df <- bind_rows(search_jugadoras, search_equipos, search_arbitros, 
   arrange(Име)
 
 search_data_json <- toJSON(search_index_df, auto_unbox = TRUE)
+
 
 
 # -------------------------------------------------------------------------
@@ -255,7 +277,11 @@ script_js <- paste(
   "  const suggestionsContainer = document.getElementById('search-suggestions');",
   "  const query = input.value.trim().toLowerCase();",
   "  if (query.length < 2) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }",
-  "  const filteredResults = searchData.filter(item => item.search_terms.includes(query));",
+  "  const searchTokens = query.split(' ').filter(t => t.length > 0);",
+  "  if (searchTokens.length === 0) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }",
+  "  const filteredResults = searchData.filter(item => {",
+  "    return searchTokens.every(token => item.search_terms.includes(token));",
+  "  });",
   "  const top5 = filteredResults.slice(0, 5);",
   "  if (top5.length === 0) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }",
   "  suggestionsContainer.innerHTML = top5.map(item => `<a href='#' onclick=\\\"mostrarPagina('${item.target_id}'); document.getElementById('search-suggestions').style.display='none'; return false;\\\"><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');",
@@ -273,7 +299,11 @@ script_js <- paste(
   "    resultsTitle.innerText = 'Резултати од пребарувањето';",
   "    mostrarPagina('search-results'); return;",
   "  }",
-  "  const filteredResults = searchData.filter(item => item.search_terms.includes(query));",
+  "  const searchTokens = query.split(' ').filter(t => t.length > 0);",
+  "  if (searchTokens.length === 0) { resultsList.innerHTML = '<p>Нема пронајдени резултати.</p>'; mostrarPagina('search-results'); return; }",
+  "  const filteredResults = searchData.filter(item => {",
+  "    return searchTokens.every(token => item.search_terms.includes(token));",
+  "  });",
   "  resultsTitle.innerText = `Резултати за: \\\"${input.value}\\\" (${filteredResults.length} пронајдени)`;",
   "  if (filteredResults.length === 0) { resultsList.innerHTML = '<p>Нема пронајдени резултати.</p>'; }",
   "  else { resultsList.innerHTML = '<ul>' + filteredResults.map(item =>`<li><a href='#' onclick=\\\"mostrarPagina('${item.target_id}')\\\">${item.Име} <span class='search-result-type'>(${item.Тип})</span></a></li>`).join('') + '</ul>'; }",
@@ -313,7 +343,6 @@ script_js <- paste(
   collapse = "\n"
 )
 
-
 # --- 9.1: Página del Portal (Página de inicio) ---
 pagina_portal <- tags$div(
   id = "portal", class = "page",
@@ -343,23 +372,23 @@ paginas_por_competicion <- map(1:nrow(competiciones_unicas_df), function(i) {
   calcular_clasificacion <- function(partidos) { if (is.null(partidos) || nrow(partidos) == 0) return(data.frame(Порака = "Нема обработени валидни натпревари.")); locales <- partidos %>% select(equipo = local, GF = goles_local, GC = goles_visitante); visitantes <- partidos %>% select(equipo = visitante, GF = goles_visitante, GC = goles_local); resultados_por_equipo <- bind_rows(locales, visitantes) %>% mutate(Pts = case_when(GF > GC ~ 3, GF < GC ~ 0, TRUE ~ 1), resultado = case_when(GF > GC ~ "Поб", GF < GC ~ "Пор", TRUE ~ "Нер")); clasificacion <- resultados_por_equipo %>% group_by(Тим = equipo) %>% summarise(Н = n(), Бод. = sum(Pts), Поб = sum(resultado == "Поб"), Нер = sum(resultado == "Нер"), Пор = sum(resultado == "Пор"), ДГ = sum(GF), ПГ = sum(GC), .groups = 'drop') %>% mutate(ГР = ДГ - ПГ) %>% arrange(desc(Бод.), desc(ГР), desc(ДГ)) %>% mutate(Поз. = row_number()) %>% select(Поз., Тим, Н, Поб, Нер, Пор, ДГ, ПГ, ГР, Бод.); return(clasificacion)}
   clasificacion_df_comp <- calcular_clasificacion(partidos_comp)
   goles_por_jugadora_comp <- goles_comp %>% filter(!is.na(id), tipo == "Normal") %>% group_by(id) %>% summarise(Голови = n(), .groups = 'drop')
-  jugadoras_info_comp <- apariciones_comp %>% distinct(id, Играч = nombre, Тим = equipo)
-  tabla_goleadoras_comp <- goles_por_jugadora_comp %>% left_join(jugadoras_info_comp, by="id") %>% filter(!is.na(Играч)) %>% arrange(desc(Голови)) %>% mutate(Поз. = min_rank(desc(Голови))) %>% select(Поз., id, Играч, Тим, Голови)
+  jugadoras_info_comp <- apariciones_comp %>% distinct(id, Фудбалерка = nombre, Тим = equipo)
+  tabla_goleadoras_comp <- goles_por_jugadora_comp %>% left_join(jugadoras_info_comp, by="id") %>% filter(!is.na(Фудбалерка)) %>% arrange(desc(Голови)) %>% mutate(Поз. = min_rank(desc(Голови))) %>% select(Поз., id, Фудбалерка, Тим, Голови)
   tarjetas_por_jugadora_comp <- tarjetas_comp %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Жолти=sum(tipo=="Amarilla",na.rm=T),Црвени=sum(tipo=="Roja",na.rm=T),.groups='drop')
-  tabla_sanciones_comp <- tarjetas_por_jugadora_comp %>% left_join(jugadoras_info_comp, by = "id") %>% filter(!is.na(Играч), Жолти > 0 | Црвени > 0) %>% arrange(desc(Црвени), desc(Жолти)) %>% mutate(Поз. = min_rank(desc(Црвени * 1000 + Жолти))) %>% select(Поз., id, Играч, Тим, Жолти, Црвени)
+  tabla_sanciones_comp <- tarjetas_por_jugadora_comp %>% left_join(jugadoras_info_comp, by = "id") %>% filter(!is.na(Фудбалерка), Жолти > 0 | Црвени > 0) %>% arrange(desc(Црвени), desc(Жолти)) %>% mutate(Поз. = min_rank(desc(Црвени * 1000 + Жолти))) %>% select(Поз., id, Фудбалерка, Тим, Жолти, Црвени)
   
   pagina_menu <- tags$div(id=paste0("menu-competicion-", comp_id), class="page", tags$a("← Назад кон порталот", href="#", onclick="mostrarPagina('portal')", class="back-link"), tags$h2(comp_nombre), tags$div(class="menu-container", tags$a(href="#", onclick=sprintf("mostrarPagina('partidos-%s')", comp_id), class="menu-button", "Распоред"), tags$a(href="#", onclick=sprintf("mostrarPagina('clasificacion-%s')", comp_id), class="menu-button", "Табела"), tags$a(href="#", onclick=sprintf("mostrarPagina('goleadoras-%s')", comp_id), class="menu-button", "Стрелци"), tags$a(href="#", onclick=sprintf("mostrarPagina('sanciones-%s')", comp_id), class="menu-button", "Дисциплинска")))
   jornadas_comp <- if (nrow(partidos_comp) > 0) sort(unique(partidos_comp$jornada)) else c()
   lista_partidos_html <- map(jornadas_comp, function(j) { partidos_jornada <- partidos_comp %>% filter(jornada == j) %>% arrange(local); tagList(tags$h3(class="jornada-header",paste("Коло",j)), map(1:nrow(partidos_jornada), function(i) { partido <- partidos_jornada[i,]; tags$a(class="partido-link", href="#", onclick=sprintf("mostrarPagina('partido-%s')", partido$id_partido), tags$span(class="equipo equipo-local", partido$local), tags$span(class="resultado", paste(partido$goles_local,"-",partido$goles_visitante)), tags$span(class="equipo equipo-visitante", partido$visitante)) })) })
   pagina_partidos <- tags$div(id=paste0("partidos-", comp_id), class="page", tags$a("← Назад кон менито",href="#",onclick=sprintf("mostrarPagina('menu-competicion-%s')", comp_id),class="back-link"),tags$h2(paste("Распоред -", comp_nombre)),lista_partidos_html)
   pagina_clasificacion <- tags$div(id=paste0("clasificacion-", comp_id), class="page", tags$a("← Назад кон менито",href="#",onclick=sprintf("mostrarPagina('menu-competicion-%s')", comp_id),class="back-link"), tags$h2(paste("Табела -", comp_nombre)), tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp),tags$th))),tags$tbody(map(1:nrow(clasificacion_df_comp),function(i){tr<-clasificacion_df_comp[i,];tags$tr(map(tr,function(cell){if(is.character(cell)&&cell%in%clasificacion_df_comp$Тим)tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('equipo-%s')",generar_id_seguro(cell)),cell))else tags$td(cell)}))}))))
-  pagina_goleadoras <- tags$div(id=paste0("goleadoras-", comp_id), class="page", tags$a("← Назад кон менито",href="#",onclick=sprintf("mostrarPagina('menu-competicion-%s')", comp_id),class="back-link"), tags$h2(paste("Листа на стрелци -", comp_nombre)), tags$table(tags$thead(tags$tr(map(names(tabla_goleadoras_comp%>%select(-id)),tags$th))),tags$tbody(map(1:nrow(tabla_goleadoras_comp),function(i){g<-tabla_goleadoras_comp[i,];tags$tr(tags$td(g$Поз.),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('jugadora-%s')",g$id),g$Играч)),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('equipo-%s')",generar_id_seguro(g$Тим)),g$Тим)),tags$td(g$Голови))}))))
-  pagina_sanciones <- tags$div(id=paste0("sanciones-", comp_id), class="page", tags$a("← Назад кон менито",href="#",onclick=sprintf("mostrarPagina('menu-competicion-%s')", comp_id),class="back-link"), tags$h2(paste("Дисциплинска евиденција -", comp_nombre)), tags$table(tags$thead(tags$tr(tags$th("Поз."), tags$th("Играч"), tags$th("Тим"), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp)>0) { map(1:nrow(tabla_sanciones_comp), function(i) {s<-tabla_sanciones_comp[i,];tags$tr(tags$td(s$Поз.),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('jugadora-%s')",s$id),s$Играч)),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('equipo-%s')",generar_id_seguro(s$Тим)),s$Тим)),tags$td(s$Жолти),tags$td(s$Црвени))})} else {tags$tr(tags$td(colspan="5","Нема регистрирани картони."))}) ))
+  pagina_goleadoras <- tags$div(id=paste0("goleadoras-", comp_id), class="page", tags$a("← Назад кон менито",href="#",onclick=sprintf("mostrarPagina('menu-competicion-%s')", comp_id),class="back-link"), tags$h2(paste("Листа на стрелци -", comp_nombre)), tags$table(tags$thead(tags$tr(map(names(tabla_goleadoras_comp%>%select(-id)),tags$th))),tags$tbody(map(1:nrow(tabla_goleadoras_comp),function(i){g<-tabla_goleadoras_comp[i,];tags$tr(tags$td(g$Поз.),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('jugadora-%s')",g$id),g$Фудбалерка)),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('equipo-%s')",generar_id_seguro(g$Тим)),g$Тим)),tags$td(g$Голови))}))))
+  pagina_sanciones <- tags$div(id=paste0("sanciones-", comp_id), class="page", tags$a("← Назад кон менито",href="#",onclick=sprintf("mostrarPagina('menu-competicion-%s')", comp_id),class="back-link"), tags$h2(paste("Дисциплинска евиденција -", comp_nombre)), tags$table(tags$thead(tags$tr(tags$th("Поз."), tags$th("Фудбалерка"), tags$th("Тим"), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp)>0) { map(1:nrow(tabla_sanciones_comp), function(i) {s<-tabla_sanciones_comp[i,];tags$tr(tags$td(s$Поз.),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('jugadora-%s')",s$id),s$Фудбалерка)),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('equipo-%s')",generar_id_seguro(s$Тим)),s$Тим)),tags$td(s$Жолти),tags$td(s$Црвени))})} else {tags$tr(tags$td(colspan="5","Нема регистрирани картони."))}) ))
   tagList(pagina_menu, pagina_partidos, pagina_clasificacion, pagina_goleadoras, pagina_sanciones)
 })
 
 # --- 9.3: Generación de páginas globales (perfiles) ---
-message("Генерирање на глобални страници (натпревари, играчи, тимови, судии)...")
+message("Генерирање на глобални страници (натпревари, Фудбалеркаи, тимови, судии)...")
 
 generar_cronologia_df <- function(id_p, resumen_partido) {
   goles_partido <- filter(goles_df_unificado, id_partido == id_p); tarjetas_partido <- filter(tarjetas_df_unificado, id_partido == id_p)
@@ -435,7 +464,7 @@ paginas_jugadoras_html <- map(1:nrow(jugadoras_stats_df), function(i) {
   
   tags$div(id=paste0("jugadora-",id_j), class="page",
            tags$a("← Назад", href="#", onclick="history.back()", class="back-link"),
-           tags$h2(jugadora$Играч),
+           tags$h2(jugadora$Фудбалерка),
            tags$h3("Резиме на кариера"),
            tags$table(class="career-summary-table",
                       tags$thead(
@@ -497,7 +526,7 @@ paginas_jugadoras_html <- map(1:nrow(jugadoras_stats_df), function(i) {
   )
 })
 
-paginas_equipos_html <- map(unique(c(partidos_df$local,partidos_df$visitante)),function(team){id_t<-generar_id_seguro(team);historial<-partidos_df%>%filter(local==team|visitante==team)%>%arrange(jornada);stats<-jugadoras_stats_df%>%filter(Тим==team)%>%select(id,Играч,Повикана,Одиграни_натпревари,Голови,Жолти,Црвени,Минути)%>%arrange(desc(Минути));headers<-c("Играч","Пов","Одиг","Гол","Ж","Ц","Мин");tags$div(id=paste0("equipo-",id_t),class="page",tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"),tags$h2(team),tags$h3("Статистика на играчи"),tags$table(id=paste0("stats-",id_t),tags$thead(tags$tr(map(seq_along(headers),function(i){tags$th(class="sortable-header",onclick=sprintf("sortTable('%s',%d)",paste0("stats-",id_t),i-1),headers[i])}))),tags$tbody(if(nrow(stats)>0){map(1:nrow(stats),function(j){p<-stats[j,];tags$tr(tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('jugadora-%s')",p$id),p$Играч)),tags$td(p$Повикана),tags$td(p$Одиграни_натпревари),tags$td(p$Голови),tags$td(p$Жолти),tags$td(p$Црвени),tags$td(p$Минути))})}else tags$tr(tags$td(colspan=length(headers),"Нема податоци.")))),tags$h3("Историја на натпревари"),tags$table(tags$thead(tags$tr(tags$th("Коло"),tags$th("Домаќин"),tags$th("Гостин"),tags$th("Резултат"))),tags$tbody(if(nrow(historial)>0){map(1:nrow(historial),function(p){partido<-historial[p,];tags$tr(tags$td(partido$jornada),tags$td(partido$local),tags$td(partido$visitante),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('partido-%s')",partido$id_partido),paste(partido$goles_local,"-",partido$goles_visitante))))})}else tags$tr(tags$td(colspan="4","Нема одиграни натпревари.")))),tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"))})
+paginas_equipos_html <- map(unique(c(partidos_df$local,partidos_df$visitante)),function(team){id_t<-generar_id_seguro(team);historial<-partidos_df%>%filter(local==team|visitante==team)%>%arrange(jornada);stats<-jugadoras_stats_df%>%filter(Тим==team)%>%select(id,Фудбалерка,Повикана,Одиграни_натпревари,Голови,Жолти,Црвени,Минути)%>%arrange(desc(Минути));headers<-c("Фудбалерка","Пов","Одиг","Гол","Ж","Ц","Мин");tags$div(id=paste0("equipo-",id_t),class="page",tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"),tags$h2(team),tags$h3("Статистика на Фудбалеркаи"),tags$table(id=paste0("stats-",id_t),tags$thead(tags$tr(map(seq_along(headers),function(i){tags$th(class="sortable-header",onclick=sprintf("sortTable('%s',%d)",paste0("stats-",id_t),i-1),headers[i])}))),tags$tbody(if(nrow(stats)>0){map(1:nrow(stats),function(j){p<-stats[j,];tags$tr(tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('jugadora-%s')",p$id),p$Фудбалерка)),tags$td(p$Повикана),tags$td(p$Одиграни_натпревари),tags$td(p$Голови),tags$td(p$Жолти),tags$td(p$Црвени),tags$td(p$Минути))})}else tags$tr(tags$td(colspan=length(headers),"Нема податоци.")))),tags$h3("Историја на натпревари"),tags$table(tags$thead(tags$tr(tags$th("Коло"),tags$th("Домаќин"),tags$th("Гостин"),tags$th("Резултат"))),tags$tbody(if(nrow(historial)>0){map(1:nrow(historial),function(p){partido<-historial[p,];tags$tr(tags$td(partido$jornada),tags$td(partido$local),tags$td(partido$visitante),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('partido-%s')",partido$id_partido),paste(partido$goles_local,"-",partido$goles_visitante))))})}else tags$tr(tags$td(colspan="4","Нема одиграни натпревари.")))),tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"))})
 
 paginas_arbitros_html <- map(unique(arbitros_df$ime),function(arb){id_a<-generar_id_seguro(arb);historial<-arbitros_df%>%filter(ime==arb)%>%left_join(partidos_df,by="id_partido")%>%arrange(jornada);tags$div(id=paste0("arbitro-",id_a),class="page",tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"),tags$h2(arb),tags$h3("Историја"),tags$table(tags$thead(tags$tr(tags$th("Коло"),tags$th("Натпревар"),tags$th("Резултат"),tags$th("Улога"))),tags$tbody(if(nrow(historial)>0){map(1:nrow(historial),function(p){partido<-historial[p,];tags$tr(tags$td(partido$jornada),tags$td(tags$a(href="#",onclick=sprintf("mostrarPagina('partido-%s')",partido$id_partido),paste(partido$local,"vs",partido$visitante))),tags$td(paste(partido$goles_local,"-",partido$goles_visitante)),tags$td(partido$uloga))})}else tags$tr(tags$td(colspan="4","Нема делегирани натпревари.")))),tags$a("← Назад",href="#",onclick="mostrarPagina('portal')",class="back-link"))})
 
@@ -544,7 +573,7 @@ pagina_completa <- tags$html(lang = "mk",
                                         tags$h1("Фудбалски портал МК"),
                                         tags$div(class = "search-container",
                                                  tags$form(action = "#", onsubmit = "showSearchResults(); return false;",
-                                                           tags$input(type = "text", id = "search-input", class = "search-input", placeholder = "Пребарај играч, тим, судија, натпреварување...", onkeyup = "handleSearchInput(event)"),
+                                                           tags$input(type = "text", id = "search-input", class = "search-input", placeholder = "Пребарај Фудбалерка, тим, судија, натпреварување...", onkeyup = "handleSearchInput(event)"),
                                                            tags$button(type = "submit", class = "search-button", "Пребарај")
                                                  ),
                                                  tags$div(id = "search-suggestions")
