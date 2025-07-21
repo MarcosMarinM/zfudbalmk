@@ -13,7 +13,7 @@ pacman::p_load(
 # -------------------------------------------------------------------------
 # PASO 1: DEFINIR RUTA Y OBTENER LISTA DE ARCHIVOS PDF
 # -------------------------------------------------------------------------
-ruta_pdfs <- "/Users/marcosmarinm/Downloads/ZFUDBALMK/24_25/"
+ruta_pdfs <- "Actas"
 archivos_pdf <- list.files(path = ruta_pdfs, pattern = "\\.pdf$", full.names = TRUE, recursive = TRUE)
 
 if (length(archivos_pdf) == 0) {

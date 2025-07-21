@@ -11,10 +11,13 @@ pacman::p_load(
 )
 
 # =========================================================================
-# FUNCIÓN AUXILIAR PARA GENERAR TÉRMINOS DE BÚSQUEDA
+# FUNCIÓN AUXILIAR PARA GENERAR TÉRMINOS DE BÚSQUEDA (VERSIÓN CORREGIDA Y MEJORADA)
 # =========================================================================
 generar_terminos_busqueda <- function(nombre) {
   nombre_lower <- tolower(nombre)
+  
+  # Inicializar una lista de todas las posibles versiones del nombre
+  versions <- c(nombre_lower)
   
   # Mapas de transliteración por "filosofía"
   map_base <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 
@@ -35,39 +38,34 @@ generar_terminos_busqueda <- function(nombre) {
                    'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
                    'ч'='ch', 'џ'='dzh', 'ш'='sh')
   
-  map_alternate <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 
+  map_alternate <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='dj', 'е'='e', 
                      'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
                      'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
                      'с'='s', 'т'='t', 'ќ'='c', 'у'='u', 'ф'='f', 'х'='h', 'ц'='ts', 
                      'ч'='ch', 'џ'='dz', 'ш'='sh')
   
-  # Mapas para caracteres especiales solicitados
-  map_k_rare <- c('ќ' = 'ḱ')
-  map_n_rare1 <- c('њ' = 'ń')
-  map_n_rare2 <- c('њ' = 'ñ')
+  map_xh <- c('џ'='xh')
   
-  # Generar las diferentes versiones completas del nombre
-  v_base <- str_replace_all(nombre_lower, map_base)
-  v_diacritic <- str_replace_all(nombre_lower, map_diacritic)
-  v_digraph <- str_replace_all(nombre_lower, map_digraph)
-  v_alternate <- str_replace_all(nombre_lower, map_alternate)
-  v_k_rare <- str_replace_all(nombre_lower, map_k_rare)
-  v_n_rare1 <- str_replace_all(nombre_lower, map_n_rare1)
-  v_n_rare2 <- str_replace_all(nombre_lower, map_n_rare2)
+  # Generar y añadir cada versión a la lista, siempre partiendo del original
+  versions <- c(versions, str_replace_all(nombre_lower, map_base))
+  versions <- c(versions, str_replace_all(nombre_lower, map_diacritic))
+  versions <- c(versions, str_replace_all(nombre_lower, map_digraph))
+  versions <- c(versions, str_replace_all(nombre_lower, map_alternate))
+  versions <- c(versions, str_replace_all(nombre_lower, map_xh))
+  versions <- c(versions, str_replace_all(nombre_lower, c('ќ' = 'ḱ')))
+  versions <- c(versions, str_replace_all(nombre_lower, c('њ' = 'ń')))
+  versions <- c(versions, str_replace_all(nombre_lower, c('њ' = 'ñ')))
   
   # Normalizar diacríticos que ya pudieran existir en el nombre original (ej. de serbio)
   map_norm_diacritics <- c('š'='s', 'č'='c', 'ž'='z', 'đ'='dj', 'ć'='c', 'ń'='n', 'ñ'='n', 'ḱ'='k')
-  nombre_norm <- str_replace_all(nombre_lower, map_norm_diacritics)
+  versions <- c(versions, str_replace_all(nombre_lower, map_norm_diacritics))
   
-  # Unir todas las versiones únicas en una sola cadena
-  all_terms <- unique(c(nombre_lower, nombre_norm, v_base, v_diacritic, v_digraph, v_alternate, v_k_rare, v_n_rare1, v_n_rare2))
-  
-  return(paste(all_terms, collapse = " "))
+  # Devolver una única cadena con todas las versiones únicas
+  return(paste(unique(versions), collapse = " "))
 }
 
 
 message("Започнување со генерирање на HTML извештајот...")
-
 
 # -------------------------------------------------------------------------
 # PASO 7: PREPARACIÓN DE DATOS
@@ -185,7 +183,6 @@ search_index_df <- bind_rows(search_jugadoras, search_equipos, search_arbitros, 
   arrange(Име)
 
 search_data_json <- toJSON(search_index_df, auto_unbox = TRUE)
-
 
 
 # -------------------------------------------------------------------------
