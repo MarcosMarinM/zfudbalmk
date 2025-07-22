@@ -244,7 +244,7 @@ procesar_acta <- function(acta_path) {
   fecha_hora_match <- str_match(texto_acta, "Датум/време: (\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2})")
   fecha <- if (!is.na(fecha_hora_match[1, 1])) fecha_hora_match[, 2] else "Desconocida"
   hora <- if (!is.na(fecha_hora_match[1, 1])) fecha_hora_match[, 3] else "Desconocida"
-  jornada_match <- str_match(texto_acta, "Коло: (\\d+)"); jornada <- if (!is.na(jornada_match[1, 1])) as.integer(jornada_match[, 2]) else NA
+  jornada_match <- str_match(texto_acta, "Коло:\\s*([^\\s\\n]+)"); jornada <- if (!is.na(jornada_match[1, 2])) str_trim(jornada_match[, 2]) else NA_character_
   estadio_match <- str_match(texto_acta, "Игралиште:\\s*([^\n]+)")
   estadio <- if (!is.na(estadio_match[1, 1])) str_remove(estadio_match[1, 2], "\\s+Р\\.бр:.*$") %>% str_trim() else "Desconocido"
   
