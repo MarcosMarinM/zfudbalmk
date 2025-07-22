@@ -20,9 +20,9 @@ generar_terminos_busqueda <- function(nombre) {
   versions <- c(nombre_lower)
   
   # Mapas de transliteración por "filosofía"
-  map_base <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 
+  map_base <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj', 'е'='e', 
                 'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
-                'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 
+                'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
                 'с'='s', 'т'='t', 'ќ'='k', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
                 'ч'='c', 'џ'='dz', 'ш'='s')
   
@@ -32,17 +32,17 @@ generar_terminos_busqueda <- function(nombre) {
                      'с'='s', 'т'='t', 'ќ'='ć', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
                      'ч'='č', 'џ'='dž', 'ш'='š')
   
-  map_digraph <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj', 'е'='e', 
+  map_digraph <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 
                    'ж'='zh', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
                    'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
                    'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
                    'ч'='ch', 'џ'='dzh', 'ш'='sh')
   
-  map_alternate <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='dj', 'е'='e', 
-                     'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
-                     'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
+  map_alternate <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='dj', 'е'='ë', 
+                     'ж'='z', 'з'='z', 'ѕ'='z', 'и'='i', 'ј'='j', 'к'='k', 'л'='ll', 
+                     'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 
                      'с'='s', 'т'='t', 'ќ'='c', 'у'='u', 'ф'='f', 'х'='h', 'ц'='ts', 
-                     'ч'='ch', 'џ'='xh', 'ш'='sh')
+                     'ч'='ç', 'џ'='xh', 'ш'='sh')
   
   map_xh <- c('џ'='xh')
   
@@ -800,7 +800,7 @@ paginas_estadios_html <- map(unique(na.omit(estadios_df$estadio)), function(est)
 })
 
 
-# --- PASO 9.4: AÑADIR SCRIPT DE CONTRASEÑA ---
+# --- PASO 9.4: AÑADIR SCRIPT DE CONTRASEÑA (VERSIÓN ROBUSTA CON BUCLE) ---
 script_contraseña <- tags$script(HTML(
   "
   (function() {
@@ -810,14 +810,35 @@ script_contraseña <- tags$script(HTML(
     
     var contraseñaIngresada = sessionStorage.getItem('zfudbalmk-password-ok');
     
-    if (contraseñaIngresada !== contraseñaCorrecta) {
-      var input = prompt('За да пристапите до извештајот, внесете ја лозинката:', '');
-      if (input !== contraseñaCorrecta) {
-        document.body.innerHTML = '<div style=\"text-align:center; padding: 50px; font-family: sans-serif;\"><h1>Пристапот е одбиен</h1><p>Погрешна лозинка.</p></div>';
-        alert('Погрешна лозинка.');
-      } else {
+    // Si ya tienen la contraseña correcta en la sesión, no hacemos nada más.
+    if (contraseñaIngresada === contraseñaCorrecta) {
+      return;
+    }
+    
+    var input;
+    var promptMessage = 'За да пристапите до извештајот, внесете ја лозинката:';
+    
+    // Bucle infinito que solo se rompe con la contraseña correcta o cancelando.
+    while (true) {
+      input = prompt(promptMessage, '');
+      
+      // CASO 1: Contraseña correcta.
+      if (input === contraseñaCorrecta) {
         sessionStorage.setItem('zfudbalmk-password-ok', input);
+        break; // Rompemos el bucle y la página se cargará.
       }
+      
+      // CASO 2: El usuario ha pulsado 'Cancelar'.
+      if (input === null) {
+        // Bloqueamos la página por completo y detenemos cualquier script posterior.
+        document.body.innerHTML = '<div style=\"text-align:center; padding: 50px; font-family: sans-serif;\"><h1>Пристапот е одбиен</h1><p>Процесот е откажан од страна на корисникот.</p></div>';
+        // Lanzamos un error para detener la ejecución de cualquier otro script en la página.
+        throw new Error('Access denied by user.');
+      }
+      
+      // CASO 3: Contraseña incorrecta.
+      // Cambiamos el mensaje para el siguiente intento y el bucle continuará.
+      promptMessage = 'Погрешна лозинка. Обидете се повторно:';
     }
   })();
   "
