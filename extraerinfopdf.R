@@ -10,6 +10,33 @@ pacman::p_load(
   pdftools, stringr, dplyr, tidyr, purrr, knitr
 )
 
+# =========================================================================
+# FUNCIÓN AUXILIAR PARA FORMATEAR MINUTOS DE TIEMPO AÑADIDO
+# =========================================================================
+formatear_minuto_partido <- function(minutos) {
+  # Esta función se aplica a un vector de minutos
+  sapply(minutos, function(minuto) {
+    # Si el minuto es NA o no es un número, lo devolvemos tal cual
+    if (is.na(minuto) || !is.numeric(minuto)) {
+      return(as.character(minuto))
+    }
+    
+    # La regla: si es mayor de 140, es un minuto de tiempo añadido
+    # y nos aseguramos de que tenga al menos 3 dígitos (ej. 451, 901)
+    if (minuto > 140 && nchar(as.character(minuto)) >= 3) {
+      minuto_str <- as.character(minuto)
+      base <- substr(minuto_str, 1, 2)
+      added <- substr(minuto_str, 3, nchar(minuto_str))
+      # Devolvemos el formato "base+añadido"
+      return(paste0(base, "+", added))
+    } else {
+      # Si no cumple la regla, devolvemos el minuto normal
+      return(as.character(minuto))
+    }
+  })
+}
+
+
 # -------------------------------------------------------------------------
 # PASO 1: DEFINIR RUTA Y OBTENER LISTA DE ARCHIVOS PDF
 # -------------------------------------------------------------------------
@@ -358,16 +385,17 @@ procesar_acta <- function(acta_path) {
   formatear_goles_texto <- function(df_goles) {
     if (is.null(df_goles) || nrow(df_goles) == 0) return("No hubo goles o no se pudieron procesar.")
     apply(df_goles, 1, function(g) {
-      if (g['tipo'] == "Autogol") paste0("Min ", g['minuto'], " - Gol de ", g['jugadora'], " (", g['equipo_jugadora'], ", autogol)")
-      else paste0("Min ", g['minuto'], " - Gol de ", g['jugadora'], " (", g['equipo_acreditado'], ")")
+      minuto_formateado <- formatear_minuto_partido(as.numeric(g['minuto']))
+      if (g['tipo'] == "Autogol") paste0("Min ", minuto_formateado, " - Gol de ", g['jugadora'], " (", g['equipo_jugadora'], ", autogol)")
+      else paste0("Min ", minuto_formateado, " - Gol de ", g['jugadora'], " (", g['equipo_acreditado'], ")")
     })
   }
   
   formatear_tarjetas_texto <- function(df_tarjetas) {
     if(is.null(df_tarjetas) || nrow(df_tarjetas) == 0) return("  No se registraron tarjetas.")
     df_tarjetas <- df_tarjetas[order(df_tarjetas$minuto), ]
-    apply(df_tarjetas, 1, function(t) paste0("  - Min ", t['minuto'], ": [", t['tipo'], "] para ", t['jugadora'], " (", t['equipo'], ") por '", t['motivo'], "'"))
-  }
+    apply(df_tarjetas, 1, function(t) paste0("  - Min ", formatear_minuto_partido(as.numeric(t['minuto'])), ": [", t['tipo'], "] para ", t['jugadora'], " (", t['equipo'], ") por '", t['motivo'], "'"))
+    }
   
   resumen_actual_lines <- c(
     "\n======================================================================", paste("INICIO DEL ACTA:", nombre_archivo), "======================================================================",
