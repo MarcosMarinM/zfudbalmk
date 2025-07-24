@@ -59,7 +59,7 @@ message("Estructura de directorios creada en: ", RUTA_BASE_SALIDA)
 generar_terminos_busqueda <- function(nombre) {
   nombre_lower <- tolower(nombre)
   versions <- c(nombre_lower)
-  map_base <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 'с'='s', 'т'='t', 'ќ'='k', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 'ч'='c', 'џ'='dz', 'ш'='s')
+  map_base <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj', 'е'='e', 'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 'љ'='lj', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 'ч'='c', 'џ'='dz', 'ш'='s')
   map_diacritic <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='đ', 'е'='e', 'ж'='ž', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='ll', 'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 'с'='s', 'т'='t', 'ќ'='ć', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 'ч'='č', 'џ'='dž', 'ш'='š')
   map_digraph <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 'ж'='zh', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 'ч'='ch', 'џ'='dzh', 'ш'='sh')
   map_alternate <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='dj', 'е'='ë', 'ж'='z', 'з'='z', 'ѕ'='z', 'и'='i', 'ј'='j', 'к'='k', 'л'='ll', 'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 'с'='s', 'т'='t', 'ќ'='c', 'у'='y', 'ф'='f', 'х'='h', 'ц'='ts', 'ч'='ç', 'џ'='xh', 'ш'='sh')
@@ -85,7 +85,7 @@ crear_botones_navegacion <- function(ruta_relativa_assets = ".") {
 }
 
 # =========================================================================
-# NUEVA FUNCIÓN: PLANTILLA HTML (SIN CAMBIOS)
+# NUEVA FUNCIÓN: PLANTILLA HTML (CON MODIFICACIÓN)
 # =========================================================================
 crear_pagina_html <- function(contenido_principal, titulo_pagina = "Фудбалски портал МК", ruta_relativa_assets = ".", search_data_json, script_contraseña) {
   tags$html(lang = "mk",
@@ -106,13 +106,19 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina = "Фудбал
                                 ),
                                 tags$div(id = "search-suggestions")
                        ),
-                       contenido_principal
+                       ### MODIFICACIÓN INICIO: Añadir un div para el contenido principal ###
+                       # Este 'div' nos permite reemplazar fácilmente el contenido con los resultados de la búsqueda.
+                       tags$div(id = "main-content",
+                                contenido_principal
+                       )
+                       ### MODIFICACIÓN FIN ###
               ),
               tags$script(type = "application/json", id = "search-data-json", HTML(search_data_json)),
               tags$script(defer = NA, src = file.path(ruta_relativa_assets, nombres_carpetas_mk$assets, "script.js"))
             )
   )
 }
+
 
 message("Започнување со генерирање на HTML извештајот...")
 
@@ -319,12 +325,20 @@ writeLines(estilo_css, file.path(RUTA_ASSETS, "style.css"))
 
 script_js <- r"(
 let searchData = [];
+
 document.addEventListener('DOMContentLoaded', initializeSearch);
+
 function initializeSearch() {
   const searchDataElement = document.getElementById('search-data-json');
   if (searchDataElement) {
-    try { searchData = JSON.parse(searchDataElement.textContent); } catch (e) { console.error('Error parsing search data JSON:', e); }
+    try { 
+      searchData = JSON.parse(searchDataElement.textContent); 
+    } catch (e) { 
+      console.error('Error parsing search data JSON:', e); 
+    }
   }
+  
+  // Ocultar sugerencias si se hace clic fuera del buscador
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer && !searchContainer.contains(event.target)) {
@@ -333,42 +347,23 @@ function initializeSearch() {
     }
   });
 }
+
 function toggleDetails(elementId) {
   const detailsRow = document.getElementById(elementId);
   if (detailsRow) {
-    if (detailsRow.style.display === 'table-row') {
-      detailsRow.style.display = 'none';
-    } else {
-      detailsRow.style.display = 'table-row';
-    }
+    detailsRow.style.display = (detailsRow.style.display === 'table-row') ? 'none' : 'table-row';
   }
 }
+
 function getBasePath() {
   const path = window.location.pathname;
   if (path.endsWith('.html') && !path.endsWith('index.html')) {
-      const segments = path.split('/');
-      if (segments.length > 2) return '..';
+    const segments = path.split('/');
+    if (segments.length > 2) return '..';
   }
   return '.';
 }
-function handleSearchInput(event) {
-  if (event.key === 'Enter') { event.preventDefault(); return; }
-  const input = document.getElementById('search-input');
-  const suggestionsContainer = document.getElementById('search-suggestions');
-  const query = input.value.trim().toLowerCase();
-  if (query.length < 2) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }
-  const searchTokens = query.split(' ').filter(t => t.length > 0);
-  if (searchTokens.length === 0) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }
-  const filteredResults = searchData.filter(item => {
-    return searchTokens.every(token => item.search_terms.includes(token));
-  });
-  const top5 = filteredResults.slice(0, 5);
-  if (top5.length === 0) { suggestionsContainer.innerHTML = ''; suggestionsContainer.style.display = 'none'; return; }
-  suggestionsContainer.innerHTML = top5.map(item => `<a href='${generateLink(item.target_id)}'><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');
-  suggestionsContainer.style.display = 'block';
-}
-### CAMBIO ###
-// Esta función ahora usa los nombres de carpeta en macedonio
+
 function generateLink(target_id) {
   const basePath = getBasePath();
   const parts = target_id.split('-');
@@ -390,6 +385,92 @@ function generateLink(target_id) {
   }
   return `${basePath}/${folder}/${id}.html`;
 }
+
+// MODIFICACIÓN: La función de sugerencias ahora también gestiona la tecla 'Enter'
+function handleSearchInput(event) {
+  // Si el usuario presiona Enter, ejecuta la búsqueda completa
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    showSearchResults();
+    return;
+  }
+
+  const input = document.getElementById('search-input');
+  const suggestionsContainer = document.getElementById('search-suggestions');
+  const query = input.value.trim().toLowerCase();
+  
+  if (query.length < 2) {
+    suggestionsContainer.innerHTML = '';
+    suggestionsContainer.style.display = 'none';
+    return;
+  }
+
+  const searchTokens = query.split(' ').filter(t => t.length > 0);
+  const filteredResults = searchData.filter(item => {
+    return searchTokens.every(token => item.search_terms.includes(token));
+  });
+
+  const top5 = filteredResults.slice(0, 5);
+  
+  if (top5.length === 0) {
+    suggestionsContainer.innerHTML = '';
+    suggestionsContainer.style.display = 'none';
+    return;
+  }
+
+  suggestionsContainer.innerHTML = top5.map(item => `<a href='${generateLink(item.target_id)}'><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');
+  suggestionsContainer.style.display = 'block';
+}
+
+// NUEVA FUNCIÓN: Muestra una página con todos los resultados de la búsqueda
+function showSearchResults() {
+  const input = document.getElementById('search-input');
+  const suggestionsContainer = document.getElementById('search-suggestions');
+  const mainContent = document.getElementById('main-content');
+  
+  if (!input || !mainContent) return; // Salida segura si los elementos no existen
+  
+  suggestionsContainer.style.display = 'none'; // Siempre ocultar sugerencias
+  const query = input.value.trim().toLowerCase();
+  const originalQuery = input.value.trim();
+
+  if (query.length < 2) {
+    mainContent.innerHTML = `<h2>Резултати од пребарувањето</h2>
+                             <p>Ве молиме внесете најмалку 2 карактери за да пребарувате.</p>
+                             ${crear_botones_navegacion('..').outerHTML}`;
+    return;
+  }
+
+  const searchTokens = query.split(' ').filter(t => t.length > 0);
+  const results = searchData.filter(item => {
+    return searchTokens.every(token => item.search_terms.includes(token));
+  });
+
+  let resultsHtml = `<h2>Резултати од пребарувањето за: "${originalQuery}"</h2>`;
+  
+  if (results.length > 0) {
+    resultsHtml += '<div id="search-results-list"><ul>';
+    results.forEach(item => {
+      resultsHtml += `
+        <li>
+          <a href="${generateLink(item.target_id)}">
+            ${item.Име}
+            <span class="search-result-type">(${item.Тип})</span>
+          </a>
+        </li>`;
+    });
+    resultsHtml += '</ul></div>';
+  } else {
+    resultsHtml += `<p>Нема пронајдени резултати за "${originalQuery}".</p>`;
+  }
+  
+  resultsHtml += `<div class="nav-buttons">
+                    <a href="${window.location.pathname}" class="back-link">← Врати се на претходната страница</a>
+                  </div>`;
+  
+  mainContent.innerHTML = resultsHtml;
+}
+
 function sortTable(tableId, columnIndex) {
   const table = document.getElementById(tableId); if(!table) return;
   const tbody = table.querySelector('tbody'); const rows = Array.from(tbody.querySelectorAll('tr')); const header = table.querySelectorAll('th')[columnIndex];
