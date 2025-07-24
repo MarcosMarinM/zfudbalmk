@@ -543,19 +543,19 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   comp_info <- competiciones_unicas_df[i,]
   comp_id <- comp_info$competicion_id
   comp_nombre <- comp_info$nombre_completo
+  is_cup <- str_detect(tolower(comp_info$competicion_nombre), "куп")
+  
+  # Filtramos los datos específicos para esta competición
   partidos_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada)
   ids_partidos_comp <- partidos_comp$id_partido
   goles_comp <- goles_df_unificado %>% filter(id_partido %in% ids_partidos_comp)
   tarjetas_comp <- tarjetas_df_unificado %>% filter(id_partido %in% ids_partidos_comp)
   apariciones_comp <- apariciones_df %>% filter(id_partido %in% ids_partidos_comp)
-  is_cup <- str_detect(tolower(comp_info$competicion_nombre), "куп")
   
   # ==========================================================
-  # 1. PÁGINA DE MENÚ DE LA COMPETICIÓN ([comp_id].html)
+  # 1. PÁGINA DE MENÚ DE LA COMPETICIÓN (Versión inicial sin el botón de porteras)
   # ==========================================================
-  ### CAMBIO ###
-  # Los enlaces (href) ahora usan los nombres de archivo macedonizados
-  contenido_menu_botones <- if (is_cup) {
+  contenido_menu_botones_inicial <- if (is_cup) {
     tags$div(class="menu-container",
              tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", "Распоред"),
              tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", "Стрелци"),
@@ -568,27 +568,27 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
              tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", "Дисциплинска"))
   }
   
-  contenido_menu_completo <- tagList(
+  contenido_menu_completo_inicial <- tagList(
     crear_botones_navegacion(ruta_relativa_assets = ".."),
     tags$h2(comp_nombre),
-    contenido_menu_botones
+    contenido_menu_botones_inicial
   )
   
-  pagina_menu_final <- crear_pagina_html(
-    contenido_principal = contenido_menu_completo,
+  pagina_menu_final_inicial <- crear_pagina_html(
+    contenido_principal = contenido_menu_completo_inicial,
     titulo_pagina = comp_nombre, 
     ruta_relativa_assets = "..",
     search_data_json = search_data_json, 
     script_contraseña = script_contraseña
   )
-  save_html(pagina_menu_final, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, ".html")))
+  save_html(pagina_menu_final_inicial, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, ".html")))
   
   # ==========================================================
   # 2. PÁGINA DE PARTIDOS/CALENDARIO 
   # ==========================================================
   jornadas_comp <- if (nrow(partidos_comp) > 0) {
     jornadas_unicas_df <- data.frame(jornada = unique(partidos_comp$jornada)) %>%
-      mutate(order_key = case_when(str_detect(jornada, "1/16") ~ 1, str_detect(jornada, "1/8") ~ 2, str_detect(jornada, "1/4") ~ 3, str_detect(jornada, "1/2") ~ 4, str_detect(jornada, "Ф$|ф$|финале") ~ 5, !is_cup ~ as.numeric(jornada), TRUE ~ 99)) %>%
+      mutate(order_key = case_when(str_detect(jornada, "1/16") ~ 1, str_detect(jornada, "1/8") ~ 2, str_detect(jornada, "1/4") ~ 3, str_detect(jornada, "1/2") ~ 4, str_detect(jornada, "Ф$|ф$|финале") ~ 5, !is_cup ~ as.numeric(suppressWarnings(jornada)), TRUE ~ 99)) %>%
       arrange(order_key)
     jornadas_unicas_df$jornada
   } else { c() }
@@ -603,8 +603,6 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
         tags$h3(class="jornada-header", header_text),
         map(1:nrow(partidos_jornada), function(k) {
           partido <- partidos_jornada[k,]
-          ### CAMBIO ###
-          # El enlace al partido apunta a la carpeta correcta
           tags$a(class="partido-link", 
                  href=file.path("..", nombres_carpetas_mk$partidos, paste0(partido$id_partido, ".html")),
                  tags$span(class="equipo equipo-local", partido$local),
@@ -616,8 +614,6 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   )
   
   pagina_partidos_final <- crear_pagina_html(contenido_partidos, paste("Распоред -", comp_nombre), "..", search_data_json, script_contraseña)
-  ### CAMBIO ###
-  # Se guarda el archivo con el nombre macedonizado
   save_html(pagina_partidos_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html")))
   
   
@@ -636,17 +632,156 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
                    tr <- clasificacion_df_comp[j,]
                    tags$tr(map(tr, function(cell) {
                      if(is.character(cell) && cell %in% clasificacion_df_comp$Тим) {
-                       ### CAMBIO ###
-                       # El enlace al equipo apunta a la carpeta correcta
                        tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(cell), ".html")), cell))
                      } else { tags$td(cell) }
                    }))
                  })))
     )
     pagina_clasificacion_final <- crear_pagina_html(contenido_clasificacion, paste("Табела -", comp_nombre), "..", search_data_json, script_contraseña)
-    ### CAMBIO ###
-    # Se guarda el archivo con el nombre macedonizado
     save_html(pagina_clasificacion_final, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html")))
+  }
+  
+  # ==========================================================
+  # SECCIÓN: PÁGINA DE PORTERAS (GOLMANKI)
+  # ==========================================================
+  
+  # Inicializamos las variables para evitar errores si no hay porteras
+  porteras_mas_50 <- NULL
+  porteras_menos_50 <- NULL
+  
+  # Filtramos solo las apariciones de porteras para esta competición
+  porteras_comp_df <- apariciones_comp %>%
+    filter(es_portera == TRUE, !is.na(id)) %>%
+    select(id, nombre, equipo, id_partido, minutos_jugados, min_entra, min_sale)
+  
+  # Calculamos los minutos totales posibles para cada equipo
+  minutos_totales_equipo <- partidos_comp %>%
+    group_by(equipo = local) %>% summarise(n_partidos = n()) %>%
+    bind_rows(partidos_comp %>% group_by(equipo = visitante) %>% summarise(n_partidos = n())) %>%
+    group_by(equipo) %>%
+    summarise(minutos_totales_posibles = sum(n_partidos) * 90)
+  
+  # Solo procedemos si hay datos de porteras y de minutos de equipos
+  if (nrow(porteras_comp_df) > 0 && nrow(minutos_totales_equipo) > 0) {
+    
+    lista_filas_porteras <- list()
+    
+    for (portera_id in unique(porteras_comp_df$id)) {
+      info_portera <- porteras_comp_df %>% filter(id == portera_id) %>% head(1)
+      partidos_jugados_portera <- porteras_comp_df %>% filter(id == portera_id)
+      goles_recibidos_total <- 0
+      porterias_a_cero <- 0
+      
+      for (row in 1:nrow(partidos_jugados_portera)) {
+        partido_actual <- partidos_jugados_portera[row, ]
+        equipo_portera <- partido_actual$equipo
+        id_partido_actual <- partido_actual$id_partido
+        
+        goles_recibidos_partido <- goles_comp %>%
+          filter(id_partido == id_partido_actual, equipo != equipo_portera)
+        
+        if (nrow(goles_recibidos_partido) > 0) {
+          goles_mientras_jugaba <- goles_recibidos_partido %>%
+            filter(minuto >= partido_actual$min_entra & minuto <= partido_actual$min_sale)
+          goles_recibidos_total <- goles_recibidos_total + nrow(goles_mientras_jugaba)
+        }
+        
+        goles_recibidos_equipo_partido <- partidos_comp %>%
+          filter(id_partido == id_partido_actual) %>%
+          mutate(goles_recibidos = if_else(local == equipo_portera, goles_visitante, goles_local)) %>%
+          pull(goles_recibidos)
+        
+        if (goles_recibidos_equipo_partido == 0) {
+          resumen_partido <- purrr::keep(resultados_exitosos, ~.x$partido_info$id_partido == id_partido_actual)[[1]]
+          cambios_partido <- bind_rows(resumen_partido$cambios_local, resumen_partido$cambios_visitante)
+          dorsales_cambios <- c()
+          if (!is.null(cambios_partido) && nrow(cambios_partido) > 0) {
+            dorsales_cambios <- unique(na.omit(c(as.numeric(str_match(cambios_partido$texto, "Entra .*?\\((\\d+)\\)")[, 2]), as.numeric(str_match(cambios_partido$texto, "por .*?\\((\\d+)\\)")[, 2]))))
+          }
+          dorsal_portera_partido <- apariciones_comp %>%
+            filter(id_partido == id_partido_actual, id == portera_id) %>% pull(dorsal) %>% head(1)
+          if (!(dorsal_portera_partido %in% dorsales_cambios)) {
+            porterias_a_cero <- porterias_a_cero + 1
+          }
+        }
+      }
+      
+      lista_filas_porteras[[length(lista_filas_porteras) + 1]] <- tibble(
+        id = portera_id, Фудбалерка = info_portera$nombre, Тим = info_portera$equipo,
+        Минути = sum(partidos_jugados_portera$minutos_jugados), ПГ = goles_recibidos_total, ЧМ = porterias_a_cero
+      )
+    }
+    
+    if (length(lista_filas_porteras) > 0) {
+      tabla_porteras_comp <- bind_rows(lista_filas_porteras) %>%
+        mutate(`ПГ/90` = if_else(Минути > 0, (ПГ / Минути) * 90, 0)) %>%
+        left_join(minutos_totales_equipo, by = c("Тим" = "equipo")) %>%
+        mutate(процент_минути = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Минути / minutos_totales_posibles) * 100, 0),
+               grupo = if_else(процент_минути >= 50, "mas_50", "menos_50")) %>%
+        select(id, Фудбалерка, Тим, `ПГ/90`, ПГ, Минути, ЧМ, grupo)
+      
+      porteras_mas_50 <- tabla_porteras_comp %>%
+        filter(grupo == "mas_50") %>% 
+        arrange(`ПГ/90`, desc(ЧМ)) %>% 
+        mutate(Поз. = row_number())
+      
+      porteras_menos_50 <- tabla_porteras_comp %>%
+        filter(grupo == "menos_50", Минути > 0) %>% 
+        arrange(`ПГ/90`, desc(ЧМ)) %>% 
+        mutate(Поз. = row_number())
+      
+      # Función auxiliar para generar el HTML de la tabla
+      generar_tabla_html_porteras <- function(df, table_id) {
+        if (is.null(df) || nrow(df) == 0) return(tags$p("Нема податоци во оваа категорија."))
+        tags$table(id = table_id, `data-sort-col` = "3", `data-sort-dir` = "asc",
+                   tags$thead(tags$tr(tags$th("Поз."), tags$th("Фудбалерка"), tags$th("Тим"),
+                                      tags$th(class="sortable-header asc", onclick=sprintf("sortTable('%s', 3)", table_id), "ПГ/90"),
+                                      tags$th("ПГ"), tags$th("Минути"),
+                                      tags$th(class="sortable-header", onclick=sprintf("sortTable('%s', 6)", table_id), "ЧМ"))),
+                   tags$tbody(map(1:nrow(df), function(j){
+                     p <- df[j,]; tags$tr(tags$td(p$Поз.),
+                                          tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(p$id, ".html")), p$Фудбалерка)),
+                                          tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(p$Тим), ".html")), p$Тим)),
+                                          tags$td(format(round(p$`ПГ/90`, 2), nsmall = 2)), tags$td(p$ПГ),
+                                          tags$td(p$Минути), tags$td(p$ЧМ))
+                   }))
+        )
+      }
+      
+      # Creamos el contenido de la página de porteras
+      contenido_porteras <- tagList(
+        crear_botones_navegacion(".."),
+        tags$h2(paste("Статистика на голманки -", comp_nombre)),
+        tags$h3("Фудбалерки со 50% или повеќе одиграни минути"),
+        generar_tabla_html_porteras(porteras_mas_50, "tabla-porteras-mas-50"),
+        tags$h3("Фудбалерки со помалку од 50% одиграни минути"),
+        generar_tabla_html_porteras(porteras_menos_50, "tabla-porteras-menos-50")
+      )
+      pagina_porteras_final <- crear_pagina_html(contenido_porteras, paste("Голманки -", comp_nombre), "..", search_data_json, script_contraseña)
+      save_html(pagina_porteras_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_golmanki.html")))
+      
+      # Y AHORA, SOBREESCRIBIMOS EL MENÚ PARA AÑADIR EL NUEVO BOTÓN
+      contenido_menu_botones_final <- if (is_cup) {
+        tags$div(class="menu-container",
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", "Распоред"),
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", "Стрелци"),
+                 tags$a(href=paste0(comp_id, "_golmanki.html"), class="menu-button", "Голманки"), # BOTÓN AÑADIDO
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", "Дисциплинска"))
+      } else {
+        tags$div(class="menu-container",
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", "Распоред"),
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"), class="menu-button", "Табела"),
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", "Стрелци"),
+                 tags$a(href=paste0(comp_id, "_golmanki.html"), class="menu-button", "Голманки"), # BOTÓN AÑADIDO
+                 tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", "Дисциплинска"))
+      }
+      contenido_menu_completo_final <- tagList(
+        crear_botones_navegacion(ruta_relativa_assets = ".."),
+        tags$h2(comp_nombre),
+        contenido_menu_botones_final)
+      pagina_menu_final_actualizada <- crear_pagina_html(contenido_menu_completo_final, comp_nombre, "..", search_data_json, script_contraseña)
+      save_html(pagina_menu_final_actualizada, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, ".html")))
+    }
   }
   
   # ==========================================================
@@ -665,11 +800,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
         g <- tabla_goleadoras_comp[j,]
         tags$tr(
           tags$td(g$Поз.),
-          ### CAMBIO ###
-          # El enlace a la jugadora apunta a la carpeta correcta
           tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(g$id, ".html")), g$Фудбалерка)),
-          ### CAMBIO ###
-          # El enlace al equipo apunta a la carpeta correcta
           tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(g$Тим), ".html")), g$Тим)),
           tags$td(g$Голови)
         )
@@ -677,8 +808,6 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
     )
   )
   pagina_goleadoras_final <- crear_pagina_html(contenido_goleadoras, paste("Стрелци -", comp_nombre), "..", search_data_json, script_contraseña)
-  ### CAMBIO ###
-  # Se guarda el archivo con el nombre macedonizado
   save_html(pagina_goleadoras_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html")))
   
   # ==========================================================
@@ -697,9 +826,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
           s <- tabla_sanciones_comp[j,]
           tags$tr(
             tags$td(s$Поз.),
-            ### CAMBIO ###
             tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(s$id, ".html")), s$Фудбалерка)),
-            ### CAMBIO ###
             tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(s$Тим), ".html")), s$Тим)),
             tags$td(s$Жолти),
             tags$td(s$Црвени)
@@ -711,19 +838,33 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
     )
   )
   pagina_sanciones_final <- crear_pagina_html(contenido_sanciones, paste("Дисциплинска -", comp_nombre), "..", search_data_json, script_contraseña)
-  ### CAMBIO ###
-  # Se guarda el archivo con el nombre macedonizado
   save_html(pagina_sanciones_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html")))
   
-}) # Fin del bucle walk para competiciones
+})
 
 # --- 9.3: Generación de páginas globales (perfiles) ---
 message("Генерирање на страници за секој натпревар, фудбалерка, тим, судија и стадион...")
 
-# Bucle para PARTIDOS
-walk(1:nrow(partidos_df), function(i) {
-  partido <- partidos_df[i, ]; id_p <- partido$id_partido
+# Enriquecemos partidos_df con el competicion_id para poder generar los enlaces
+partidos_df_enriquecido <- partidos_df %>%
+  left_join(
+    competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, competicion_id),
+    by = c("competicion_nombre", "competicion_temporada")
+  )
+
+# ====================================================================
+# Bucle para PARTIDOS (Ahora itera sobre el dataframe enriquecido)
+# ====================================================================
+walk(1:nrow(partidos_df_enriquecido), function(i) {
+  
+  ### LÍNEA MODIFICADA: Usamos el nuevo dataframe ###
+  partido <- partidos_df_enriquecido[i, ]
+  id_p <- partido$id_partido
+  
+  # Recopilación de todos los datos necesarios para la página del partido
   resumen_partido <- purrr::keep(resultados_exitosos, ~.x$partido_info$id_partido == id_p)[[1]]
+  # La función generar_cronologia_df() que mencionaste antes, la he vuelto a añadir aquí.
+  # Si no la tienes definida globalmente, simplemente borra la línea siguiente.
   cronologia <- generar_cronologia_df(id_p, resumen_partido) 
   arbitros_partido <- arbitros_df %>% filter(id_partido == id_p)
   estadio_info <- estadios_df %>% filter(id_partido == id_p) %>% head(1)
@@ -731,6 +872,11 @@ walk(1:nrow(partidos_df), function(i) {
   tarjetas_partido <- tarjetas_df_unificado %>% filter(id_partido == id_p)
   alineacion_partido <- apariciones_df %>% filter(id_partido == id_p)
   
+  ### NUEVO BLOQUE DE LÓGICA: Determinar el texto de la jornada/ronda ###
+  is_cup_match <- str_detect(tolower(partido$competicion_nombre), "куп")
+  jornada_texto <- if(is_cup_match) partido$jornada else paste("Коло", partido$jornada)
+  
+  # Función interna para renderizar las alineaciones (sin cambios)
   render_equipo_html <- function(df_equipo, goles_del_partido, tarjetas_del_partido) {
     if (is.null(df_equipo) || nrow(df_equipo) == 0) return(tags$p("Нема податоци."))
     starters <- df_equipo %>% filter(tipo == "Titular"); subs <- df_equipo %>% filter(tipo == "Suplente")
@@ -738,40 +884,46 @@ walk(1:nrow(partidos_df), function(i) {
       if (nrow(df_j) == 0) return(tags$p(style = "color:#777;", "Нема."))
       tags$ul(map(1:nrow(df_j), function(j) {
         jugadora <- df_j[j, ]; eventos_html <- tagList()
-        goles_jugadora <- goles_del_partido %>% filter(id == jugadora['id'], tipo == "Normal"); if (nrow(goles_jugadora) > 0) walk(1:nrow(goles_jugadora), function(g) { gol <- goles_jugadora[g, ]; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event goal", HTML(paste0("⚽ ", gol$minuto, "'")))) })
-        tarjetas_jugadora <- tarjetas_del_partido %>% filter(id == jugadora['id']); if (nrow(tarjetas_jugadora) > 0) walk(1:nrow(tarjetas_jugadora), function(c) { tarjeta <- tarjetas_jugadora[c, ]; icono_emoji <- if (tarjeta$tipo == "Amarilla") "🟨" else "🟥"; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event", HTML(paste0(icono_emoji, " ", tarjeta$minuto, "'")))) })
+        goles_jugadora <- goles_del_partido %>% filter(id == jugadora['id'], tipo == "Normal"); if (nrow(goles_jugadora) > 0) walk(1:nrow(goles_jugadora), function(g) { gol <- goles_jugadora[g, ]; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event goal", HTML(paste0("⚽ ", formatear_minuto_partido(gol$minuto), "'")))) })
+        tarjetas_jugadora <- tarjetas_del_partido %>% filter(id == jugadora['id']); if (nrow(tarjetas_jugadora) > 0) walk(1:nrow(tarjetas_jugadora), function(c) { tarjeta <- tarjetas_jugadora[c, ]; icono_emoji <- if (tarjeta$tipo == "Amarilla") "🟨" else "🟥"; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event", HTML(paste0(icono_emoji, " ", formatear_minuto_partido(tarjeta$minuto), "'")))) })
         if (!is.na(jugadora['min_entra']) && jugadora['tipo'] == "Suplente") eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-in", paste0("↑", jugadora['min_entra'], "'")))
         if (!is.na(jugadora['min_sale']) && jugadora['min_sale'] < 90 && !is.na(jugadora['minutos_jugados']) && jugadora['minutos_jugados'] > 0) eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-out", paste0("↓", jugadora['min_sale'], "'")))
         icono_p <- if (isTRUE(jugadora$es_portera)) "🧤" else ""; icono_c <- if (isTRUE(jugadora$es_capitana)) "(C)" else ""
-        ### CAMBIO ###
         tags$li(paste0(jugadora$dorsal, ". "), tags$a(href = file.path("..", nombres_carpetas_mk$jugadoras, paste0(jugadora$id, ".html")), jugadora$nombre), icono_p, icono_c, eventos_html)
       }))
     }
     tagList(tags$h4("Почетен состав"), crear_lista_jugadoras(starters), tags$h4("Резерви"), crear_lista_jugadoras(subs))
   }
   
+  # Creación del contenido HTML de la página del partido
   contenido_partido <- tagList(
     crear_botones_navegacion(".."),
-    tags$h2(paste(partido$local, "vs", partido$visitante)), 
-    tags$h3(paste("Конечен резултат:", partido$goles_local, "-", partido$goles_visitante)), 
-    ### CAMBIO ###
-    tags$p(paste0("Датум: ", partido$fecha, " | Време: ", partido$hora, " | Стадион: "), if (nrow(estadio_info) > 0) tags$a(href = file.path("..", nombres_carpetas_mk$estadios, paste0(generar_id_seguro(estadio_info$estadio), ".html")), estadio_info$estadio) else "Непознат"), 
-    tags$h3("Судии"), 
-    ### CAMBIO ###
-    tags$ul(class = "sudii-lista", map(1:nrow(arbitros_partido), function(a) { arb <- arbitros_partido[a, ]; tags$li(paste0(arb$uloga, ": "), tags$a(href = file.path("..", nombres_carpetas_mk$arbitros, paste0(generar_id_seguro(arb$ime), ".html")), arb$ime)) })), 
-    tags$h3("Состави"), 
-    tags$div(class = "alineaciones-container", 
-             ### CAMBIO ###
-             tags$div(class = "columna-alineacion", tags$h3(style = "text-align:center;border:none;", tags$a(href = file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(partido$local), ".html")), partido$local)), render_equipo_html(filter(alineacion_partido, equipo == partido$local), goles_partido, tarjetas_partido)), 
-             tags$div(class = "columna-alineacion", tags$h3(style = "text-align:center;border:none;", tags$a(href = file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(partido$visitante), ".html")), partido$visitante)), render_equipo_html(filter(alineacion_partido, equipo == partido$visitante), goles_partido, tarjetas_partido))), 
-    tags$h3("Хронологија"), 
-    tags$ul(class = "timeline", if (nrow(cronologia) > 0) { map(1:nrow(cronologia), function(c) { e <- cronologia[c, ]; tags$li(HTML(paste0("<span class='icon'>", e$icono, "</span>")), paste0(formatear_minuto_partido(e$minuto), "' - "), HTML(e$texto_evento)) }) } else { tags$li("Нема регистрирани настани.") }), 
+    tags$h2(paste(partido$local, "vs", partido$visitante)),
+    
+    ### NUEVO ELEMENTO HTML AÑADIDO ###
+    # Este párrafo muestra la competición (con enlace) y la jornada/ronda
+    tags$p(style = "text-align:center; font-size: 1.1em; color: #555; margin-top: -15px; margin-bottom: 20px;",
+           tags$a(href = file.path("..", nombres_carpetas_mk$competiciones, paste0(partido$competicion_id, ".html")),
+                  paste(partido$competicion_nombre, partido$competicion_temporada)),
+           " - ",
+           jornada_texto
+    ),
+    
+    tags$h3(paste("Конечен резултат:", partido$goles_local, "-", partido$goles_visitante)),
+    tags$p(paste0("Датум: ", partido$fecha, " | Време: ", partido$hora, " | Стадион: "), if (nrow(estadio_info) > 0) tags$a(href = file.path("..", nombres_carpetas_mk$estadios, paste0(generar_id_seguro(estadio_info$estadio), ".html")), estadio_info$estadio) else "Непознат"),
+    tags$h3("Судии"),
+    tags$ul(class = "sudii-lista", map(1:nrow(arbitros_partido), function(a) { arb <- arbitros_partido[a, ]; tags$li(paste0(arb$uloga, ": "), tags$a(href = file.path("..", nombres_carpetas_mk$arbitros, paste0(generar_id_seguro(arb$ime), ".html")), arb$ime)) })),
+    tags$h3("Состави"),
+    tags$div(class = "alineaciones-container",
+             tags$div(class = "columna-alineacion", tags$h3(style = "text-align:center;border:none;", tags$a(href = file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(partido$local), ".html")), partido$local)), render_equipo_html(filter(alineacion_partido, equipo == partido$local), goles_partido, tarjetas_partido)),
+             tags$div(class = "columna-alineacion", tags$h3(style = "text-align:center;border:none;", tags$a(href = file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(partido$visitante), ".html")), partido$visitante)), render_equipo_html(filter(alineacion_partido, equipo == partido$visitante), goles_partido, tarjetas_partido))),
+    tags$h3("Хронологија"),
+    tags$ul(class = "timeline", if (exists("cronologia") && nrow(cronologia) > 0) { map(1:nrow(cronologia), function(c) { e <- cronologia[c, ]; tags$li(HTML(paste0("<span class='icon'>", e$icono, "</span>")), paste0(formatear_minuto_partido(e$minuto), "' - "), HTML(e$texto_evento)) }) } else { tags$li("Нема регистрирани настани.") }),
     crear_botones_navegacion("..")
   )
   
+  # Generación final de la página HTML del partido
   pagina_partido_final <- crear_pagina_html(contenido_partido, paste(partido$local, "vs", partido$visitante), "..", search_data_json, script_contraseña)
-  ### CAMBIO ###
-  # Guarda el archivo en la carpeta correcta
   save_html(pagina_partido_final, file = file.path(RUTA_PARTIDOS, paste0(id_p, ".html")))
 })
 
