@@ -69,12 +69,29 @@ generar_terminos_busqueda <- function(nombre) {
   return(paste(unique(versions), collapse = " "))
 }
 generar_id_seguro <- function(nombre) {
-  map_id <- c('а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 'с'='s', 'т'='t', 'ќ'='k', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 'ч'='c', 'џ'='dz', 'ш'='s')
+  # Mapa de transliteración de cirílico a latino
+  map_id <- c(
+    'а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='gj', 'е'='e', 
+    'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
+    'љ'='lj', 'м'='m', 'н'='n', 'њ'='nj', 'о'='o', 'п'='p', 'р'='r', 
+    'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
+    'ч'='c', 'џ'='dz', 'ш'='s')
+  
+  # 1. Convertir a minúsculas y transliterar
   nombre_latin <- str_replace_all(tolower(nombre), map_id)
-  id_sanitizada <- gsub("[\\s/]+", "_", nombre_latin)
-  id_sanitizada <- gsub("[^a-z0-9_\\-]+", "", id_sanitizada)
-  id_sanitizada <- gsub("_{2,}", "_", id_sanitizada)
-  id_sanitizada <- gsub("^_+|_+$", "", id_sanitizada)
+  
+  # 2. Reemplazar espacios y slashes con guiones bajos
+  id_sanitizada <- str_replace_all(nombre_latin, "[\\s/]+", "_")
+  
+  # 3. CORRECCIÓN: Eliminar todos los caracteres no válidos.
+  #    Se usa str_replace_all en lugar del problemático gsub.
+  #    Esto resuelve el bug que eliminaba la letra 's'.
+  id_sanitizada <- str_replace_all(id_sanitizada, "[^a-z0-9_\\-]+", "")
+  
+  # 4. Limpiar guiones bajos duplicados o en los extremos
+  id_sanitizada <- str_replace_all(id_sanitizada, "_{2,}", "_")
+  id_sanitizada <- str_replace_all(id_sanitizada, "^_+|_+$", "")
+  
   return(id_sanitizada)
 }
 crear_botones_navegacion <- function(ruta_relativa_assets = ".") {
@@ -153,13 +170,6 @@ minutos_df_raw <- map_dfr(resultados_exitosos, function(res) {
   bind_rows(min_local, min_visitante) %>% mutate(id_partido = id_p)
 })
 
-generar_id_seguro <- function(nombre) {
-  id_sanitizada <- tolower(nombre)
-  id_sanitizada <- gsub("[\\s/]+", "_", id_sanitizada)
-  id_sanitizada <- gsub("[^\\p{L}0-9_\\-]+", "", id_sanitizada, perl = TRUE)
-  id_sanitizada <- gsub("^_+|_+$", "", id_sanitizada)
-  return(id_sanitizada)
-}
 
 preferred_id_map <- apariciones_df_raw %>% filter(!is.na(nombre), !is.na(id), str_detect(id, "^\\d{5,6}$")) %>% count(nombre, id, name = "frequency") %>% group_by(nombre) %>% filter(frequency == max(frequency)) %>% slice(1) %>% ungroup() %>% select(nombre, canonical_id = id)
 id_mapping <- apariciones_df_raw %>% filter(!is.na(nombre) & nchar(trimws(nombre)) > 2) %>% distinct(nombre) %>% left_join(preferred_id_map, by = "nombre") %>% mutate(final_id = if_else(!is.na(canonical_id), as.character(canonical_id), paste0("player_gen_", generar_id_seguro(nombre)))) %>% select(nombre, canonical_id = final_id)
