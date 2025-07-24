@@ -13,14 +13,30 @@ pacman::p_load(
 # =========================================================================
 # NUEVO PASO 6.5: DEFINIR RUTAS Y CREAR ESTRUCTURA DE DIRECTORIOS
 # =========================================================================
-RUTA_BASE_SALIDA <- "informe_web"
-RUTA_ASSETS <- file.path(RUTA_BASE_SALIDA, "assets")
-RUTA_COMPETICIONES <- file.path(RUTA_BASE_SALIDA, "competiciones")
-RUTA_PARTIDOS <- file.path(RUTA_BASE_SALIDA, "partidos")
-RUTA_JUGADORAS <- file.path(RUTA_BASE_SALIDA, "jugadoras")
-RUTA_EQUIPOS <- file.path(RUTA_BASE_SALIDA, "equipos")
-RUTA_ARBITROS <- file.path(RUTA_BASE_SALIDA, "arbitros")
-RUTA_ESTADIOS <- file.path(RUTA_BASE_SALIDA, "estadios")
+
+# Nombres en cirílico para visualización (si fuera necesario)
+nombres_carpetas_mk_cirilico <- list(base = "docs", assets = "assets", competiciones = "натпреварувања", partidos = "натпревари", jugadoras = "играчи", equipos = "тимови", arbitros = "судии", estadios = "стадиони")
+
+# Nombres en macedonio LATINIZADO para URLs y nombres de carpeta (más seguro)
+nombres_carpetas_latin <- list(
+  base = "docs",
+  assets = "assets",
+  competiciones = "natprevaruvanja",
+  partidos = "natprevari",
+  jugadoras = "igraci",
+  equipos = "timovi",
+  arbitros = "sudii",
+  estadios = "stadioni"
+)
+
+RUTA_BASE_SALIDA <- nombres_carpetas_latin$base
+RUTA_ASSETS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$assets)
+RUTA_COMPETICIONES <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$competiciones)
+RUTA_PARTIDOS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$partidos)
+RUTA_JUGADORAS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$jugadoras)
+RUTA_EQUIPOS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$equipos)
+RUTA_ARBITROS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$arbitros)
+RUTA_ESTADIOS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_latin$estadios)
 
 # Crear todos los directorios de una vez. showWarnings = FALSE evita avisos si ya existen.
 walk(c(RUTA_BASE_SALIDA, RUTA_ASSETS, RUTA_COMPETICIONES, RUTA_PARTIDOS, 
@@ -240,18 +256,16 @@ function generateLink(target_id) {
   const type = parts[0];
   const id_parts = parts.slice(1);
   
-  // Maneja casos donde el ID contiene guiones, como en 'menu-competicion-[...]'
   let id = id_parts.join('-'); 
   
   let folder;
   switch(type) {
-    case 'jugadora': folder = 'jugadoras'; break;
-    case 'equipo': folder = 'equipos'; break;
-    case 'arbitro': folder = 'arbitros'; break;
-    case 'стадион': folder = 'estadios'; break;
+    case 'jugadora': folder = 'igachi'; break; // O 'igraci'
+    case 'equipo': folder = 'timovi'; break;
+    case 'arbitro': folder = 'sudii'; break;
+    case 'стадион': folder = 'stadioni'; break;
     case 'menu': 
-      folder = 'competiciones';
-      // Para competiciones, el target_id es 'menu-competicion-[id]', así que quitamos 'competicion-'
+      folder = 'natprevaruvanja';
       id = id.replace('competicion-', '');
       break;
     default: return `${basePath}/index.html`;
@@ -337,15 +351,15 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   # Definimos los botones del menú con enlaces a los archivos HTML que VAMOS a crear
   contenido_menu_botones <- if (is_cup) {
     tags$div(class="menu-container",
-             tags$a(href=paste0(comp_id, "_partidos.html"), class="menu-button", "Распоред"),
-             tags$a(href=paste0(comp_id, "_goleadoras.html"), class="menu-button", "Стрелци"),
-             tags$a(href=paste0(comp_id, "_sanciones.html"), class="menu-button", "Дисциплинска"))
+             tags$a(href=paste0(comp_id, "_raspored.html"), class="menu-button", "Распоред"),
+             tags$a(href=paste0(comp_id, "_strelci.html"), class="menu-button", "Стрелци"),
+             tags$a(href=paste0(comp_id, "_disciplinska.html"), class="menu-button", "Дисциплинска"))
   } else {
     tags$div(class="menu-container",
-             tags$a(href=paste0(comp_id, "_partidos.html"), class="menu-button", "Распоред"),
-             tags$a(href=paste0(comp_id, "_clasificacion.html"), class="menu-button", "Табела"),
-             tags$a(href=paste0(comp_id, "_goleadoras.html"), class="menu-button", "Стрелци"),
-             tags$a(href=paste0(comp_id, "_sanciones.html"), class="menu-button", "Дисциплинска"))
+             tags$a(href=paste0(comp_id, "_raspored.html"), class="menu-button", "Распоред"),
+             tags$a(href=paste0(comp_id, "_tabela.html"), class="menu-button", "Табела"),
+             tags$a(href=paste0(comp_id, "_strelci.html"), class="menu-button", "Стрелци"),
+             tags$a(href=paste0(comp_id, "_disciplinska.html"), class="menu-button", "Дисциплинска"))
   }
   
   contenido_menu_completo <- tagList(
@@ -395,7 +409,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   )
   
   pagina_partidos_final <- crear_pagina_html(contenido_partidos, paste("Распоред -", comp_nombre), "..", search_data_json, script_contraseña)
-  save_html(pagina_partidos_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_partidos.html")))
+  save_html(pagina_partidos_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_raspored.html")))
   
   
   # ==========================================================
@@ -420,7 +434,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
                  })))
     )
     pagina_clasificacion_final <- crear_pagina_html(contenido_clasificacion, paste("Табела -", comp_nombre), "..", search_data_json, script_contraseña)
-    save_html(pagina_clasificacion_final, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, "_clasificacion.html")))
+    save_html(pagina_clasificacion_final, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, "_tabela.html")))
   }
   
   # ==========================================================
@@ -449,7 +463,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
     )
   )
   pagina_goleadoras_final <- crear_pagina_html(contenido_goleadoras, paste("Стрелци -", comp_nombre), "..", search_data_json, script_contraseña)
-  save_html(pagina_goleadoras_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_goleadoras.html")))
+  save_html(pagina_goleadoras_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_strelci.html")))
   
   # ==========================================================
   # 5. PÁGINA DE SANCIONES ([comp_id]_sanciones.html)
@@ -481,7 +495,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
     )
   )
   pagina_sanciones_final <- crear_pagina_html(contenido_sanciones, paste("Дисциплинска -", comp_nombre), "..", search_data_json, script_contraseña)
-  save_html(pagina_sanciones_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_sanciones.html")))
+  save_html(pagina_sanciones_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_disciplinska.html")))
   
 }) # Fin del bucle walk para competiciones
 

@@ -26,13 +26,10 @@ function toggleDetails(elementId) {
 }
 function getBasePath() {
   const path = window.location.pathname;
-  // Si la URL termina en .html, estamos en una subpágina.
   if (path.endsWith('.html') && !path.endsWith('index.html')) {
       const segments = path.split('/');
-      // Si hay más de 2 segmentos (ej. /repo/subfolder/page.html), estamos en una subcarpeta
       if (segments.length > 2) return '..';
   }
-  // Si no, estamos en la raíz (index.html o la carpeta principal)
   return '.';
 }
 function handleSearchInput(event) {
@@ -51,24 +48,23 @@ function handleSearchInput(event) {
   suggestionsContainer.innerHTML = top5.map(item => `<a href='${generateLink(item.target_id)}'><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');
   suggestionsContainer.style.display = 'block';
 }
+### CAMBIO ###
+// Esta función ahora usa los nombres de carpeta en macedonio
 function generateLink(target_id) {
   const basePath = getBasePath();
   const parts = target_id.split('-');
   const type = parts[0];
   const id_parts = parts.slice(1);
-  
-  // Maneja casos donde el ID contiene guiones, como en 'menu-competicion-[...]'
   let id = id_parts.join('-'); 
   
   let folder;
   switch(type) {
-    case 'jugadora': folder = 'jugadoras'; break;
-    case 'equipo': folder = 'equipos'; break;
-    case 'arbitro': folder = 'arbitros'; break;
-    case 'стадион': folder = 'estadios'; break;
+    case 'jugadora': folder = 'igraci'; break; 
+    case 'equipo': folder = 'timovi'; break;
+    case 'arbitro': folder = 'sudii'; break;
+    case 'стадион': folder = 'stadioni'; break;
     case 'menu': 
-      folder = 'competiciones';
-      // Para competiciones, el target_id es 'menu-competicion-[id]', así que quitamos 'competicion-'
+      folder = 'natprevaruvanja';
       id = id.replace('competicion-', '');
       break;
     default: return `${basePath}/index.html`;
