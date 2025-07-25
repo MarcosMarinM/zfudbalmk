@@ -1016,7 +1016,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
       # PASO 8: Generar el HTML con la tabla desplegable (VERSIÓN FINAL)
       contenido_defensas <- tagList(
         crear_botones_navegacion(".."),
-        tags$h2(paste("Најдобар дефанзивен трио -", comp_nombre)),
+        tags$h2(paste("Најдобро дефанзивно трио -", comp_nombre)),
         tags$p(style="text-align:center; font-style:italic; color:#555;", 
                "Дефанзивното трио од секој тим кое одиграло најмалку 50 % од можните минути заедно."),
         tags$table(class = "main-summary-table",
