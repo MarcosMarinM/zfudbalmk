@@ -46,4 +46,6 @@ th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { back
 #search-results-list a { font-size: 1.2em; text-decoration: none; }
 #search-results-list a:hover { text-decoration: underline; }
 .search-result-type { font-size: 0.85em; color: #6c757d; margin-left: 8px; }
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { background-color: #f0f8ff; }
 

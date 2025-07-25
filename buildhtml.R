@@ -14,7 +14,6 @@ pacman::p_load(
 # NUEVO PASO 6.5: DEFINIR RUTAS Y CREAR ESTRUCTURA DE DIRECTORIOS
 # =========================================================================
 
-### CAMBIO ###
 # Nombres de carpetas y archivos en macedonio para consistencia
 nombres_carpetas_mk <- list(
   base = "docs", 
@@ -34,7 +33,6 @@ nombres_archivos_mk <- list(
   sanciones = "disciplinska"
 )
 
-### CAMBIO ###
 # Se usan los nombres de la lista para definir las rutas dinámicamente
 RUTA_BASE_SALIDA <- nombres_carpetas_mk$base
 RUTA_ASSETS <- file.path(RUTA_BASE_SALIDA, nombres_carpetas_mk$assets)
@@ -82,10 +80,6 @@ generar_id_seguro <- function(nombre) {
   
   # 2. Reemplazar espacios y slashes con guiones bajos
   id_sanitizada <- str_replace_all(nombre_latin, "[\\s/]+", "_")
-  
-  # 3. CORRECCIÓN: Eliminar todos los caracteres no válidos.
-  #    Se usa str_replace_all en lugar del problemático gsub.
-  #    Esto resuelve el bug que eliminaba la letra 's'.
   id_sanitizada <- str_replace_all(id_sanitizada, "[^a-z0-9_\\-]+", "")
   
   # 4. Limpiar guiones bajos duplicados o en los extremos
@@ -184,6 +178,54 @@ tarjetas_raw_df <- map_dfr(resultados_exitosos, "tarjetas")
 if(nrow(tarjetas_raw_df) > 0) { tarjetas_df_unificado <- tarjetas_raw_df %>% mutate(jugadora = str_squish(jugadora)) %>% left_join(id_mapping, by = c("jugadora" = "nombre")) %>% select(-any_of(c("id", "id_jugadora"))) %>% rename(id = canonical_id)
 } else { tarjetas_df_unificado <- tibble(jugadora = character(), equipo = character(), dorsal = integer(), minuto = integer(), tipo = character(), motivo = character(), id_partido = character(), id = character()) }
 
+# --- 7.1.5: Procesar y traducir posiciones ---
+message("Процесирање и преведување на позиции на фудбалерки...")
+
+# 1. Crear un único DICCIONARIO de traducción.
+#    Este mapa contiene TODAS las posibilidades y las traduce directamente al macedonio.
+traduccion_completa_mk <- c(
+  # Porteras
+  "GK"             = "Голманка", 
+  "Portera"        = "Голманка",
+  # Defensas
+  "DL"             = "Одбрана", 
+  "DC"             = "Одбрана", 
+  "DR"             = "Одбрана", 
+  "DM"             = "Одбрана",
+  "WBL"            = "Одбрана", 
+  "WBR"            = "Одбрана", 
+  "Defensa"        = "Одбрана",
+  # Centrocampistas
+  "ML"             = "Среден ред", 
+  "MC"             = "Среден ред", 
+  "MR"             = "Среден ред", 
+  "AMC"            = "Среден ред",
+  "Centrocampista" = "Среден ред",
+  # Delanteras
+  "AML"            = "Напад", 
+  "AMR"            = "Напад", 
+  "SC"             = "Напад", 
+  "Delantera"      = "Напад"
+)
+
+# 2. Procesar el dataframe 'posiciones_df' con el nuevo diccionario.
+#    Esta lógica es ahora mucho más simple y directa.
+posiciones_procesadas_df <- posiciones_df %>%
+  # Usamos el diccionario para crear una nueva columna traducida.
+  # recode() es perfecto para esto. Si no encuentra una coincidencia, pone NA.
+  mutate(posicion_mk = recode(posicion, !!!traduccion_completa_mk, .default = NA_character_)) %>%
+  
+  # Quitamos cualquier fila que no se haya podido traducir
+  filter(!is.na(posicion_mk)) %>%
+  
+  # Agrupamos por jugadora para manejar los casos de múltiples posiciones
+  group_by(id) %>%
+  summarise(
+    # Obtenemos las posiciones únicas (ej. si es DC y DR, ambas son "Одбрана", unique() la deja sola)
+    # y las unimos con "/" si hay más de una categoría (ej. "Одбрана / Среден ред").
+    posicion_final_mk = paste(unique(posicion_mk), collapse = " / ")
+  ) %>%
+  ungroup()
 
 # --- 7.2: Identificar competiciones únicas ---
 message("Идентификување и подредување на уникатни натпреварувања...")
@@ -225,8 +267,13 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
   stats_generales <- apariciones_df %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Фудбалерка=first(nombre),Тим=last(equipo),Повикана=n_distinct(id_partido),Почетен_состав=sum(tipo=="Titular",na.rm=T),Минути=sum(minutos_jugados,na.rm=T),Одиграни_натпревари=sum(minutos_jugados>0,na.rm=T),.groups='drop')
   goles_por_jugadora_global <- goles_df_unificado %>% filter(!is.na(id), tipo == "Normal") %>% group_by(id) %>% summarise(Голови = n(), .groups = 'drop')
   tarjetas_por_jugadora_global <- tarjetas_df_unificado %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Жолти=sum(tipo=="Amarilla",na.rm=T),Црвени=sum(tipo=="Roja",na.rm=T),.groups='drop')
-  jugadoras_stats_df <- stats_generales %>% left_join(goles_por_jugadora_global, by="id") %>% left_join(tarjetas_por_jugadora_global, by="id") %>% mutate(Голови=replace_na(Голови,0), Жолти=replace_na(Жолти,0), Црвени=replace_na(Црвени,0)) %>% select(id, Фудбалерка, Тим, Повикана, Одиграни_натпревари, Почетен_состав, Минути, Голови, Жолти, Црвени) %>% arrange(desc(Голови), desc(Минути))
-}
+  jugadoras_stats_df <- stats_generales %>% 
+    left_join(goles_por_jugadora_global, by="id") %>% 
+    left_join(tarjetas_por_jugadora_global, by="id") %>%
+    left_join(posiciones_procesadas_df, by = "id") %>% 
+    mutate(Голови=replace_na(Голови,0), Жолти=replace_na(Жолти,0), Црвени=replace_na(Црвени,0)) %>% 
+    select(id, Фудбалерка, Тим, posicion_final_mk, Повикана, Одиграни_натпревари, Почетен_состав, Минути, Голови, Жолти, Црвени) %>% 
+    arrange(desc(Голови), desc(Минути))}
 arbitros_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$arbitro_principal)) NULL else data.frame(id_partido=.x$partido_info$id_partido,arbitro_principal=.x$arbitro_principal,arbitro_asist_1=.x$arbitro_asist_1,arbitro_asist_2=.x$arbitro_asist_2)) %>% pivot_longer(cols=starts_with("arbitro_"),names_to="uloga",values_to="ime",values_drop_na=T) %>% mutate(uloga=case_when(uloga=="arbitro_principal"~"Главен судија",uloga=="arbitro_asist_1"~"1-ви помошник",uloga=="arbitro_asist_2"~"2-ри помошник",T~uloga))
 estadios_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$estadio)) NULL else data.frame(id_partido=.x$partido_info$id_partido,estadio=.x$estadio)) %>% left_join(partidos_df,by="id_partido")
 
@@ -330,8 +377,14 @@ th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { back
 #search-results-list a { font-size: 1.2em; text-decoration: none; }
 #search-results-list a:hover { text-decoration: underline; }
 .search-result-type { font-size: 0.85em; color: #6c757d; margin-left: 8px; }
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { background-color: #f0f8ff; }
 )"
 writeLines(estilo_css, file.path(RUTA_ASSETS, "style.css"))
+
+
+
+
 
 script_js <- r"(
 let searchData = [];
@@ -356,6 +409,19 @@ function initializeSearch() {
       if(suggestions) suggestions.style.display = 'none';
     }
   });
+
+  // ================== NUEVO MANEJADOR DE CLICS (UBICACIÓN CORRECTA) ==================
+  // Delegación de eventos para manejar clics en filas de tabla clicables.
+  // Lo ponemos aquí para que se active una vez que la página ha cargado.
+  document.addEventListener('click', function(event) {
+    // 'closest' sube por el DOM para encontrar el ancestro más cercano que coincida
+    const clickableRow = event.target.closest('.clickable-row');
+    
+    if (clickableRow && clickableRow.dataset.href) {
+      window.location.href = clickableRow.dataset.href;
+    }
+  });
+  // =================================================================================
 }
 
 function toggleDetails(elementId) {
@@ -396,15 +462,12 @@ function generateLink(target_id) {
   return `${basePath}/${folder}/${id}.html`;
 }
 
-// MODIFICACIÓN: La función de sugerencias ahora también gestiona la tecla 'Enter'
 function handleSearchInput(event) {
-  // Si el usuario presiona Enter, ejecuta la búsqueda completa
   if (event.key === 'Enter') {
     event.preventDefault();
     showSearchResults();
     return;
   }
-
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const query = input.value.trim().toLowerCase();
@@ -414,12 +477,10 @@ function handleSearchInput(event) {
     suggestionsContainer.style.display = 'none';
     return;
   }
-
   const searchTokens = query.split(' ').filter(t => t.length > 0);
   const filteredResults = searchData.filter(item => {
     return searchTokens.every(token => item.search_terms.includes(token));
   });
-
   const top5 = filteredResults.slice(0, 5);
   
   if (top5.length === 0) {
@@ -427,57 +488,41 @@ function handleSearchInput(event) {
     suggestionsContainer.style.display = 'none';
     return;
   }
-
   suggestionsContainer.innerHTML = top5.map(item => `<a href='${generateLink(item.target_id)}'><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');
   suggestionsContainer.style.display = 'block';
 }
 
-// NUEVA FUNCIÓN: Muestra una página con todos los resultados de la búsqueda
 function showSearchResults() {
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const mainContent = document.getElementById('main-content');
   
-  if (!input || !mainContent) return; // Salida segura si los elementos no existen
+  if (!input || !mainContent) return;
   
-  suggestionsContainer.style.display = 'none'; // Siempre ocultar sugerencias
+  suggestionsContainer.style.display = 'none';
   const query = input.value.trim().toLowerCase();
   const originalQuery = input.value.trim();
-
   if (query.length < 2) {
-    mainContent.innerHTML = `<h2>Резултати од пребарувањето</h2>
-                             <p>Ве молиме внесете најмалку 2 карактери за да пребарувате.</p>
-                             ${crear_botones_navegacion('..').outerHTML}`;
+    mainContent.innerHTML = `<h2>Резултати од пребарувањето</h2><p>Ве молиме внесете најмалку 2 карактери за да пребарувате.</p>${crear_botones_navegacion('..').outerHTML}`;
     return;
   }
-
   const searchTokens = query.split(' ').filter(t => t.length > 0);
   const results = searchData.filter(item => {
     return searchTokens.every(token => item.search_terms.includes(token));
   });
-
   let resultsHtml = `<h2>Резултати од пребарувањето за: "${originalQuery}"</h2>`;
   
   if (results.length > 0) {
     resultsHtml += '<div id="search-results-list"><ul>';
     results.forEach(item => {
-      resultsHtml += `
-        <li>
-          <a href="${generateLink(item.target_id)}">
-            ${item.Име}
-            <span class="search-result-type">(${item.Тип})</span>
-          </a>
-        </li>`;
+      resultsHtml += `<li><a href="${generateLink(item.target_id)}">${item.Име}<span class="search-result-type">(${item.Тип})</span></a></li>`;
     });
     resultsHtml += '</ul></div>';
   } else {
     resultsHtml += `<p>Нема пронајдени резултати за "${originalQuery}".</p>`;
   }
   
-  resultsHtml += `<div class="nav-buttons">
-                    <a href="${window.location.pathname}" class="back-link">← Врати се на претходната страница</a>
-                  </div>`;
-  
+  resultsHtml += `<div class="nav-buttons"><a href="${window.location.pathname}" class="back-link">← Врати се на претходната страница</a></div>`;
   mainContent.innerHTML = resultsHtml;
 }
 
@@ -840,7 +885,238 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   pagina_sanciones_final <- crear_pagina_html(contenido_sanciones, paste("Дисциплинска -", comp_nombre), "..", search_data_json, script_contraseña)
   save_html(pagina_sanciones_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html")))
   
+  # ====================================================================
+  # 6. PÁGINA DE TRÍOS DEFENSIVOS (VERSIÓN 2.0 - REESCRITA)
+  # ====================================================================
+  message(paste("Computando tríos defensivos para:", comp_nombre))
+  
+  # PASO 1: Calcular los minutos totales posibles por equipo
+  minutos_totales_equipo_comp <- partidos_comp %>%
+    group_by(equipo = local) %>% summarise(n_partidos = n()) %>%
+    bind_rows(partidos_comp %>% group_by(equipo = visitante) %>% summarise(n_partidos = n())) %>%
+    group_by(equipo) %>%
+    summarise(minutos_totales_posibles = sum(n_partidos) * 90, .groups = 'drop')
+  
+  # PASO 2: Identificar todas las apariciones de defensas
+  defensas_comp_df <- apariciones_comp %>%
+    left_join(posiciones_procesadas_df, by = "id") %>%
+    filter(str_detect(posicion_final_mk, "Одбрана"), !is.na(min_entra), minutos_jugados > 0) %>%
+    select(id_partido, equipo, id, nombre, min_entra, min_sale)
+  
+  # PASO 3: Calcular minutos compartidos por cada trío en cada partido
+  trio_minutos_partido <- defensas_comp_df %>%
+    group_by(id_partido, equipo) %>%
+    filter(n() >= 3) %>%
+    group_modify(~ {
+      combn(.x$id, 3, simplify = FALSE) %>%
+        map_dfr(function(trio_ids) {
+          jugadoras_trio <- .x %>% filter(id %in% trio_ids)
+          minutos_compartidos <- max(0, min(jugadoras_trio$min_sale) - max(jugadoras_trio$min_entra))
+          tibble(trio_key = paste(sort(trio_ids), collapse = "-"),
+                 minutos_compartidos = minutos_compartidos,
+                 start_shared = max(jugadoras_trio$min_entra),
+                 end_shared = min(jugadoras_trio$min_sale))
+        })
+    }) %>%
+    ungroup() %>%
+    filter(minutos_compartidos > 0)
+  
+  # Solo continuar si hay datos
+  if(nrow(trio_minutos_partido) > 0) {
+    
+    # PASO 4: Agregar minutos totales y APLICAR EL FILTRO DEL 50%
+    trios_con_minutos_totales <- trio_minutos_partido %>%
+      group_by(equipo, trio_key) %>%
+      summarise(minutos_totales_juntas = sum(minutos_compartidos), .groups = 'drop') %>%
+      left_join(minutos_totales_equipo_comp, by = "equipo") %>%
+      mutate(pct_minutos_jugados = minutos_totales_juntas / minutos_totales_posibles) %>%
+      filter(pct_minutos_jugados >= 0.5)
+    
+    # PASO 5: Seleccionar el mejor trío de los que superaron el filtro
+    mejores_trios_filtrados <- trios_con_minutos_totales %>%
+      group_by(equipo) %>%
+      slice_max(order_by = minutos_totales_juntas, n = 1, with_ties = FALSE) %>%
+      ungroup()
+    
+    # Solo continuar si algún trío superó el filtro
+    if(nrow(mejores_trios_filtrados) > 0) {
+      
+
+      # PASO 6: CALCULAR GOLES RECIBIDOS (MÉTODO CORRECTO)
+      
+      # 1. Preparamos un dataframe que, para cada gol, sepa quién lo marcó Y QUIÉN LO RECIBIÓ.
+      #    Usamos 'partidos_comp' para obtener la información del rival.
+      goles_con_rival_df <- goles_comp %>%
+        left_join(partidos_comp %>% select(id_partido, local, visitante), by = "id_partido") %>%
+        mutate(
+          equipo_que_recibio_gol = case_when(
+            # Si el equipo que marcó es el local, el que recibió fue el visitante
+            equipo == local ~ visitante,
+            # Si el equipo que marcó es el visitante, el que recibió fue el local
+            equipo == visitante ~ local,
+            # En caso de autogol, el equipo que recibió es el acreditado con el gol
+            tipo == "Autogol" ~ equipo,
+            TRUE ~ NA_character_
+          )
+        ) %>%
+        filter(!is.na(equipo_que_recibio_gol)) %>%
+        select(id_partido, equipo_conceded = equipo_que_recibio_gol, minuto_gol = minuto)
+      
+      # 2. Ahora, el cálculo de goles es el mismo que antes, pero con el dataframe correcto.
+      goles_calculados <- pmap_dfr(mejores_trios_filtrados, function(...) {
+        trio_actual <- list(...)
+        intervalos_del_trio <- trio_minutos_partido %>%
+          filter(trio_key == trio_actual$trio_key, equipo == trio_actual$equipo)
+        
+        goles_en_intervalos <- pmap_dbl(intervalos_del_trio, function(...) {
+          intervalo_actual <- list(...)
+          goles_contados <- goles_con_rival_df %>%
+            filter(id_partido == intervalo_actual$id_partido,
+                   equipo_conceded == intervalo_actual$equipo,
+                   minuto_gol >= intervalo_actual$start_shared,
+                   minuto_gol <= intervalo_actual$end_shared) %>%
+            nrow()
+          return(goles_contados)
+        })
+        
+        tibble(
+          equipo = trio_actual$equipo,
+          trio_key = trio_actual$trio_key,
+          goles_recibidos_juntas = sum(goles_en_intervalos)
+        )
+      })
+      
+      # PASO 7: Preparar la tabla final para el HTML
+      id_nombre_map <- apariciones_comp %>% distinct(id, nombre)
+      
+      # ============================ INICIO DE LA CORRECCIÓN ============================
+      
+      tabla_final_defensas <- mejores_trios_filtrados %>%
+        left_join(goles_calculados, by = c("equipo", "trio_key")) %>%
+        mutate(goles_recibidos_juntas = replace_na(goles_recibidos_juntas, 0)) %>%
+        # 1. CREAMOS LAS COLUMNAS CON SUS NOMBRES FINALES PRIMERO
+        mutate(
+          `Клуб` = equipo,
+          `Минути заедно` = minutos_totales_juntas,
+          `Примени голови` = goles_recibidos_juntas,
+          `Примени/90мин` = if_else(minutos_totales_juntas > 0, (goles_recibidos_juntas / minutos_totales_juntas) * 90, 0)
+        ) %>%
+        rowwise() %>%
+        mutate(
+          `Трио` = paste(sapply(strsplit(trio_key, "-")[[1]], function(id) id_nombre_map$nombre[id_nombre_map$id == id][1]), collapse = " - ")
+        ) %>%
+        ungroup() %>%
+        # 2. AHORA QUE LAS COLUMNAS EXISTEN, PODEMOS ORDENAR POR ELLAS
+        arrange(`Примени/90мин`, `Примени голови`) %>%
+        # 3. FINALMENTE, SELECCIONAMOS LAS COLUMNAS EN EL ORDEN DESEADO
+        mutate(`Поз.` = row_number()) %>%
+        select(`Поз.`, `Трио`, `Клуб`, `Минути заедно`, `Примени голови`, `Примени/90мин`, trio_key)
+      
+      
+      # PASO 8: Generar el HTML con la tabla desplegable (VERSIÓN FINAL)
+      contenido_defensas <- tagList(
+        crear_botones_navegacion(".."),
+        tags$h2(paste("Најдобар дефанзивен трио -", comp_nombre)),
+        tags$p(style="text-align:center; font-style:italic; color:#555;", 
+               "Дефанзивното трио од секој тим кое одиграло најмалку 50 % од можните минути заедно."),
+        tags$table(class = "main-summary-table",
+                   tags$thead(tags$tr(map(names(tabla_final_defensas %>% select(-trio_key)), tags$th))),
+                   tags$tbody(
+                     # Iteramos sobre cada fila del dataframe de la tabla final
+                     pmap(tabla_final_defensas, function(...) {
+                       fila <- list(...)
+                       details_id <- paste0("details-trio-", fila$Поз.) # Usar la posición como ID único
+                       
+                       partidos_del_trio <- trio_minutos_partido %>%
+                         filter(trio_key == fila$trio_key) %>%
+                         left_join(partidos_comp, by = "id_partido") %>%
+                         select(id_partido, local, visitante, goles_local, goles_visitante, minutos_compartidos)
+                       
+                       tagList(
+                         tags$tr(class = "summary-row", onclick = sprintf("toggleDetails('%s')", details_id),
+                                 tags$td(fila$Поз.),
+                                 tags$td(fila$Трио),
+                                 tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(fila$Клуб), ".html")), 
+                                                onclick="event.stopPropagation();", fila$Клуб)),
+                                 tags$td(round(fila$`Минути заедно`)),
+                                 tags$td(fila$`Примени голови`),
+                                 tags$td(format(round(fila$`Примени/90мин`, 2), nsmall = 2))
+                         ),
+                         tags$tr(id = details_id, class = "details-row",
+                                 tags$td(colspan = "6", 
+                                         tags$div(class = "details-content",
+                                                  tags$h4("Одиграни натпревари заедно"),
+                                                  tags$table(class="details-table",
+                                                             tags$thead(tags$tr(tags$th("Натпревар"), tags$th("Резултат"), tags$th("Минути заедно"))),
+                                                             tags$tbody(
+                                                               map(1:nrow(partidos_del_trio), function(p_idx) {
+                                                                 partido <- partidos_del_trio[p_idx,]
+                                                                 enlace_partido <- file.path("..", nombres_carpetas_mk$partidos, paste0(partido$id_partido, ".html"))
+                                                                 tags$tr(class = "clickable-row", `data-href` = enlace_partido,
+                                                                         tags$td(paste(partido$local, "vs", partido$visitante)),
+                                                                         tags$td(paste(partido$goles_local, "-", partido$goles_visitante)),
+                                                                         tags$td(round(partido$minutos_compartidos))
+                                                                 )
+                                                               })
+                                                             )
+                                                  )
+                                         )
+                                 )
+                         )
+                       )
+                     })
+                   )
+        )
+      )
+      
+      # Guardar la página HTML y actualizar el menú (esta parte no cambia)
+      nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html")
+      save_html(crear_pagina_html(contenido_defensas, paste("Дефанзивно трио -", comp_nombre), "..", search_data_json, script_contraseña),
+                file.path(RUTA_COMPETICIONES, nombre_archivo_defensas))
+      
+    
+    # CORRECCIÓN: Volvemos a generar el menú de la competición para añadir el nuevo botón.
+    # Esta es una forma robusta de hacerlo, sin manipular los tags directamente.
+    nuevo_boton_defensa <- tags$a(href=nombre_archivo_defensas, class="menu-button", "Дефанзивно трио")
+    
+    botones_menu <- if (is_cup) {
+      tagList(
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", "Распоред"),
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", "Стрелци"),
+        # Aquí puedes decidir el orden de los botones
+        nuevo_boton_defensa,
+        tags$a(href=paste0(comp_id, "_golmanki.html"), class="menu-button", "Голманки"),
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", "Дисциплинска")
+      )
+    } else {
+      tagList(
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", "Распоред"),
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"), class="menu-button", "Табела"),
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", "Стрелци"),
+        nuevo_boton_defensa,
+        tags$a(href=paste0(comp_id, "_golmanki.html"), class="menu-button", "Голманки"),
+        tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", "Дисциплинска")
+      )
+    }
+    
+    contenido_menu_final <- tagList(
+      crear_botones_navegacion(ruta_relativa_assets = ".."),
+      tags$h2(comp_nombre),
+      tags$div(class="menu-container", botones_menu)
+    )
+    
+    save_html(crear_pagina_html(contenido_menu_final, comp_nombre, "..", search_data_json, script_contraseña), 
+              file = file.path(RUTA_COMPETICIONES, paste0(comp_id, ".html")))
+  }
+  
+  }
 })
+
+
+
+
+
+
 
 # --- 9.3: Generación de páginas globales (perfiles) ---
 message("Генерирање на страници за секој натпревар, фудбалерка, тим, судија и стадион...")
@@ -853,18 +1129,15 @@ partidos_df_enriquecido <- partidos_df %>%
   )
 
 # ====================================================================
-# Bucle para PARTIDOS (Ahora itera sobre el dataframe enriquecido)
+# Bucle para PARTIDOS 
 # ====================================================================
 walk(1:nrow(partidos_df_enriquecido), function(i) {
   
-  ### LÍNEA MODIFICADA: Usamos el nuevo dataframe ###
   partido <- partidos_df_enriquecido[i, ]
   id_p <- partido$id_partido
   
   # Recopilación de todos los datos necesarios para la página del partido
   resumen_partido <- purrr::keep(resultados_exitosos, ~.x$partido_info$id_partido == id_p)[[1]]
-  # La función generar_cronologia_df() que mencionaste antes, la he vuelto a añadir aquí.
-  # Si no la tienes definida globalmente, simplemente borra la línea siguiente.
   cronologia <- generar_cronologia_df(id_p, resumen_partido) 
   arbitros_partido <- arbitros_df %>% filter(id_partido == id_p)
   estadio_info <- estadios_df %>% filter(id_partido == id_p) %>% head(1)
@@ -937,7 +1210,15 @@ walk(1:nrow(jugadoras_stats_df), function(i) {
   
   contenido_jugadora <- tagList(
     crear_botones_navegacion(".."),
-    tags$h2(jugadora$Фудбалерка),
+    
+    tags$h2(
+      jugadora$Фудбалерка,
+      # Si la posición NO es NA, añadimos un <span> con ella
+      if (!is.na(jugadora$posicion_final_mk)) {
+        tags$span(style = "font-size: 0.6em; color: #555; vertical-align: middle; margin-left: 15px;", 
+                  jugadora$posicion_final_mk)
+      }
+    ),
     tags$h3("Резиме на кариера"),
     tags$table(class="career-summary-table", tags$thead(tags$tr(tags$th("Сезона"), tags$th("Тим"), tags$th("Натпреварување"), tags$th("Наст."), tags$th("Гол."), tags$th("Мин."))),
                tags$tbody(map(1:nrow(player_career_final), function(j) {

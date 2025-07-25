@@ -7,7 +7,7 @@
 # -------------------------------------------------------------------------
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
-  pdftools, stringr, dplyr, tidyr, purrr, knitr
+  pdftools, stringr, dplyr, tidyr, purrr, knitr, readxl
 )
 
 # =========================================================================
@@ -36,6 +36,108 @@ formatear_minuto_partido <- function(minutos) {
   })
 }
 
+# =========================================================================
+# FUNCIÓN PARA CARGAR Y PROCESAR POSICIONES DESDE XLS 
+# =========================================================================
+
+cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
+  
+  if (!file.exists(ruta_xls)) {
+    warning(paste("Archivo de posiciones no encontrado en:", ruta_xls, "- Se continuará sin datos de posición."))
+    return(tibble(id = character(), posicion = character()))
+  }
+  
+  message("Cargando y procesando el archivo de posiciones: ", basename(ruta_xls))
+  
+  datos_xls <- tryCatch({ read_excel(ruta_xls) }, error = function(e) {
+    warning("Error al leer el archivo .xls. Se continuará sin datos de posición.")
+    return(NULL)
+  })
+  
+  if (is.null(datos_xls) || !"FA ID Number" %in% names(datos_xls)) {
+    warning("El archivo XLS no contiene la columna 'FA ID Number'. No se pueden procesar las posiciones.")
+    return(tibble(id = character(), posicion = character()))
+  }
+  
+  datos_xls <- datos_xls %>%
+    select(-any_of("ID")) %>% 
+    rename(ID = `FA ID Number`)
+  
+  ids_jugadoras_validas <- as.character(ids_jugadoras_validas)
+  datos_xls <- datos_xls %>% mutate(ID = as.character(ID))
+  
+  datos_relevantes_xls <- datos_xls %>% 
+    filter(ID %in% ids_jugadoras_validas)
+  
+  if(nrow(datos_relevantes_xls) == 0) {
+    message("Ninguna de las jugadoras del archivo XLS coincide con las jugadoras procesadas de las actas.")
+    return(tibble(id = character(), posicion = character()))
+  }
+  
+  # ============================ INICIO DE LA CORRECCIÓN LÓGICA ============================
+  
+  # Definimos todas las columnas de posiciones posibles
+  columnas_posiciones <- c("GK", "DL", "DC", "DR", "DM", "WBL", "WBR", "ML", "MC", "MR", "AML", "AMC", "AMR", "SC")
+  
+  # Seleccionamos solo las columnas que nos interesan para el procesamiento
+  columnas_existentes <- intersect(c("ID", "Position Partially Known", columnas_posiciones), names(datos_relevantes_xls))
+  datos_filtrados <- datos_relevantes_xls %>% select(all_of(columnas_existentes))
+  
+  # Usamos pmap para iterar por cada fila de manera eficiente
+  posiciones_final <- pmap_dfr(datos_filtrados, function(...) {
+    fila_actual <- list(...)
+    id_jugadora <- fila_actual$ID
+    
+    # 1. BUSCAR POSICIONES EXACTAS (REGLA DEL 20)
+    pos_exactas_encontradas <- character(0)
+    
+    # Iteramos solo sobre las columnas de posición que existen en el archivo
+    for (pos_code in intersect(columnas_posiciones, names(fila_actual))) {
+      # Comprobamos que el valor es 20 y no es NA
+      if (!is.na(fila_actual[[pos_code]]) && fila_actual[[pos_code]] == 20) {
+        # Añadimos el código de la posición (ej. "DC", "MC") directamente
+        pos_exactas_encontradas <- c(pos_exactas_encontradas, pos_code)
+      }
+    }
+    
+    # Si encontramos una o más posiciones con valor 20, las usamos y terminamos.
+    if (length(pos_exactas_encontradas) > 0) {
+      return(tibble(id = id_jugadora, posicion = pos_exactas_encontradas))
+    }
+    
+    # 2. SI NO HAY POSICIÓN EXACTA, USAR LA POSICIÓN PARCIALMENTE CONOCIDA
+    pos_parcial <- fila_actual[["Position Partially Known"]]
+    if (!is.null(pos_parcial) && !is.na(pos_parcial)) {
+      # Aquí sí usamos la posición agrupada como fallback
+      posicion_agrupada <- case_when(
+        pos_parcial == 1 ~ "Defensa",
+        pos_parcial == 2 ~ "Centrocampista",
+        pos_parcial == 3 ~ "Delantera",
+        TRUE ~ NA_character_
+      )
+      if (!is.na(posicion_agrupada)) {
+        return(tibble(id = id_jugadora, posicion = posicion_agrupada))
+      }
+    }
+    
+    # 3. SI NO HAY NINGUNA INFORMACIÓN, NO DEVOLVEMOS NADA PARA ESTA JUGADORA
+    # Devolver un tibble vacío es más seguro que devolver NA
+    return(tibble(id = character(), posicion = character()))
+  })
+  
+  # ============================ FIN DE LA CORRECCIÓN LÓGICA ============================
+  
+  # Limpiar filas donde la posición esté vacía (aunque ya no debería haber NAs) y asegurar unicidad
+  posiciones_final <- posiciones_final %>% 
+    filter(!is.na(posicion), trimws(posicion) != "") %>%
+    distinct()
+  
+  message("Procesamiento de posiciones completado. Se encontraron ", nrow(posiciones_final), " asignaciones de posición para las jugadoras de las actas.")
+  
+  return(posiciones_final)
+}
+
+
 
 # -------------------------------------------------------------------------
 # PASO 1: DEFINIR RUTA Y OBTENER LISTA DE ARCHIVOS PDF
@@ -46,6 +148,7 @@ archivos_pdf <- list.files(path = ruta_pdfs, pattern = "\\.pdf$", full.names = T
 if (length(archivos_pdf) == 0) {
   stop("No se encontraron archivos PDF en la ruta especificada. Revisa la ruta.")
 }
+
 
 # -------------------------------------------------------------------------
 # PASO 2: FUNCIÓN DE PARSEO DE JUGADORAS (SIN CAMBIOS EN ESTA SECCIÓN)
@@ -437,6 +540,25 @@ if (length(errores) > 0) {
 partidos_df <- purrr::map_dfr(resultados_exitosos, "partido_info")
 goles_df <- purrr::map_dfr(resultados_exitosos, "goles")
 tarjetas_df <- purrr::map_dfr(resultados_exitosos, "tarjetas")
+
+# --- NUEVO: OBTENER LISTA DE JUGADORAS Y PROCESAR POSICIONES ---
+
+# 1. Obtener una lista única de todas las IDs de jugadoras que aparecen en las actas
+#    La fuente más completa es la lista de resultados exitosos.
+ids_validas_de_actas <- map_dfr(resultados_exitosos, ~bind_rows(
+  .x$alineacion_local,
+  .x$alineacion_visitante
+)) %>%
+  pull(id) %>%
+  unique() %>%
+  na.omit()
+
+message(paste("\nSe encontraron un total de", length(ids_validas_de_actas), "jugadoras únicas en todas las actas."))
+
+# 2. Llamar a la función para procesar posiciones, pasándole los IDs válidos
+ruta_xls_posiciones <- "/Users/marcosmarinm/Documents/жфМ/zfudbalmk/20238-mkd-players-since-2023.xls"
+posiciones_df <- cargar_y_procesar_posiciones(ruta_xls_posiciones, ids_validas_de_actas)
+
 
 calcular_clasificacion <- function(partidos) {
   if (is.null(partidos) || nrow(partidos) == 0) return(data.frame(Mensaje = "No se procesaron partidos válidos."))

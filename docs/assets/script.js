@@ -21,6 +21,19 @@ function initializeSearch() {
       if(suggestions) suggestions.style.display = 'none';
     }
   });
+
+  // ================== NUEVO MANEJADOR DE CLICS (UBICACIÓN CORRECTA) ==================
+  // Delegación de eventos para manejar clics en filas de tabla clicables.
+  // Lo ponemos aquí para que se active una vez que la página ha cargado.
+  document.addEventListener('click', function(event) {
+    // 'closest' sube por el DOM para encontrar el ancestro más cercano que coincida
+    const clickableRow = event.target.closest('.clickable-row');
+    
+    if (clickableRow && clickableRow.dataset.href) {
+      window.location.href = clickableRow.dataset.href;
+    }
+  });
+  // =================================================================================
 }
 
 function toggleDetails(elementId) {
@@ -61,15 +74,12 @@ function generateLink(target_id) {
   return `${basePath}/${folder}/${id}.html`;
 }
 
-// MODIFICACIÓN: La función de sugerencias ahora también gestiona la tecla 'Enter'
 function handleSearchInput(event) {
-  // Si el usuario presiona Enter, ejecuta la búsqueda completa
   if (event.key === 'Enter') {
     event.preventDefault();
     showSearchResults();
     return;
   }
-
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const query = input.value.trim().toLowerCase();
@@ -79,12 +89,10 @@ function handleSearchInput(event) {
     suggestionsContainer.style.display = 'none';
     return;
   }
-
   const searchTokens = query.split(' ').filter(t => t.length > 0);
   const filteredResults = searchData.filter(item => {
     return searchTokens.every(token => item.search_terms.includes(token));
   });
-
   const top5 = filteredResults.slice(0, 5);
   
   if (top5.length === 0) {
@@ -92,57 +100,41 @@ function handleSearchInput(event) {
     suggestionsContainer.style.display = 'none';
     return;
   }
-
   suggestionsContainer.innerHTML = top5.map(item => `<a href='${generateLink(item.target_id)}'><strong>${item.Име}</strong> <span class='search-result-type'>(${item.Тип})</span></a>`).join('');
   suggestionsContainer.style.display = 'block';
 }
 
-// NUEVA FUNCIÓN: Muestra una página con todos los resultados de la búsqueda
 function showSearchResults() {
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const mainContent = document.getElementById('main-content');
   
-  if (!input || !mainContent) return; // Salida segura si los elementos no existen
+  if (!input || !mainContent) return;
   
-  suggestionsContainer.style.display = 'none'; // Siempre ocultar sugerencias
+  suggestionsContainer.style.display = 'none';
   const query = input.value.trim().toLowerCase();
   const originalQuery = input.value.trim();
-
   if (query.length < 2) {
-    mainContent.innerHTML = `<h2>Резултати од пребарувањето</h2>
-                             <p>Ве молиме внесете најмалку 2 карактери за да пребарувате.</p>
-                             ${crear_botones_navegacion('..').outerHTML}`;
+    mainContent.innerHTML = `<h2>Резултати од пребарувањето</h2><p>Ве молиме внесете најмалку 2 карактери за да пребарувате.</p>${crear_botones_navegacion('..').outerHTML}`;
     return;
   }
-
   const searchTokens = query.split(' ').filter(t => t.length > 0);
   const results = searchData.filter(item => {
     return searchTokens.every(token => item.search_terms.includes(token));
   });
-
   let resultsHtml = `<h2>Резултати од пребарувањето за: "${originalQuery}"</h2>`;
   
   if (results.length > 0) {
     resultsHtml += '<div id="search-results-list"><ul>';
     results.forEach(item => {
-      resultsHtml += `
-        <li>
-          <a href="${generateLink(item.target_id)}">
-            ${item.Име}
-            <span class="search-result-type">(${item.Тип})</span>
-          </a>
-        </li>`;
+      resultsHtml += `<li><a href="${generateLink(item.target_id)}">${item.Име}<span class="search-result-type">(${item.Тип})</span></a></li>`;
     });
     resultsHtml += '</ul></div>';
   } else {
     resultsHtml += `<p>Нема пронајдени резултати за "${originalQuery}".</p>`;
   }
   
-  resultsHtml += `<div class="nav-buttons">
-                    <a href="${window.location.pathname}" class="back-link">← Врати се на претходната страница</a>
-                  </div>`;
-  
+  resultsHtml += `<div class="nav-buttons"><a href="${window.location.pathname}" class="back-link">← Врати се на претходната страница</a></div>`;
   mainContent.innerHTML = resultsHtml;
 }
 
