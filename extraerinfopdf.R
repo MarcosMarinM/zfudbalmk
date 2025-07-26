@@ -44,7 +44,7 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
   
   if (!file.exists(ruta_xls)) {
     warning(paste("Archivo de posiciones no encontrado en:", ruta_xls, "- Se continuará sin datos de posición."))
-    return(tibble(id = character(), posicion = character()))
+    return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
   message("Cargando y procesando el archivo de posiciones: ", basename(ruta_xls))
@@ -54,14 +54,21 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
     return(NULL)
   })
   
-  if (is.null(datos_xls) || !"FA ID Number" %in% names(datos_xls)) {
-    warning("El archivo XLS no contiene la columna 'FA ID Number'. No se pueden procesar las posiciones.")
-    return(tibble(id = character(), posicion = character()))
+  columnas_requeridas <- c("FA ID Number", "Nationality Name", "Date Of Birth", "City Of Birth Name")
+  if (is.null(datos_xls) || !all(columnas_requeridas %in% names(datos_xls))) {
+    columnas_faltantes <- paste(setdiff(columnas_requeridas, names(datos_xls)), collapse=", ")
+    warning(paste("El archivo XLS no contiene las columnas requeridas. Faltan:", columnas_faltantes, ". No se pueden procesar las posiciones ni los datos demográficos."))
+    return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
   datos_xls <- datos_xls %>%
     select(-any_of("ID")) %>% 
-    rename(ID = `FA ID Number`)
+    rename(
+      ID = `FA ID Number`,
+      nacionalidad = `Nationality Name`,
+      fecha_nacimiento = `Date Of Birth`,
+      ciudad_nacimiento = `City Of Birth Name`
+    )
   
   ids_jugadoras_validas <- as.character(ids_jugadoras_validas)
   datos_xls <- datos_xls %>% mutate(ID = as.character(ID))
@@ -71,7 +78,7 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
   
   if(nrow(datos_relevantes_xls) == 0) {
     message("Ninguna de las jugadoras del archivo XLS coincide con las jugadoras procesadas de las actas.")
-    return(tibble(id = character(), posicion = character()))
+    return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
   # ============================ INICIO DE LA CORRECCIÓN LÓGICA ============================
@@ -79,14 +86,22 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
   # Definimos todas las columnas de posiciones posibles
   columnas_posiciones <- c("GK", "DL", "DC", "DR", "DM", "WBL", "WBR", "ML", "MC", "MR", "AML", "AMC", "AMR", "SC")
   
+  # AÑADIMOS LAS NUEVAS COLUMNAS DE DATOS A LA SELECCIÓN
+  columnas_adicionales <- c("nacionalidad", "fecha_nacimiento", "ciudad_nacimiento")
+  
   # Seleccionamos solo las columnas que nos interesan para el procesamiento
-  columnas_existentes <- intersect(c("ID", "Position Partially Known", columnas_posiciones), names(datos_relevantes_xls))
+  columnas_existentes <- intersect(c("ID", "Position Partially Known", columnas_posiciones, columnas_adicionales), names(datos_relevantes_xls))
   datos_filtrados <- datos_relevantes_xls %>% select(all_of(columnas_existentes))
   
   # Usamos pmap para iterar por cada fila de manera eficiente
   posiciones_final <- pmap_dfr(datos_filtrados, function(...) {
     fila_actual <- list(...)
     id_jugadora <- fila_actual$ID
+    
+    # EXTRAEMOS LOS DATOS DEMOGRÁFICOS
+    nacionalidad_jugadora <- fila_actual$nacionalidad
+    fecha_nac_jugadora <- fila_actual$fecha_nacimiento
+    ciudad_nac_jugadora <- fila_actual$ciudad_nacimiento
     
     # 1. BUSCAR POSICIONES EXACTAS (REGLA DEL 20)
     pos_exactas_encontradas <- character(0)
@@ -102,7 +117,13 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
     
     # Si encontramos una o más posiciones con valor 20, las usamos y terminamos.
     if (length(pos_exactas_encontradas) > 0) {
-      return(tibble(id = id_jugadora, posicion = pos_exactas_encontradas))
+      return(tibble(
+        id = id_jugadora, 
+        posicion = pos_exactas_encontradas,
+        nacionalidad = nacionalidad_jugadora,
+        fecha_nacimiento = fecha_nac_jugadora,
+        ciudad_nacimiento = ciudad_nac_jugadora
+      ))
     }
     
     # 2. SI NO HAY POSICIÓN EXACTA, USAR LA POSICIÓN PARCIALMENTE CONOCIDA
@@ -116,23 +137,29 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
         TRUE ~ NA_character_
       )
       if (!is.na(posicion_agrupada)) {
-        return(tibble(id = id_jugadora, posicion = posicion_agrupada))
+        return(tibble(
+          id = id_jugadora, 
+          posicion = posicion_agrupada,
+          nacionalidad = nacionalidad_jugadora,
+          fecha_nacimiento = fecha_nac_jugadora,
+          ciudad_nacimiento = ciudad_nac_jugadora
+        ))
       }
     }
     
     # 3. SI NO HAY NINGUNA INFORMACIÓN, NO DEVOLVEMOS NADA PARA ESTA JUGADORA
-    # Devolver un tibble vacío es más seguro que devolver NA
-    return(tibble(id = character(), posicion = character()))
+    # Devolver un tibble vacío con el esquema correcto es más seguro que devolver NA
+    return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   })
   
   # ============================ FIN DE LA CORRECCIÓN LÓGICA ============================
   
-  # Limpiar filas donde la posición esté vacía (aunque ya no debería haber NAs) y asegurar unicidad
+  # Limpiar filas donde la posición esté vacía y asegurar unicidad
   posiciones_final <- posiciones_final %>% 
     filter(!is.na(posicion), trimws(posicion) != "") %>%
     distinct()
   
-  message("Procesamiento de posiciones completado. Se encontraron ", nrow(posiciones_final), " asignaciones de posición para las jugadoras de las actas.")
+  message("Procesamiento de posiciones y datos demográficos completado. Se encontraron ", nrow(posiciones_final), " asignaciones para las jugadoras de las actas.")
   
   return(posiciones_final)
 }

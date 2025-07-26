@@ -1,0 +1,212 @@
+nombre_ingles,nombre_macedonio
+Afghanistan,Авганистан
+Albania,Албанија
+Algeria,Алжир
+American Samoa,Американска Самоа
+Andorra,Андора
+Angola,Ангола
+Anguilla,Ангвила
+Antigua and Barbuda,Антигва и Барбуда
+Argentina,Аргентина
+Armenia,Ерменија
+Aruba,Аруба
+Australia,Австралија
+Austria,Австрија
+Azerbaijan,Азербејџан
+Bahamas,Бахами
+Bahrain,Бахреин
+Bangladesh,Бангладеш
+Barbados,Барбадос
+Belarus,Белорусија
+Belgium,Белгија
+Belize,Белизе
+Benin,Бенин
+Bermuda,Бермуди
+Bhutan,Бутан
+Bolivia,Боливија
+Bosnia and Herzegovina,Босна и Херцеговина
+Botswana,Боцвана
+Brazil,Бразил
+Brunei,Брунеј
+Bulgaria,Бугарија
+Burkina Faso,Буркина Фасо
+Burundi,Бурунди
+Cabo Verde,Зелен ’Рт
+Cambodia,Камбоџа
+Cameroon,Камерун
+Canada,Канада
+Cayman Islands,Кајмански Острови
+Central African Republic,Централноафриканска Република
+Chad,Чад
+Chile,Чиле
+China,Кина
+Colombia,Колумбија
+Comoros,Комори
+Congo,Република Конго
+Congo, Democratic Republic of the,Демократска Република Конго
+Cook Islands,Кукови Острови
+Costa Rica,Костарика
+Croatia,Хрватска
+Cuba,Куба
+Curaçao,Курасао
+Cyprus,Кипар
+Czechia,Чешка
+Denmark,Данска
+Djibouti,Џибути
+Dominica,Доминика
+Dominican Republic,Доминиканска Република
+Ecuador,Еквадор
+Egypt,Египет
+El Salvador,Ел Салвадор
+England,Англија
+Equatorial Guinea,Екваторска Гвинеја
+Eritrea,Еритреја
+Estonia,Естонија
+Eswatini,Есватини
+Ethiopia,Етиопија
+Faroe Islands,Фарски Острови
+Fiji,Фиџи
+Finland,Финска
+France,Франција
+Gabon,Габон
+Gambia,Гамбија
+Georgia,Грузија
+Germany,Германија
+Ghana,Гана
+Gibraltar,Гибралтар
+Greece,Грција
+Grenada,Гренада
+Guam,Гуам
+Guatemala,Гватемала
+Guinea,Гвинеја
+Guinea-Bissau,Гвинеја-Бисао
+Guyana,Гвајана
+Haiti,Хаити
+Honduras,Хондурас
+Hong Kong,Хонгконг
+Hungary,Унгарија
+Iceland,Исланд
+India,Индија
+Indonesia,Индонезија
+Iran,Иран
+Iraq,Ирак
+Ireland,Ирска
+Israel,Израел
+Italy,Италија
+Ivory Coast,Брег на Слоновата Коска
+Jamaica,Јамајка
+Japan,Јапонија
+Jordan,Јордан
+Kazakhstan,Казахстан
+Kenya,Кенија
+Kosovo,Косово
+Kuwait,Кувајт
+Kyrgyzstan,Киргистан
+Laos,Лаос
+Latvia,Латвија
+Lebanon,Либан
+Lesotho,Лесото
+Liberia,Либерија
+Libya,Либија
+Liechtenstein,Лихтенштајн
+Lithuania,Литванија
+Luxembourg,Луксембург
+Macao,Макао
+Madagascar,Мадагаскар
+Malawi,Малави
+Malaysia,Малезија
+Maldives,Малдиви
+Mali,Мали
+Malta,Малта
+Mauritania,Мавританија
+Mauritius,Маврициус
+Mexico,Мексико
+Moldova,Молдавија
+Mongolia,Монголија
+Montenegro,Црна Гора
+Montserrat,Монтсерат
+Morocco,Мароко
+Mozambique,Мозамбик
+Myanmar,Мјанмар
+Namibia,Намибија
+Nepal,Непал
+Netherlands,Холандија
+New Caledonia,Нова Каледонија
+New Zealand,Нов Зеланд
+Nicaragua,Никарагва
+Niger,Нигер
+Nigeria,Нигерија
+North Korea,Северна Кореја
+North Macedonia,Македонија
+Northern Ireland,Северна Ирска
+Norway,Норвешка
+Oman,Оман
+Pakistan,Пакистан
+Palestine,Палестина
+Panama,Панама
+Papua New Guinea,Папуа Нова Гвинеја
+Paraguay,Парагвај
+Peru,Перу
+Philippines,Филипини
+Poland,Полска
+Portugal,Португалија
+Puerto Rico,Порторико
+Qatar,Катар
+Romania,Романија
+Russia,Русија
+Rwanda,Руанда
+Saint Kitts and Nevis,Свети Китс и Невис
+Saint Lucia,Света Луција
+Saint Vincent and the Grenadines,Свети Винсент и Гренадини
+Samoa,Самоа
+San Marino,Сан Марино
+São Tomé and Príncipe,Сао Томе и Принсипе
+Saudi Arabia,Саудиска Арабија
+Scotland,Шкотска
+Senegal,Сенегал
+Serbia,Србија
+Seychelles,Сејшели
+Sierra Leone,Сиера Леоне
+Singapore,Сингапур
+Slovakia,Словачка
+Slovenia,Словенија
+Solomon Islands,Соломонски Острови
+Somalia,Сомалија
+South Africa,Јужна Африка
+South Korea,Јужна Кореја
+South Sudan,Јужен Судан
+Spain,Шпанија
+Sri Lanka,Шри Ланка
+Sudan,Судан
+Suriname,Суринам
+Sweden,Шведска
+Switzerland,Швајцарија
+Syria,Сирија
+Taiwan,Тајван
+Tajikistan,Таџикистан
+Tanzania,Танзанија
+Thailand,Тајланд
+Timor-Leste,Источен Тимор
+Togo,Того
+Tonga,Тонга
+Trinidad and Tobago,Тринидад и Тобаго
+Tunisia,Тунис
+Turkey,Турција
+Turkmenistan,Туркменистан
+Turks and Caicos Islands,Острови Туркс и Кајкос
+Tuvalu,Тувалу
+Uganda,Уганда
+Ukraine,Украина
+United Arab Emirates,Обединети Арапски Емирати
+United States,Соединети Држави
+Uruguay,Уругвај
+Uzbekistan,Узбекистан
+Vanuatu,Вануату
+Venezuela,Венецуела
+Vietnam,Виетнам
+British Virgin Islands,Британски Девствени Острови
+US Virgin Islands,Американски Девствени Острови
+Wales,Велс
+Yemen,Јемен
+Zambia,Замбија
+Zimbabwe,Зимбабве
