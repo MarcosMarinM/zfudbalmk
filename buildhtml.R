@@ -867,9 +867,31 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   # ==========================================================
   # 4. PÁGINA DE GOLEADORAS
   # ==========================================================
-  goles_por_jugadora_comp <- goles_comp %>% filter(!is.na(id), tipo == "Normal") %>% group_by(id) %>% summarise(Голови = n(), .groups = 'drop')
-  jugadoras_info_comp <- apariciones_comp %>% distinct(id, Фудбалерка = nombre, Тим = equipo)
-  tabla_goleadoras_comp <- goles_por_jugadora_comp %>% left_join(jugadoras_info_comp, by="id") %>% filter(!is.na(Фудбалерка)) %>% arrange(desc(Голови)) %>% mutate(Поз. = min_rank(desc(Голови))) %>% select(Поз., id, Фудбалерка, Тим, Голови)
+  
+  # PASO 1: Calcular el total de goles por jugadora (lógica sin cambios)
+  goles_por_jugadora_comp <- goles_comp %>% 
+    filter(!is.na(id), tipo == "Normal") %>% 
+    group_by(id) %>% 
+    summarise(Голови = n(), .groups = 'drop')
+  
+  # PASO 2: Agregar la información de la jugadora, concatenando los equipos (lógica sin cambios)
+  jugadoras_info_comp <- apariciones_comp %>%
+    filter(!is.na(id)) %>%
+    group_by(id) %>%
+    summarise(
+      Фудбалерка = first(nombre),
+      Тим = paste(unique(equipo), collapse = " / "),
+      .groups = 'drop'
+    )
+  
+  # PASO 3: Unir la información agregada (lógica sin cambios)
+  tabla_goleadoras_comp <- goles_por_jugadora_comp %>%
+    left_join(jugadoras_info_comp, by = "id") %>%
+    filter(!is.na(Фудбалерка)) %>%
+    arrange(desc(Голови)) %>%
+    mutate(Поз. = min_rank(desc(Голови))) %>%
+    select(Поз., id, Фудбалерка, Тим, Голови)
+  
   
   contenido_goleadoras <- tagList(
     crear_botones_navegacion(".."),
@@ -881,7 +903,39 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
         tags$tr(
           tags$td(g$Поз.),
           tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(g$id, ".html")), g$Фудбалерка)),
-          tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(g$Тим), ".html")), g$Тим)),
+          
+          # ============================ INICIO DE LA CORRECCIÓN ============================
+          # Esta celda ahora maneja múltiples equipos, creando un enlace para cada uno.
+          tags$td({
+            # Dividimos la cadena de equipos en un vector
+            teams <- str_split(g$Тим, " / ")[[1]]
+            
+            # Creamos una lista para almacenar las etiquetas HTML (enlaces y separadores)
+            team_tags <- list()
+            
+            # Iteramos sobre cada nombre de equipo
+            for (i in seq_along(teams)) {
+              team_name <- teams[i]
+              
+              # Creamos un enlace <a> para el equipo actual
+              team_link <- tags$a(
+                href = file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(team_name), ".html")),
+                team_name
+              )
+              
+              # Añadimos el enlace a nuestra lista
+              team_tags <- append(team_tags, list(team_link))
+              
+              # Si no es el último equipo de la lista, añadimos el separador
+              if (i < length(teams)) {
+                team_tags <- append(team_tags, list(" / "))
+              }
+            }
+            # Devolvemos una lista de etiquetas que htmltools renderizará correctamente
+            tagList(team_tags)
+          }),
+          # ============================ FIN DE LA CORRECCIÓN ============================
+          
           tags$td(g$Голови)
         )
       }))
