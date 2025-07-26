@@ -757,6 +757,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
         equipo_portera <- partido_actual$equipo
         id_partido_actual <- partido_actual$id_partido
         
+        # Cálculo de goles recibidos (sin cambios)
         goles_recibidos_partido <- goles_comp %>%
           filter(id_partido == id_partido_actual, equipo != equipo_portera)
         
@@ -766,20 +767,32 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
           goles_recibidos_total <- goles_recibidos_total + nrow(goles_mientras_jugaba)
         }
         
+        # Lógica de porterías a cero
         goles_recibidos_equipo_partido <- partidos_comp %>%
           filter(id_partido == id_partido_actual) %>%
           mutate(goles_recibidos = if_else(local == equipo_portera, goles_visitante, goles_local)) %>%
           pull(goles_recibidos)
         
-        if (goles_recibidos_equipo_partido == 0) {
+        if (goles_recibidos_equipo_partido == 0 && partido_actual$minutos_jugados > 0) {
+          
           resumen_partido <- purrr::keep(resultados_exitosos, ~.x$partido_info$id_partido == id_partido_actual)[[1]]
-          cambios_partido <- bind_rows(resumen_partido$cambios_local, resumen_partido$cambios_visitante)
+          
+          # ============================ INICIO DE LA CORRECCIÓN ============================
+          # Seleccionamos las sustituciones SÓLO del equipo de la portera
+          info_partido_base <- resumen_partido$partido_info
+          es_local <- (equipo_portera == info_partido_base$local)
+          
+          cambios_equipo_portera <- if (es_local) resumen_partido$cambios_local else resumen_partido$cambios_visitante
+          
           dorsales_cambios <- c()
-          if (!is.null(cambios_partido) && nrow(cambios_partido) > 0) {
-            dorsales_cambios <- unique(na.omit(c(as.numeric(str_match(cambios_partido$texto, "Entra .*?\\((\\d+)\\)")[, 2]), as.numeric(str_match(cambios_partido$texto, "por .*?\\((\\d+)\\)")[, 2]))))
+          if (!is.null(cambios_equipo_portera) && nrow(cambios_equipo_portera) > 0) {
+            dorsales_cambios <- unique(na.omit(c(as.numeric(str_match(cambios_equipo_portera$texto, "Entra .*?\\((\\d+)\\)")[, 2]), as.numeric(str_match(cambios_equipo_portera$texto, "por .*?\\((\\d+)\\)")[, 2]))))
           }
+          # ============================ FIN DE LA CORRECCIÓN ============================
+          
           dorsal_portera_partido <- apariciones_comp %>%
             filter(id_partido == id_partido_actual, id == portera_id) %>% pull(dorsal) %>% head(1)
+          
           if (!(dorsal_portera_partido %in% dorsales_cambios)) {
             porterias_a_cero <- porterias_a_cero + 1
           }
@@ -792,6 +805,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
       )
     }
     
+    # El resto del código de esta sección no necesita cambios
     if (length(lista_filas_porteras) > 0) {
       tabla_porteras_comp <- bind_rows(lista_filas_porteras) %>%
         mutate(`ПГ/90` = if_else(Минути > 0, (ПГ / Минути) * 90, 0)) %>%
@@ -863,6 +877,7 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
       save_html(pagina_menu_final_actualizada, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, ".html")))
     }
   }
+  
   
   # ==========================================================
   # 4. PÁGINA DE GOLEADORAS
