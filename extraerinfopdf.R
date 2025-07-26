@@ -556,7 +556,7 @@ ids_validas_de_actas <- map_dfr(resultados_exitosos, ~bind_rows(
 message(paste("\nSe encontraron un total de", length(ids_validas_de_actas), "jugadoras únicas en todas las actas."))
 
 # 2. Llamar a la función para procesar posiciones, pasándole los IDs válidos
-ruta_xls_posiciones <- "/Users/marcosmarinm/Documents/жфМ/zfudbalmk/20238-mkd-players-since-2023.xls"
+ruta_xls_posiciones <- "/Users/marcosmarinm/Documents/жфМ/zfudbalmk/igraci.xlsx"
 posiciones_df <- cargar_y_procesar_posiciones(ruta_xls_posiciones, ids_validas_de_actas)
 
 
