@@ -81,8 +81,6 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
     return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
-  # ============================ INICIO DE LA CORRECCIÓN LÓGICA ============================
-  
   # Definimos todas las columnas de posiciones posibles
   columnas_posiciones <- c("GK", "DL", "DC", "DR", "DM", "WBL", "WBR", "ML", "MC", "MR", "AML", "AMC", "AMR", "SC")
   
@@ -151,8 +149,6 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
     # Devolver un tibble vacío con el esquema correcto es más seguro que devolver NA
     return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   })
-  
-  # ============================ FIN DE LA CORRECCIÓN LÓGICA ============================
   
   # Limpiar filas donde la posición esté vacía y asegurar unicidad
   posiciones_final <- posiciones_final %>% 
@@ -379,9 +375,8 @@ procesar_acta <- function(acta_path) {
   texto_acta <- tryCatch({ paste(pdf_text(acta_path), collapse = "\n\n") }, error = function(e) { stop(paste("Error al leer PDF:", e$message)) })
   if (is.null(texto_acta) || nchar(texto_acta) == 0) stop("El PDF está vacío o no se pudo leer el texto.")
   
-  # --- INICIO DE LA MODIFICACIÓN: Captura dinámica de nombre y temporada de la competición ---
-  # Regex mejorado para capturar el nombre de la competición y la temporada por separado
-  regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+)"
+  # --- INICIO DE LA MODIFICACIÓN 1: Capturar el asterisco en el resultado ---
+  regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+\\*?)"
   partido_info_match <- str_match(texto_acta, regex_principal)
   
   if (is.na(partido_info_match[1, 1])) {
@@ -393,10 +388,15 @@ procesar_acta <- function(acta_path) {
   equipo_local <- str_trim(partido_info_match[, 4])
   equipo_visitante <- str_trim(partido_info_match[, 5])
   resultado_final_str <- partido_info_match[, 6]
-  goles_split <- as.integer(str_split(resultado_final_str, ":", simplify = TRUE))
+  
+  # --- INICIO DE LA MODIFICACIÓN 2: Detectar y almacenar el resultado oficial ---
+  es_resultado_oficial <- str_detect(resultado_final_str, "\\*") && str_detect(texto_acta, "службен резултат")
+  resultado_limpio <- str_remove(resultado_final_str, "\\*")
+  goles_split <- as.integer(str_split(resultado_limpio, ":", simplify = TRUE))
+  # --- FIN DE LA MODIFICACIÓN 2 ---
+  
   goles_local <- goles_split[1]
   goles_visitante <- goles_split[2]
-  # --- FIN DE LA MODIFICACIÓN ---
   
   fecha_hora_match <- str_match(texto_acta, "Датум/време: (\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2})")
   fecha <- if (!is.na(fecha_hora_match[1, 1])) fecha_hora_match[, 2] else "Desconocida"
@@ -415,16 +415,17 @@ procesar_acta <- function(acta_path) {
   arbitro_asist_1 <- extraer_info(texto_acta, "1\\.\\s*помошен:")
   arbitro_asist_2 <- extraer_info(texto_acta, "2\\.\\s*помошен:")
   
-  # --- INICIO DE LA MODIFICACIÓN: Añadir columnas de competición al dataframe ---
+  # --- INICIO DE LA MODIFICACIÓN 3: Añadir la nueva columna al dataframe del partido ---
   partido_df <- data.frame(
     id_partido = id_partido,
     competicion_nombre = competicion_nombre,
     competicion_temporada = competicion_temporada,
     jornada, fecha, hora,
     local = equipo_local, visitante = equipo_visitante,
-    goles_local, goles_visitante
+    goles_local, goles_visitante,
+    es_resultado_oficial = es_resultado_oficial # <-- NUEVA COLUMNA
   )
-  # --- FIN DE LA MODIFICACIÓN ---
+  # --- FIN DE LA MODIFICACIÓN 3 ---
   
   entrenador_local <- "Desconocido"; entrenador_visitante <- "Desconocido"
   linea_entrenadores_match <- str_extract(texto_acta, ".*Шеф на стручен штаб.*")
@@ -455,6 +456,13 @@ procesar_acta <- function(acta_path) {
   linea_goleadores_full <- str_extract(texto_acta, "Стрелец/Мин[^\n]+")
   linea_pen_ag_full <- str_extract(texto_acta, "Пен/АГ[^\n]+")
   if (!is.na(linea_resultados_full) && !is.na(linea_goleadores_full)) {
+    
+    # --- INICIO DE LA MODIFICACIÓN 4: Determinar el equipo perdedor oficial ---
+    equipo_perdedor_oficial <- if (es_resultado_oficial) {
+      if (goles_local == 0) equipo_local else if (goles_visitante == 0) equipo_visitante else NA_character_
+    } else { NA_character_ }
+    # --- FIN DE LA MODIFICACIÓN 4 ---
+    
     resultados_parciales <- str_split(str_trim(str_match(linea_resultados_full, "Резултат\\s+(.*)")[, 2]), "\\s+")[[1]]
     goleadores_minutos_nums <- as.integer(str_split(str_trim(str_match(linea_goleadores_full, "Стрелец/Мин\\s+(.*)")[, 2]), "\\s+")[[1]])
     es_autogol <- rep(FALSE, length(resultados_parciales))
@@ -484,6 +492,14 @@ procesar_acta <- function(acta_path) {
       equipo_acreditado_gol <- NA
       if (marcador_actual[1] > resultados_previo[1]) equipo_acreditado_gol <- equipo_local
       else if (marcador_actual[2] > resultados_previo[2]) equipo_acreditado_gol <- equipo_visitante
+      
+      # --- INICIO DE LA MODIFICACIÓN 5: Anular goles si es necesario ---
+      if (es_resultado_oficial && !is.na(equipo_perdedor_oficial) && equipo_acreditado_gol == equipo_perdedor_oficial) {
+        resultados_previo <- marcador_actual
+        next # Saltamos al siguiente gol sin añadir este.
+      }
+      # --- FIN DE LA MODIFICACIÓN 5 ---
+      
       if (!is.na(equipo_acreditado_gol)) {
         equipo_jugadora_es_local <- if (tipo_gol == "Autogol") equipo_acreditado_gol == equipo_visitante else equipo_acreditado_gol == equipo_local
         alineacion_a_buscar <- if(equipo_jugadora_es_local) alineacion_local else alineacion_visitante
@@ -525,18 +541,25 @@ procesar_acta <- function(acta_path) {
     if(is.null(df_tarjetas) || nrow(df_tarjetas) == 0) return("  No se registraron tarjetas.")
     df_tarjetas <- df_tarjetas[order(df_tarjetas$minuto), ]
     apply(df_tarjetas, 1, function(t) paste0("  - Min ", formatear_minuto_partido(as.numeric(t['minuto'])), ": [", t['tipo'], "] para ", t['jugadora'], " (", t['equipo'], ") por '", t['motivo'], "'"))
-    }
+  }
+  
+  # --- INICIO DE LA MODIFICACIÓN 6: Añadir nota visual al resumen de texto ---
+  resultado_texto_resumen <- paste(goles_local, "-", goles_visitante)
+  if (es_resultado_oficial) {
+    resultado_texto_resumen <- paste(resultado_texto_resumen, "(службен резултат)")
+  }
+  # --- FIN DE LA MODIFICACIÓN 6 ---
   
   resumen_actual_lines <- c(
     "\n======================================================================", paste("INICIO DEL ACTA:", nombre_archivo), "======================================================================",
     paste("COMPETICIÓN:", competicion_nombre, competicion_temporada),
     paste("RESUMEN DEL PARTIDO:", equipo_local, "vs", equipo_visitante, "(ID:", id_partido, ")"), paste("Fecha:", fecha, "| Hora:", hora, "| Jornada:", jornada),
-    paste("Estadio:", estadio), paste("Resultado Final:", goles_local, "-", goles_visitante), "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
+    paste("Estadio:", estadio), paste("Resultado final:", resultado_texto_resumen), "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
     "\n--- SANCIONES (TARJETAS) ---", formatear_tarjetas_texto(tarjetas_partido_actual),
-    "\n--- ÁRBITROS Y OFICIALES ---", paste("  Árbitro Principal:", arbitro_principal), paste("  1.er Asistente:", arbitro_asist_1), paste("  2.º Asistente:", arbitro_asist_2),
-    "\n--- ALINEACIONES ---", paste("\nEquipo Local:", equipo_local), paste("  Entrenador:", entrenador_local), "  Titulares:", formatear_jugadoras(alineacion_local, "Titular"),
+    "\n--- ÁRBITRAS Y OFICIALES ---", paste("  Árbitro/a principal:", arbitro_principal), paste("  1.ª Asistente:", arbitro_asist_1), paste("  2.ª Asistente:", arbitro_asist_2),
+    "\n--- ALINEACIONES ---", paste("\nEquipo local:", equipo_local), paste("  Entrenador/a:", entrenador_local), "  Titulares:", formatear_jugadoras(alineacion_local, "Titular"),
     "  Suplentes:", formatear_jugadoras(alineacion_local, "Suplente"), "  Cambios:", if(!is.null(cambios_local_df) && nrow(cambios_local_df) > 0) cambios_local_df$texto else "  No se registraron cambios.",
-    paste("\nEquipo Visitante:", equipo_visitante), paste("  Entrenador:", entrenador_visitante), "  Titulares:", formatear_jugadoras(alineacion_visitante, "Titular"),
+    paste("\nEquipo visitante:", equipo_visitante), paste("  Entrenador/a:", entrenador_visitante), "  Titulares:", formatear_jugadoras(alineacion_visitante, "Titular"),
     "  Suplentes:", formatear_jugadoras(alineacion_visitante, "Suplente"), "  Cambios:", if(!is.null(cambios_visitante_df) && nrow(cambios_visitante_df) > 0) cambios_visitante_df$texto else "  No se registraron cambios.",
     "\n======================================================================\n"
   )

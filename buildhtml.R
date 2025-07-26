@@ -683,10 +683,18 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
         tags$h3(class="jornada-header", header_text),
         map(1:nrow(partidos_jornada), function(k) {
           partido <- partidos_jornada[k,]
+          
+          resultado_texto <- paste(partido$goles_local, "-", partido$goles_visitante)
+          span_attrs <- list(class = "resultado")
+          if (isTRUE(partido$es_resultado_oficial)) {
+            resultado_texto <- paste0(resultado_texto, "*")
+            span_attrs$title <- "службен резултат"
+          }
+
           tags$a(class="partido-link", 
                  href=file.path("..", nombres_carpetas_mk$partidos, paste0(partido$id_partido, ".html")),
                  tags$span(class="equipo equipo-local", partido$local),
-                 tags$span(class="resultado", paste(partido$goles_local,"-",partido$goles_visitante)),
+                 do.call(tags$span, c(list(resultado_texto), span_attrs)), # Se construye el span con los atributos condicionales
                  tags$span(class="equipo equipo-visitante", partido$visitante))
         })
       )
@@ -695,7 +703,6 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   
   pagina_partidos_final <- crear_pagina_html(contenido_partidos, paste("Распоред -", comp_nombre), "..", search_data_json, script_contraseña)
   save_html(pagina_partidos_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html")))
-  
   
   # ==========================================================
   # 3. PÁGINA DE CLASIFICACIÓN (si es liga)
@@ -1249,7 +1256,6 @@ walk(1:nrow(partidos_df_enriquecido), function(i) {
   tarjetas_partido <- tarjetas_df_unificado %>% filter(id_partido == id_p)
   alineacion_partido <- apariciones_df %>% filter(id_partido == id_p)
   
-  ### NUEVO BLOQUE DE LÓGICA: Determinar el texto de la jornada/ronda ###
   is_cup_match <- str_detect(tolower(partido$competicion_nombre), "куп")
   jornada_texto <- if(is_cup_match) partido$jornada else paste("Коло", partido$jornada)
   
@@ -1272,13 +1278,17 @@ walk(1:nrow(partidos_df_enriquecido), function(i) {
     tagList(tags$h4("Почетен состав"), crear_lista_jugadoras(starters), tags$h4("Резерви"), crear_lista_jugadoras(subs))
   }
   
+  # --- INICIO DE LA MODIFICACIÓN: Añadir texto de resultado oficial ---
+  resultado_texto_final <- paste(partido$goles_local, "-", partido$goles_visitante)
+  if (isTRUE(partido$es_resultado_oficial)) {
+    resultado_texto_final <- paste(resultado_texto_final, "(службен резултат)")
+  }
+  # --- FIN DE LA MODIFICACIÓN ---
+  
   # Creación del contenido HTML de la página del partido
   contenido_partido <- tagList(
     crear_botones_navegacion(".."),
     tags$h2(paste(partido$local, "vs", partido$visitante)),
-    
-    ### NUEVO ELEMENTO HTML AÑADIDO ###
-    # Este párrafo muestra la competición (con enlace) y la jornada/ronda
     tags$p(style = "text-align:center; font-size: 1.1em; color: #555; margin-top: -15px; margin-bottom: 20px;",
            tags$a(href = file.path("..", nombres_carpetas_mk$competiciones, paste0(partido$competicion_id, ".html")),
                   paste(partido$competicion_nombre, partido$competicion_temporada)),
@@ -1286,7 +1296,8 @@ walk(1:nrow(partidos_df_enriquecido), function(i) {
            jornada_texto
     ),
     
-    tags$h3(paste("Конечен резултат:", partido$goles_local, "-", partido$goles_visitante)),
+    tags$h3(paste("Конечен резултат:", resultado_texto_final)), # Usamos la variable modificada
+    
     tags$p(paste0("Датум: ", partido$fecha, " | Време: ", partido$hora, " | Стадион: "), if (nrow(estadio_info) > 0) tags$a(href = file.path("..", nombres_carpetas_mk$estadios, paste0(generar_id_seguro(estadio_info$estadio), ".html")), estadio_info$estadio) else "Непознат"),
     tags$h3("Судии"),
     tags$ul(class = "sudii-lista", map(1:nrow(arbitros_partido), function(a) { arb <- arbitros_partido[a, ]; tags$li(paste0(arb$uloga, ": "), tags$a(href = file.path("..", nombres_carpetas_mk$arbitros, paste0(generar_id_seguro(arb$ime), ".html")), arb$ime)) })),
