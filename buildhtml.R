@@ -1517,6 +1517,65 @@ walk(1:nrow(jugadoras_stats_df), function(i) {
   save_html(pagina_jugadora_final, file = file.path(RUTA_JUGADORAS, paste0(id_j, ".html")))
 })
 
+# Bucle para EQUIPOS
+walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_name) {
+  if (is.na(team_name)) return()
+  
+  id_t <- generar_id_seguro(team_name)
+  
+  # Filtrar partidos del equipo y ordenarlos por fecha
+  historial_equipo <- partidos_df_enriquecido %>%
+    filter(local == team_name | visitante == team_name) %>%
+    mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+    arrange(desc(fecha_date))
+  
+  # Filtrar jugadoras que han aparecido en el equipo
+  plantilla_equipo <- apariciones_df %>%
+    filter(equipo == team_name) %>%
+    distinct(id, nombre) %>%
+    arrange(nombre)
+  
+  contenido_equipo <- tagList(
+    crear_botones_navegacion(".."),
+    tags$h2(team_name),
+    
+    tags$h3("Состав"),
+    tags$ul(
+      if (nrow(plantilla_equipo) > 0) {
+        map(1:nrow(plantilla_equipo), function(p_idx) {
+          jugadora <- plantilla_equipo[p_idx,]
+          tags$li(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(jugadora$id, ".html")), jugadora$nombre))
+        })
+      } else {
+        tags$li("Нема податоци за составот.")
+      }
+    ),
+    
+    tags$h3("Натпревари"),
+    tags$table(
+      tags$thead(tags$tr(tags$th("Датум"), tags$th("Натпреварување"), tags$th("Коло"), tags$th("Натпревар"), tags$th("Резултат"))),
+      tags$tbody(
+        if (nrow(historial_equipo) > 0) {
+          map(1:nrow(historial_equipo), function(m_idx) {
+            partido <- historial_equipo[m_idx,]
+            tags$tr(
+              tags$td(partido$fecha),
+              tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$competiciones, paste0(partido$competicion_id, ".html")), partido$competicion_nombre)),
+              tags$td(partido$jornada),
+              tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$partidos, paste0(partido$id_partido, ".html")), paste(partido$local, "vs", partido$visitante))),
+              tags$td(paste(partido$goles_local, "-", partido$goles_visitante))
+            )
+          })
+        } else {
+          tags$tr(tags$td(colspan="5", "Нема одиграни натпревари."))
+        }
+      )
+    )
+  )
+  
+  pagina_equipo_final <- crear_pagina_html(contenido_equipo, team_name, "..", search_data_json, script_contraseña)
+  save_html(pagina_equipo_final, file = file.path(RUTA_EQUIPOS, paste0(id_t, ".html")))
+})
 
 # Bucle para ARBITROS
 walk(unique(arbitros_df$ime), function(arb) {
