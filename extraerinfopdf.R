@@ -564,10 +564,10 @@ procesar_acta <- function(acta_path) {
     "\n======================================================================\n"
   )
   
-  goles_normales_df <- if(nrow(goles_partido_actual) > 0) filter(goles_partido_actual, tipo == "Normal") else data.frame()
-  if(nrow(goles_normales_df) > 0) names(goles_normales_df)[names(goles_normales_df) == 'equipo_acreditado'] <- 'equipo'
+  # La sección que filtraba goles y renombraba columnas ha sido eliminada.
+  # Ahora pasamos el dataframe de goles completo.
   
-  return(list(partido_info = partido_df, goles = goles_normales_df, tarjetas = tarjetas_partido_actual, resumen_texto = unlist(resumen_actual_lines), alineacion_local = alineacion_local, alineacion_visitante = alineacion_visitante, cambios_local = cambios_local_df, cambios_visitante = cambios_visitante_df, arbitro_principal = arbitro_principal, arbitro_asist_1 = arbitro_asist_1, arbitro_asist_2 = arbitro_asist_2, estadio = estadio))
+  return(list(partido_info = partido_df, goles = goles_partido_actual, tarjetas = tarjetas_partido_actual, resumen_texto = unlist(resumen_actual_lines), alineacion_local = alineacion_local, alineacion_visitante = alineacion_visitante, cambios_local = cambios_local_df, cambios_visitante = cambios_visitante_df, arbitro_principal = arbitro_principal, arbitro_asist_1 = arbitro_asist_1, arbitro_asist_2 = arbitro_asist_2, estadio = estadio))
 }
 
 # -------------------------------------------------------------------------
@@ -583,6 +583,7 @@ if (length(errores) > 0) {
   message("\n--- AVISO: Se encontraron errores en ", length(errores), " de ", length(archivos_pdf), " archivos. ---")
   purrr::walk2(names(errores), errores, ~message(paste0("\nERROR en archivo: ", .x, "\nMENSAJE: ", .y$message)))
 } else { message("\n¡Todos los archivos se procesaron sin errores!") }
+
 
 # -------------------------------------------------------------------------
 # PASO 5: AGREGACIÓN DE RESULTADOS Y ESCRITURA DE ARCHIVO
@@ -621,7 +622,12 @@ calcular_clasificacion <- function(partidos) {
 clasificacion_df <- calcular_clasificacion(partidos_df)
 
 if (!is.null(goles_df) && nrow(goles_df) > 0) {
-  tabla_goleadoras <- goles_df %>% group_by(Jugadora = jugadora, Equipo = equipo) %>% summarise(Goles = n(), .groups = 'drop') %>% arrange(desc(Goles))
+  # MODIFICACIÓN: Se filtra por tipo=="Normal" y se usa "equipo_acreditado" para la tabla de goleadoras
+  tabla_goleadoras <- goles_df %>% 
+    filter(tipo == "Normal") %>% 
+    group_by(Jugadora = jugadora, Equipo = equipo_acreditado) %>% 
+    summarise(Goles = n(), .groups = 'drop') %>% 
+    arrange(desc(Goles))
 } else { tabla_goleadoras <- data.frame(Mensaje = "No se procesaron goles válidos.") }
 
 if (!is.null(tarjetas_df) && nrow(tarjetas_df) > 0) {
