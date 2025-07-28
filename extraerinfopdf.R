@@ -375,7 +375,7 @@ procesar_acta <- function(acta_path) {
   texto_acta <- tryCatch({ paste(pdf_text(acta_path), collapse = "\n\n") }, error = function(e) { stop(paste("Error al leer PDF:", e$message)) })
   if (is.null(texto_acta) || nchar(texto_acta) == 0) stop("El PDF está vacío o no se pudo leer el texto.")
   
-  # --- INICIO DE LA MODIFICACIÓN 1: Capturar el asterisco en el resultado ---
+  # Capturar el resultado, incluyendo un posible asterisco
   regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+\\*?)"
   partido_info_match <- str_match(texto_acta, regex_principal)
   
@@ -389,11 +389,10 @@ procesar_acta <- function(acta_path) {
   equipo_visitante <- str_trim(partido_info_match[, 5])
   resultado_final_str <- partido_info_match[, 6]
   
-  # --- INICIO DE LA MODIFICACIÓN 2: Detectar y almacenar el resultado oficial ---
+  # Detectar si es un resultado oficial y limpiar el string del resultado
   es_resultado_oficial <- str_detect(resultado_final_str, "\\*") && str_detect(texto_acta, "службен резултат")
   resultado_limpio <- str_remove(resultado_final_str, "\\*")
   goles_split <- as.integer(str_split(resultado_limpio, ":", simplify = TRUE))
-  # --- FIN DE LA MODIFICACIÓN 2 ---
   
   goles_local <- goles_split[1]
   goles_visitante <- goles_split[2]
@@ -415,7 +414,7 @@ procesar_acta <- function(acta_path) {
   arbitro_asist_1 <- extraer_info(texto_acta, "1\\.\\s*помошен:")
   arbitro_asist_2 <- extraer_info(texto_acta, "2\\.\\s*помошен:")
   
-  # --- INICIO DE LA MODIFICACIÓN 3: Añadir la nueva columna al dataframe del partido ---
+  # Añadir la nueva columna al dataframe del partido
   partido_df <- data.frame(
     id_partido = id_partido,
     competicion_nombre = competicion_nombre,
@@ -425,7 +424,6 @@ procesar_acta <- function(acta_path) {
     goles_local, goles_visitante,
     es_resultado_oficial = es_resultado_oficial # <-- NUEVA COLUMNA
   )
-  # --- FIN DE LA MODIFICACIÓN 3 ---
   
   entrenador_local <- "Desconocido"; entrenador_visitante <- "Desconocido"
   linea_entrenadores_match <- str_extract(texto_acta, ".*Шеф на стручен штаб.*")
@@ -457,12 +455,6 @@ procesar_acta <- function(acta_path) {
   linea_pen_ag_full <- str_extract(texto_acta, "Пен/АГ[^\n]+")
   if (!is.na(linea_resultados_full) && !is.na(linea_goleadores_full)) {
     
-    # --- INICIO DE LA MODIFICACIÓN 4: Determinar el equipo perdedor oficial ---
-    equipo_perdedor_oficial <- if (es_resultado_oficial) {
-      if (goles_local == 0) equipo_local else if (goles_visitante == 0) equipo_visitante else NA_character_
-    } else { NA_character_ }
-    # --- FIN DE LA MODIFICACIÓN 4 ---
-    
     resultados_parciales <- str_split(str_trim(str_match(linea_resultados_full, "Резултат\\s+(.*)")[, 2]), "\\s+")[[1]]
     goleadores_minutos_nums <- as.integer(str_split(str_trim(str_match(linea_goleadores_full, "Стрелец/Мин\\s+(.*)")[, 2]), "\\s+")[[1]])
     es_autogol <- rep(FALSE, length(resultados_parciales))
@@ -492,13 +484,6 @@ procesar_acta <- function(acta_path) {
       equipo_acreditado_gol <- NA
       if (marcador_actual[1] > resultados_previo[1]) equipo_acreditado_gol <- equipo_local
       else if (marcador_actual[2] > resultados_previo[2]) equipo_acreditado_gol <- equipo_visitante
-      
-      # --- INICIO DE LA MODIFICACIÓN 5: Anular goles si es necesario ---
-      if (es_resultado_oficial && !is.na(equipo_perdedor_oficial) && equipo_acreditado_gol == equipo_perdedor_oficial) {
-        resultados_previo <- marcador_actual
-        next # Saltamos al siguiente gol sin añadir este.
-      }
-      # --- FIN DE LA MODIFICACIÓN 5 ---
       
       if (!is.na(equipo_acreditado_gol)) {
         equipo_jugadora_es_local <- if (tipo_gol == "Autogol") equipo_acreditado_gol == equipo_visitante else equipo_acreditado_gol == equipo_local
@@ -543,18 +528,11 @@ procesar_acta <- function(acta_path) {
     apply(df_tarjetas, 1, function(t) paste0("  - Min ", formatear_minuto_partido(as.numeric(t['minuto'])), ": [", t['tipo'], "] para ", t['jugadora'], " (", t['equipo'], ") por '", t['motivo'], "'"))
   }
   
-  # --- INICIO DE LA MODIFICACIÓN 6: Añadir nota visual al resumen de texto ---
-  resultado_texto_resumen <- paste(goles_local, "-", goles_visitante)
-  if (es_resultado_oficial) {
-    resultado_texto_resumen <- paste(resultado_texto_resumen, "(службен резултат)")
-  }
-  # --- FIN DE LA MODIFICACIÓN 6 ---
-  
   resumen_actual_lines <- c(
     "\n======================================================================", paste("INICIO DEL ACTA:", nombre_archivo), "======================================================================",
     paste("COMPETICIÓN:", competicion_nombre, competicion_temporada),
     paste("RESUMEN DEL PARTIDO:", equipo_local, "vs", equipo_visitante, "(ID:", id_partido, ")"), paste("Fecha:", fecha, "| Hora:", hora, "| Jornada:", jornada),
-    paste("Estadio:", estadio), paste("Resultado final:", resultado_texto_resumen), "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
+    paste("Estadio:", estadio), paste("Resultado final:", resultado_final_str), "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
     "\n--- SANCIONES (TARJETAS) ---", formatear_tarjetas_texto(tarjetas_partido_actual),
     "\n--- ÁRBITRAS Y OFICIALES ---", paste("  Árbitro/a principal:", arbitro_principal), paste("  1.ª Asistente:", arbitro_asist_1), paste("  2.ª Asistente:", arbitro_asist_2),
     "\n--- ALINEACIONES ---", paste("\nEquipo local:", equipo_local), paste("  Entrenador/a:", entrenador_local), "  Titulares:", formatear_jugadoras(alineacion_local, "Titular"),
@@ -563,9 +541,6 @@ procesar_acta <- function(acta_path) {
     "  Suplentes:", formatear_jugadoras(alineacion_visitante, "Suplente"), "  Cambios:", if(!is.null(cambios_visitante_df) && nrow(cambios_visitante_df) > 0) cambios_visitante_df$texto else "  No se registraron cambios.",
     "\n======================================================================\n"
   )
-  
-  # La sección que filtraba goles y renombraba columnas ha sido eliminada.
-  # Ahora pasamos el dataframe de goles completo.
   
   return(list(partido_info = partido_df, goles = goles_partido_actual, tarjetas = tarjetas_partido_actual, resumen_texto = unlist(resumen_actual_lines), alineacion_local = alineacion_local, alineacion_visitante = alineacion_visitante, cambios_local = cambios_local_df, cambios_visitante = cambios_visitante_df, arbitro_principal = arbitro_principal, arbitro_asist_1 = arbitro_asist_1, arbitro_asist_2 = arbitro_asist_2, estadio = estadio))
 }
