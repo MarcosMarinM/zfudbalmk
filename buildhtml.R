@@ -103,14 +103,10 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
   goles_data <- resumen_partido$goles
   if (!is.null(goles_data) && nrow(goles_data) > 0) {
     
-    # INICIO DE LA CORRECCIÓN: Asegurarse de que la columna 'equipo_acreditado' exista.
-    # Esto proporciona compatibilidad con datos generados por una versión anterior del script 1.
     if (!"equipo_acreditado" %in% names(goles_data) && "equipo" %in% names(goles_data)) {
       goles_data <- goles_data %>% rename(equipo_acreditado = equipo)
     }
-    # FIN DE LA CORRECCIÓN
     
-    # Unimos con los datos de las jugadoras para obtener sus IDs para los enlaces
     goles_con_ids <- goles_data %>%
       left_join(apariciones_df %>% distinct(nombre, id), by = c("jugadora" = "nombre"))
     
@@ -156,8 +152,13 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
       nombre_entra <- match_info[1, 2]; dorsal_entra <- match_info[1, 3]
       nombre_sale <- match_info[1, 4]; dorsal_sale <- match_info[1, 5]
       
-      id_entra <- (filter(alineacion_equipo, nombre == nombre_entra, dorsal == as.numeric(dorsal_entra)) %>% head(1))$id
-      id_sale <- (filter(alineacion_equipo, nombre == nombre_sale, dorsal == as.numeric(dorsal_sale)) %>% head(1))$id
+      # --- INICIO DE LA CORRECCIÓN: Búsqueda robusta de IDs ---
+      info_entra <- filter(alineacion_equipo, nombre == nombre_entra, dorsal == as.numeric(dorsal_entra))
+      id_entra <- if (nrow(info_entra) > 0) info_entra$id[1] else NA_character_
+      
+      info_sale <- filter(alineacion_equipo, nombre == nombre_sale, dorsal == as.numeric(dorsal_sale))
+      id_sale <- if (nrow(info_sale) > 0) info_sale$id[1] else NA_character_
+      # --- FIN DE LA CORRECCIÓN ---
       
       texto_entra_link <- if (!is.na(id_entra)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_entra, nombre_entra) else nombre_entra
       texto_sale_link <- if (!is.na(id_sale)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_sale, nombre_sale) else nombre_sale
@@ -277,6 +278,103 @@ if (file.exists(ruta_mapeo_iso) && file.exists(ruta_traduccion_mk)) {
 # PASO 7: PREPARACIÓN DE DATOS
 # -------------------------------------------------------------------------
 
+# =========================================================================
+# NUEVO PASO 7.0: APLICAR CORRECCIONES Y REORDENAR NOMBRES
+# =========================================================================
+message("Aplicando correcciones y reordenando nombres...")
+
+# --- Función para aplicar el mapa de conversiones a un dataframe ---
+aplicar_conversiones <- function(df, columnas, mapa_conversiones) {
+  if (is.null(mapa_conversiones) || nrow(df) == 0) return(df)
+  # Usamos across con any_of para aplicar la función solo a las columnas que existan
+  df %>%
+    mutate(across(any_of(columnas), ~ recode(.x, !!!mapa_conversiones)))
+}
+
+# --- Función para reordenar el nombre de una jugadora (Apellido, Nombre -> Nombre Apellido) ---
+reordenar_nombre_jugadora <- function(nombres) {
+  sapply(nombres, function(nombre) {
+    if (is.na(nombre)) return(NA_character_)
+    palabras <- str_split(nombre, "\\s+")[[1]]
+    if (length(palabras) >= 2) {
+      # Mueve la última palabra al principio
+      primer_nombre <- palabras[length(palabras)]
+      apellido <- paste(palabras[-length(palabras)], collapse = " ")
+      return(paste(primer_nombre, apellido))
+    } else {
+      # Si solo hay una palabra, la devuelve tal cual
+      return(nombre)
+    }
+  }, USE.NAMES = FALSE)
+}
+
+# 1. Cargar el archivo de conversiones
+ruta_conversiones <- "conversions.txt"
+mapa_conversiones <- NULL
+if (file.exists(ruta_conversiones)) {
+  tryCatch({
+    conversiones_df <- read.csv(ruta_conversiones, stringsAsFactors = FALSE, encoding = "UTF-8")
+    # Crear un vector nombrado que sirva como mapa/diccionario para recode
+    mapa_conversiones <- setNames(conversiones_df$corregido, conversiones_df$original)
+    message("Archivo de conversiones cargado y procesado.")
+  }, error = function(e) {
+    warning("Error al leer el archivo conversions.txt. No se aplicarán correcciones.")
+  })
+} else {
+  message("Archivo conversions.txt no encontrado. Se continuará sin aplicar correcciones de nombres.")
+}
+
+# 2. Aplicar correcciones a todos los dataframes relevantes
+if (!is.null(mapa_conversiones)) {
+  # Corregir nombres de equipos y estadios en partidos_df
+  partidos_df <- aplicar_conversiones(partidos_df, c("local", "visitante", "estadio"), mapa_conversiones)
+  
+  # Corregir nombres en los datos de resultados exitosos (fuente de todos los demás dataframes)
+  resultados_exitosos <- map(resultados_exitosos, function(res) {
+    if (is.null(res)) return(NULL)
+    
+    # Info del partido
+    res$partido_info <- aplicar_conversiones(res$partido_info, c("local", "visitante"), mapa_conversiones)
+    res$estadio <- recode(res$estadio, !!!mapa_conversiones)
+    res$arbitro_principal <- recode(res$arbitro_principal, !!!mapa_conversiones)
+    res$arbitro_asist_1 <- recode(res$arbitro_asist_1, !!!mapa_conversiones)
+    res$arbitro_asist_2 <- recode(res$arbitro_asist_2, !!!mapa_conversiones)
+    
+    # Alineaciones
+    res$alineacion_local <- aplicar_conversiones(res$alineacion_local, c("nombre"), mapa_conversiones)
+    res$alineacion_visitante <- aplicar_conversiones(res$alineacion_visitante, c("nombre"), mapa_conversiones)
+    
+    # Goles
+    res$goles <- aplicar_conversiones(res$goles, c("jugadora", "equipo_jugadora", "equipo_acreditado"), mapa_conversiones)
+    
+    # Tarjetas
+    res$tarjetas <- aplicar_conversiones(res$tarjetas, c("jugadora", "equipo"), mapa_conversiones)
+    
+    return(res)
+  })
+}
+
+# 3. Reordenar nombres de jugadoras (APELLIDO, NOMBRE -> NOMBRE APELLIDO)
+resultados_exitosos <- map(resultados_exitosos, function(res) {
+  if (is.null(res)) return(NULL)
+  
+  if (nrow(res$alineacion_local) > 0) {
+    res$alineacion_local$nombre <- reordenar_nombre_jugadora(res$alineacion_local$nombre)
+  }
+  if (nrow(res$alineacion_visitante) > 0) {
+    res$alineacion_visitante$nombre <- reordenar_nombre_jugadora(res$alineacion_visitante$nombre)
+  }
+  if (nrow(res$goles) > 0) {
+    res$goles$jugadora <- reordenar_nombre_jugadora(res$goles$jugadora)
+  }
+  if (nrow(res$tarjetas) > 0) {
+    res$tarjetas$jugadora <- reordenar_nombre_jugadora(res$tarjetas$jugadora)
+  }
+  
+  return(res)
+})
+
+
 # --- 7.1: Cargar y unificar datos brutos ---
 apariciones_df_raw <- map_dfr(resultados_exitosos, ~bind_rows(
   .x$alineacion_local %>% mutate(id_partido = .x$partido_info$id_partido, equipo = .x$partido_info$local, competicion_nombre = .x$partido_info$competicion_nombre, competicion_temporada = .x$partido_info$competicion_temporada),
@@ -311,7 +409,7 @@ apariciones_df <- apariciones_df_raw %>% left_join(minutos_df_raw %>% select(id_
 
 goles_raw_df <- map_dfr(resultados_exitosos, "goles")
 if (nrow(goles_raw_df) > 0) { goles_df_unificado <- goles_raw_df %>% mutate(jugadora = str_squish(jugadora)) %>% left_join(id_mapping, by = c("jugadora" = "nombre")) %>% select(-any_of(c("id", "id_jugadora"))) %>% rename(id = canonical_id)
-} else { goles_df_unificado <- tibble(id_partido = character(), jugadora = character(), equipo_jugadora = character(), equipo = character(), minuto = integer(), dorsal = integer(), tipo = character(), id = character()) }
+} else { goles_df_unificado <- tibble(id_partido = character(), jugadora = character(), equipo_jugadora = character(), equipo_acreditado = character(), minuto = integer(), dorsal = integer(), tipo = character(), id = character()) }
 
 tarjetas_raw_df <- map_dfr(resultados_exitosos, "tarjetas")
 if(nrow(tarjetas_raw_df) > 0) { tarjetas_df_unificado <- tarjetas_raw_df %>% mutate(jugadora = str_squish(jugadora)) %>% left_join(id_mapping, by = c("jugadora" = "nombre")) %>% select(-any_of(c("id", "id_jugadora"))) %>% rename(id = canonical_id)
@@ -336,7 +434,7 @@ posiciones_procesadas_df <- posiciones_df %>%
   # Usamos el diccionario para crear una nueva columna traducida.
   mutate(posicion_mk = recode(posicion, !!!traduccion_posicion_mk, .default = NA_character_)) %>%
   
-  # Quitamos cualquier fila que no se haya podido traducir
+  # Quitamos cualquier fila que не se haya podido traducir
   filter(!is.na(posicion_mk)) %>%
   
   # Agrupamos por jugadora para manejar los casos de múltiples posiciones
@@ -465,6 +563,7 @@ search_index_df <- bind_rows(search_jugadoras, search_equipos, search_arbitros, 
   arrange(Име)
 
 search_data_json <- toJSON(search_index_df, auto_unbox = TRUE)
+
 
 
 # =========================================================================
@@ -1518,62 +1617,34 @@ walk(1:nrow(jugadoras_stats_df), function(i) {
 })
 
 # Bucle para EQUIPOS
-walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_name) {
-  if (is.na(team_name)) return()
-  
-  id_t <- generar_id_seguro(team_name)
-  
-  # Filtrar partidos del equipo y ordenarlos por fecha
-  historial_equipo <- partidos_df_enriquecido %>%
-    filter(local == team_name | visitante == team_name) %>%
-    mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
-    arrange(desc(fecha_date))
-  
-  # Filtrar jugadoras que han aparecido en el equipo
-  plantilla_equipo <- apariciones_df %>%
-    filter(equipo == team_name) %>%
-    distinct(id, nombre) %>%
-    arrange(nombre)
+walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team) {
+  id_t <- generar_id_seguro(team)
+  historial_equipo <- partidos_df %>% filter(local == team | visitante == team) %>% mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y"))
+  temporadas_summary <- historial_equipo %>% group_by(competicion_temporada, competicion_nombre) %>% summarise(last_match_date = max(fecha_date, na.rm = TRUE), .groups = 'drop') %>% arrange(desc(last_match_date))
   
   contenido_equipo <- tagList(
     crear_botones_navegacion(".."),
-    tags$h2(team_name),
-    
-    tags$h3("Состав"),
-    tags$ul(
-      if (nrow(plantilla_equipo) > 0) {
-        map(1:nrow(plantilla_equipo), function(p_idx) {
-          jugadora <- plantilla_equipo[p_idx,]
-          tags$li(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(jugadora$id, ".html")), jugadora$nombre))
-        })
-      } else {
-        tags$li("Нема податоци за составот.")
-      }
-    ),
-    
-    tags$h3("Натпревари"),
-    tags$table(
-      tags$thead(tags$tr(tags$th("Датум"), tags$th("Натпреварување"), tags$th("Коло"), tags$th("Натпревар"), tags$th("Резултат"))),
-      tags$tbody(
-        if (nrow(historial_equipo) > 0) {
-          map(1:nrow(historial_equipo), function(m_idx) {
-            partido <- historial_equipo[m_idx,]
-            tags$tr(
-              tags$td(partido$fecha),
-              tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$competiciones, paste0(partido$competicion_id, ".html")), partido$competicion_nombre)),
-              tags$td(partido$jornada),
-              tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$partidos, paste0(partido$id_partido, ".html")), paste(partido$local, "vs", partido$visitante))),
-              tags$td(paste(partido$goles_local, "-", partido$goles_visitante))
-            )
-          })
-        } else {
-          tags$tr(tags$td(colspan="5", "Нема одиграни натпревари."))
-        }
-      )
-    )
+    tags$h2(team), tags$h3("Историја по натпреварувања"),
+    tags$table(class="team-career-summary", tags$thead(tags$tr(tags$th("Сезона"), tags$th("Натпреварување"))),
+               tags$tbody(map(1:nrow(temporadas_summary), function(j) {
+                 stage <- temporadas_summary[j,]; details_id <- paste0("details-", id_t, "-", j)
+                 historial_stage <- historial_equipo %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre) %>% arrange(fecha_date)
+                 ids_partidos_stage <- historial_stage$id_partido
+                 stats_jugadoras_stage <- apariciones_df %>% filter(id_partido %in% ids_partidos_stage, equipo == team) %>% group_by(id, nombre) %>% summarise(Повикана = n_distinct(id_partido), Одиграни = sum(minutos_jugados > 0, na.rm = TRUE), Минути = sum(minutos_jugados, na.rm = TRUE), .groups = 'drop')
+                 goles_stage <- goles_df_unificado %>% filter(id_partido %in% ids_partidos_stage, equipo_jugadora == team) %>% group_by(id) %>% summarise(Голови = n(), .groups = 'drop')
+                 tarjetas_stage <- tarjetas_df_unificado %>% filter(id_partido %in% ids_partidos_stage, equipo == team) %>% group_by(id) %>% summarise(Жолти = sum(tipo == "Amarilla", na.rm = TRUE), Црвени = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop')
+                 stats_final_stage <- stats_jugadoras_stage %>% left_join(goles_stage, by = "id") %>% left_join(tarjetas_stage, by = "id") %>% mutate(across(c(Голови, Жолти, Црвени), ~replace_na(., 0))) %>% select(id, Фудбалерка = nombre, Повикана, Одиграни, Минути, Голови, Жолти, Црвени) %>% arrange(desc(Минути))
+                 headers_stats <- c("Фудбалерка", "Пов", "Одиг", "Мин", "Гол", "Ж", "Ц")
+                 tagList(
+                   tags$tr(class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id), tags$td(stage$competicion_temporada), tags$td(stage$competicion_nombre)),
+                   tags$tr(id = details_id, class="details-row", tags$td(colspan="2", tags$div(class="details-content",
+                                                                                               tags$h4("Статистика на фудбалерки"), tags$table(tags$thead(tags$tr(map(headers_stats, tags$th))), tags$tbody(if(nrow(stats_final_stage) > 0) { map(1:nrow(stats_final_stage), function(p_idx) { p <- stats_final_stage[p_idx,]; tags$tr(tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(p$id, ".html")), p$Фудбалерка)), tags$td(p$Повикана), tags$td(p$Одиграни), tags$td(p$Минути), tags$td(p$Голови), tags$td(p$Жолти), tags$td(p$Црвени)) }) } else { tags$tr(tags$td(colspan=length(headers_stats), "Нема податоци за фудбалерки.")) })),
+                                                                                               tags$h4("Список на натпревари"), tags$table(tags$thead(tags$tr(tags$th("Коло"), tags$th("Датум"), tags$th("Домаќин"), tags$th("Гостин"), tags$th("Резултат"))), tags$tbody(map(1:nrow(historial_stage), function(p_idx) { partido <- historial_stage[p_idx,]; tags$tr(tags$td(partido$jornada), tags$td(partido$fecha), tags$td(partido$local), tags$td(partido$visitante), tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$partidos, paste0(partido$id_partido, ".html")), paste(partido$goles_local, "-", partido$goles_visitante)))) })))
+                   )))
+                 )
+               })))
   )
-  
-  pagina_equipo_final <- crear_pagina_html(contenido_equipo, team_name, "..", search_data_json, script_contraseña)
+  pagina_equipo_final <- crear_pagina_html(contenido_equipo, team, "..", search_data_json, script_contraseña)
   save_html(pagina_equipo_final, file = file.path(RUTA_EQUIPOS, paste0(id_t, ".html")))
 })
 
