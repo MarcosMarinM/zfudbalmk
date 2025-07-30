@@ -624,26 +624,25 @@ search_data_json <- toJSON(search_index_df, auto_unbox = TRUE)
 ### 12.1. Guardar hoja de estilos (style.css) ----
 
 # Se define todo el CSS como un string y se escribe en un archivo externo.
-# Esto mantiene el código R limpio y permite una gestión de estilos más sencilla.
 estilo_css <- r"(
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #212529; margin: 0; }
 .container { max-width: 900px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
 .page { display: none; } #portal { display: block; }
-h1, h2, h3 { color: #003366; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; }
+h1, h2, h3 { color: #8B0000; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; }
 h1 { font-size: 2.5em; text-align: center; } h2 { font-size: 1.8em; margin-top: 40px; } h3 { font-size: 1.5em; }
-a { color: #0056b3; text-decoration: none; font-weight: bold; } a:hover { text-decoration: underline; }
+a { color: #CC0000; text-decoration: none; font-weight: bold; } a:hover { text-decoration: underline; }
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
 th { background-color: #f2f2f2; }
-.summary-row { cursor: pointer; } .summary-row:hover { background-color: #f0f8ff; }
+.summary-row { cursor: pointer; } .summary-row:hover { background-color: #FFF0F0; }
 .details-row { display: none; } .details-row > td { padding: 0; }
-.details-content { padding: 20px; background-color: #fdfdfd; border-top: 2px solid #003366; }
-.details-content h4 { font-size: 1.3em; color: #004488; margin-top: 10px; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px;}
+.details-content { padding: 20px; background-color: #fdfdfd; border-top: 2px solid #8B0000; }
+.details-content h4 { font-size: 1.3em; color: #8B0000; margin-top: 10px; border-bottom: 1px solid #e0e0e0; padding-bottom: 5px;}
 .back-link, .menu-button, .portal-button { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: #6c757d; color: white !important; border-radius: 5px; font-weight: bold; text-decoration: none; text-align: center;}
 .back-link:hover, .menu-button:hover, .portal-button:hover { background-color: #5a6268; text-decoration: none; }
 .menu-container, .portal-container { text-align: center; padding: 20px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
-.menu-button { padding: 15px 30px; font-size: 1.1em; background-color: #003366; color: white !important; } .menu-button:hover { background-color: #002244; }
-.portal-button { width: 80%; padding: 20px; font-size: 1.3em; background-color: #004488; } .portal-button:hover { background-color: #003366; }
+.menu-button { padding: 15px 30px; font-size: 1.1em; background-color: #8B0000; color: white !important; } .menu-button:hover { background-color: #660000; }
+.portal-button { width: 80%; padding: 20px; font-size: 1.3em; background-color: #8B0000; } .portal-button:hover { background-color: #660000; }
 .sortable-header { cursor: pointer; user-select: none; } .sortable-header::after { content: ' '; display: inline-block; margin-left: 5px; }
 .sortable-header.asc::after { content: '▲'; } .sortable-header.desc::after { content: '▼'; }
 .partido-link { display: flex; justify-content: space-between; align-items: center; padding: 15px; margin: 10px 0; background-color: #e9ecef; border-radius: 5px; transition: background-color 0.2s; }
@@ -652,7 +651,7 @@ th { background-color: #f2f2f2; }
 .partido-link span.equipo-local { text-align: right; margin-right: 15px; justify-content: flex-end; }
 .partido-link span.equipo-visitante { text-align: left; margin-left: 15px; }
 .partido-link span.resultado { font-size: 1.2em; font-weight: bold; text-align: center; }
-.jornada-header { background-color: #003366; color: white; padding: 10px; border-radius: 5px; margin-top: 30px; }
+.jornada-header { background-color: #8B0000; color: white; padding: 10px; border-radius: 5px; margin-top: 30px; }
 .timeline { list-style: none; padding-left: 0; } .timeline li { padding: 8px 0; border-bottom: 1px dotted #ccc; display: flex; align-items: center; }
 .timeline .icon { margin-right: 10px; font-size: 1.2em; width: 24px; text-align: center; }
 .alineaciones-container { display: flex; gap: 30px; align-items: flex-start; } .columna-alineacion { flex: 1; }
@@ -665,19 +664,19 @@ th { background-color: #f2f2f2; }
 .search-container { position: relative; margin: 25px 0; }
 .search-container form { display: flex; }
 .search-input { flex-grow: 1; font-size: 1.1em; padding: 12px; border: 1px solid #ccc; border-radius: 5px 0 0 5px; }
-.search-button { font-size: 1.1em; padding: 12px 20px; border: 1px solid #003366; background-color: #003366; color: white; cursor: pointer; border-radius: 0 5px 5px 0; }
+.search-button { font-size: 1.1em; padding: 12px 20px; border: 1px solid #8B0000; background-color: #8B0000; color: white; cursor: pointer; border-radius: 0 5px 5px 0; }
 #search-suggestions { display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: white; border: 1px solid #ccc; border-top: none; z-index: 1000; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 #search-suggestions a { display: block; padding: 12px; color: #333; text-decoration: none; border-bottom: 1px solid #f0f0f0; }
 #search-suggestions a:last-child { border-bottom: none; }
 #search-suggestions a:hover { background-color: #f2f2f2; }
-#search-suggestions a strong { color: #003366; }
+#search-suggestions a strong { color: #8B0000; }
 #search-results-list ul { list-style-type: none; padding: 0; }
 #search-results-list li { margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 4px; }
 #search-results-list a { font-size: 1.2em; text-decoration: none; }
 #search-results-list a:hover { text-decoration: underline; }
 .search-result-type { font-size: 0.85em; color: #6c757d; margin-left: 8px; }
 .clickable-row { cursor: pointer; }
-.clickable-row:hover { background-color: #f0f8ff; }
+.clickable-row:hover { background-color: #FFF0F0; }
 .legend { margin-top: 20px; padding: 10px; text-align: left; font-size: 0.9em; }
 .legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
 .legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
@@ -700,7 +699,7 @@ th { background-color: #f2f2f2; }
   padding-bottom: 0;
   margin-bottom: 5px;
 }
-.alineacion-header h3 a { color: #003366; }
+.alineacion-header h3 a { color: #8B0000; }
 )"
 writeLines(estilo_css, file.path(RUTA_ASSETS, "style.css"))
 
