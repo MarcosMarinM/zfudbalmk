@@ -132,7 +132,7 @@ crear_botones_navegacion <- function(ruta_relativa_assets = ".") {
   )
 }
 
-# --- NUEVA FUNCIÓN AÑADIDA PARA CORREGIR EL ERROR ---
+# --- CREAR CRONOLOGÍA ---
 generar_cronologia_df <- function(id_p, resumen_partido) {
   lista_eventos <- list()
   
@@ -165,13 +165,17 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
     tarjetas_eventos <- tarjetas_data %>%
       mutate(
         icono = if_else(tipo == "Amarilla", "🟨", "🟥"),
+        # --- INICIO DE LA CORRECCIÓN ---
+        # La lógica se simplifica para asegurar que el nombre del equipo siempre se muestre.
+        # El enlace al equipo se reconstruye correctamente.
         texto_evento = paste0(
           "Картон за ",
           sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_jugadora, jugadora),
           " (",
-          sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$equipos, generar_id_seguro(equipo), equipo),
+          sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(equipo), equipo),
           ")"
         )
+        # --- FIN DE LA CORRECCIÓN ---
       ) %>%
       select(minuto, icono, texto_evento)
     lista_eventos[[length(lista_eventos) + 1]] <- tarjetas_eventos
@@ -189,19 +193,17 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
       nombre_entra <- match_info[1, 2]; dorsal_entra <- match_info[1, 3]
       nombre_sale <- match_info[1, 4]; dorsal_sale <- match_info[1, 5]
       
-      # --- INICIO DE LA CORRECCIÓN: Búsqueda robusta de IDs ---
       info_entra <- filter(alineacion_equipo, nombre == nombre_entra, dorsal == as.numeric(dorsal_entra))
       id_entra <- if (nrow(info_entra) > 0) info_entra$id[1] else NA_character_
       
       info_sale <- filter(alineacion_equipo, nombre == nombre_sale, dorsal == as.numeric(dorsal_sale))
       id_sale <- if (nrow(info_sale) > 0) info_sale$id[1] else NA_character_
-      # --- FIN DE LA CORRECCIÓN ---
       
       texto_entra_link <- if (!is.na(id_entra)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_entra, nombre_entra) else nombre_entra
       texto_sale_link <- if (!is.na(id_sale)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_sale, nombre_sale) else nombre_sale
       
       texto_final <- paste0(
-        "Измена за ", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$equipos, generar_id_seguro(nombre_equipo), nombre_equipo),
+        "Измена за ", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(nombre_equipo), nombre_equipo),
         ": влегува ", texto_entra_link, " (", dorsal_entra, ") на местото на ", texto_sale_link, " (", dorsal_sale, ")"
       )
       
@@ -209,7 +211,6 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
     })
   }
   
-  # Unimos las alineaciones para tener un mapa ID-Nombre-Dorsal completo para este partido
   alineacion_completa <- bind_rows(
     resumen_partido$alineacion_local %>%
       mutate(equipo = resumen_partido$partido_info$local) %>%
@@ -229,7 +230,6 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
   lista_eventos[[length(lista_eventos) + 1]] <- cambios_local_eventos
   lista_eventos[[length(lista_eventos) + 1]] <- cambios_visitante_eventos
   
-  # Combinar y ordenar
   if (length(lista_eventos) == 0) {
     return(tibble(minuto = integer(), icono = character(), texto_evento = character()))
   }
@@ -1535,6 +1535,9 @@ partidos_df_enriquecido <- partidos_df %>%
     by = c("competicion_nombre", "competicion_temporada")
   )
 
+# ====================================================================
+# Bucle para PARTIDOS 
+# ====================================================================
 walk(1:nrow(partidos_df_enriquecido), function(i) {
   
   partido <- partidos_df_enriquecido[i, ]
@@ -1583,7 +1586,12 @@ walk(1:nrow(partidos_df_enriquecido), function(i) {
             })
           }
           
-          tarjetas_jugadora <- tarjetas_df_unificado %>% filter(id == !!id)
+          # --- INICIO DE LA CORRECCIÓN DE TARJETAS ---
+          # Se usa 'tarjetas_del_partido' (el dataframe ya filtrado para este partido)
+          # en lugar del global 'tarjetas_df_unificado'.
+          tarjetas_jugadora <- tarjetas_del_partido %>% filter(id == !!id)
+          # --- FIN DE LA CORRECCIÓN DE TARJETAS ---
+          
           if (nrow(tarjetas_jugadora) > 0) {
             walk(1:nrow(tarjetas_jugadora), function(c) {
               tarjeta <- tarjetas_jugadora[c,]
