@@ -13,7 +13,6 @@ function initializeSearch() {
     }
   }
   
-  // Ocultar sugerencias si se hace clic fuera del buscador
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer && !searchContainer.contains(event.target)) {
@@ -22,18 +21,13 @@ function initializeSearch() {
     }
   });
 
-  // ================== NUEVO MANEJADOR DE CLICS (UBICACIÓN CORRECTA) ==================
   // Delegación de eventos para manejar clics en filas de tabla clicables.
-  // Lo ponemos aquí para que se active una vez que la página ha cargado.
   document.addEventListener('click', function(event) {
-    // 'closest' sube por el DOM para encontrar el ancestro más cercano que coincida
     const clickableRow = event.target.closest('.clickable-row');
-    
     if (clickableRow && clickableRow.dataset.href) {
       window.location.href = clickableRow.dataset.href;
     }
   });
-  // =================================================================================
 }
 
 function toggleDetails(elementId) {

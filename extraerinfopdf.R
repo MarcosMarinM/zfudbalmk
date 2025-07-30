@@ -1,66 +1,94 @@
-# =========================================================================
-# SCRIPT DE ANÁLISIS DE ACTAS DE FÚTBOL
-# =========================================================================
+################################################################################
+##                                                                            ##
+##                  SCRIPT DE ANÁLISIS DE ACTAS DE FÚTBOL                     ##
+##                                                                            ##
+################################################################################
 
-# -------------------------------------------------------------------------
-# PASO 0: INSTALAR Y CARGAR PAQUETES
-# -------------------------------------------------------------------------
+
+## -------------------------------------------------------------------------- ##
+##  0. CONFIGURACIÓN INICIAL
+## -------------------------------------------------------------------------- ##
+
+# Carga de paquetes necesarios. Se usa 'pacman' para instalar y cargar
+# eficientemente todas las dependencias.
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   pdftools, stringr, dplyr, tidyr, purrr, knitr, readxl
 )
 
-# =========================================================================
-# FUNCIÓN AUXILIAR PARA FORMATEAR MINUTOS DE TIEMPO AÑADIDO
-# =========================================================================
+
+## -------------------------------------------------------------------------- ##
+##  1. DEFINICIÓN DE FUNCIONES AUXILIARES
+## -------------------------------------------------------------------------- ##
+
+### 1.1. Formatear minutos de partido ----
+
+#' Formatea un vector de minutos para manejar el tiempo añadido.
+#'
+#' Convierte minutos numéricos a formato de texto. La lógica principal es transformar
+#' valores como 451 en "45+1" o 902 en "90+2", que representan el tiempo de descuento.
+#'
+#' @param minutos Un vector numérico de minutos.
+#' @return Un vector de caracteres con los minutos formateados.
 formatear_minuto_partido <- function(minutos) {
-  # Esta función se aplica a un vector de minutos
   sapply(minutos, function(minuto) {
-    # Si el minuto es NA o no es un número, lo devolvemos tal cual
+    # Control de casos NA o no numéricos.
     if (is.na(minuto) || !is.numeric(minuto)) {
       return(as.character(minuto))
     }
     
-    # La regla: si es mayor de 140, es un minuto de tiempo añadido
-    # y nos aseguramos de que tenga al menos 3 dígitos (ej. 451, 901)
+    # Lógica de negocio para detectar tiempo añadido (e.g., 451 -> "45+1").
+    # Se aplica si el minuto es mayor de 140 y tiene al menos 3 dígitos.
     if (minuto > 140 && nchar(as.character(minuto)) >= 3) {
       minuto_str <- as.character(minuto)
       base <- substr(minuto_str, 1, 2)
       added <- substr(minuto_str, 3, nchar(minuto_str))
-      # Devolvemos el formato "base+añadido"
       return(paste0(base, "+", added))
     } else {
-      # Si no cumple la regla, devolvemos el minuto normal
+      # Para minutos estándar, se devuelve el valor como caracter.
       return(as.character(minuto))
     }
   })
 }
 
-# =========================================================================
-# FUNCIÓN PARA CARGAR Y PROCESAR POSICIONES DESDE XLS 
-# =========================================================================
 
+### 1.2. Cargar y procesar datos de jugadoras (XLS) ----
+
+#' Carga y procesa datos de jugadoras desde un archivo XLS.
+#'
+#' Lee un archivo .xlsx que contiene información demográfica y de posición de las
+#' jugadoras. Filtra por los IDs de jugadoras encontradas en las actas y extrae
+#' la posición más específica disponible.
+#'
+#' @param ruta_xls Ruta al archivo .xlsx con datos de jugadoras.
+#' @param ids_jugadoras_validas Vector de IDs de jugadoras extraídos de las actas.
+#' @return Un tibble con `id`, `posicion`, `nacionalidad`, `fecha_nacimiento` y
+#'   `ciudad_nacimiento` para las jugadoras encontradas.
 cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
   
+  # Verificación de la existencia del archivo.
   if (!file.exists(ruta_xls)) {
-    warning(paste("Archivo de posiciones no encontrado en:", ruta_xls, "- Se continuará sin datos de posición."))
+    warning(paste("Archivo de posiciones no encontrado:", ruta_xls, "- Se continuará sin datos de posición."))
     return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
   message("Cargando y procesando el archivo de posiciones: ", basename(ruta_xls))
   
+  # Intenta leer el archivo .xls de forma segura.
   datos_xls <- tryCatch({ read_excel(ruta_xls) }, error = function(e) {
     warning("Error al leer el archivo .xls. Se continuará sin datos de posición.")
     return(NULL)
   })
   
+  # Verificación de la existencia de columnas críticas.
   columnas_requeridas <- c("FA ID Number", "Nationality Name", "Date Of Birth", "City Of Birth Name")
   if (is.null(datos_xls) || !all(columnas_requeridas %in% names(datos_xls))) {
     columnas_faltantes <- paste(setdiff(columnas_requeridas, names(datos_xls)), collapse=", ")
-    warning(paste("El archivo XLS no contiene las columnas requeridas. Faltan:", columnas_faltantes, ". No se pueden procesar las posiciones ni los datos demográficos."))
+    warning(paste("El archivo XLS no contiene las columnas requeridas. Faltan:", columnas_faltantes))
     return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
+  # Renombrado y preparación de columnas.
   datos_xls <- datos_xls %>%
     select(-any_of("ID")) %>% 
     rename(
@@ -68,52 +96,47 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
       nacionalidad = `Nationality Name`,
       fecha_nacimiento = `Date Of Birth`,
       ciudad_nacimiento = `City Of Birth Name`
-    )
+    ) %>%
+    mutate(ID = as.character(ID))
   
-  ids_jugadoras_validas <- as.character(ids_jugadoras_validas)
-  datos_xls <- datos_xls %>% mutate(ID = as.character(ID))
-  
+  # Filtrado para mantener solo las jugadoras presentes en las actas.
   datos_relevantes_xls <- datos_xls %>% 
-    filter(ID %in% ids_jugadoras_validas)
+    filter(ID %in% as.character(ids_jugadoras_validas))
   
   if(nrow(datos_relevantes_xls) == 0) {
-    message("Ninguna de las jugadoras del archivo XLS coincide con las jugadoras procesadas de las actas.")
+    message("Ninguna de las jugadoras del archivo XLS coincide con las jugadoras de las actas.")
     return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   }
   
-  # Definimos todas las columnas de posiciones posibles
+  # Definición de las columnas de posición y datos demográficos.
   columnas_posiciones <- c("GK", "DL", "DC", "DR", "DM", "WBL", "WBR", "ML", "MC", "MR", "AML", "AMC", "AMR", "SC")
-  
-  # AÑADIMOS LAS NUEVAS COLUMNAS DE DATOS A LA SELECCIÓN
   columnas_adicionales <- c("nacionalidad", "fecha_nacimiento", "ciudad_nacimiento")
   
-  # Seleccionamos solo las columnas que nos interesan para el procesamiento
-  columnas_existentes <- intersect(c("ID", "Position Partially Known", columnas_posiciones, columnas_adicionales), names(datos_relevantes_xls))
-  datos_filtrados <- datos_relevantes_xls %>% select(all_of(columnas_existentes))
+  columnas_a_seleccionar <- intersect(
+    c("ID", "Position Partially Known", columnas_posiciones, columnas_adicionales), 
+    names(datos_relevantes_xls)
+  )
+  datos_filtrados <- datos_relevantes_xls %>% select(all_of(columnas_a_seleccionar))
   
-  # Usamos pmap para iterar por cada fila de manera eficiente
+  # Se itera sobre cada jugadora del archivo XLS para extraer su posición.
   posiciones_final <- pmap_dfr(datos_filtrados, function(...) {
     fila_actual <- list(...)
     id_jugadora <- fila_actual$ID
     
-    # EXTRAEMOS LOS DATOS DEMOGRÁFICOS
+    # Extracción de datos demográficos.
     nacionalidad_jugadora <- fila_actual$nacionalidad
     fecha_nac_jugadora <- fila_actual$fecha_nacimiento
     ciudad_nac_jugadora <- fila_actual$ciudad_nacimiento
     
-    # 1. BUSCAR POSICIONES EXACTAS (REGLA DEL 20)
+    # 1. Búsqueda de posición específica (valor en columna de posición == 20).
     pos_exactas_encontradas <- character(0)
-    
-    # Iteramos solo sobre las columnas de posición que existen en el archivo
     for (pos_code in intersect(columnas_posiciones, names(fila_actual))) {
-      # Comprobamos que el valor es 20 y no es NA
       if (!is.na(fila_actual[[pos_code]]) && fila_actual[[pos_code]] == 20) {
-        # Añadimos el código de la posición (ej. "DC", "MC") directamente
         pos_exactas_encontradas <- c(pos_exactas_encontradas, pos_code)
       }
     }
     
-    # Si encontramos una o más posiciones con valor 20, las usamos y terminamos.
+    # Si se encuentra una posición específica, se utiliza y se finaliza para esta jugadora.
     if (length(pos_exactas_encontradas) > 0) {
       return(tibble(
         id = id_jugadora, 
@@ -124,10 +147,9 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
       ))
     }
     
-    # 2. SI NO HAY POSICIÓN EXACTA, USAR LA POSICIÓN PARCIALMENTE CONOCIDA
+    # 2. Si no hay posición específica, se usa la posición general (Defensa, Centrocampista, etc.).
     pos_parcial <- fila_actual[["Position Partially Known"]]
     if (!is.null(pos_parcial) && !is.na(pos_parcial)) {
-      # Aquí sí usamos la posición agrupada como fallback
       posicion_agrupada <- case_when(
         pos_parcial == 1 ~ "Defensa",
         pos_parcial == 2 ~ "Centrocampista",
@@ -145,37 +167,36 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
       }
     }
     
-    # 3. SI NO HAY NINGUNA INFORMACIÓN, NO DEVOLVEMOS NADA PARA ESTA JUGADORA
-    # Devolver un tibble vacío con el esquema correcto es más seguro que devolver NA
+    # 3. Si no hay datos, se devuelve un tibble vacío para mantener la consistencia.
     return(tibble(id = character(), posicion = character(), nacionalidad = character(), fecha_nacimiento = as.POSIXct(character()), ciudad_nacimiento = character()))
   })
   
-  # Limpiar filas donde la posición esté vacía y asegurar unicidad
+  # Limpieza final para eliminar jugadoras sin posición asignada y duplicados.
   posiciones_final <- posiciones_final %>% 
     filter(!is.na(posicion), trimws(posicion) != "") %>%
     distinct()
   
-  message("Procesamiento de posiciones y datos demográficos completado. Se encontraron ", nrow(posiciones_final), " asignaciones para las jugadoras de las actas.")
+  message("Procesamiento de posiciones completado. Se encontraron ", nrow(posiciones_final), " asignaciones.")
   
   return(posiciones_final)
 }
 
 
+## -------------------------------------------------------------------------- ##
+##  2. DEFINICIÓN DE FUNCIONES DE PARSEO DEL PDF
+## -------------------------------------------------------------------------- ##
 
-# -------------------------------------------------------------------------
-# PASO 1: DEFINIR RUTA Y OBTENER LISTA DE ARCHIVOS PDF
-# -------------------------------------------------------------------------
-ruta_pdfs <- "Actas"
-archivos_pdf <- list.files(path = ruta_pdfs, pattern = "\\.pdf$", full.names = TRUE, recursive = TRUE)
+### 2.1. Parsear bloque de alineaciones y cambios ----
 
-if (length(archivos_pdf) == 0) {
-  stop("No se encontraron archivos PDF en la ruta especificada. Revisa la ruta.")
-}
-
-
-# -------------------------------------------------------------------------
-# PASO 2: FUNCIÓN DE PARSEO DE JUGADORAS (SIN CAMBIOS EN ESTA SECCIÓN)
-# -------------------------------------------------------------------------
+#' Parsea el bloque de texto de alineaciones para extraer jugadoras y cambios.
+#'
+#' Función compleja que identifica las columnas de equipo local y visitante, extrae
+#' los datos de cada jugadora (dorsal, nombre, ID, si es portera o capitana) y
+#' asocia las sustituciones con las jugadoras que entran al campo.
+#'
+#' @param bloque_texto El fragmento de texto del PDF que contiene las alineaciones.
+#' @return Una lista con dataframes para `alineacion_local`, `cambios_local`,
+#'   `alineacion_visitante` y `cambios_visitante`.
 parsear_bloque_jugadoras_final <- function(bloque_texto) {
   lineas_raw_originales <- str_split(bloque_texto, "\\n")[[1]]
   regex_sub_local <- "\\((\\d{1,2})\\)\\s*\\d{1,3}\\b"
@@ -200,6 +221,7 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
   lineas_local <- str_sub(lineas_raw_originales, 1, split_col - 1)
   lineas_visitante <- str_sub(lineas_raw_originales, split_col, -1)
   
+  # Función interna para extraer datos de una columna de texto.
   extraer_de_columna <- function(lineas_columna, equipo_tag) {
     lineas_procesadas <- list()
     i <- 1
@@ -243,10 +265,14 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
     }
     return(jugadoras_col)
   }
+  
+  # Se procesan las columnas local y visitante.
   jugadoras_local <- extraer_de_columna(lineas_local, "local")
   jugadoras_visitante <- extraer_de_columna(lineas_visitante, "visitante")
   jugadoras_visitante <- map(jugadoras_visitante, function(j) { j$pos_start <- j$pos_start + split_col; j$pos_end <- j$pos_end + split_col; return(j) })
   jugadoras <- c(jugadoras_local, jugadoras_visitante)
+  
+  # Lógica para identificar y asociar las sustituciones a las jugadoras.
   cambios <- list()
   for(i in seq_along(lineas_raw_originales)) {
     linea <- lineas_raw_originales[i]
@@ -278,6 +304,8 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
       }
     }
   }
+  
+  # Función interna para construir los dataframes finales por equipo.
   construir_equipo_df <- function(lista_jugadoras, equipo_filtro) {
     jugadoras_equipo <- Filter(function(j) j$equipo == equipo_filtro, lista_jugadoras)
     if (length(jugadoras_equipo) == 0) return(list(alineacion = data.frame(id=character(), dorsal = integer(), nombre = character(), es_portera = logical(), es_capitana = logical(), tipo = character()), cambios = data.frame(minuto = integer(), texto = character())))
@@ -295,16 +323,32 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
     }
     return(list(alineacion = alineacion_df, cambios = cambios_df))
   }
+  
   res_local <- construir_equipo_df(jugadoras, "local")
   res_visitante <- construir_equipo_df(jugadoras, "visitante")
+  
   return(list(alineacion_local = res_local$alineacion, cambios_local = res_local$cambios, alineacion_visitante = res_visitante$alineacion, cambios_visitante = res_visitante$cambios))
 }
 
-# -------------------------------------------------------------------------
-# PASO 2.5: FUNCIÓN AUXILIAR PARA EXTRAER TARJETAS (SIN CAMBIOS)
-# -------------------------------------------------------------------------
+
+### 2.2. Extraer tarjetas (amarillas y rojas) ----
+
+#' Extrae la información de tarjetas del texto del acta.
+#'
+#' Busca las secciones de "Amonestaciones" (Опомени) y "Expulsiones" (Исклучување)
+#' y parsea los datos de cada tarjeta: jugadora, equipo, minuto, tipo y motivo.
+#' Maneja tanto rojas directas como dobles amarillas.
+#'
+#' @param texto_acta Texto completo del PDF.
+#' @param equipo_local_nombre Nombre del equipo local.
+#' @param equipo_visitante_nombre Nombre del equipo visitante.
+#' @param alineacion_local Dataframe con la alineación del equipo local.
+#' @param alineacion_visitante Dataframe con la alineación del equipo visitante.
+#' @return Un dataframe con todas las tarjetas del partido.
 extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_nombre, alineacion_local, alineacion_visitante) {
   tarjetas_df_final <- data.frame()
+  
+  # Extracción de tarjetas amarillas.
   bloque_amarillas_raw <- str_extract(texto_acta, "Опомени:([\\s\\S]*?)(?=Исклучување:|Ж: Жолт картон|ПОТВРДЕН|ОДИГРАН)")
   if (!is.na(bloque_amarillas_raw)) {
     texto_limpio <- str_remove(bloque_amarillas_raw, "Опомени:") %>% str_replace_all("\\n", " ") %>% str_squish()
@@ -326,6 +370,8 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
       }
     }
   }
+  
+  # Extracción de tarjetas rojas.
   bloque_rojas_raw <- str_extract(texto_acta, "Исклучување:([\\s\\S]*?)(?=Опомени:|Ж: Жолт картон|ПОТВРДЕН|ОДИГРАН|Забелешка)")
   if (!is.na(bloque_rojas_raw)) {
     texto_limpio <- str_remove(bloque_rojas_raw, "Исклучување:") %>% str_replace_all("\\n", " ") %>% str_squish()
@@ -333,6 +379,8 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
     for (bloque_equipo in bloques_por_equipo) {
       if (str_trim(bloque_equipo) == "") next
       equipo_actual <- if (str_detect(bloque_equipo, paste0("^", equipo_local_nombre))) equipo_local_nombre else equipo_visitante_nombre
+      
+      # Caso: Doble amarilla.
       regex_doble_amarilla <- "(\\d{1,2})\\s+([\\p{L}\\s.'-]+?)\\s+\\((\\d{1,3})\\s*-\\s*(.+?)\\s+и\\s+(\\d{1,3})\\s*-\\s*(.+?)\\)"
       matches_doble <- str_match_all(bloque_equipo, regex_doble_amarilla)[[1]]
       if (nrow(matches_doble) > 0) {
@@ -346,6 +394,8 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
         }
         bloque_equipo <- str_remove_all(bloque_equipo, regex_doble_amarilla)
       }
+      
+      # Caso: Roja directa.
       if (str_trim(bloque_equipo) != "") {
         regex_roja_directa <- "(\\d{1,2})\\s+[\\p{L}\\s.'-]+?\\s+\\((\\d{1,3})\\s*-\\s*([^)]+?)\\)"
         matches_roja <- str_match_all(bloque_equipo, regex_roja_directa)[[1]]
@@ -365,38 +415,49 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
   return(tarjetas_df_final)
 }
 
-# =========================================================================
-# PASO 3: FUNCIÓN PRINCIPAL DE PROCESAMIENTO
-# =========================================================================
+
+## -------------------------------------------------------------------------- ##
+##  3. FUNCIÓN PRINCIPAL DE PROCESAMIENTO POR ACTA
+## -------------------------------------------------------------------------- ##
+
+#' Procesa un único archivo PDF de un acta de partido.
+#'
+#' Esta es la función principal que orquesta todo el proceso para un acta:
+#' lee el PDF, extrae la información general del partido, llama a las funciones
+#' de parseo de alineaciones, goles y tarjetas, y finalmente compila todos los
+#' datos en una lista estructurada y un resumen de texto.
+#'
+#' @param acta_path La ruta al archivo PDF del acta.
+#' @return Una lista que contiene dataframes para `partido_info`, `goles`, `tarjetas`,
+#'   `alineacion_local`, etc., así como un `resumen_texto`.
 procesar_acta <- function(acta_path) {
+  # Lectura y preparación inicial del texto del PDF.
   nombre_archivo <- basename(acta_path)
   id_partido_match <- str_match(nombre_archivo, "match_(\\d+)_")
   id_partido <- if (!is.na(id_partido_match[1, 2])) id_partido_match[1, 2] else tools::file_path_sans_ext(nombre_archivo)
   texto_acta <- tryCatch({ paste(pdf_text(acta_path), collapse = "\n\n") }, error = function(e) { stop(paste("Error al leer PDF:", e$message)) })
   if (is.null(texto_acta) || nchar(texto_acta) == 0) stop("El PDF está vacío o no se pudo leer el texto.")
   
-  # Capturar el resultado, incluyendo un posible asterisco
+  # Extracción de la información principal del partido (competición, equipos, resultado).
   regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+\\*?)"
   partido_info_match <- str_match(texto_acta, regex_principal)
-  
   if (is.na(partido_info_match[1, 1])) {
-    stop(paste("Info principal (incluyendo competición y temporada) no encontrada en", nombre_archivo))
+    stop(paste("Información principal no encontrada en", nombre_archivo))
   }
-  
   competicion_nombre <- str_trim(partido_info_match[, 2])
   competicion_temporada <- str_trim(partido_info_match[, 3])
   equipo_local <- str_trim(partido_info_match[, 4])
   equipo_visitante <- str_trim(partido_info_match[, 5])
   resultado_final_str <- partido_info_match[, 6]
   
-  # Detectar si es un resultado oficial y limpiar el string del resultado
+  # Detección de resultado oficial (marcado con *) y limpieza del marcador.
   es_resultado_oficial <- str_detect(resultado_final_str, "\\*") && str_detect(texto_acta, "службен резултат")
   resultado_limpio <- str_remove(resultado_final_str, "\\*")
   goles_split <- as.integer(str_split(resultado_limpio, ":", simplify = TRUE))
-  
   goles_local <- goles_split[1]
   goles_visitante <- goles_split[2]
   
+  # Extracción de datos específicos (fecha, hora, jornada, estadio).
   fecha_hora_match <- str_match(texto_acta, "Датум/време: (\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2})")
   fecha <- if (!is.na(fecha_hora_match[1, 1])) fecha_hora_match[, 2] else "Desconocida"
   hora <- if (!is.na(fecha_hora_match[1, 1])) fecha_hora_match[, 3] else "Desconocida"
@@ -404,26 +465,17 @@ procesar_acta <- function(acta_path) {
   estadio_match <- str_match(texto_acta, "Игралиште:\\s*([^\n]+)")
   estadio <- if (!is.na(estadio_match[1, 1])) str_remove(estadio_match[1, 2], "\\s+Р\\.бр:.*$") %>% str_trim() else "Desconocido"
   
+  # Función interna para extraer datos de líneas con formato "Etiqueta: Valor".
   extraer_info <- function(texto, etiqueta) {
     patron_regex <- paste0(etiqueta, "\\s*(.+?)(?:\\s{2,}|$)")
     match <- str_match(texto, patron_regex)
     if (!is.na(match[1, 2])) str_trim(match[1, 2]) else "Desconocido"
   }
   
+  # Extracción de los nombres de los árbitros y entrenadores.
   arbitro_principal <- extraer_info(texto_acta, "Гл\\.судија:")
   arbitro_asist_1 <- extraer_info(texto_acta, "1\\.\\s*помошен:")
   arbitro_asist_2 <- extraer_info(texto_acta, "2\\.\\s*помошен:")
-  
-  # Añadir la nueva columna al dataframe del partido
-  partido_df <- data.frame(
-    id_partido = id_partido,
-    competicion_nombre = competicion_nombre,
-    competicion_temporada = competicion_temporada,
-    jornada, fecha, hora,
-    local = equipo_local, visitante = equipo_visitante,
-    goles_local, goles_visitante,
-    es_resultado_oficial = es_resultado_oficial # <-- NUEVA COLUMNA
-  )
   
   entrenador_local <- "Desconocido"; entrenador_visitante <- "Desconocido"
   linea_entrenadores_match <- str_extract(texto_acta, ".*Шеф на стручен штаб.*")
@@ -435,6 +487,14 @@ procesar_acta <- function(acta_path) {
     entrenador_visitante <- str_remove_all(entrenador_visitante, "\\d") %>% str_trim()
   }
   
+  # Creación del dataframe con la información general del partido.
+  partido_df <- data.frame(
+    id_partido, competicion_nombre, competicion_temporada, jornada, fecha, hora,
+    local = equipo_local, visitante = equipo_visitante, goles_local, goles_visitante,
+    es_resultado_oficial
+  )
+  
+  # Localización y parseo del bloque de alineaciones.
   pos_start_players <- str_locate(texto_acta, "Голови\\s+Ж Ц\\s+З")
   pos_end_players <- str_locate(texto_acta, "Шеф на стручен штаб|Резервни играчи|Официјални претставници")
   alineacion_local <- data.frame(); cambios_local_df <- data.frame()
@@ -449,14 +509,16 @@ procesar_acta <- function(acta_path) {
     }
   }
   
+  # Extracción y procesamiento de los goles del partido.
   goles_partido_actual <- data.frame()
   linea_resultados_full <- str_extract(texto_acta, "Резултат[^\n]+")
   linea_goleadores_full <- str_extract(texto_acta, "Стрелец/Мин[^\n]+")
   linea_pen_ag_full <- str_extract(texto_acta, "Пен/АГ[^\n]+")
   if (!is.na(linea_resultados_full) && !is.na(linea_goleadores_full)) {
-    
     resultados_parciales <- str_split(str_trim(str_match(linea_resultados_full, "Резултат\\s+(.*)")[, 2]), "\\s+")[[1]]
     goleadores_minutos_nums <- as.integer(str_split(str_trim(str_match(linea_goleadores_full, "Стрелец/Мин\\s+(.*)")[, 2]), "\\s+")[[1]])
+    
+    # Detección de autogoles (AG).
     es_autogol <- rep(FALSE, length(resultados_parciales))
     if (!is.na(linea_pen_ag_full)) {
       pos_goleadores_abs <- str_locate_all(linea_goleadores_full, "\\b\\d{1,2}\\s+\\d{1,2}\\b")[[1]]
@@ -473,6 +535,8 @@ procesar_acta <- function(acta_path) {
         }
       }
     }
+    
+    # Bucle para asignar cada gol a una jugadora y equipo.
     resultados_previo <- c(0, 0)
     for (i in 1:length(resultados_parciales)) {
       if (any(is.na(goleadores_minutos_nums)) || (i * 2) > length(goleadores_minutos_nums)) break
@@ -481,6 +545,8 @@ procesar_acta <- function(acta_path) {
       dorsal_gol <- goleadores_minutos_nums[(i * 2) - 1]; minuto_gol <- goleadores_minutos_nums[i * 2]
       if (is.na(dorsal_gol) || is.na(minuto_gol)) next
       tipo_gol <- if (length(es_autogol) >= i && es_autogol[i]) "Autogol" else "Normal"
+      
+      # Determina qué equipo marcó el gol comparando con el marcador anterior.
       equipo_acreditado_gol <- NA
       if (marcador_actual[1] > resultados_previo[1]) equipo_acreditado_gol <- equipo_local
       else if (marcador_actual[2] > resultados_previo[2]) equipo_acreditado_gol <- equipo_visitante
@@ -497,9 +563,11 @@ procesar_acta <- function(acta_path) {
     }
   }
   
+  # Llamada a la función auxiliar para extraer las tarjetas.
   tarjetas_partido_actual <- extraer_tarjetas(texto_acta, equipo_local, equipo_visitante, alineacion_local, alineacion_visitante)
   if(nrow(tarjetas_partido_actual) > 0) tarjetas_partido_actual$id_partido <- id_partido
   
+  # Funciones internas para formatear el texto de resumen para el archivo de salida.
   formatear_jugadoras <- function(df, tipo_jugadora) {
     if (is.null(df) || nrow(df) == 0) return(paste("  No se encontraron", tolower(tipo_jugadora), "s."))
     subset_df <- filter(df, tipo == tipo_jugadora)
@@ -509,9 +577,6 @@ procesar_acta <- function(acta_path) {
       paste("  -", j['dorsal'], nombre_display)
     })
   }
-  
-  if (!is.null(cambios_local_df) && nrow(cambios_local_df) > 0) cambios_local_df <- cambios_local_df[order(cambios_local_df$minuto), ]
-  if (!is.null(cambios_visitante_df) && nrow(cambios_visitante_df) > 0) cambios_visitante_df <- cambios_visitante_df[order(cambios_visitante_df$minuto), ]
   
   formatear_goles_texto <- function(df_goles) {
     if (is.null(df_goles) || nrow(df_goles) == 0) return("No hubo goles o no se pudieron procesar.")
@@ -528,6 +593,11 @@ procesar_acta <- function(acta_path) {
     apply(df_tarjetas, 1, function(t) paste0("  - Min ", formatear_minuto_partido(as.numeric(t['minuto'])), ": [", t['tipo'], "] para ", t['jugadora'], " (", t['equipo'], ") por '", t['motivo'], "'"))
   }
   
+  # Ordenación de los cambios por minuto.
+  if (!is.null(cambios_local_df) && nrow(cambios_local_df) > 0) cambios_local_df <- cambios_local_df[order(cambios_local_df$minuto), ]
+  if (!is.null(cambios_visitante_df) && nrow(cambios_visitante_df) > 0) cambios_visitante_df <- cambios_visitante_df[order(cambios_visitante_df$minuto), ]
+  
+  # Composición del bloque de texto con el resumen del partido.
   resumen_actual_lines <- c(
     "\n======================================================================", paste("INICIO DEL ACTA:", nombre_archivo), "======================================================================",
     paste("COMPETICIÓN:", competicion_nombre, competicion_temporada),
@@ -542,35 +612,68 @@ procesar_acta <- function(acta_path) {
     "\n======================================================================\n"
   )
   
+  # Retorno de todos los datos extraídos en una lista.
   return(list(partido_info = partido_df, goles = goles_partido_actual, tarjetas = tarjetas_partido_actual, resumen_texto = unlist(resumen_actual_lines), alineacion_local = alineacion_local, alineacion_visitante = alineacion_visitante, cambios_local = cambios_local_df, cambios_visitante = cambios_visitante_df, arbitro_principal = arbitro_principal, arbitro_asist_1 = arbitro_asist_1, arbitro_asist_2 = arbitro_asist_2, estadio = estadio))
 }
 
-# -------------------------------------------------------------------------
-# PASO 4: BUCLE DE PROCESAMIENTO
-# -------------------------------------------------------------------------
+
+## -------------------------------------------------------------------------- ##
+##  4. EJECUCIÓN DEL PROCESO PRINCIPAL
+## -------------------------------------------------------------------------- ##
+
+### 4.1. Localización de archivos PDF ----
+
+ruta_pdfs <- "Actas"
+archivos_pdf <- list.files(path = ruta_pdfs, pattern = "\\.pdf$", full.names = TRUE, recursive = TRUE)
+
+if (length(archivos_pdf) == 0) {
+  stop("No se encontraron archivos PDF en la ruta especificada. Revisa la ruta.")
+}
+
+### 4.2. Bucle de procesamiento de actas ----
+
 message("Iniciando procesamiento de ", length(archivos_pdf), " actas...")
+
+# Se utiliza 'safely' para que el bucle no se detenga si un archivo falla.
 procesador_seguro <- purrr::safely(procesar_acta)
 names(archivos_pdf) <- basename(archivos_pdf)
-lista_resultados <- purrr::map(archivos_pdf, ~{ message(paste("Procesando:", basename(.x))); procesador_seguro(.x) })
+
+# Se aplica la función de procesamiento a cada PDF.
+lista_resultados <- purrr::map(archivos_pdf, ~{
+  message(paste("Procesando:", basename(.x)))
+  procesador_seguro(.x)
+})
+
+### 4.3. Gestión de errores ----
+
+# Separación de resultados exitosos y errores.
 resultados_exitosos <- purrr::map(lista_resultados, "result") %>% purrr::compact()
 errores <- purrr::map(lista_resultados, "error") %>% purrr::compact()
+
+# Si hubo errores, se informa al usuario de forma detallada.
 if (length(errores) > 0) {
   message("\n--- AVISO: Se encontraron errores en ", length(errores), " de ", length(archivos_pdf), " archivos. ---")
   purrr::walk2(names(errores), errores, ~message(paste0("\nERROR en archivo: ", .x, "\nMENSAJE: ", .y$message)))
-} else { message("\n¡Todos los archivos se procesaron sin errores!") }
+} else {
+  message("\n¡Todos los archivos se procesaron sin errores!")
+}
 
 
-# -------------------------------------------------------------------------
-# PASO 5: AGREGACIÓN DE RESULTADOS Y ESCRITURA DE ARCHIVO
-# -------------------------------------------------------------------------
+## -------------------------------------------------------------------------- ##
+##  5. AGREGACIÓN Y GENERACIÓN DE REPORTES
+## -------------------------------------------------------------------------- ##
+
+### 5.1. Consolidación de datos ----
+
+# Se combinan los resultados de todas las actas en dataframes únicos.
 partidos_df <- purrr::map_dfr(resultados_exitosos, "partido_info")
 goles_df <- purrr::map_dfr(resultados_exitosos, "goles")
 tarjetas_df <- purrr::map_dfr(resultados_exitosos, "tarjetas")
 
-# --- NUEVO: OBTENER LISTA DE JUGADORAS Y PROCESAR POSICIONES ---
 
-# 1. Obtener una lista única de todas las IDs de jugadoras que aparecen en las actas
-#    La fuente más completa es la lista de resultados exitosos.
+### 5.2. Enriquecimiento con datos de jugadoras (desde archivo XLS) ----
+
+# Se recopilan todos los IDs únicos de jugadoras de las actas procesadas.
 ids_validas_de_actas <- map_dfr(resultados_exitosos, ~bind_rows(
   .x$alineacion_local,
   .x$alineacion_visitante
@@ -581,41 +684,71 @@ ids_validas_de_actas <- map_dfr(resultados_exitosos, ~bind_rows(
 
 message(paste("\nSe encontraron un total de", length(ids_validas_de_actas), "jugadoras únicas en todas las actas."))
 
-# 2. Llamar a la función para procesar posiciones, pasándole los IDs válidos
+# Se cargan y procesan los datos adicionales (posición, nacionalidad, etc.).
 ruta_xls_posiciones <- "igraci.xlsx"
 posiciones_df <- cargar_y_procesar_posiciones(ruta_xls_posiciones, ids_validas_de_actas)
 
 
+### 5.3. Cálculo de tablas derivadas ----
+
+# Función para generar la tabla de clasificación.
 calcular_clasificacion <- function(partidos) {
   if (is.null(partidos) || nrow(partidos) == 0) return(data.frame(Mensaje = "No se procesaron partidos válidos."))
   locales <- partidos %>% select(equipo = local, GF = goles_local, GC = goles_visitante)
   visitantes <- partidos %>% select(equipo = visitante, GF = goles_visitante, GC = goles_local)
-  resultados_por_equipo <- bind_rows(locales, visitantes) %>% mutate(Pts = case_when(GF > GC ~ 3, GF < GC ~ 0, TRUE ~ 1), resultado = case_when(GF > GC ~ "PG", GF < GC ~ "PP", TRUE ~ "PE"))
-  clasificacion <- resultados_por_equipo %>% group_by(Equipo = equipo) %>% summarise(PJ = n(), Pts = sum(Pts), PG = sum(resultado == "PG"), PE = sum(resultado == "PE"), PP = sum(resultado == "PP"), GF = sum(GF), GC = sum(GC), .groups = 'drop') %>% mutate(DG = GF - GC) %>% arrange(desc(Pts), desc(DG), desc(GF))
+  resultados_por_equipo <- bind_rows(locales, visitantes) %>%
+    mutate(
+      Pts = case_when(GF > GC ~ 3, GF < GC ~ 0, TRUE ~ 1),
+      resultado = case_when(GF > GC ~ "PG", GF < GC ~ "PP", TRUE ~ "PE")
+    )
+  clasificacion <- resultados_por_equipo %>%
+    group_by(Equipo = equipo) %>%
+    summarise(PJ = n(), Pts = sum(Pts), PG = sum(resultado == "PG"), PE = sum(resultado == "PE"), PP = sum(resultado == "PP"), GF = sum(GF), GC = sum(GC), .groups = 'drop') %>%
+    mutate(DG = GF - GC) %>%
+    arrange(desc(Pts), desc(DG), desc(GF))
   return(clasificacion)
 }
+
 clasificacion_df <- calcular_clasificacion(partidos_df)
 
+# Creación de la tabla de goleadoras.
 if (!is.null(goles_df) && nrow(goles_df) > 0) {
-  # MODIFICACIÓN: Se filtra por tipo=="Normal" y se usa "equipo_acreditado" para la tabla de goleadoras
+  # Se consideran solo goles 'Normales' y se usa 'equipo_acreditado' para la tabla.
   tabla_goleadoras <- goles_df %>% 
     filter(tipo == "Normal") %>% 
     group_by(Jugadora = jugadora, Equipo = equipo_acreditado) %>% 
     summarise(Goles = n(), .groups = 'drop') %>% 
     arrange(desc(Goles))
-} else { tabla_goleadoras <- data.frame(Mensaje = "No se procesaron goles válidos.") }
+} else {
+  tabla_goleadoras <- data.frame(Mensaje = "No se procesaron goles válidos.")
+}
 
+# Creación de la tabla de sanciones.
 if (!is.null(tarjetas_df) && nrow(tarjetas_df) > 0) {
-  tabla_sanciones <- tarjetas_df %>% group_by(Jugadora = jugadora, Equipo = equipo) %>% summarise(Amarillas = sum(tipo == "Amarilla"), Rojas = sum(tipo == "Roja"), .groups = 'drop') %>% filter(Amarillas > 0 | Rojas > 0) %>% arrange(desc(Rojas), desc(Amarillas))
-} else { tabla_sanciones <- data.frame(Mensaje = "No se procesaron sanciones válidas.") }
+  tabla_sanciones <- tarjetas_df %>%
+    group_by(Jugadora = jugadora, Equipo = equipo) %>%
+    summarise(Amarillas = sum(tipo == "Amarilla"), Rojas = sum(tipo == "Roja"), .groups = 'drop') %>%
+    filter(Amarillas > 0 | Rojas > 0) %>%
+    arrange(desc(Rojas), desc(Amarillas))
+} else {
+  tabla_sanciones <- data.frame(Mensaje = "No se procesaron sanciones válidas.")
+}
 
+
+### 5.4. Escritura del archivo de salida ----
+
+# Generación del archivo de texto final con todos los resúmenes y tablas.
 ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_liga_futbol_R_final.txt")
 tryCatch({
+  # Se recopilan todos los resúmenes de texto de cada partido.
   resumenes_completos <- unlist(purrr::map(resultados_exitosos, "resumen_texto"))
+  
+  # Se formatean las tablas finales usando 'knitr' para una mejor visualización.
   goleadoras_formateadas <- c("\n\n========================= TABLA DE GOLEADORAS =========================", capture.output(print(knitr::kable(tabla_goleadoras, format = "pipe", row.names = FALSE))), "")
   sanciones_formateadas <- c("\n\n========================== TABLA DE SANCIONES ==========================", capture.output(print(knitr::kable(tabla_sanciones, format = "pipe", row.names = FALSE))), "")
   clasificacion_formateada <- c("\n\n============================= CLASIFICACIÓN =============================", capture.output(print(knitr::kable(clasificacion_df, format = "pipe", row.names = FALSE))), "")
   
+  # Escritura del archivo en UTF-8 para asegurar la correcta visualización de caracteres.
   con <- file(ruta_salida_txt, open = "wt", encoding = "UTF-8")
   writeLines(resumenes_completos, con)
   writeLines(goleadoras_formateadas, con)
@@ -625,4 +758,8 @@ tryCatch({
   
   message(paste("\n¡PROCESO COMPLETADO CON ÉXITO!"))
   message(paste("Revisa el archivo de salida en:", ruta_salida_txt))
-}, error = function(e) { message("\nError al escribir el archivo de salida."); message(paste("Error original:", e$message)) })
+  
+}, error = function(e) {
+  message("\nError al escribir el archivo de salida.")
+  message(paste("Error original:", e$message))
+})
