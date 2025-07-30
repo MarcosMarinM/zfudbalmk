@@ -6,7 +6,8 @@ h1, h2, h3 { color: #003366; border-bottom: 2px solid #dee2e6; padding-bottom: 1
 h1 { font-size: 2.5em; text-align: center; } h2 { font-size: 1.8em; margin-top: 40px; } h3 { font-size: 1.5em; }
 a { color: #0056b3; text-decoration: none; font-weight: bold; } a:hover { text-decoration: underline; }
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { background-color: #f2f2f2; }
+th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
+th { background-color: #f2f2f2; }
 .summary-row { cursor: pointer; } .summary-row:hover { background-color: #f0f8ff; }
 .details-row { display: none; } .details-row > td { padding: 0; }
 .details-content { padding: 20px; background-color: #fdfdfd; border-top: 2px solid #003366; }
@@ -19,14 +20,16 @@ th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { back
 .sortable-header { cursor: pointer; user-select: none; } .sortable-header::after { content: ' '; display: inline-block; margin-left: 5px; }
 .sortable-header.asc::after { content: '▲'; } .sortable-header.desc::after { content: '▼'; }
 .partido-link { display: flex; justify-content: space-between; align-items: center; padding: 15px; margin: 10px 0; background-color: #e9ecef; border-radius: 5px; transition: background-color 0.2s; }
-.partido-link:hover { background-color: #ced4da; } .partido-link span.equipo { flex: 1; }
-.partido-link span.equipo-local { text-align: right; margin-right: 15px; } .partido-link span.equipo-visitante { text-align: left; margin-left: 15px; }
+.partido-link:hover { background-color: #ced4da; }
+.partido-link span.equipo { flex: 1; display: flex; align-items: center; font-weight: bold; }
+.partido-link span.equipo-local { text-align: right; margin-right: 15px; justify-content: flex-end; }
+.partido-link span.equipo-visitante { text-align: left; margin-left: 15px; }
 .partido-link span.resultado { font-size: 1.2em; font-weight: bold; text-align: center; }
 .jornada-header { background-color: #003366; color: white; padding: 10px; border-radius: 5px; margin-top: 30px; }
 .timeline { list-style: none; padding-left: 0; } .timeline li { padding: 8px 0; border-bottom: 1px dotted #ccc; display: flex; align-items: center; }
 .timeline .icon { margin-right: 10px; font-size: 1.2em; width: 24px; text-align: center; }
 .alineaciones-container { display: flex; gap: 30px; align-items: flex-start; } .columna-alineacion { flex: 1; }
-.columna-alineacion h3 a { color: #003366; } .columna-alineacion h4 { margin-top: 15px; margin-bottom: 10px; font-size: 1.2em; color: #111; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+.columna-alineacion h4 { margin-top: 15px; margin-bottom: 10px; font-size: 1.2em; color: #111; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
 .columna-alineacion ul { list-style: none; padding: 0; margin: 0 0 20px 0; } .columna-alineacion li { padding: 6px 3px; border-bottom: 1px solid #f0f0f0; }
 .player-event { margin-left: 8px; font-size: 0.9em; color: #444; vertical-align: middle; } .player-event.goal { font-weight: bold; }
 .sub-in { color: #28a745; font-style: italic; vertical-align: middle; } .sub-out { color: #dc3545; font-style: italic; vertical-align: middle; }
@@ -48,11 +51,27 @@ th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { back
 .search-result-type { font-size: 0.85em; color: #6c757d; margin-left: 8px; }
 .clickable-row { cursor: pointer; }
 .clickable-row:hover { background-color: #f0f8ff; }
-
-/* === INICIO ESTILOS NUEVOS PARA LEYENDA DE CLASIFICACIÓN === */
 .legend { margin-top: 20px; padding: 10px; text-align: left; font-size: 0.9em; }
 .legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
 .legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
-/* === FIN ESTILOS NUEVOS === */
-
+.team-logo { height: 24px; width: 24px; object-fit: contain; }
+.team-cell { display: flex; align-items: center; }
+.team-cell .team-logo { margin-right: 12px; }
+.partido-link .team-logo { height: 28px; width: 28px; }
+.partido-link .equipo-local .team-logo { margin-right: 10px; }
+.partido-link .equipo-visitante .team-logo { margin-left: 10px; }
+.alineacion-header { text-align: center; margin-bottom: 20px; }
+.alineacion-header .match-page-crest, .team-page-crest {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin: 10px auto;
+  display: block;
+}
+.alineacion-header h3 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 5px;
+}
+.alineacion-header h3 a { color: #003366; }
 
