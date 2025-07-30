@@ -151,8 +151,17 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
       mutate(
         icono = "⚽",
         texto_evento = case_when(
-          tipo == "Autogol" ~ paste0("Автогол на ", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id, jugadora), " (", equipo_jugadora, ") во корист на ", equipo_acreditado),
-          TRUE ~ paste0("Гол на ", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id, jugadora), " (", equipo_acreditado, ")")
+          tipo == "Autogol" ~ paste0(
+            "Автогол на ", 
+            sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id, jugadora), 
+            " (", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(equipo_jugadora), equipo_jugadora), ") во корист на ", 
+            sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(equipo_acreditado), equipo_acreditado)
+          ),
+          TRUE ~ paste0(
+            "Гол на ", 
+            sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id, jugadora), 
+            " (", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(equipo_acreditado), equipo_acreditado), ")"
+          )
         )
       ) %>%
       select(minuto, icono, texto_evento)
@@ -165,9 +174,6 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
     tarjetas_eventos <- tarjetas_data %>%
       mutate(
         icono = if_else(tipo == "Amarilla", "🟨", "🟥"),
-        # --- INICIO DE LA CORRECCIÓN ---
-        # La lógica se simplifica para asegurar que el nombre del equipo siempre se muestre.
-        # El enlace al equipo se reconstruye correctamente.
         texto_evento = paste0(
           "Картон за ",
           sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_jugadora, jugadora),
@@ -175,7 +181,6 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
           sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(equipo), equipo),
           ")"
         )
-        # --- FIN DE LA CORRECCIÓN ---
       ) %>%
       select(minuto, icono, texto_evento)
     lista_eventos[[length(lista_eventos) + 1]] <- tarjetas_eventos
@@ -190,17 +195,25 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
       match_info <- str_match(cambio$texto, "Entra (.*?) \\((\\d+)\\) por (.*?) \\((\\d+)\\)")
       if (is.na(match_info[1,1])) return(NULL)
       
-      nombre_entra <- match_info[1, 2]; dorsal_entra <- match_info[1, 3]
-      nombre_sale <- match_info[1, 4]; dorsal_sale <- match_info[1, 5]
+      nombre_entra_raw <- match_info[1, 2]; dorsal_entra <- as.numeric(match_info[1, 3])
+      nombre_sale_raw <- match_info[1, 4]; dorsal_sale <- as.numeric(match_info[1, 5])
       
-      info_entra <- filter(alineacion_equipo, nombre == nombre_entra, dorsal == as.numeric(dorsal_entra))
+      # --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
+      # 1. Reordenar nombres. Esta función ahora está disponible globalmente en el script.
+      nombre_entra_corregido <- reordenar_nombre_jugadora(nombre_entra_raw)
+      nombre_sale_corregido <- reordenar_nombre_jugadora(nombre_sale_raw)
+      
+      # 2. Buscar ID usando el nombre reordenado y el dorsal.
+      info_entra <- alineacion_equipo %>% filter(nombre == nombre_entra_corregido, dorsal == dorsal_entra)
       id_entra <- if (nrow(info_entra) > 0) info_entra$id[1] else NA_character_
       
-      info_sale <- filter(alineacion_equipo, nombre == nombre_sale, dorsal == as.numeric(dorsal_sale))
+      info_sale <- alineacion_equipo %>% filter(nombre == nombre_sale_corregido, dorsal == dorsal_sale)
       id_sale <- if (nrow(info_sale) > 0) info_sale$id[1] else NA_character_
       
-      texto_entra_link <- if (!is.na(id_entra)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_entra, nombre_entra) else nombre_entra
-      texto_sale_link <- if (!is.na(id_sale)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_sale, nombre_sale) else nombre_sale
+      # 3. Construir el texto del enlace usando el nombre reordenado
+      texto_entra_link <- if (!is.na(id_entra)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_entra, nombre_entra_corregido) else nombre_entra_corregido
+      texto_sale_link <- if (!is.na(id_sale)) sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$jugadoras, id_sale, nombre_sale_corregido) else nombre_sale_corregido
+      # --- FIN DE LA CORRECCIÓN DEFINITIVA ---
       
       texto_final <- paste0(
         "Измена за ", sprintf("<a href='../%s/%s.html'>%s</a>", nombres_carpetas_mk$timovi, generar_id_seguro(nombre_equipo), nombre_equipo),
@@ -240,6 +253,7 @@ generar_cronologia_df <- function(id_p, resumen_partido) {
   
   return(cronologia_final_df)
 }
+
 
 # =========================================================================
 # NUEVA FUNCIÓN: PLANTILLA HTML (CON MODIFICACIÓN)
