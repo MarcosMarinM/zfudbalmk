@@ -49,3 +49,10 @@ th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { back
 .clickable-row { cursor: pointer; }
 .clickable-row:hover { background-color: #f0f8ff; }
 
+/* === INICIO ESTILOS NUEVOS PARA LEYENDA DE CLASIFICACIÓN === */
+.legend { margin-top: 20px; padding: 10px; text-align: left; font-size: 0.9em; }
+.legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
+.legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
+/* === FIN ESTILOS NUEVOS === */
+
+

@@ -243,7 +243,68 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina = "Фудбал
 message("Започнување со генерирање на HTML извештајот...")
 
 # =========================================================================
-# NUEVO PASO 6.9: CARGAR MAPEADORES EXTERNOS
+# NUEVO PASO 6.8: CARGAR ESTILOS DE CLASIFICACIÓN
+# =========================================================================
+message("Вчитување на сопствени стилови за табели...")
+
+# --- Función para parsear el archivo de estilos de clasificación ---
+parsear_estilos_clasificacion <- function(ruta_archivo) {
+  if (!file.exists(ruta_archivo)) {
+    warning(paste("Датотеката за стилови на табели не е пронајдена во:", ruta_archivo))
+    return(list())
+  }
+  
+  tryCatch({
+    lineas <- readLines(ruta_archivo, warn = FALSE, encoding = "UTF-8")
+    lista_estilos <- list()
+    competicion_actual <- NULL
+    
+    for (linea in lineas) {
+      linea <- trimws(linea)
+      if (linea == "" || startsWith(linea, "#")) next # Ignorar líneas vacías o comentarios
+      
+      # Detectar cabecera de competición
+      if (startsWith(linea, "[COMPETICION:")) {
+        competicion_actual <- str_match(linea, "\\[COMPETICION:\\s*(.*?)\\]$")[1, 2]
+        if (!is.na(competicion_actual)) {
+          lista_estilos[[competicion_actual]] <- list(reglas = data.frame(), leyenda = list())
+        }
+      } else if (!is.null(competicion_actual)) {
+        partes <- str_split(linea, ",", n = 3)[[1]]
+        if (length(partes) == 3) {
+          puesto <- as.integer(trimws(partes[1]))
+          color <- trimws(partes[2])
+          texto <- trimws(partes[3])
+          
+          if (!is.na(puesto) && nchar(color) > 1 && nchar(texto) > 0) {
+            # Añadir regla de estilo para la fila de la tabla
+            regla_actual <- data.frame(puesto = puesto, color = color, texto = texto, stringsAsFactors = FALSE)
+            lista_estilos[[competicion_actual]]$reglas <- rbind(lista_estilos[[competicion_actual]]$reglas, regla_actual)
+            
+            # Añadir a la leyenda (evitando duplicados)
+            if (!any(sapply(lista_estilos[[competicion_actual]]$leyenda, function(l) l$color == color && l$texto == texto))) {
+              lista_estilos[[competicion_actual]]$leyenda[[length(lista_estilos[[competicion_actual]]$leyenda) + 1]] <- list(color = color, texto = texto)
+            }
+          }
+        }
+      }
+    }
+    message("Стиловите за табели се вчитани успешно.")
+    return(lista_estilos)
+  }, error = function(e) {
+    warning("Грешка при вчитување на датотеката за стилови на табели. Нема да се применат сопствени стилови.")
+    message("Грешката е: ", e$message)
+    return(list())
+  })
+}
+
+# Llamada a la función para cargar los datos
+ruta_estilos_clasificacion <- "estilos_clasificacion.txt"
+estilos_clasificacion_data <- parsear_estilos_clasificacion(ruta_estilos_clasificacion)
+
+
+# =========================================================================
+# PASO 6.9: CARGAR MAPEADORES EXTERNOS
 # =========================================================================
 message("Вчитување на мапирања за националности...")
 
@@ -621,6 +682,13 @@ th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; } th { back
 .search-result-type { font-size: 0.85em; color: #6c757d; margin-left: 8px; }
 .clickable-row { cursor: pointer; }
 .clickable-row:hover { background-color: #f0f8ff; }
+
+/* === INICIO ESTILOS NUEVOS PARA LEYENDA DE CLASIFICACIÓN === */
+.legend { margin-top: 20px; padding: 10px; text-align: left; font-size: 0.9em; }
+.legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
+.legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
+/* === FIN ESTILOS NUEVOS === */
+
 )"
 writeLines(estilo_css, file.path(RUTA_ASSETS, "style.css"))
 
@@ -909,25 +977,58 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   
   
   # ==========================================================
-  # 3. PÁGINA DE CLASIFICACIÓN (si es liga)
+  # 3. PÁGINA DE CLASIFICACIÓN (si es liga) - (BLOQUE MODIFICADO)
   # ==========================================================
   if (!is_cup) {
     calcular_clasificacion <- function(partidos) { if (is.null(partidos) || nrow(partidos) == 0) return(data.frame(Порака = "Нема обработени валидни натпревари.")); locales <- partidos %>% select(equipo = local, GF = goles_local, GC = goles_visitante); visitantes <- partidos %>% select(equipo = visitante, GF = goles_visitante, GC = goles_local); resultados_por_equipo <- bind_rows(locales, visitantes) %>% mutate(Pts = case_when(GF > GC ~ 3, GF < GC ~ 0, TRUE ~ 1), resultado = case_when(GF > GC ~ "Поб", GF < GC ~ "Пор", TRUE ~ "Нер")); clasificacion <- resultados_por_equipo %>% group_by(Тим = equipo) %>% summarise(Н = n(), Бод. = sum(Pts), Поб = sum(resultado == "Поб"), Нер = sum(resultado == "Нер"), Пор = sum(resultado == "Пор"), ДГ = sum(GF), ПГ = sum(GC), .groups = 'drop') %>% mutate(ГР = ДГ - ПГ) %>% arrange(desc(Бод.), desc(ГР), desc(ДГ)) %>% mutate(Поз. = row_number()) %>% select(Поз., Тим, Н, Поб, Нер, Пор, ДГ, ПГ, ГР, Бод.); return(clasificacion)}
     clasificacion_df_comp <- calcular_clasificacion(partidos_comp)
+    
+    # --- INICIO DE LA LÓGICA DE ESTILOS PERSONALIZADOS ---
+    estilos_comp <- estilos_clasificacion_data[[comp_nombre]]
     
     contenido_clasificacion <- tagList(
       crear_botones_navegacion(".."),
       tags$h2(paste("Табела -", comp_nombre)),
       tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))),
                  tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) {
-                   tr <- clasificacion_df_comp[j,]
-                   tags$tr(map(tr, function(cell) {
-                     if(is.character(cell) && cell %in% clasificacion_df_comp$Тим) {
-                       tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(cell), ".html")), cell))
-                     } else { tags$td(cell) }
+                   fila <- clasificacion_df_comp[j,]
+                   
+                   # Buscar si hay una regla para esta posición
+                   regla_actual <- NULL
+                   if (!is.null(estilos_comp)) {
+                     regla_match <- estilos_comp$reglas %>% filter(puesto == fila$Поз.)
+                     if (nrow(regla_match) > 0) {
+                       regla_actual <- regla_match[1,]
+                     }
+                   }
+                   
+                   tags$tr(map(1:ncol(fila), function(k) {
+                     cell_value <- fila[[k]]
+                     
+                     # Aplicar estilo solo a la primera celda (posición)
+                     if (k == 1 && !is.null(regla_actual)) {
+                       tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value)
+                     } else if (k == 2) { # Celda del equipo (con enlace)
+                       tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$equipos, paste0(generar_id_seguro(cell_value), ".html")), cell_value))
+                     } else { # Otras celdas
+                       tags$td(cell_value)
+                     }
                    }))
-                 })))
+                 }))),
+      # Generar la leyenda si hay estilos definidos
+      if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) {
+        tags$div(class = "legend",
+                 map(estilos_comp$leyenda, function(item_leyenda) {
+                   tags$div(class = "legend-item",
+                            tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")),
+                            tags$span(item_leyenda$texto)
+                   )
+                 })
+        )
+      }
     )
+    # --- FIN DE LA LÓGICA DE ESTILOS PERSONALIZADOS ---
+    
     pagina_clasificacion_final <- crear_pagina_html(contenido_clasificacion, paste("Табела -", comp_nombre), "..", search_data_json, script_contraseña)
     save_html(pagina_clasificacion_final, file = file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html")))
   }
