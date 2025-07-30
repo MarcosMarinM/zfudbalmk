@@ -1,0 +1,13 @@
+# Archivos de sistema de macOS
+.DS_Store
+
+# Archivos de proyecto de RStudio
+*.Rproj
+.Rhistory
+.Rdata
+.Ruserdata
+/Actas
+
+# Directorios de caché y temporales
+.Rapp.history
+.Rproj.user/
