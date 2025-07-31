@@ -618,45 +618,134 @@ procesar_acta <- function(acta_path) {
 
 
 ## -------------------------------------------------------------------------- ##
-##  4. EJECUCIÓN DEL PROCESO PRINCIPAL
+##  4. EJECUCIÓN DEL PROCESO PRINCIPAL (CON CACHÉ)
 ## -------------------------------------------------------------------------- ##
 
-### 4.1. Localización de archivos PDF ----
+### 4.1. Definición de rutas y carga de caché ----
 
+# Ruta a la carpeta que contiene las actas en PDF.
 ruta_pdfs <- "Actas"
-archivos_pdf <- list.files(path = ruta_pdfs, pattern = "\\.pdf$", full.names = TRUE, recursive = TRUE)
+# Ruta para el archivo de caché donde se guardarán los resultados procesados.
+ruta_cache <- "actas_cache.rds"
 
-if (length(archivos_pdf) == 0) {
+# Se listan todos los archivos PDF actuales en la carpeta.
+archivos_pdf_actuales <- list.files(path = ruta_pdfs, pattern = "\\.pdf$", full.names = TRUE, recursive = TRUE)
+if (length(archivos_pdf_actuales) == 0) {
   stop("No se encontraron archivos PDF en la ruta especificada. Revisa la ruta.")
 }
 
-### 4.2. Bucle de procesamiento de actas ----
+# Se intenta cargar los resultados de ejecuciones anteriores desde el caché.
+resultados_cacheados <- list()
+if (file.exists(ruta_cache)) {
+  message(paste("Cargando resultados previos desde:", ruta_cache))
+  tryCatch({
+    resultados_cacheados <- readRDS(ruta_cache)
+    # Se asegura que el caché sea una lista. Si está corrupto, se empieza de cero.
+    if (!is.list(resultados_cacheados)) resultados_cacheados <- list()
+  }, error = function(e) {
+    warning("El archivo de caché parece estar corrupto. Se procesarán todos los archivos de nuevo.")
+    resultados_cacheados <- list()
+  })
+}
 
-message("Iniciando procesamiento de ", length(archivos_pdf), " actas...")
+### 4.2. Detección de cambios en archivos ----
 
-# Se utiliza 'safely' para que el bucle no se detenga si un archivo falla.
+# Se obtienen los nombres base de los archivos para usarlos como identificadores únicos.
+nombres_archivos_actuales <- basename(archivos_pdf_actuales)
+nombres_archivos_cacheados <- names(resultados_cacheados)
+
+# Se identifican los archivos nuevos (en disco pero no en caché) y los eliminados (en caché pero no en disco).
+archivos_a_procesar_nombres <- setdiff(nombres_archivos_actuales, nombres_archivos_cacheados)
+archivos_eliminados_nombres <- setdiff(nombres_archivos_cacheados, nombres_archivos_actuales)
+
+# Se informa al usuario si se han eliminado o modificado actas.
+if (length(archivos_eliminados_nombres) > 0) {
+  message(paste("Se han detectado", length(archivos_eliminados_nombres), "actas eliminadas o modificadas. Actualizando..."))
+  # Se eliminan del conjunto de resultados cacheados.
+  resultados_cacheados <- resultados_cacheados[!names(resultados_cacheados) %in% archivos_eliminados_nombres]
+}
+
+### 4.3. Procesamiento incremental de actas nuevas ----
+
+# Se prepara el procesador seguro que envuelve la función principal de parseo.
 procesador_seguro <- purrr::safely(procesar_acta)
-names(archivos_pdf) <- basename(archivos_pdf)
+nuevos_resultados_completos <- list()
 
-# Se aplica la función de procesamiento a cada PDF.
-lista_resultados <- purrr::map(archivos_pdf, ~{
-  message(paste("Procesando:", basename(.x)))
-  procesador_seguro(.x)
+if (length(archivos_a_procesar_nombres) > 0) {
+  message(paste("Iniciando procesamiento de", length(archivos_a_procesar_nombres), "acta(s) nueva(s)..."))
+  
+  # Se obtienen las rutas completas de los archivos que necesitan ser procesados.
+  rutas_a_procesar <- archivos_pdf_actuales[basename(archivos_pdf_actuales) %in% archivos_a_procesar_nombres]
+  names(rutas_a_procesar) <- basename(rutas_a_procesar)
+  
+  # Se aplica la función de procesamiento únicamente a los archivos nuevos.
+  nuevos_resultados_completos <- purrr::map(rutas_a_procesar, ~{
+    message(paste("Procesando:", basename(.x)))
+    procesador_seguro(.x)
+  })
+  
+} else {
+  message("No hay actas nuevas que procesar. Todos los resultados se han cargado desde el caché.")
+}
+
+### 4.4. Gestión de errores en nuevos procesamientos ----
+
+# Se separan los resultados exitosos de los errores, solo para los archivos recién procesados.
+nuevos_resultados_exitosos <- purrr::map(nuevos_resultados_completos, "result") %>% purrr::compact()
+errores_nuevos <- purrr::map(nuevos_resultados_completos, "error") %>% purrr::compact()
+
+# Si hubo errores en los nuevos archivos, se informa al usuario de forma detallada.
+if (length(errores_nuevos) > 0) {
+  message("\n--- AVISO: Se encontraron errores en ", length(errores_nuevos), " de los ", length(archivos_a_procesar_nombres), " archivos nuevos. ---")
+  purrr::walk2(names(errores_nuevos), errores_nuevos, ~message(paste0("\nERROR en archivo: ", .x, "\nMENSAJE: ", .y$message)))
+} else if (length(archivos_a_procesar_nombres) > 0) {
+  message("\n¡Todos los archivos nuevos se procesaron sin errores!")
+}
+
+### 4.5. Consolidación y actualización del caché ----
+
+# Identificar los resultados que fueron eliminados para obtener sus datos antes de borrarlos.
+resultados_eliminados <- list()
+if (length(archivos_eliminados_nombres) > 0) {
+  # Carga el caché antiguo para encontrar los datos de los archivos eliminados.
+  if (file.exists(ruta_cache)) {
+    cache_antiguo <- readRDS(ruta_cache)
+    if (is.list(cache_antiguo)) {
+      resultados_eliminados <- cache_antiguo[names(cache_antiguo) %in% archivos_eliminados_nombres]
+    }
+  }
+}
+
+# Se combinan los resultados cargados del caché con los resultados de los archivos recién procesados.
+resultados_exitosos <- c(resultados_cacheados, nuevos_resultados_exitosos)
+
+# Se guarda la lista combinada y actualizada en el archivo de caché para futuras ejecuciones.
+tryCatch({
+  saveRDS(resultados_exitosos, file = ruta_cache)
+  message(paste("Caché actualizado con", length(resultados_exitosos), "actas procesadas. Guardado en:", ruta_cache))
+}, error = function(e) {
+  warning("No se pudo guardar el archivo de caché. Los resultados no estarán disponibles en la próxima ejecución.")
+  message(paste("Error original:", e$message))
 })
 
-### 4.3. Gestión de errores ----
 
-# Separación de resultados exitosos y errores.
-resultados_exitosos <- purrr::map(lista_resultados, "result") %>% purrr::compact()
-errores <- purrr::map(lista_resultados, "error") %>% purrr::compact()
+### 4.6. Guardar estado de cambios de archivos ----
 
-# Si hubo errores, se informa al usuario de forma detallada.
-if (length(errores) > 0) {
-  message("\n--- AVISO: Se encontraron errores en ", length(errores), " de ", length(archivos_pdf), " archivos. ---")
-  purrr::walk2(names(errores), errores, ~message(paste0("\nERROR en archivo: ", .x, "\nMENSAJE: ", .y$message)))
-} else {
-  message("\n¡Todos los archivos se procesaron sin errores!")
-}
+# Se determina si hubo algún cambio (archivos nuevos o eliminados).
+hubo_cambios <- length(archivos_a_procesar_nombres) > 0 || length(archivos_eliminados_nombres) > 0
+
+# Se crea una lista simple que solo contiene los nombres de los archivos que han cambiado.
+# El Script 2 usará esta información para determinar qué entidades se ven afectadas.
+info_cambios = list(
+  hubo_cambios = hubo_cambios,
+  archivos_nuevos_nombres = archivos_a_procesar_nombres,
+  archivos_eliminados_nombres = archivos_eliminados_nombres
+)
+
+# Guardar esta información para que la use el Script 2.
+ruta_cache_info <- "cache_info.rds"
+saveRDS(info_cambios, file = ruta_cache_info)
+message(paste("Información de cambios de archivos guardada en:", ruta_cache_info))
 
 
 ## -------------------------------------------------------------------------- ##
