@@ -402,34 +402,48 @@ if (file.exists(ruta_conversiones)) {
 ### 9.1. Aplicar correcciones y reordenar nombres ----
 message("Примена на корекции и преуредување на имиња...")
 
-# Se aplican las correcciones del archivo 'conversions.txt' a todos los datos.
-if (!is.null(mapa_conversiones)) {
-  partidos_df <- aplicar_conversiones(partidos_df, c("local", "visitante", "estadio"), mapa_conversiones)
+# Se comprueba si el objeto de datos principal ya tiene una marca (atributo)
+# que indique que los nombres han sido procesados. Esto previene la doble
+# inversión si el script se ejecuta de nuevo. La marca está vinculada al objeto,
+# por lo que si los datos se regeneran (ejecutando el Script 1), la marca
+# desaparece y el procesamiento se vuelve a ejecutar correctamente.
+if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
+  
+  # Se aplican las correcciones del archivo 'conversions.txt' a todos los datos.
+  if (!is.null(mapa_conversiones)) {
+    partidos_df <- aplicar_conversiones(partidos_df, c("local", "visitante", "estadio"), mapa_conversiones)
+    resultados_exitosos <- map(resultados_exitosos, function(res) {
+      if (is.null(res)) return(NULL)
+      res$partido_info <- aplicar_conversiones(res$partido_info, c("local", "visitante"), mapa_conversiones)
+      res$estadio <- recode(res$estadio, !!!mapa_conversiones)
+      res$arbitro_principal <- recode(res$arbitro_principal, !!!mapa_conversiones)
+      res$arbitro_asist_1 <- recode(res$arbitro_asist_1, !!!mapa_conversiones)
+      res$arbitro_asist_2 <- recode(res$arbitro_asist_2, !!!mapa_conversiones)
+      res$alineacion_local <- aplicar_conversiones(res$alineacion_local, c("nombre"), mapa_conversiones)
+      res$alineacion_visitante <- aplicar_conversiones(res$alineacion_visitante, c("nombre"), mapa_conversiones)
+      res$goles <- aplicar_conversiones(res$goles, c("jugadora", "equipo_jugadora", "equipo_acreditado"), mapa_conversiones)
+      res$tarjetas <- aplicar_conversiones(res$tarjetas, c("jugadora", "equipo"), mapa_conversiones)
+      return(res)
+    })
+  }
+  
+  # Se reordenan los nombres de las jugadoras a un formato consistente.
   resultados_exitosos <- map(resultados_exitosos, function(res) {
     if (is.null(res)) return(NULL)
-    res$partido_info <- aplicar_conversiones(res$partido_info, c("local", "visitante"), mapa_conversiones)
-    res$estadio <- recode(res$estadio, !!!mapa_conversiones)
-    res$arbitro_principal <- recode(res$arbitro_principal, !!!mapa_conversiones)
-    res$arbitro_asist_1 <- recode(res$arbitro_asist_1, !!!mapa_conversiones)
-    res$arbitro_asist_2 <- recode(res$arbitro_asist_2, !!!mapa_conversiones)
-    res$alineacion_local <- aplicar_conversiones(res$alineacion_local, c("nombre"), mapa_conversiones)
-    res$alineacion_visitante <- aplicar_conversiones(res$alineacion_visitante, c("nombre"), mapa_conversiones)
-    res$goles <- aplicar_conversiones(res$goles, c("jugadora", "equipo_jugadora", "equipo_acreditado"), mapa_conversiones)
-    res$tarjetas <- aplicar_conversiones(res$tarjetas, c("jugadora", "equipo"), mapa_conversiones)
+    if (nrow(res$alineacion_local) > 0) res$alineacion_local$nombre <- reordenar_nombre_jugadora(res$alineacion_local$nombre)
+    if (nrow(res$alineacion_visitante) > 0) res$alineacion_visitante$nombre <- reordenar_nombre_jugadora(res$alineacion_visitante$nombre)
+    if (nrow(res$goles) > 0) res$goles$jugadora <- reordenar_nombre_jugadora(res$goles$jugadora)
+    if (nrow(res$tarjetas) > 0) res$tarjetas$jugadora <- reordenar_nombre_jugadora(res$tarjetas$jugadora)
     return(res)
   })
+  
+  # Se añade el atributo al objeto de datos para marcarlo como procesado.
+  attr(resultados_exitosos, "nombres_procesados") <- TRUE
+  message("Имињата се преуредени и корегирани.")
+  
+} else {
+  message("Корекцијата и преуредувањето на имињата веќе се извршени врз овие податоци. Се прескокнува овој чекор.")
 }
-
-# Se reordenan los nombres de las jugadoras a un formato consistente.
-resultados_exitosos <- map(resultados_exitosos, function(res) {
-  if (is.null(res)) return(NULL)
-  if (nrow(res$alineacion_local) > 0) res$alineacion_local$nombre <- reordenar_nombre_jugadora(res$alineacion_local$nombre)
-  if (nrow(res$alineacion_visitante) > 0) res$alineacion_visitante$nombre <- reordenar_nombre_jugadora(res$alineacion_visitante$nombre)
-  if (nrow(res$goles) > 0) res$goles$jugadora <- reordenar_nombre_jugadora(res$goles$jugadora)
-  if (nrow(res$tarjetas) > 0) res$tarjetas$jugadora <- reordenar_nombre_jugadora(res$tarjetas$jugadora)
-  return(res)
-})
-
 
 ### 9.2. Consolidar y unificar datos de jugadoras ----
 
@@ -1014,7 +1028,35 @@ walk(1:nrow(competiciones_unicas_df), function(i) {
   #### 13.2.6. Página de sanciones (disciplinska) ----
   tarjetas_por_jugadora_comp <- tarjetas_comp %>% filter(!is.na(id)) %>% group_by(id) %>% summarise(Жолти=sum(tipo=="Amarilla",na.rm=T),Црвени=sum(tipo=="Roja",na.rm=T),.groups='drop')
   tabla_sanciones_comp <- tarjetas_por_jugadora_comp %>% left_join(jugadoras_info_comp, by = "id") %>% filter(!is.na(Фудбалерка), Жолти > 0 | Црвени > 0) %>% arrange(desc(Црвени), desc(Жолти)) %>% mutate(Поз. = min_rank(desc(Црвени * 1000 + Жолти))) %>% select(Поз., id, Фудбалерка, Тим, Жолти, Црвени)
-  contenido_sanciones <- tagList(crear_botones_navegacion(".."), tags$h2(paste("Дисциплинска евиденција -", comp_nombre)), tags$table(tags$thead(tags$tr(tags$th("Поз."), tags$th("Фудбалерка"), tags$th("Тим"), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { s <- tabla_sanciones_comp[j,]; s_team_name <- s$Тим; nombre_archivo_final <- paste0(generar_id_seguro(s_team_name), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", nombres_carpetas_mk$assets, nombres_carpetas_mk$logos, nombre_archivo_final); tags$tr(tags$td(s$Поз.), tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(s$id, ".html")), s$Фудбалерка)), tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = s_team_name), tags$a(href=file.path("..", nombres_carpetas_mk$timovi, paste0(generar_id_seguro(s_team_name), ".html")), s_team_name)), tags$td(s$Жолти), tags$td(s$Црвени)) }) } else { tags$tr(tags$td(colspan="5", "Нема регистрирани картони.")) })))
+  contenido_sanciones <- tagList(crear_botones_navegacion(".."), tags$h2(paste("Дисциплинска евиденција -", comp_nombre)), tags$table(tags$thead(tags$tr(tags$th("Поз."), tags$th("Фудбалерка"), tags$th("Тим"), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { 
+    s <- tabla_sanciones_comp[j,]; 
+    tags$tr(
+      tags$td(s$Поз.), 
+      tags$td(tags$a(href=file.path("..", nombres_carpetas_mk$jugadoras, paste0(s$id, ".html")), s$Фудбалерка)), 
+      tags$td({
+        teams <- str_split(s$Тим, " / ")[[1]]
+        team_tags <- list()
+        for (i in seq_along(teams)) {
+          team_name <- teams[i]
+          nombre_archivo_final <- paste0(generar_id_seguro(team_name), ".png")
+          if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) {
+            nombre_archivo_final <- "NOLOGO.png"
+          }
+          ruta_relativa_logo_html <- file.path("..", nombres_carpetas_mk$assets, nombres_carpetas_mk$logos, nombre_archivo_final)
+          team_element <- tags$span(class="team-cell", 
+                                    tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), 
+                                    tags$a(href = file.path("..", nombres_carpetas_mk$timovi, paste0(generar_id_seguro(team_name), ".html")), team_name))
+          team_tags <- append(team_tags, list(team_element))
+          if (i < length(teams)) {
+            team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/")))
+          }
+        }
+        tagList(team_tags)
+      }), 
+      tags$td(s$Жолти), 
+      tags$td(s$Црвени)
+    ) 
+  }) } else { tags$tr(tags$td(colspan="5", "Нема регистрирани картони.")) })))
   pagina_sanciones_final <- crear_pagina_html(contenido_sanciones, paste("Дисциплинска -", comp_nombre), "..", search_data_json, script_contraseña)
   save_html(pagina_sanciones_final, file.path(RUTA_COMPETICIONES, paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html")))
   
