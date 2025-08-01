@@ -429,7 +429,7 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
 #'
 #' @param acta_path La ruta al archivo PDF del acta.
 #' @return Una lista que contiene dataframes para `partido_info`, `goles`, `tarjetas`,
-#'   `alineacion_local`, etc., así como un `resumen_texto`.
+#'   `alineacion_local`, etc., así como un `resumen_texto` y `nota_arbitro`.
 procesar_acta <- function(acta_path) {
   # Lectura y preparación inicial del texto del PDF.
   nombre_archivo <- basename(acta_path)
@@ -451,7 +451,7 @@ procesar_acta <- function(acta_path) {
   resultado_final_str <- partido_info_match[, 6]
   
   # Detección de resultado oficial (marcado con *) y limpieza del marcador.
-  es_resultado_oficial <- str_detect(resultado_final_str, "\\*") && str_detect(texto_acta, "службен резултат")
+  es_resultado_oficial <- str_detect(resultado_final_str, "\\*") && str_detect(tolower(texto_acta), "службен резултат")
   resultado_limpio <- str_remove(resultado_final_str, "\\*")
   goles_split <- as.integer(str_split(resultado_limpio, ":", simplify = TRUE))
   goles_local <- goles_split[1]
@@ -485,6 +485,16 @@ procesar_acta <- function(acta_path) {
     if (length(partes_entrenador) >= 2 && nchar(str_trim(partes_entrenador[2])) > 0) entrenador_visitante <- str_trim(partes_entrenador[2])
     entrenador_local <- str_remove_all(entrenador_local, "\\d") %>% str_trim()
     entrenador_visitante <- str_remove_all(entrenador_visitante, "\\d") %>% str_trim()
+  }
+  
+  # Extracción de la nota del árbitro, si existe.
+  nota_arbitro <- NA_character_
+  if(es_resultado_oficial) {
+    regex_nota <- "Забелешка(?:\\s+и\\s+потпис\\s+на\\s+главен\\s+судија)?:?\\s*([\\s\\S]*?)(?=Ж:\\s*Жолт\\s*картон|ПОТВРДЕН|ОДИГРАН)"
+    nota_match <- str_match(texto_acta, regex_nota)
+    if (!is.na(nota_match[1, 2])) {
+      nota_arbitro <- str_trim(nota_match[1, 2])
+    }
   }
   
   # Creación del dataframe con la información general del partido.
@@ -602,9 +612,12 @@ procesar_acta <- function(acta_path) {
     "\n======================================================================", paste("INICIO DEL ACTA:", nombre_archivo), "======================================================================",
     paste("COMPETICIÓN:", competicion_nombre, competicion_temporada),
     paste("RESUMEN DEL PARTIDO:", equipo_local, "vs", equipo_visitante, "(ID:", id_partido, ")"), paste("Fecha:", fecha, "| Hora:", hora, "| Jornada:", jornada),
-    paste("Estadio:", estadio), paste("Resultado final:", resultado_final_str), "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
+    paste("Estadio:", estadio), 
+    paste("Resultado final:", resultado_final_str, if(es_resultado_oficial) "(Resultado oficial)" else ""),
+    "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
     "\n--- SANCIONES (TARJETAS) ---", formatear_tarjetas_texto(tarjetas_partido_actual),
     "\n--- ÁRBITRAS Y OFICIALES ---", paste("  Árbitro/a principal:", arbitro_principal), paste("  1.ª Asistente:", arbitro_asist_1), paste("  2.ª Asistente:", arbitro_asist_2),
+    if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) c("\n--- NOTA DEL ÁRBITRO ---", nota_arbitro),
     "\n--- ALINEACIONES ---", paste("\nEquipo local:", equipo_local), paste("  Entrenador/a:", entrenador_local), "  Titulares:", formatear_jugadoras(alineacion_local, "Titular"),
     "  Suplentes:", formatear_jugadoras(alineacion_local, "Suplente"), "  Cambios:", if(!is.null(cambios_local_df) && nrow(cambios_local_df) > 0) cambios_local_df$texto else "  No se registraron cambios.",
     paste("\nEquipo visitante:", equipo_visitante), paste("  Entrenador/a:", entrenador_visitante), "  Titulares:", formatear_jugadoras(alineacion_visitante, "Titular"),
@@ -613,7 +626,7 @@ procesar_acta <- function(acta_path) {
   )
   
   # Retorno de todos los datos extraídos en una lista.
-  return(list(partido_info = partido_df, goles = goles_partido_actual, tarjetas = tarjetas_partido_actual, resumen_texto = unlist(resumen_actual_lines), alineacion_local = alineacion_local, alineacion_visitante = alineacion_visitante, cambios_local = cambios_local_df, cambios_visitante = cambios_visitante_df, arbitro_principal = arbitro_principal, arbitro_asist_1 = arbitro_asist_1, arbitro_asist_2 = arbitro_asist_2, estadio = estadio))
+  return(list(partido_info = partido_df, goles = goles_partido_actual, tarjetas = tarjetas_partido_actual, resumen_texto = unlist(resumen_actual_lines), alineacion_local = alineacion_local, alineacion_visitante = alineacion_visitante, cambios_local = cambios_local_df, cambios_visitante = cambios_visitante_df, arbitro_principal = arbitro_principal, arbitro_asist_1 = arbitro_asist_1, arbitro_asist_2 = arbitro_asist_2, estadio = estadio, nota_arbitro = nota_arbitro))
 }
 
 
