@@ -1,0 +1,61 @@
+mk,sq,es,en
+Прва ЖФЛ 13/14,Liga e Parë e Femrave 13/14,Primera Liga Femenina 13/14,Women's First League 13/14
+Прва ЖФЛ 14/15,Liga e Parë e Femrave 14/15,Primera Liga Femenina 14/15,Women's First League 14/15
+Прва ЖФЛ 15/16,Liga e Parë e Femrave 15/16,Primera Liga Femenina 15/16,Women's First League 15/16
+Прва ЖФЛ 16/17,Liga e Parë e Femrave 16/17,Primera Liga Femenina 16/17,Women's First League 16/17
+Прва ЖФЛ 17/18,Liga e Parë e Femrave 17/18,Primera Liga Femenina 17/18,Women's First League 17/18
+Прва ЖФЛ 18/19,Liga e Parë e Femrave 18/19,Primera Liga Femenina 18/19,Women's First League 18/19
+Прва ЖФЛ 19/20,Liga e Parë e Femrave 19/20,Primera Liga Femenina 19/20,Women's First League 19/20
+Прва ЖФЛ 20/21,Liga e Parë e Femrave 20/21,Primera Liga Femenina 20/21,Women's First League 20/21
+Прва ЖФЛ 21/22,Liga e Parë e Femrave 21/22,Primera Liga Femenina 21/22,Women's First League 21/22
+Прва ЖФЛ 22/23,Liga e Parë e Femrave 22/23,Primera Liga Femenina 22/23,Women's First League 22/23
+Прва ЖФЛ 23/24,Liga e Parë e Femrave 23/24,Primera Liga Femenina 23/24,Women's First League 23/24
+Прва ЖФЛ 24/25,Liga e Parë e Femrave 24/25,Primera Liga Femenina 24/25,Women's First League 24/25
+Прва ЖФЛ 25/26,Liga e Parë e Femrave 25/26,Primera Liga Femenina 25/26,Women's First League 25/26
+Втора ЖФЛ 21/22,Liga e Dytë e Femrave 21/22,Segunda Liga Femenina 21/22,Women's Second League 21/22
+Втора ЖФЛ 22/23,Liga e Dytë e Femrave 22/23,Segunda Liga Femenina 22/23,Women's Second League 22/23
+Втора ЖФЛ 23/24,Liga e Dytë e Femrave 23/24,Segunda Liga Femenina 23/24,Women's Second League 23/24
+Втора ЖФЛ 24/25,Liga e Dytë e Femrave 24/25,Segunda Liga Femenina 24/25,Women's Second League 24/25
+Втора ЖФЛ 25/26,Liga e Dytë e Femrave 25/26,Segunda Liga Femenina 25/26,Women's Second League 25/26
+Бараж за Прва ЖФЛ 13/14,Barazh për Ligën e Parë të Femrave 13/14,Play-off de ascenso a la Primera Liga Femenina 13/14,Play-off for the First Women's League 13/14
+Бараж за Прва ЖФЛ 14/15,Barazh për Ligën e Parë të Femrave 14/15,Play-off de ascenso a la Primera Liga Femenina 14/15,Play-off for the First Women's League 14/15
+Бараж за Прва ЖФЛ 15/16,Barazh për Ligën e Parë të Femrave 15/16,Play-off de ascenso a la Primera Liga Femenina 15/16,Play-off for the First Women's League 15/16
+Бараж за Прва ЖФЛ 16/17,Barazh për Ligën e Parë të Femrave 16/17,Play-off de ascenso a la Primera Liga Femenina 16/17,Play-off for the First Women's League 16/17
+Бараж за Прва ЖФЛ 17/18,Barazh për Ligën e Parë të Femrave 17/18,Play-off de ascenso a la Primera Liga Femenina 17/18,Play-off for the First Women's League 17/18
+Бараж за Прва ЖФЛ 18/19,Barazh për Ligën e Parë të Femrave 18/19,Play-off de ascenso a la Primera Liga Femenina 18/19,Play-off for the First Women's League 18/19
+Бараж за Прва ЖФЛ 19/20,Barazh për Ligën e Parë të Femrave 19/20,Play-off de ascenso a la Primera Liga Femenina 19/20,Play-off for the First Women's League 19/20
+Бараж за Прва ЖФЛ 20/21,Barazh për Ligën e Parë të Femrave 20/21,Play-off de ascenso a la Primera Liga Femenina 20/21,Play-off for the First Women's League 20/21
+Бараж за Прва ЖФЛ 21/22,Barazh për Ligën e Parë të Femrave 21/22,Play-off de ascenso a la Primera Liga Femenina 21/22,Play-off for the First Women's League 21/22
+Бараж за Прва ЖФЛ 22/23,Barazh për Ligën e Parë të Femrave 22/23,Play-off de ascenso a la Primera Liga Femenina 22/23,Play-off for the First Women's League 22/23
+Бараж за Прва ЖФЛ 23/24,Barazh për Ligën e Parë të Femrave 23/24,Play-off de ascenso a la Primera Liga Femenina 23/24,Play-off for the First Women's League 23/24
+Бараж за Прва ЖФЛ 24/25,Barazh për Ligën e Parë të Femrave 24/25,Play-off de ascenso a la Primera Liga Femenina 24/25,Play-off for the First Women's League 24/25
+Бараж за Прва ЖФЛ 25/26,Barazh për Ligën e Parë të Femrave 25/26,Play-off de ascenso a la Primera Liga Femenina 25/26,Play-off for the First Women's League 25/26
+КУП на РМ за Жени 13/14,Kupa e RM për Femra 13/14,Copa Femenina de Macedonia del Norte 13/14,North Macedonian Women's Cup 13/14
+КУП на РМ за Жени 14/15,Kupa e RM për Femra 14/15,Copa Femenina de Macedonia del Norte 14/15,North Macedonian Women's Cup 14/15
+КУП на РМ за Жени 15/16,Kupa e RM për Femra 15/16,Copa Femenina de Macedonia del Norte 15/16,North Macedonian Women's Cup 15/16
+КУП на РМ за Жени 16/17,Kupa e RM për Femra 16/17,Copa Femenina de Macedonia del Norte 16/17,North Macedonian Women's Cup 16/17
+КУП на РМ за Жени 17/18,Kupa e RM për Femra 17/18,Copa Femenina de Macedonia del Norte 17/18,North Macedonian Women's Cup 17/18
+КУП на РМ за Жени 18/19,Kupa e RM për Femra 18/19,Copa Femenina de Macedonia del Norte 18/19,North Macedonian Women's Cup 18/19
+КУП на РМ за Жени 19/20,Kupa e RM për Femra 19/20,Copa Femenina de Macedonia del Norte 19/20,North Macedonian Women's Cup 19/20
+КУП на РМ за Жени 20/21,Kupa e RM për Femra 20/21,Copa Femenina de Macedonia del Norte 20/21,North Macedonian Women's Cup 20/21
+КУП на РМ за Жени 21/22,Kupa e RM për Femra 21/22,Copa Femenina de Macedonia del Norte 21/22,North Macedonian Women's Cup 21/22
+КУП на РМ за Жени 22/23,Kupa e RM për Femra 22/23,Copa Femenina de Macedonia del Norte 22/23,North Macedonian Women's Cup 22/23
+КУП на РМ за Жени 23/24,Kupa e RM për Femra 23/24,Copa Femenina de Macedonia del Norte 23/24,North Macedonian Women's Cup 23/24
+КУП на РМ за Жени 24/25,Kupa e RM për Femra 24/25,Copa Femenina de Macedonia del Norte 24/25,North Macedonian Women's Cup 24/25
+КУП на РМ за Жени 25/26,Kupa e RM për Femra 25/26,Copa Femenina de Macedonia del Norte 25/26,North Macedonian Women's Cup 25/26
+Младинска Женска Фудбалска Лига 18/19,Liga e të Rejave 18/19,Liga Femenina Juvenil 18/19,Women's Youth League 18/19
+Младинска Женска Фудбалска Лига 19/20,Liga e të Rejave 19/20,Liga Femenina Juvenil 19/20,Women's Youth League 19/20
+Младинска Женска Фудбалска Лига 20/21,Liga e të Rejave 20/21,Liga Femenina Juvenil 20/21,Women's Youth League 20/21
+Младинска Женска Фудбалска Лига 21/22,Liga e të Rejave 21/22,Liga Femenina Juvenil 21/22,Women's Youth League 21/22
+Младинска Женска Фудбалска Лига 22/23,Liga e të Rejave 22/23,Liga Femenina Juvenil 22/23,Women's Youth League 22/23
+Младинска Женска Фудбалска Лига 23/24,Liga e të Rejave 23/24,Liga Femenina Juvenil 23/24,Women's Youth League 23/24
+Младинска Женска Фудбалска Лига 24/25,Liga e të Rejave 24/25,Liga Femenina Juvenil 24/25,Women's Youth League 24/25
+Младинска Женска Фудбалска Лига 25/26,Liga e të Rejave 25/26,Liga Femenina Juvenil 25/26,Women's Youth League 25/26
+Кадетска Женска Фудбалска Лига 18/19,Liga e Kadeteve 18/19,Liga Femenina Cadete 18/19,Women's Cadet League 18/19
+Кадетска Женска Фудбалска Лига 19/20,Liga e Kadeteve 19/20,Liga Femenina Cadete 19/20,Women's Cadet League 19/20
+Кадетска Женска Фудбалска Лига 20/21,Liga e Kadeteve 20/21,Liga Femenina Cadete 20/21,Women's Cadet League 20/21
+Кадетска Женска Фудбалска Лига 21/22,Liga e Kadeteve 21/22,Liga Femenina Cadete 21/22,Women's Cadet League 21/22
+Кадетска Женска Фудбалска Лига 22/23,Liga e Kadeteve 22/23,Liga Femenina Cadete 22/23,Women's Cadet League 22/23
+Кадетска Женска Фудбалска Лига 23/24,Liga e Kadeteve 23/24,Liga Femenina Cadete 23/24,Women's Cadet League 23/24
+Кадетска Женска Фудбалска Лига 24/25,Liga e Kadeteve 24/25,Liga Femenina Cadete 24/25,Women's Cadet League 24/25
+Кадетска Женска Фудбалска Лига 25/26,Liga e Kadeteve 25/26,Liga Femenina Cadete 25/26,Women's Cadet League 25/26

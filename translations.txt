@@ -1,0 +1,116 @@
+key,mk,sq,es,en
+lang_name,Македонски,Shqip,Castellano,English
+back_button,← Назад,← Prapa,← Volver,← Back
+home_button,🏠 Почетна,🏠 Faqja kryesore,🏠 Inicio,🏠 Home
+search_placeholder,"Пребарај фудбалерка, тим, судија, стадион...","Kërko lojtare, ekip, gjyqtar, stadium...","Buscar jugadora, equipo, árbitro, estadio...","Search for player, team, referee, stadium..."
+search_button,Пребарај,Kërko,Buscar,Search
+search_results_for,"Резултати од пребарувањето за:","Rezultatet e kërkimit për:","Resultados de la búsqueda para:","Search results for:"
+no_search_results,"Нема пронајдени резултати за","Nuk u gjetën rezultate për","No se encontraron resultados para","No results found for"
+search_prompt,"Ве молиме внесете најмалку 2 карактери за да пребарувате.","Ju lutemi, shkruani të paktën 2 karaktere për të kërkuar.","Por favor, introduce al menos 2 caracteres para buscar.","Please enter at least 2 characters to search."
+portal_title,Портал на натпреварувања,Portali i garave,Portal de competiciones,Competitions portal
+schedule_title,Распоред,Orari,Calendario,Fixtures
+standings_title,Табела,Tabela,Clasificación,Table
+scorers_title,Стрелци,Golashënuesit,Goleadoras,Top scorers
+disciplinary_title,Дисциплинска,Evidenca disiplinore,Disciplina,Disciplinary
+goalkeepers_title,Статистика на голманки,Statistikat e portiereve,Estadísticas de porteras,Goalkeeper stats
+defensive_trio_title,Најдобро дефанзивно трио,Treshja më e mirë mbrojtëse,Mejor trío defensivo,Best defensive trio
+final_score,Конечен резултат,Rezultati përfundimtar,Resultado final,Final score
+officials_notes,Забелешка на судијата,Shënimi i gjyqtarit,Notas de la árbitra,Referee's notes
+lineups_title,Состави,Formacionet,Alineaciones,Line-ups
+timeline_title,Хронологија,Kronologjia,Cronología,Timeline
+referees_title,Судии,Gjyqtarët,Árbitras,Referees
+player_type,Фудбалерка,Lojtare,Jugadora,Player
+team_type,Тим,Ekip,Equipo,Team
+referee_type,Судија,Gjyqtar,Árbitao,Referee
+stadium_type,Стадион,Stadium,Estadio,Stadium
+competition_type,Натпреварување,Garë,Competición,Competition
+site_title,Фудбалски портал МК,Portali i futbollit MK,Portal de fútbol MK,MK Football Portal
+no_competitions_found,Не се пронајдени натпреварувања.,Nuk u gjetën gara.,No se encontraron competiciones.,No competitions found.
+round_prefix,Коло,Raundi,Jornada,Round
+standings_no_data_message,Нема обработени валидни натпревари.,Nuk ka ndeshje të vlefshme të përpunuara.,No hay partidos válidos procesados.,No valid matches have been processed.
+standings_pos,Поз.,Poz.,Pos.,Pos
+standings_team,Тим,Ekipi,Equipo,Team
+standings_p,Н,N,J,P
+standings_w,Поб,F,G,W
+standings_d,Нер,B,E,D
+standings_l,Пор,H,P,L
+standings_gf,ДГ,GSh,GF,GF
+standings_ga,ПГ,GP,GC,GA
+standings_gd,ГР,GD,DG,GD
+standings_pts,Бод.,P.,Pts,Pts
+gk_stats_header_over_50,"Фудбалерки со 50% или повеќе одиграни минути","Lojtaret me 50% ose më shumë minuta të luajtura","Jugadoras con al menos el 50 % de minutos jugados","Players with 50% or more of minutes played"
+gk_stats_header_under_50,"Фудбалерки со помалку од 50% одиграни минути","Lojtaret me më pak se 50% minuta të luajtura","Jugadoras con menos del 50 % de minutos jugados","Players with less than 50% of minutes played"
+no_data_in_category,Нема податоци во оваа категорија.,Nuk ka të dhëna në këtë kategori.,No hay datos en esta categoría.,No data in this category.
+stats_minutes,Минути,Minuta,Minutos,Minutes
+gk_ga,ПГ,GP,GC,GA
+gk_cs,ЧМ,PM,PI,CS
+gk_ga_90,ПГ/90,GP/90,GC/90,GA/90
+stats_goals,Голови,Gola,Goles,Goals
+disciplinary_no_cards_message,Нема регистрирани картони.,Nuk ka kartonë të regjistruar.,No hay tarjetas registradas.,No cards recorded.
+defensive_trio_subtitle,"Дефанзивното трио од секој тим кое одиграло најмалку 50 % од можните минути заедно.","Treshja mbrojtëse nga çdo ekip që ka luajtur të paktën 50% të minutave të mundshme së bashku.","El trío defensivo de cada equipo que ha jugado al menos el 50 % de los minutos posibles en conjunto.","The defensive trio from each team that has played at least 50% of the possible minutes together."
+defensive_trio_header_trio,Трио,Treshja,Trío,Trio
+defensive_trio_header_minutes,Минути заедно,Minuta së bashku,Minutos juntos,Minutes together
+defensive_trio_header_ga,Примени голови,Gola të pranuar,Goles encajados,Goals conceded
+defensive_trio_header_ga90,Примени/90мин,Pranuar/90min,Encajados / 90 min,Conceded/90min
+defensive_trio_details_matches,Одиграни натпревари заедно,Ndeshje të luajtura së bashku,Partidos jugados juntos,Matches played together
+match_header_match,Натпревар,Ndeshja,Partido,Match
+match_header_result,Резултат,Rezultati,Resultado,Result
+match_official_result,"(Службен резултат)","(Rezultat zyrtar)","(Resultado otorgado)","(Default result)"
+match_date,Датум,Data,Fecha,Date
+match_time,Време,Koha,Hora,Time
+match_stadium,Стадион,Stadiumi,Estadio,Stadium
+match_unknown,Непознат,I panjohur,Desconocido,Unknown
+match_timeline_no_events,Нема регистрирани настани.,Nuk ka ngjarje të regjistruara.,No hay eventos registrados.,No events recorded.
+match_starting_lineup,Почетен состав,Formacioni startues,Once inicial,Starting line-up
+match_substitutes,Резерви,Rezervat,Suplentes,Substitutes
+match_no_data,Нема податоци.,Nuk ka të dhëna.,No hay datos.,No data.
+match_no_players,Нема.,Asnjë.,Ninguno.,None.
+match_timeline_goal,"Гол на %s (%s)","Gol nga %s (%s)","Gol de %s (%s)","Goal by %s (%s)"
+match_timeline_own_goal,"Автогол на %s (%s) во корист на %s","Autogol nga %s (%s) në favor të %s","Gol en propia puerta de %s (%s) a favor de %s","Own goal by %s (%s) for %s"
+match_timeline_card,"Картон за %s (%s)","Karton për %s (%s)","Tarjeta para %s (%s)","Card for %s (%s)"
+match_timeline_substitution,"Измена за %s: влегува %s (%s) на местото на %s (%s)","Zëvendësim për %s: hyn %s (%s) në vend të %s (%s)","Cambio en el %s: entra %s (%s) por %s (%s)","Substitution in %s: %s (%s) comes in for %s (%s)"
+player_career_summary,Резиме на кариера,Përmbledhje e karrierës,Resumen de carrera,Career summary
+player_detailed_stats,Детална статистика,Statistika të detajuara,Estadísticas detalladas,Detailed stats
+player_match_list,Список на натпревари,Lista e ndeshjeve,Lista de partidos,Match list
+player_goal_list,Список на голови,Lista e golave,Lista de goles,Goal list
+player_card_list,Список на картони,Lista e kartonëve,Lista de tarjetas,Card list
+player_season,Сезона,Sezoni,Temporada,Season
+player_competition,Натпреварување,Gara,Competición,Competition
+player_apps,Наст.,Nd.,Part.,Apps
+player_goals,Гол.,G,Gol.,Goals
+player_mins,Мин.,Min.,Min.,Mins
+player_called_up,Повикана,E ftuar,Convocada,Called up
+player_played,Одиграни,Luajtur,Jugados,Played
+player_starter,Почетен состав,Titullare,Titular,Starter
+player_yellow_cards,Жолти картони,Kartonë të verdhë,Tarjetas amarillas,Yellow cards
+player_red_cards,Црвени картони,Kartonë të kuq,Tarjetas rojas,Red cards
+player_no_matches,Нема одиграни натпревари.,Nuk ka ndeshje të luajtura.,No ha jugado partidos.,No matches played.
+player_no_goals,Нема постигнато голови.,Nuk ka shënuar gola.,No ha marcado goles.,No goals scored.
+player_no_cards,Нема добиено картони.,Nuk ka marrë kartonë.,No ha recibido tarjetas.,No cards received.
+player_status,Статус,Statusi,Estado,Status
+player_status_played_sub,"Резерва (одигра)","Rezervë (luajti)","Suplente (jugó)","Substitute (played)"
+player_status_called_up,Повикана,E ftuar,Convocada,Called up
+match_header_minute,Минута,Minuta,Minuto,Minute
+match_header_reason,Причина,Arsyeja,Motivo,Reason
+match_header_card,Картон,Kartoni,Tarjeta,Card
+team_history_by_competition,Историја по натпреварувања,Historia sipas garave,Historial por competición,History by competition
+team_player_stats,Статистика на фудбалерки,Statistikat e lojtareve,Estadísticas de jugadoras,Player stats
+team_match_list,Список на натпревари,Lista e ndeshjeve,Lista de partidos,Match list
+team_header_date,Датум,Data,Fecha,Date
+team_header_home,Домаќин,Vendas,Local,Home
+team_header_away,Гостин,Mysafir,Visitante,Away
+referee_history_by_competition,Историја по натпреварувања,Historia sipas garave,Historial por competición,History by competition
+referee_header_matches,Натпревари,Ndeshje,Partidos,Matches
+referee_header_role,Улога,Roli,Rol,Role
+stadium_match_history,Историја на натпревари,Historia e ndeshjeve,Historial de partidos,Match history
+search_results,Резултати од пребарувањето,Rezultatet e kërkimit,Resultados de la búsqueda,Search results
+final_process_success,ПРОЦЕСОТ Е УСПЕШНО ЗАВРШЕН!,PROCESI U PËRFUNDUA ME SUKSES!,¡Proceso completado con éxito!,Process completed successfully!
+final_full_rebuild,"Извршена е целосна реконструкција на страницата.","Është bërë një rindërtim i plotë i faqes.","Se ha realizado una reconstrucción completa del sitio.","A full site rebuild has been performed."
+final_incremental_update,"Извршено е инкрементално ажурирање на страницата.","Është bërë një përditësim shtesë i faqes.","Se ha realizado una actualización incremental del sitio.","An incremental site update has been performed."
+final_site_location,"Креирана/ажурирана е статична веб-страница во папката:","Është krijuar/përditësuar një uebfaqe statike në dosjen:","Se ha creado/actualizado un sitio web estático en la carpeta:","A static website has been created/updated in the folder:"
+final_navigate_prompt,"Отворете ја датотеката 'index.html' од таа папка за да започнете со прелистување.","Hapni skedarin 'index.html' nga ajo dosje për të filluar shfletimin.","Abre el archivo 'index.html' de esa carpeta para empezar a navegar.","Open the 'index.html' file in that folder to start browsing."
+player_age_suffix,год.,vjeç,años,y.o.
+position_goalkeeper,Голманка,Portiere,Portera,Goalkeeper
+position_defender,Одбрана,Mbrojtëse,Defensa,Defender
+position_midfielder,Среден ред,Mesfushore,Centrocampista,Midfielder
+position_forward,Напад,Sulmuese,Delantera,Forward
