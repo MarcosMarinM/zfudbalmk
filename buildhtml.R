@@ -864,8 +864,9 @@ if (!hubo_cambios) {
 }
 
 ## -------------------------------------------------------------------------- ##
-##  10. CREACIÓN DE DATASETS AGREGADOS PARA PERFILES
+##  10. CREACIÓN DE DATASETS AGREGADOS PARA PERFILES Y ESTADÍSTICAS
 ## -------------------------------------------------------------------------- ##
+message("Централизирано пресметување на сите статистики...")
 
 ### 10.1. Generar estadísticas globales de jugadoras ----
 if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
@@ -893,7 +894,6 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
       clave_lower = tolower(trimws(nacionalidad))
     )
   
-  # --- Lógica de Traducción Robusta para Jugadoras ---
   if (!is.null(mapa_nombres_jugadoras_long)) {
     player_translations_wide <- mapa_nombres_jugadoras_long %>%
       pivot_wider(id_cols = original_mk, names_from = lang, values_from = translated_name, names_prefix = "PlayerName_")
@@ -928,21 +928,16 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
 
 
 ### 10.2. Generar datos de árbitros y estadios ----
-
-# Se transforman los datos para crear listas de árbitros y estadios con los partidos asociados.
 arbitros_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$arbitro_principal)) NULL else data.frame(id_partido=.x$partido_info$id_partido,arbitro_principal=.x$arbitro_principal,arbitro_asist_1=.x$arbitro_asist_1,arbitro_asist_2=.x$arbitro_asist_2)) %>% pivot_longer(cols=starts_with("arbitro_"),names_to="uloga",values_to="ime",values_drop_na=T) %>% mutate(uloga=case_when(uloga=="arbitro_principal"~"Главен судија",uloga=="arbitro_asist_1"~"1-ви помошник",uloga=="arbitro_asist_2"~"2-ри помошник",T~uloga))
 estadios_df <- map_dfr(resultados_exitosos, ~if(is.null(.x)||is.null(.x$estadio)) NULL else data.frame(id_partido=.x$partido_info$id_partido,estadio=.x$estadio)) %>% left_join(partidos_df,by="id_partido")
 
 ### 10.3. Crear dataframe maestro de entidades (equipos, árbitros, estadios) ----
-message("Креирање на мастер податочна рамка за ентитети...")
-
 nombres_equipos <- unique(c(partidos_df$local, partidos_df$visitante))
 nombres_arbitros <- unique(arbitros_df$ime)
 nombres_estadios <- unique(na.omit(estadios_df$estadio))
 
 entidades_base_df <- tibble(original_name = c(nombres_equipos, nombres_arbitros, nombres_estadios)) %>% distinct()
 
-# --- Lógica de Traducción Robusta para Entidades ---
 if (!is.null(mapa_nombres_entidades_long)) {
   entity_translations_wide <- mapa_nombres_entidades_long %>%
     pivot_wider(id_cols = original_mk, names_from = lang, values_from = translated_name, names_prefix = "translated_name_")
@@ -968,6 +963,228 @@ for (lang_code in setdiff(IDIOMAS_SOPORTADOS, "mk")) {
       str_replace_all(tolower(original_name), map_transliteration_entity) %>% str_to_title()
     ))
 }
+
+### 10.4. Calcular estadísticas por competición (Clasificación, Goleadoras, Sanciones) ----
+stats_clasificacion_por_comp_df <- competiciones_unicas_df %>%
+  filter(!str_detect(tolower(competicion_nombre), "куп")) %>%
+  group_by(competicion_id, competicion_nombre, competicion_temporada) %>%
+  reframe({
+    partidos_comp <- partidos_df %>% filter(competicion_nombre == first(.$competicion_nombre), competicion_temporada == first(.$competicion_temporada))
+    if (nrow(partidos_comp) == 0) return(tibble())
+    locales <- partidos_comp %>% select(team = local, GF = goles_local, GA = goles_visitante)
+    visitantes <- partidos_comp %>% select(team = visitante, GF = goles_visitante, GA = goles_local)
+    bind_rows(locales, visitantes) %>%
+      mutate(Pts = case_when(GF > GA ~ 3, GF < GA ~ 0, TRUE ~ 1), result = case_when(GF > GA ~ "W", GF < GA ~ "L", TRUE ~ "D")) %>%
+      group_by(team) %>%
+      summarise(P = n(), Pts = sum(Pts), W = sum(result == "W"), D = sum(result == "D"), L = sum(result == "L"), GF = sum(GF), GA = sum(GA), .groups = 'drop') %>%
+      mutate(GD = GF - GA) %>%
+      arrange(desc(Pts), desc(GD), desc(GF)) %>%
+      mutate(Pos = row_number())
+  })
+
+stats_goleadoras_por_comp_df <- apariciones_df %>%
+  group_by(id, competicion_nombre, competicion_temporada) %>%
+  summarise(TeamNames_mk = paste(unique(equipo), collapse = " / "), .groups = 'drop') %>%
+  right_join(
+    goles_df_unificado %>% filter(tipo == "Normal", !is.na(id)) %>%
+      left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+      group_by(id, competicion_nombre, competicion_temporada) %>%
+      summarise(Goals = n(), .groups = 'drop'),
+    by = c("id", "competicion_nombre", "competicion_temporada")
+  ) %>%
+  left_join(competiciones_unicas_df %>% select(competicion_id, competicion_nombre, competicion_temporada), by=c("competicion_nombre", "competicion_temporada")) %>%
+  filter(!is.na(competicion_id)) %>%
+  arrange(competicion_id, desc(Goals)) %>%
+  group_by(competicion_id) %>%
+  mutate(Pos = min_rank(desc(Goals))) %>%
+  ungroup()
+
+stats_sanciones_por_comp_df <- apariciones_df %>%
+  group_by(id, competicion_nombre, competicion_temporada) %>%
+  summarise(TeamNames_mk = paste(unique(equipo), collapse = " / "), .groups = 'drop') %>%
+  right_join(
+    tarjetas_df_unificado %>% filter(!is.na(id)) %>%
+      left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+      group_by(id, competicion_nombre, competicion_temporada) %>%
+      summarise(YellowCards = sum(tipo == "Amarilla", na.rm = TRUE), RedCards = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop') %>%
+      filter(YellowCards > 0 | RedCards > 0),
+    by = c("id", "competicion_nombre", "competicion_temporada")
+  ) %>%
+  left_join(competiciones_unicas_df %>% select(competicion_id, competicion_nombre, competicion_temporada), by=c("competicion_nombre", "competicion_temporada")) %>%
+  filter(!is.na(competicion_id)) %>%
+  arrange(competicion_id, desc(RedCards), desc(YellowCards)) %>%
+  group_by(competicion_id) %>%
+  mutate(Pos = row_number()) %>%
+  ungroup()
+
+### 10.5. Calcular estadísticas de porteras por competición ----
+porteras_apariciones_df <- apariciones_df %>%
+  filter(es_portera == TRUE, !is.na(id), minutos_jugados > 0) %>%
+  select(id, id_partido, equipo, competicion_nombre, competicion_temporada, min_entra, min_sale, minutos_jugados)
+
+goles_recibidos_df <- goles_df_unificado %>%
+  left_join(partidos_df %>% select(id_partido, local, visitante), by = "id_partido") %>%
+  mutate(equipo_que_recibio_gol = if_else(equipo_acreditado == local, visitante, local)) %>%
+  select(id_partido, equipo_conceded = equipo_que_recibio_gol, minuto_gol = minuto)
+
+# Paso 1: Calcular los Goles Encajados (GA) de forma explícita y robusta
+stats_ga <- porteras_apariciones_df %>%
+  left_join(goles_recibidos_df, by = c("id_partido", "equipo" = "equipo_conceded"), relationship = "many-to-many") %>%
+  filter(!is.na(minuto_gol) & minuto_gol >= min_entra & minuto_gol <= min_sale) %>%
+  group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  summarise(GA = n(), .groups = 'drop')
+
+# Paso 2: Calcular las Porterías a Cero (CS) de forma explícita y robusta
+stats_cs <- porteras_apariciones_df %>%
+  filter(minutos_jugados >= 90) %>%
+  # #################################################################### #
+  # ##       AQUÍ ESTÁ LA CORRECCIÓN: Se seleccionan solo las columnas necesarias de partidos_df      ##
+  # #################################################################### #
+  left_join(partidos_df %>% select(id_partido, local, visitante, goles_local, goles_visitante), by = "id_partido") %>%
+  mutate(goles_recibidos_partido = if_else(local == equipo, goles_visitante, goles_local)) %>%
+  filter(goles_recibidos_partido == 0) %>%
+  group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  summarise(CS = n(), .groups = 'drop')
+
+# Paso 3: Calcular los minutos totales
+stats_minutos <- porteras_apariciones_df %>%
+  group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  summarise(Minutes = sum(minutos_jugados, na.rm = TRUE), .groups = 'drop')
+
+# Paso 4: Unir todas las estadísticas en un dataframe final
+stats_porteras_por_comp_df <- stats_minutos %>%
+  full_join(stats_ga, by = c("id", "competicion_nombre", "competicion_temporada", "TeamName_mk")) %>%
+  full_join(stats_cs, by = c("id", "competicion_nombre", "competicion_temporada", "TeamName_mk")) %>%
+  mutate(across(c(GA, CS), ~replace_na(., 0))) %>%
+  mutate(GA90 = if_else(Minutes > 0, (GA / Minutes) * 90, 0)) %>%
+  left_join(competiciones_unicas_df %>% select(competicion_id, competicion_nombre, competicion_temporada), by = c("competicion_nombre", "competicion_temporada"))
+
+### 10.6. Calcular estadísticas de tríos defensivos por competición ----
+defensas_apariciones_df <- apariciones_df %>%
+  left_join(posiciones_procesadas_df, by = "id") %>%
+  filter(str_detect(posicion_final_unificada, "defender"), !is.na(min_entra), minutos_jugados > 0) %>%
+  select(id, id_partido, equipo, competicion_nombre, competicion_temporada, min_entra, min_sale)
+
+trio_minutos_partido_df <- defensas_apariciones_df %>%
+  group_by(id_partido, equipo) %>%
+  filter(n() >= 3) %>%
+  group_modify(~ {
+    combn(.x$id, 3, simplify = FALSE) %>%
+      map_dfr(function(trio_ids) {
+        jugadoras_trio <- .x %>% filter(id %in% trio_ids)
+        minutos_compartidos <- max(0, min(jugadoras_trio$min_sale) - max(jugadoras_trio$min_entra))
+        tibble(
+          trio_key = paste(sort(trio_ids), collapse = "-"),
+          minutos_compartidos = minutos_compartidos,
+          start_shared = max(jugadoras_trio$min_entra),
+          end_shared = min(jugadoras_trio$min_sale)
+        )
+      })
+  }) %>%
+  ungroup() %>%
+  filter(minutos_compartidos > 0) %>%
+  left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by="id_partido")
+
+# Paso 1: Calcular los minutos totales que cada trío jugó junto
+stats_minutes_trios <- trio_minutos_partido_df %>%
+  group_by(trio_key, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  summarise(MinutesTogether = sum(minutos_compartidos, na.rm = TRUE), .groups = 'drop')
+
+# Paso 2: Calcular los goles encajados por cada trío mientras jugaban juntos
+stats_ga_trios <- trio_minutos_partido_df %>%
+  left_join(goles_recibidos_df, by = c("id_partido", "equipo" = "equipo_conceded"), relationship = "many-to-many") %>%
+  filter(!is.na(minuto_gol) & minuto_gol >= start_shared & minuto_gol <= end_shared) %>%
+  group_by(trio_key, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  summarise(GA_Together = n(), .groups = 'drop')
+
+# Paso 3: Unir las estadísticas de minutos y goles en un dataframe final
+stats_trios_defensivos_df <- stats_minutes_trios %>%
+  full_join(stats_ga_trios, by = c("trio_key", "competicion_nombre", "competicion_temporada", "TeamName_mk")) %>%
+  mutate(GA_Together = replace_na(GA_Together, 0)) %>%
+  mutate(GA90_Together = if_else(MinutesTogether > 0, (GA_Together / MinutesTogether) * 90, 0)) %>%
+  left_join(competiciones_unicas_df %>% select(competicion_id, competicion_nombre, competicion_temporada), by = c("competicion_nombre", "competicion_temporada"))
+
+
+### 10.7. Calcular resúmenes de carrera por jugadora ----
+career_summary_jugadoras_df <- apariciones_df %>%
+  filter(!is.na(id)) %>%
+  group_by(id, competicion_temporada, competicion_nombre, equipo) %>%
+  summarise(
+    CalledUp = n_distinct(id_partido), Played = sum(minutos_jugados > 0, na.rm=TRUE),
+    Starter = sum(tipo=="Titular", na.rm=TRUE), Minutes = sum(minutos_jugados, na.rm=TRUE),
+    .groups = 'drop'
+  ) %>%
+  full_join(
+    goles_df_unificado %>% filter(!is.na(id)) %>%
+      left_join(partidos_df %>% select(id_partido, competicion_temporada, competicion_nombre), by="id_partido") %>%
+      group_by(id, competicion_temporada, competicion_nombre, equipo = equipo_jugadora) %>%
+      summarise(Goals = sum(tipo == "Normal"), .groups = 'drop'),
+    by = c("id", "competicion_temporada", "competicion_nombre", "equipo")
+  ) %>%
+  full_join(
+    tarjetas_df_unificado %>% filter(!is.na(id)) %>%
+      left_join(partidos_df %>% select(id_partido, competicion_temporada, competicion_nombre), by="id_partido") %>%
+      group_by(id, competicion_temporada, competicion_nombre, equipo) %>%
+      summarise(Yellows = sum(tipo == "Amarilla", na.rm=T), Reds = sum(tipo == "Roja", na.rm=T), .groups = 'drop'),
+    by = c("id", "competicion_temporada", "competicion_nombre", "equipo")
+  ) %>%
+  mutate(across(c(CalledUp, Played, Starter, Minutes, Goals, Yellows, Reds), ~replace_na(., 0))) %>%
+  arrange(id, desc(competicion_temporada))
+
+### 10.8. Calcular resúmenes de perfiles de equipos ----
+stats_equipos_por_temporada_df <- partidos_df %>%
+  mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+  group_by(local, competicion_temporada, competicion_nombre) %>%
+  summarise(last_match_date = max(fecha_date, na.rm=TRUE), .groups='drop') %>%
+  rename(equipo = local) %>%
+  bind_rows(
+    partidos_df %>%
+      mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+      group_by(visitante, competicion_temporada, competicion_nombre) %>%
+      summarise(last_match_date = max(fecha_date, na.rm=TRUE), .groups='drop') %>%
+      rename(equipo = visitante)
+  ) %>%
+  group_by(equipo, competicion_temporada, competicion_nombre) %>%
+  summarise(last_match_date = max(last_match_date, na.rm=TRUE), .groups='drop') %>%
+  arrange(equipo, desc(last_match_date))
+
+stats_jugadoras_por_equipo_temporada_df <- apariciones_df %>%
+  group_by(id, nombre, equipo, competicion_nombre, competicion_temporada) %>%
+  summarise(
+    CalledUp = n_distinct(id_partido),
+    Played = sum(minutos_jugados > 0, na.rm = TRUE),
+    Minutes = sum(minutos_jugados, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  left_join(
+    goles_df_unificado %>%
+      filter(tipo == "Normal") %>%
+      left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+      group_by(id, equipo = equipo_jugadora, competicion_nombre, competicion_temporada) %>%
+      summarise(Goals = n(), .groups = 'drop'),
+    by = c("id", "equipo", "competicion_nombre", "competicion_temporada")
+  ) %>%
+  left_join(
+    tarjetas_df_unificado %>%
+      left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+      group_by(id, equipo, competicion_nombre, competicion_temporada) %>%
+      summarise(Yellows = sum(tipo == "Amarilla", na.rm = TRUE), Reds = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop'),
+    by = c("id", "equipo", "competicion_nombre", "competicion_temporada")
+  ) %>%
+  mutate(across(c(Goals, Yellows, Reds), ~replace_na(., 0))) %>%
+  arrange(equipo, competicion_temporada, desc(Minutes))
+
+### 10.9. Calcular resúmenes de perfiles de árbitros ----
+stats_arbitros_por_temporada_df <- arbitros_df %>%
+  left_join(partidos_df, by = "id_partido") %>%
+  mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+  group_by(ime, competicion_temporada, competicion_nombre) %>%
+  summarise(
+    num_matches = n_distinct(id_partido),
+    last_match_date = max(fecha_date, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(ime, desc(last_match_date))
 
 ## -------------------------------------------------------------------------- ##
 ##  12. EXTERNALIZACIÓN DE ASSETS (CSS Y JAVASCRIPT)
@@ -1303,197 +1520,103 @@ if (hubo_cambios) {
       comp_info <- competiciones_unicas_df[i,]; comp_id <- comp_info$competicion_id
       if (!full_rebuild_needed && !(comp_id %in% affected_competition_ids)) { return() }
       
-      # Se obtiene el nombre traducido de forma robusta desde el dataframe pre-procesado.
       comp_name_col <- paste0("nombre_completo_", lang)
       comp_nombre_current_lang <- comp_info[[comp_name_col]]
       
       message(paste("... Генерирање на страници за натпреварување:", comp_nombre_current_lang))
       
-      is_cup <- str_detect(tolower(comp_info$competicion_nombre), "куп"); partidos_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada); ids_partidos_comp <- partidos_comp$id_partido; goles_comp <- goles_df_unificado %>% filter(id_partido %in% ids_partidos_comp); tarjetas_comp <- tarjetas_df_unificado %>% filter(id_partido %in% ids_partidos_comp); apariciones_comp <- apariciones_df %>% filter(id_partido %in% ids_partidos_comp)
-      
-      # Definir el nombre de columna dinámico UNA VEZ para usarlo en todos los subbloques.
+      is_cup <- str_detect(tolower(comp_info$competicion_nombre), "куп")
       player_name_col <- paste0("PlayerName_", lang)
       player_name_col_sym <- rlang::sym(if(player_name_col %in% names(jugadoras_stats_df)) player_name_col else "PlayerName_mk")
       
-      #### 13.2.1. Menú principal de la competición ----
-      contenido_menu_botones_inicial <- if (is_cup) { tags$div(class="menu-container", tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", t("schedule_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", t("scorers_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", t("disciplinary_title"))) } else { tags$div(class="menu-container", tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", t("schedule_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"), class="menu-button", t("standings_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", t("scorers_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", t("disciplinary_title"))) }
-      contenido_menu_completo_inicial <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), contenido_menu_botones_inicial)
-      pagina_menu_final_inicial <- crear_pagina_html(contenido_menu_completo_inicial, comp_nombre_current_lang, path_to_root_dir = "../..", search_data_json, script_contraseña)
-      save_html(pagina_menu_final_inicial, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
+      # Generar páginas de estadísticas y construir dinámicamente el menú
+      lista_botones_menu <- list()
       
       #### 13.2.2. Página de calendario/partidos (raspored) ----
+      partidos_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada)
       jornadas_comp <- if (nrow(partidos_comp) > 0) { data.frame(jornada = unique(partidos_comp$jornada)) %>% mutate(order_key = case_when(str_detect(jornada, "1/16") ~ 1, str_detect(jornada, "1/8") ~ 2, str_detect(jornada, "1/4") ~ 3, str_detect(jornada, "1/2") ~ 4, str_detect(jornada, "Ф$|ф$|финале") ~ 5, !is_cup ~ as.numeric(suppressWarnings(jornada)), TRUE ~ 99)) %>% arrange(order_key) %>% pull(jornada) } else { c() }
       contenido_partidos <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("schedule_title"), "-", comp_nombre_current_lang)), map(jornadas_comp, function(j) { partidos_jornada <- partidos_comp %>% filter(jornada == j) %>% arrange(local); header_text <- if(is_cup) as.character(j) else paste(t("round_prefix"), j); get_logo_tag <- function(nombre_equipo_mk) { nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo_mk) }; tagList(tags$h3(class="jornada-header", header_text), map(1:nrow(partidos_jornada), function(k) { partido <- partidos_jornada[k,]; local_name <- entidades_df %>% filter(original_name == partido$local) %>% pull(current_lang_name); visitante_name <- entidades_df %>% filter(original_name == partido$visitante) %>% pull(current_lang_name); resultado_texto <- paste(partido$goles_local, "-", partido$goles_visitante); if (isTRUE(partido$es_resultado_oficial)) { resultado_texto <- paste(resultado_texto, "*") }; tags$a(class="partido-link", href=file.path("..", nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")), tags$span(class="equipo equipo-local", get_logo_tag(partido$local), tags$span(local_name)), tags$span(class="resultado", resultado_texto), tags$span(class="equipo equipo-visitante", tags$span(visitante_name), get_logo_tag(partido$visitante))) })) }))
-      pagina_partidos_final <- crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), path_to_root_dir = "../..", search_data_json, script_contraseña)
-      save_html(pagina_partidos_final, file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html")))
+      nombre_archivo_partidos <- paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"); save_html(crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_partidos))
+      lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_partidos, class="menu-button", t("schedule_title"))
       
-      #### 13.2.3. Página de clasificación (tabela) - si aplica ----
+      #### 13.2.3. Página de clasificación (tabela) ----
       if (!is_cup) {
-        calcular_clasificacion <- function(partidos) { if (is.null(partidos) || nrow(partidos) == 0) { return(data.frame(error_msg = t("standings_no_data_message")))}; locales <- partidos %>% select(team = local, GF = goles_local, GA = goles_visitante); visitantes <- partidos %>% select(team = visitante, GF = goles_visitante, GA = goles_local); resultados_por_equipo <- bind_rows(locales, visitantes) %>% mutate(Pts = case_when(GF > GA ~ 3, GF < GA ~ 0, TRUE ~ 1), result = case_when(GF > GA ~ "W", GF < GA ~ "L", TRUE ~ "D")); clasificacion <- resultados_por_equipo %>% group_by(team) %>% summarise(P = n(), Pts = sum(Pts), W = sum(result == "W"), D = sum(result == "D"), L = sum(result == "L"), GF = sum(GF), GA = sum(GA), .groups = 'drop') %>% mutate(GD = GF - GA) %>% arrange(desc(Pts), desc(GD), desc(GF)) %>% mutate(Pos = row_number()) %>% select(Pos, team, P, W, D, L, GF, GA, GD, Pts); return(clasificacion)}
-        clasificacion_df_comp_raw <- calcular_clasificacion(partidos_comp)
-        
-        # Se extrae el nombre original de la competición SIN temporada para buscarlo en los estilos
-        comp_nombre_base_mk <- comp_info$competicion_nombre 
-        
-        contenido_tabla <- if ("error_msg" %in% names(clasificacion_df_comp_raw)) { tags$p(clasificacion_df_comp_raw$error_msg[1]) } else { clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col); estilos_comp <- estilos_clasificacion_data[[comp_nombre_base_mk]]; tagList(tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) { tags$div(class = "legend", map(estilos_comp$leyenda, function(item_leyenda) { tags$div(class = "legend-item", tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")), tags$span(item_leyenda$texto)) })) })}
+        clasificacion_df_comp_raw <- stats_clasificacion_por_comp_df %>% filter(competicion_id == comp_id)
+        comp_nombre_base_mk <- comp_info$competicion_nombre
+        contenido_tabla <- if (nrow(clasificacion_df_comp_raw) == 0) { tags$p(t("standings_no_data_message")) } else { clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col); estilos_comp <- estilos_clasificacion_data[[comp_nombre_base_mk]]; tagList(tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) { tags$div(class = "legend", map(estilos_comp$leyenda, function(item_leyenda) { tags$div(class = "legend-item", tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")), tags$span(item_leyenda$texto)) })) })}
         contenido_clasificacion <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("standings_title"), "-", comp_nombre_current_lang)), contenido_tabla)
-        pagina_clasificacion_final <- crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), path_to_root_dir = "../..", search_data_json, script_contraseña)
-        save_html(pagina_clasificacion_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html")))
-      }
-    
-      #### 13.2.4. Página de estadísticas de porteras (golmanki) ----
-      porteras_comp_df <- apariciones_comp %>% filter(es_portera == TRUE, !is.na(id)) %>% select(id, nombre, equipo, id_partido, minutos_jugados, min_entra, min_sale); minutos_totales_equipo <- partidos_comp %>% group_by(equipo = local) %>% summarise(n_partidos = n()) %>% bind_rows(partidos_comp %>% group_by(equipo = visitante) %>% summarise(n_partidos = n())) %>% group_by(equipo) %>% summarise(minutos_totales_posibles = sum(n_partidos) * 90)
-      if (nrow(porteras_comp_df) > 0 && nrow(minutos_totales_equipo) > 0) {
-        lista_filas_porteras <- list(); 
-        for (portera_id in unique(porteras_comp_df$id)) { 
-          info_portera <- porteras_comp_df %>% filter(id == portera_id) %>% head(1); 
-          partidos_jugados_portera <- porteras_comp_df %>% filter(id == portera_id); 
-          goles_recibidos_total <- 0; 
-          porterias_a_cero <- 0; 
-          for (row in 1:nrow(partidos_jugados_portera)) { 
-            partido_actual <- partidos_jugados_portera[row,]; 
-            equipo_portera <- partido_actual$equipo; 
-            id_partido_actual <- partido_actual$id_partido; 
-            goles_recibidos_partido <- goles_comp %>% filter(id_partido == id_partido_actual, equipo_acreditado != equipo_portera); 
-            if (nrow(goles_recibidos_partido) > 0) { 
-              goles_mientras_jugaba <- goles_recibidos_partido %>% filter(minuto >= partido_actual$min_entra & minuto <= partido_actual$min_sale); 
-              goles_recibidos_total <- goles_recibidos_total + nrow(goles_mientras_jugaba)
-            }; 
-            goles_recibidos_equipo_partido <- partidos_comp %>% filter(id_partido == id_partido_actual) %>% mutate(goles_recibidos = if_else(local == equipo_portera, goles_visitante, goles_local)) %>% pull(goles_recibidos); 
-            if (goles_recibidos_equipo_partido == 0 && partido_actual$minutos_jugados > 0) { 
-              resumen_partido <- purrr::keep(resultados_exitosos, ~.x$partido_info$id_partido == id_partido_actual)[[1]]; 
-              info_partido_base <- resumen_partido$partido_info; 
-              es_local <- (equipo_portera == info_partido_base$local); 
-              cambios_equipo_portera <- if (es_local) resumen_partido$cambios_local else resumen_partido$cambios_visitante; 
-              dorsales_cambios <- c(); 
-              if (!is.null(cambios_equipo_portera) && nrow(cambios_equipo_portera) > 0) { 
-                dorsales_cambios <- unique(na.omit(c(as.numeric(str_match(cambios_equipo_portera$texto, "Entra .*?\\((\\d+)\\)")[, 2]), as.numeric(str_match(cambios_equipo_portera$texto, "por .*?\\((\\d+)\\)")[, 2]))))
-              };
-              dorsal_portera_partido <- apariciones_comp %>% filter(id_partido == id_partido_actual, id == portera_id) %>% pull(dorsal) %>% head(1); 
-              if (!(dorsal_portera_partido %in% dorsales_cambios)) { 
-                porterias_a_cero <- porterias_a_cero + 1
-              }
-            }
-          }; 
-          
-          # ###################################################################### #
-          # ## CORRECCIÓN: Se elimina la columna 'PlayerName_mk' de aquí para   ##
-          # ## evitar el conflicto en el 'left_join' posterior. Se une con los  ##
-          # ## nombres canónicos de 'jugadoras_stats_df' a continuación.        ##
-          # ###################################################################### #
-          lista_filas_porteras[[length(lista_filas_porteras) + 1]] <- tibble(
-            id = portera_id, 
-            TeamName_mk = info_portera$equipo, 
-            Minutes = sum(partidos_jugados_portera$minutos_jugados), 
-            GA = goles_recibidos_total, 
-            CS = porterias_a_cero
-          )
-        }
-        if (length(lista_filas_porteras) > 0) {
-          # ###################################################################### #
-          # ## EXPLICACIÓN: Ahora, este 'left_join' ya no tiene conflicto.      ##
-          # ## Une todas las columnas 'PlayerName_' sin duplicados.             ##
-          # ###################################################################### #
-          tabla_porteras_comp_raw <- bind_rows(lista_filas_porteras) %>%
-            left_join(jugadoras_stats_df %>% select(id, starts_with("PlayerName_")), by = "id") %>% 
-            left_join(entidades_df, by = c("TeamName_mk" = "original_name")) %>% 
-            mutate(GA90 = if_else(Minutes > 0, (GA / Minutes) * 90, 0)) %>% 
-            left_join(minutos_totales_equipo, by = c("TeamName_mk" = "equipo")) %>% 
-            mutate(
-              pct_minutos = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Minutes / minutos_totales_posibles) * 100, 0), 
-              group = if_else(pct_minutos >= 50, "mas_50", "menos_50")
-            ) %>% 
-            select(id, PlayerName = !!player_name_col_sym, TeamName = current_lang_name, TeamName_mk, GA90, GA, Minutes, CS, group)
-          
-          porteras_mas_50 <- tabla_porteras_comp_raw %>% filter(group == "mas_50") %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number()); porteras_menos_50 <- tabla_porteras_comp_raw %>% filter(group == "menos_50", Minutes > 0) %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number())
-          generar_tabla_html_porteras <- function(df, table_id) { if (is.null(df) || nrow(df) == 0) { return(tags$p(t("no_data_in_category")))}; tags$table(id = table_id, `data-sort-col` = "3", `data-sort-dir` = "asc", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(class="sortable-header asc", onclick=sprintf("sortTable('%s', 3)", table_id), t("gk_ga_90")), tags$th(t("gk_ga")), tags$th(t("stats_minutes")), tags$th(class="sortable-header", onclick=sprintf("sortTable('%s', 6)", table_id), t("gk_cs")))), tags$tbody(map(1:nrow(df), function(j){ p <- df[j,]; nombre_equipo <- p$TeamName; nombre_equipo_mk <- p$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$tr(tags$td(p$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), nombre_equipo)), tags$td(format(round(p$GA90, 2), nsmall = 2)), tags$td(p$GA), tags$td(p$Minutes), tags$td(p$CS)) })))}
-          contenido_porteras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("goalkeepers_title"), "-", comp_nombre_current_lang)), tags$h3(t("gk_stats_header_over_50")), generar_tabla_html_porteras(porteras_mas_50, "tabla-porteras-mas-50"), tags$h3(t("gk_stats_header_under_50")), generar_tabla_html_porteras(porteras_menos_50, "tabla-porteras-menos-50"))
-          pagina_porteras_final <- crear_pagina_html(contenido_porteras, paste(t("goalkeepers_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña); save_html(pagina_porteras_final, file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_golmanki.html")))
-          botones_existentes <- if (is_cup) { list(tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", t("schedule_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", t("scorers_title"))) } else { list(tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", t("schedule_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"), class="menu-button", t("standings_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", t("scorers_title"))) }
-          contenido_menu_botones_final <- tags$div(class="menu-container", botones_existentes, tags$a(href=paste0(comp_id, "_golmanki.html"), class="menu-button", t("goalkeepers_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", t("disciplinary_title")))
-          contenido_menu_completo_final <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), contenido_menu_botones_final)
-          pagina_menu_final_actualizada <- crear_pagina_html(contenido_menu_completo_final, comp_nombre_current_lang, "../..", search_data_json, script_contraseña); save_html(pagina_menu_final_actualizada, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
-        }
+        nombre_archivo_clasif <- paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"); save_html(crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_clasif))
+        lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_clasif, class="menu-button", t("standings_title"))
       }
       
-      
-      #### 13.2.5. Página de goleadoras (strelci) ----
-      # 1. Calcular goles solo para esta competición
-      goles_por_jugadora_comp <- goles_comp %>%
-        filter(!is.na(id), tipo == "Normal") %>%
-        group_by(id) %>%
-        summarise(Goals = n(), .groups = 'drop')
-      
-      # 2. Obtener los equipos de cada jugadora en esta competición
-      jugadoras_equipos_comp <- apariciones_comp %>%
-        filter(id %in% goles_por_jugadora_comp$id) %>%
-        group_by(id) %>%
-        summarise(TeamNames_mk = paste(unique(equipo), collapse = " / "), .groups = 'drop')
-      
-      tabla_goleadoras_comp <- goles_por_jugadora_comp %>%
-        left_join(jugadoras_equipos_comp, by = "id") %>%
-        left_join(jugadoras_stats_df %>% select(id, starts_with("PlayerName_")), by = "id") %>%
+      #### 13.2.4. Página de goleadoras (strelci) ----
+      tabla_goleadoras_comp <- stats_goleadoras_por_comp_df %>%
+        filter(competicion_id == comp_id) %>%
+        left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>%
         filter(!is.na(!!player_name_col_sym)) %>%
-        arrange(desc(Goals)) %>% # Ahora 'Goals' existe y es la correcta
-        mutate(Pos = min_rank(desc(Goals))) %>%
         select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, Goals)
-      
       headers_traducidos <- c(t("standings_pos"), t("player_type"), t("team_type"), t("stats_goals"))
       contenido_goleadoras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("scorers_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(map(headers_traducidos, tags$th))), tags$tbody(map(1:nrow(tabla_goleadoras_comp), function(j){ g <- tabla_goleadoras_comp[j,]; tags$tr(tags$td(g$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(g$id, ".html")), g$PlayerName)), tags$td({ teams_mk <- str_split(g$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) } }; tagList(team_tags) }), tags$td(g$Goals)) }))))
-      pagina_goleadoras_final <- crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), path_to_root_dir = "../..", search_data_json, script_contraseña)
-      save_html(pagina_goleadoras_final, file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html")))
+      nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"); save_html(crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_goleadoras))
+      lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_goleadoras, class="menu-button", t("scorers_title"))
       
-      #### 13.2.6. Página de sanciones (disciplinska) ----
-      # 1. Calcular tarjetas solo para esta competición
-      tarjetas_por_jugadora_comp <- tarjetas_comp %>%
-        filter(!is.na(id)) %>%
-        group_by(id) %>%
-        summarise(YellowCards = sum(tipo == "Amarilla", na.rm = TRUE), RedCards = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop')
+      #### 13.2.5. Página de estadísticas de porteras (golmanki) ----
+      minutos_totales_equipo_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>% group_by(equipo = local) %>% summarise(n=n()) %>% bind_rows(partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>% group_by(equipo = visitante) %>% summarise(n=n())) %>% group_by(equipo) %>% summarise(minutos_totales_posibles = sum(n) * 90)
+      tabla_porteras_comp_raw <- stats_porteras_por_comp_df %>% filter(competicion_id == comp_id) %>%
+        left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>%
+        left_join(entidades_df, by = c("TeamName_mk" = "original_name")) %>%
+        left_join(minutos_totales_equipo_comp, by = c("TeamName_mk" = "equipo")) %>%
+        mutate(
+          pct_minutos = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Minutes / minutos_totales_posibles) * 100, 0),
+          group = if_else(pct_minutos >= 50, "mas_50", "menos_50")
+        ) %>%
+        select(id, PlayerName = !!player_name_col_sym, TeamName = current_lang_name, TeamName_mk, GA90, GA, Minutes, CS, group)
       
-      # 2. Obtener los equipos de cada jugadora en esta competición
-      jugadoras_equipos_comp <- apariciones_comp %>%
-        filter(id %in% tarjetas_por_jugadora_comp$id) %>%
-        group_by(id) %>%
-        summarise(TeamNames_mk = paste(unique(equipo), collapse = " / "), .groups = 'drop')
-      
-      tabla_sanciones_comp <- tarjetas_por_jugadora_comp %>%
-        left_join(jugadoras_equipos_comp, by = "id") %>%
-        left_join(jugadoras_stats_df %>% select(id, starts_with("PlayerName_")), by = "id") %>%
-        filter(!is.na(!!player_name_col_sym), YellowCards > 0 | RedCards > 0) %>%
-        arrange(desc(RedCards), desc(YellowCards)) %>% # Ahora 'RedCards' y 'YellowCards' existen
-        mutate(Pos = min_rank(desc(RedCards * 1000 + YellowCards))) %>%
-        select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, YellowCards, RedCards)
-      
-      contenido_sanciones <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("disciplinary_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { s <- tabla_sanciones_comp[j,]; tags$tr(tags$td(s$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(s$id, ".html")), s$PlayerName)), tags$td({ teams_mk <- str_split(s$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) }}; tagList(team_tags) }), tags$td(s$YellowCards), tags$td(s$RedCards)) })} else { tags$tr(tags$td(colspan="5", t("disciplinary_no_cards_message"))) })))
-      pagina_sanciones_final <- crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), path_to_root_dir = "../..", search_data_json, script_contraseña)
-      save_html(pagina_sanciones_final, file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html")))
-      
-      #### 13.2.7. Página de trío defensivo ----
-      message(paste("Computando tríos defensivos para:", comp_nombre_current_lang)); minutos_totales_equipo_comp <- partidos_comp %>% group_by(equipo = local) %>% summarise(n_partidos = n()) %>% bind_rows(partidos_comp %>% group_by(equipo = visitante) %>% summarise(n_partidos = n())) %>% group_by(equipo) %>% summarise(minutos_totales_posibles = sum(n_partidos) * 90, .groups = 'drop'); defensas_comp_df <- apariciones_comp %>% left_join(posiciones_procesadas_df, by = "id") %>% filter(str_detect(posicion_final_unificada, "defender"), !is.na(min_entra), minutos_jugados > 0) %>% select(id_partido, equipo, id, nombre, min_entra, min_sale); trio_minutos_partido <- defensas_comp_df %>% group_by(id_partido, equipo) %>% filter(n() >= 3) %>% group_modify(~ { combn(.x$id, 3, simplify = FALSE) %>% map_dfr(function(trio_ids) { jugadoras_trio <- .x %>% filter(id %in% trio_ids); minutos_compartidos <- max(0, min(jugadoras_trio$min_sale) - max(jugadoras_trio$min_entra)); tibble(trio_key = paste(sort(trio_ids), collapse = "-"), minutos_compartidos = minutos_compartidos, start_shared = max(jugadoras_trio$min_entra), end_shared = min(jugadoras_trio$min_sale)) }) }) %>% ungroup() %>% filter(minutos_compartidos > 0)
-      if(nrow(trio_minutos_partido) > 0) {
-        trios_con_minutos_totales <- trio_minutos_partido %>% group_by(equipo, trio_key) %>% summarise(minutos_totales_juntas = sum(minutos_compartidos), .groups = 'drop') %>% left_join(minutos_totales_equipo_comp, by = "equipo") %>% mutate(pct_minutos_jugados = minutos_totales_juntas / minutos_totales_posibles) %>% filter(pct_minutos_jugados >= 0.5); mejores_trios_filtrados <- trios_con_minutos_totales %>% group_by(equipo) %>% slice_max(order_by = minutos_totales_juntas, n = 1, with_ties = FALSE) %>% ungroup()
-        if(nrow(mejores_trios_filtrados) > 0) {
-          goles_con_rival_df <- goles_comp %>% left_join(partidos_comp %>% select(id_partido, local, visitante), by = "id_partido") %>% mutate(equipo_que_recibio_gol = case_when(equipo_acreditado == local ~ visitante, equipo_acreditado == visitante ~ local, tipo == "Autogol" ~ equipo_acreditado, TRUE ~ NA_character_)) %>% filter(!is.na(equipo_que_recibio_gol)) %>% select(id_partido, equipo_conceded = equipo_que_recibio_gol, minuto_gol = minuto); goles_calculados <- pmap_dfr(mejores_trios_filtrados, function(...) { trio_actual <- list(...); intervalos_del_trio <- trio_minutos_partido %>% filter(trio_key == trio_actual$trio_key, equipo == trio_actual$equipo); goles_en_intervalos <- pmap_dbl(intervalos_del_trio, function(...) { intervalo_actual <- list(...); goles_contados <- goles_con_rival_df %>% filter(id_partido == intervalo_actual$id_partido, equipo_conceded == intervalo_actual$equipo, minuto_gol >= intervalo_actual$start_shared, minuto_gol <= intervalo_actual$end_shared) %>% nrow(); return(goles_contados) }); tibble(equipo = trio_actual$equipo, trio_key = trio_actual$trio_key, goles_recibidos_juntas = sum(goles_en_intervalos)) }); 
-          id_nombre_map <- apariciones_comp %>% 
-            distinct(id, nombre) %>% 
-            left_join(jugadoras_stats_df %>% select(id, starts_with("PlayerName_")), by = "id") %>%
-            select(-nombre)
-          
-          tabla_final_defensas <- mejores_trios_filtrados %>% left_join(goles_calculados, by = c("equipo", "trio_key")) %>% mutate(goles_recibidos_juntas = replace_na(goles_recibidos_juntas, 0)) %>% left_join(entidades_df, by = c("equipo" = "original_name")) %>% mutate(TeamName = current_lang_name, TeamName_mk = equipo, MinutesTogether = minutos_totales_juntas, GA_Together = goles_recibidos_juntas, GA90_Together = if_else(minutos_totales_juntas > 0, (goles_recibidos_juntas / minutos_totales_juntas) * 90, 0)) %>% rowwise() %>% mutate(TrioNames = paste(sapply(strsplit(trio_key, "-")[[1]], function(id_jug) { pull(filter(id_nombre_map, id == id_jug), !!player_name_col_sym)[1] }), collapse = " - ")) %>% ungroup() %>% arrange(GA90_Together, GA_Together) %>% mutate(Pos = row_number()) %>% select(Pos, TrioNames, TeamName, TeamName_mk, MinutesTogether, GA_Together, GA90_Together, trio_key)
-          contenido_defensas <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("defensive_trio_title"), "-", comp_nombre_current_lang)), tags$p(style="text-align:center; font-style:italic; color:#555;", t("defensive_trio_subtitle")), tags$table(class = "main-summary-table", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("defensive_trio_header_trio")), tags$th(t("team_type")), tags$th(t("defensive_trio_header_minutes")), tags$th(t("defensive_trio_header_ga")), tags$th(t("defensive_trio_header_ga90")))), tags$tbody(pmap(tabla_final_defensas, function(...) { fila <- list(...); details_id <- paste0("details-trio-", fila$Pos); nombre_equipo <- fila$TeamName; nombre_equipo_mk <- fila$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); partidos_del_trio_mk <- trio_minutos_partido %>% filter(trio_key == fila$trio_key) %>% left_join(partidos_comp, by = "id_partido") %>% select(id_partido, local, visitante, goles_local, goles_visitante, minutos_compartidos); partidos_del_trio <- partidos_del_trio_mk %>% left_join(entidades_df %>% select(original_name, home_name=current_lang_name), by=c("local"="original_name")) %>% left_join(entidades_df %>% select(original_name, away_name=current_lang_name), by=c("visitante"="original_name")); tagList(tags$tr(class = "summary-row", onclick = sprintf("toggleDetails('%s')", details_id), tags$td(fila$Pos), tags$td(fila$TrioNames), tags$td(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), onclick="event.stopPropagation();", nombre_equipo)), tags$td(round(fila$MinutesTogether)), tags$td(fila$GA_Together), tags$td(format(round(fila$GA90_Together, 2), nsmall = 2))), tags$tr(id = details_id, class = "details-row", tags$td(colspan = "6", tags$div(class = "details-content", tags$h4(t("defensive_trio_details_matches")), tags$table(class="details-table", tags$thead(tags$tr(tags$th(t("match_header_match")), tags$th(t("match_header_result")), tags$th(t("defensive_trio_header_minutes")))), tags$tbody(map(1:nrow(partidos_del_trio), function(p_idx) { partido <- partidos_del_trio[p_idx,]; enlace_partido <- file.path("..", nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")); tags$tr(class = "clickable-row", `data-href` = enlace_partido, tags$td(paste(partido$home_name, "vs", partido$away_name)), tags$td(paste(partido$goles_local, "-", partido$goles_visitante)), tags$td(round(partido$minutos_compartidos))) }))))))) }))))
-          nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html"); save_html(crear_pagina_html(contenido_defensas, paste(t("defensive_trio_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_defensas))
-          nuevo_boton_defensa <- tags$a(href=nombre_archivo_defensas, class="menu-button", t("defensive_trio_title"))
-          botones_iniciales <- if (is_cup) { list(tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", t("schedule_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", t("scorers_title"))) } else { list(tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"), class="menu-button", t("schedule_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"), class="menu-button", t("standings_title")), tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"), class="menu-button", t("scorers_title"))) }
-          boton_porteras <- if (file.exists(file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_golmanki.html")))) { list(tags$a(href=paste0(comp_id, "_golmanki.html"), class="menu-button", t("goalkeepers_title"))) } else { list() }
-          botones_menu <- tagList(botones_iniciales, nuevo_boton_defensa, boton_porteras, list(tags$a(href=paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"), class="menu-button", t("disciplinary_title"))))
-          contenido_menu_final <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), tags$div(class="menu-container", botones_menu)); save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", search_data_json, script_contraseña), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
-        }
+      if (nrow(tabla_porteras_comp_raw) > 0) {
+        porteras_mas_50 <- tabla_porteras_comp_raw %>% filter(group == "mas_50") %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number()); porteras_menos_50 <- tabla_porteras_comp_raw %>% filter(group == "menos_50", Minutes > 0) %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number())
+        generar_tabla_html_porteras <- function(df, table_id) { if (is.null(df) || nrow(df) == 0) { return(tags$p(t("no_data_in_category")))}; tags$table(id = table_id, `data-sort-col` = "3", `data-sort-dir` = "asc", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(class="sortable-header asc", onclick=sprintf("sortTable('%s', 3)", table_id), t("gk_ga_90")), tags$th(t("gk_ga")), tags$th(t("stats_minutes")), tags$th(class="sortable-header", onclick=sprintf("sortTable('%s', 6)", table_id), t("gk_cs")))), tags$tbody(map(1:nrow(df), function(j){ p <- df[j,]; nombre_equipo <- p$TeamName; nombre_equipo_mk <- p$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$tr(tags$td(p$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), nombre_equipo)), tags$td(format(round(p$GA90, 2), nsmall = 2)), tags$td(p$GA), tags$td(p$Minutes), tags$td(p$CS)) })))}
+        contenido_porteras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("goalkeepers_title"), "-", comp_nombre_current_lang)), tags$h3(t("gk_stats_header_over_50")), generar_tabla_html_porteras(porteras_mas_50, "tabla-porteras-mas-50"), tags$h3(t("gk_stats_header_under_50")), generar_tabla_html_porteras(porteras_menos_50, "tabla-porteras-menos-50"))
+        nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html"); save_html(crear_pagina_html(contenido_porteras, paste(t("goalkeepers_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_porteras))
+        lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_porteras, class="menu-button", t("goalkeepers_title"))
       }
+      
+      #### 13.2.6. Página de trío defensivo ----
+      tabla_final_defensas <- stats_trios_defensivos_df %>% filter(competicion_id == comp_id) %>%
+        left_join(entidades_df, by = c("TeamName_mk" = "original_name")) %>%
+        mutate(TeamName = current_lang_name) %>%
+        rowwise() %>%
+        mutate(TrioNames = paste(sapply(strsplit(trio_key, "-")[[1]], function(id_jug) {
+          name <- (jugadoras_stats_df %>% filter(id == id_jug) %>% pull(!!player_name_col_sym)); if(length(name)==0) id_jug else name
+        }), collapse = " - ")) %>%
+        ungroup() %>%
+        arrange(GA90_Together, GA_Together) %>%
+        mutate(Pos = row_number()) %>%
+        select(Pos, TrioNames, TeamName, TeamName_mk, MinutesTogether, GA_Together, GA90_Together, trio_key)
+      
+      if (nrow(tabla_final_defensas) > 0) {
+        contenido_defensas <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("defensive_trio_title"), "-", comp_nombre_current_lang)), tags$p(style="text-align:center; font-style:italic; color:#555;", t("defensive_trio_subtitle")), tags$table(class = "main-summary-table", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("defensive_trio_header_trio")), tags$th(t("team_type")), tags$th(t("defensive_trio_header_minutes")), tags$th(t("defensive_trio_header_ga")), tags$th(t("defensive_trio_header_ga90")))), tags$tbody(pmap(tabla_final_defensas, function(...) { fila <- list(...); details_id <- paste0("details-trio-", fila$Pos); nombre_equipo <- fila$TeamName; nombre_equipo_mk <- fila$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tagList(tags$tr(class = "summary-row", onclick = sprintf("toggleDetails('%s')", details_id), tags$td(fila$Pos), tags$td(fila$TrioNames), tags$td(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), onclick="event.stopPropagation();", nombre_equipo)), tags$td(round(fila$MinutesTogether)), tags$td(fila$GA_Together), tags$td(format(round(fila$GA90_Together, 2), nsmall = 2)))) }))))
+        nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html"); save_html(crear_pagina_html(contenido_defensas, paste(t("defensive_trio_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_defensas))
+        lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_defensas, class="menu-button", t("defensive_trio_title"))
+      }
+      
+      #### 13.2.7. Página de sanciones (disciplinska) ----
+      tabla_sanciones_comp <- stats_sanciones_por_comp_df %>%
+        filter(competicion_id == comp_id) %>%
+        left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>%
+        filter(!is.na(!!player_name_col_sym)) %>%
+        select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, YellowCards, RedCards)
+      contenido_sanciones <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("disciplinary_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { s <- tabla_sanciones_comp[j,]; tags$tr(tags$td(s$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(s$id, ".html")), s$PlayerName)), tags$td({ teams_mk <- str_split(s$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) }}; tagList(team_tags) }), tags$td(s$YellowCards), tags$td(s$RedCards)) })} else { tags$tr(tags$td(colspan="5", t("disciplinary_no_cards_message"))) })))
+      nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"); save_html(crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), "../..", search_data_json, script_contraseña), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_sanciones))
+      lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_sanciones, class="menu-button", t("disciplinary_title"))
+      
+      #### 13.2.1. Menú principal de la competición (Re-generación con todos los botones) ----
+      contenido_menu_final <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), tags$div(class="menu-container", lista_botones_menu))
+      save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", search_data_json, script_contraseña), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
+      
     }) # Cierre del walk de competiciones
     
     ### 13.3. Páginas de perfiles individuales (bucle) ----
     message("Генерирање на страници за секој натпревар, фудбалерка, тим, судија и стадион...")
-    partidos_df_enriquecido <- partidos_df %>% left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada"))
     
     #### 13.3.1. Perfiles de partidos ----
     walk(1:nrow(partidos_df), function(i) {
@@ -1548,82 +1671,20 @@ if (hubo_cambios) {
       
       message(paste("... Generando perfil para jugadora:", current_player_name))
       
-      # ###################################################################### #
-      # ## INICIO DE LA CORRECCIÓN PRINCIPAL                                ##
-      # ###################################################################### #
-      
-      # 1. Obtenemos TODOS los partidos de la jugadora. Esta será nuestra tabla base.
-      #    Contiene la información de la aparición (equipo, minutos) y ya tiene el ID de la jugadora.
-      partidos_jugadora_base <- apariciones_df %>% 
-        filter(id == id_j)
-      
-      # Si la jugadora no tiene apariciones, no generamos perfil.
+      partidos_jugadora_base <- apariciones_df %>% filter(id == id_j)
       if(nrow(partidos_jugadora_base) == 0) return()
       
-      # 2. Enriquecemos esta tabla base UNA SOLA VEZ con todos los detalles del partido y la competición.
-      #    Seleccionamos explícitamente las columnas de `partidos_df` para evitar conflictos.
-      partidos_jugadora <- partidos_jugadora_base %>%
-        left_join(
-          partidos_df %>% select(id_partido, jornada, fecha, hora, local, visitante, goles_local, goles_visitante, es_resultado_oficial), 
-          by = "id_partido"
-        ) %>%
-        left_join(
-          competiciones_unicas_df, 
-          by = c("competicion_nombre", "competicion_temporada")
-        )
-      
-      # 3. Pre-traducimos los nombres de los equipos para usarlos en las tablas de detalles.
-      comp_name_col <- paste0("nombre_completo_", lang)
-      partidos_jugadora <- partidos_jugadora %>%
-        mutate(
-          competicion_actual_lang = .[[comp_name_col]],
-          equipo_actual_lang = (entidades_df %>% filter(original_name == equipo))$current_lang_name[1]
-        ) %>%
+      comp_name_col_lang <- paste0("nombre_completo_", lang)
+      partidos_jugadora_details <- partidos_jugadora_base %>%
+        left_join(partidos_df %>% select(id_partido, jornada, fecha, local, visitante, goles_local, goles_visitante), by = "id_partido") %>%
         left_join(entidades_df %>% select(original_name, local_lang=current_lang_name), by=c("local"="original_name")) %>%
         left_join(entidades_df %>% select(original_name, visitante_lang=current_lang_name), by=c("visitante"="original_name"))
       
-      # 4. AHORA calculamos los resúmenes. Todos parten de la tabla `partidos_jugadora` que ya tiene todo el contexto.
-      #    Esto soluciona el problema de "falta de contexto" para goles y tarjetas.
+      player_career_final <- career_summary_jugadoras_df %>%
+        filter(id == id_j) %>%
+        left_join(competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, !!sym(comp_name_col_lang)), by=c("competicion_nombre", "competicion_temporada")) %>%
+        left_join(entidades_df, by = c("equipo" = "original_name"))
       
-      # Resumen de apariciones y minutos
-      career_summary_raw <- partidos_jugadora %>%
-        group_by(competicion_temporada, competicion_nombre, equipo, competicion_actual_lang, equipo_actual_lang) %>%
-        summarise(
-          CalledUp = n_distinct(id_partido), Played = sum(minutos_jugados > 0, na.rm=TRUE), 
-          Starter = sum(tipo=="Titular", na.rm=TRUE), Minutes = sum(minutos_jugados, na.rm=TRUE),
-          .groups = 'drop'
-        )
-      
-      # Resumen de goles
-      career_goles <- goles_df_unificado %>%
-        filter(id == id_j, tipo == "Normal", id_partido %in% partidos_jugadora$id_partido) %>%
-        left_join(partidos_jugadora %>% distinct(id_partido, competicion_temporada, competicion_nombre), by = "id_partido") %>%
-        group_by(competicion_temporada, competicion_nombre, equipo = equipo_jugadora) %>%
-        summarise(Goals = n(), .groups = 'drop')
-      
-      # Resumen de tarjetas
-      career_tarjetas <- tarjetas_df_unificado %>%
-        filter(id == id_j, id_partido %in% partidos_jugadora$id_partido) %>%
-        left_join(partidos_jugadora %>% distinct(id_partido, competicion_temporada, competicion_nombre), by = "id_partido") %>%
-        group_by(competicion_temporada, competicion_nombre, equipo) %>%
-        summarise(Yellows = sum(tipo == "Amarilla", na.rm=T), Reds = sum(tipo == "Roja", na.rm=T), .groups = 'drop')
-      
-      # 5. Unimos los resúmenes de forma robusta con `full_join` para no perder estadísticas.
-      player_career_final <- career_summary_raw %>% 
-        full_join(career_goles, by=c("competicion_temporada", "competicion_nombre", "equipo")) %>%
-        full_join(career_tarjetas, by=c("competicion_temporada", "competicion_nombre", "equipo")) %>%
-        group_by(competicion_temporada, competicion_nombre, equipo) %>%
-        # Rellenamos los nombres traducidos que podrían haberse perdido en el full_join
-        fill(competicion_actual_lang, equipo_actual_lang, .direction = "downup") %>%
-        ungroup() %>%
-        mutate(across(c(CalledUp, Played, Starter, Minutes, Goals, Yellows, Reds), ~replace_na(., 0))) %>%
-        arrange(desc(competicion_temporada))
-      
-      # ###################################################################### #
-      # ## FIN DE LA CORRECCIÓN PRINCIPAL                                   ##
-      # ###################################################################### #
-      
-      # El resto del código para generar el HTML permanece igual, ya que ahora recibe los datos correctos.
       path_rel_timovi <- file.path("..", nombres_carpetas_relativos$timovi); path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
       mapa_pos_traducida <- c("goalkeeper" = t("position_goalkeeper"), "defender" = t("position_defender"), "midfielder" = t("position_midfielder"), "forward" = t("position_forward"))
       posicion_traducida <- recode(jugadora$posicion_final_unificada, !!!mapa_pos_traducida, .default = jugadora$posicion_final_unificada)
@@ -1631,11 +1692,11 @@ if (hubo_cambios) {
       tabla_resumen_carrera <- tags$table(class="career-summary-table",
                                           tags$thead(tags$tr(tags$th(t("player_season")), tags$th(t("team_type")), tags$th(t("player_competition")), tags$th(t("player_apps")), tags$th(t("player_goals")), tags$th(t("player_mins")))),
                                           tags$tbody(if(nrow(player_career_final) > 0) { map(1:nrow(player_career_final), function(j) {
-                                            stage <- player_career_final[j,]; details_id <- paste0("details-", id_j, "-", j); nombre_equipo_stage_mk <- stage$equipo; nombre_equipo_stage_lang <- stage$equipo_actual_lang; nombre_comp_stage_lang <- stage$competicion_actual_lang
+                                            stage <- player_career_final[j,]; details_id <- paste0("details-", id_j, "-", j); nombre_equipo_stage_mk <- stage$equipo; nombre_equipo_stage_lang <- stage$current_lang_name; nombre_comp_stage_lang <- stage[[comp_name_col_lang]]
                                             nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_stage_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final)
-                                            partidos_stage <- partidos_jugadora %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre, equipo == stage$equipo)
-                                            goles_stage <- goles_df_unificado %>% filter(id == id_j, id_partido %in% partidos_stage$id_partido)
-                                            tarjetas_stage <- tarjetas_df_unificado %>% filter(id == id_j, id_partido %in% partidos_stage$id_partido)
+                                            partidos_stage <- partidos_jugadora_details %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre, equipo == stage$equipo)
+                                            goles_stage <- goles_df_unificado %>% filter(id == id_j, id_partido %in% partidos_stage$id_partido, equipo_jugadora == stage$equipo)
+                                            tarjetas_stage <- tarjetas_df_unificado %>% filter(id == id_j, id_partido %in% partidos_stage$id_partido, equipo == stage$equipo)
                                             tabla_detalles_stats <- tags$table(tags$tbody(tags$tr(tags$td(t("team_type")), tags$td(nombre_equipo_stage_lang)), tags$tr(tags$td(t("player_called_up")), tags$td(stage$CalledUp)), tags$tr(tags$td(t("player_played")), tags$td(stage$Played)), tags$tr(tags$td(t("player_starter")), tags$td(stage$Starter)), tags$tr(tags$td(t("player_mins")), tags$td(stage$Minutes)), tags$tr(tags$td(t("player_goals")), tags$td(stage$Goals)), tags$tr(tags$td(t("player_yellow_cards")), tags$td(stage$Yellows)), tags$tr(tags$td(t("player_red_cards")), tags$td(stage$Reds))))
                                             tabla_partidos <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")),tags$th(t("match_header_match")),tags$th(t("match_header_result")),tags$th(t("player_status")), tags$th(t("player_mins")))), tags$tbody(if(nrow(partidos_stage)>0) { map(1:nrow(partidos_stage),function(p_idx){ partido_row <- partidos_stage[p_idx,]; status_partido <- if (partido_row$tipo == "Titular") t("player_starter") else if (!is.na(partido_row$minutos_jugados) && partido_row$minutos_jugados > 0) t("player_status_played_sub") else t("player_status_called_up"); tags$tr(tags$td(partido_row$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido_row$id_partido, ".html")),paste(partido_row$local_lang,"vs",partido_row$visitante_lang))), tags$td(paste(partido_row$goles_local,"-",partido_row$goles_visitante)), tags$td(status_partido), tags$td(if(is.na(partido_row$minutos_jugados)) 0 else partido_row$minutos_jugados)) }) } else { tags$tr(tags$td(colspan="5",t("player_no_matches"))) }))
                                             tabla_goles <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")), tags$th(t("match_header_match")), tags$th(t("match_header_minute")))), tags$tbody(if(nrow(goles_stage)>0){ map(1:nrow(goles_stage), function(g_idx){ goal_row <- goles_stage[g_idx,]; g_partido<-filter(partidos_stage, id_partido==goal_row$id_partido) %>% head(1); tags$tr(tags$td(g_partido$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(goal_row$id_partido, ".html")),paste(g_partido$local_lang,"vs",g_partido$visitante_lang))), tags$td(formatear_minuto_partido(goal_row$minuto)))}) } else { tags$tr(tags$td(colspan="3", t("player_no_goals"))) }))
@@ -1655,7 +1716,7 @@ if (hubo_cambios) {
       pagina_jugadora_final <- crear_pagina_html(contenido_jugadora, current_player_name, path_to_root_dir = "../..", search_data_json, script_contraseña)
       save_html(pagina_jugadora_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$jugadoras, paste0(id_j, ".html")))
     })
-      
+    
     #### 13.3.3. Perfiles de equipos ----
     walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_mk) {
       id_t <- generar_id_seguro(team_mk); if (!full_rebuild_needed && !(id_t %in% affected_team_ids)) { return() }
@@ -1664,23 +1725,12 @@ if (hubo_cambios) {
       message(paste("... Generando perfil para equipo:", current_team_name))
       
       nombre_archivo_final <- paste0(id_t, ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final)
-      historial_equipo <- partidos_df %>% filter(local == team_mk | visitante == team_mk) %>% mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y"))
       
       comp_name_col <- paste0("nombre_completo_", lang)
-      historial_equipo_traducido <- historial_equipo %>%
-        left_join(
-          competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, !!sym(comp_name_col)),
-          by = c("competicion_nombre", "competicion_temporada")
-        )
-      
-      temporadas_summary <- historial_equipo_traducido %>%
-        group_by(competicion_temporada, !!sym(comp_name_col)) %>%
-        summarise(
-          competicion_nombre_original = first(competicion_nombre),
-          last_match_date = max(fecha_date, na.rm = TRUE),
-          .groups = 'drop'
-        ) %>%
-        arrange(desc(last_match_date))
+      temporadas_summary <- stats_equipos_por_temporada_df %>%
+        filter(equipo == team_mk) %>%
+        left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada")) %>%
+        select(competicion_temporada, competicion_nombre, !!sym(comp_name_col))
       
       path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras); path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
       
@@ -1690,18 +1740,16 @@ if (hubo_cambios) {
                                                stage <- temporadas_summary[j,]; details_id <- paste0("details-", id_t, "-", j)
                                                nombre_competicion_mostrado <- stage[[comp_name_col]]
                                                
-                                               historial_stage_mk <- historial_equipo %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre_original) %>% arrange(fecha_date)
+                                               historial_stage_mk <- partidos_df %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre, local == team_mk | visitante == team_mk) %>% mutate(fecha_date = as.Date(fecha, format="%d.%m.%Y")) %>% arrange(fecha_date)
                                                historial_stage <- historial_stage_mk %>% left_join(entidades_df %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% left_join(entidades_df %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name"))
-                                               ids_partidos_stage <- historial_stage_mk$id_partido
-                                               
-                                               stats_jugadoras_stage <- apariciones_df %>% filter(id_partido %in% ids_partidos_stage, equipo == team_mk) %>% group_by(id, nombre) %>% summarise(CalledUp = n_distinct(id_partido), Played = sum(minutos_jugados > 0, na.rm = TRUE), Minutes = sum(minutos_jugados, na.rm = TRUE), .groups = 'drop')
-                                               goles_stage <- goles_df_unificado %>% filter(id_partido %in% ids_partidos_stage, equipo_jugadora == team_mk) %>% group_by(id) %>% summarise(Goals = n(), .groups = 'drop')
-                                               tarjetas_stage <- tarjetas_df_unificado %>% filter(id_partido %in% ids_partidos_stage, equipo == team_mk) %>% group_by(id) %>% summarise(Yellows = sum(tipo == "Amarilla", na.rm = TRUE), Reds = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop')
                                                
                                                player_name_col_lang <- paste0("PlayerName_", lang)
                                                player_name_col_sym <- sym(if (player_name_col_lang %in% names(jugadoras_stats_df)) player_name_col_lang else "PlayerName_mk")
+                                               stats_jugadoras_stage_lang <- stats_jugadoras_por_equipo_temporada_df %>%
+                                                 filter(equipo == team_mk, competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre) %>%
+                                                 left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>%
+                                                 select(id, PlayerName = !!player_name_col_sym, CalledUp, Played, Minutes, Goals, Yellows, Reds)
                                                
-                                               stats_jugadoras_stage_lang <- stats_jugadoras_stage %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% left_join(goles_stage, by = "id") %>% left_join(tarjetas_stage, by = "id") %>% mutate(across(c(Goals, Yellows, Reds), ~replace_na(., 0))) %>% select(id, PlayerName = !!player_name_col_sym, CalledUp, Played, Minutes, Goals, Yellows, Reds) %>% arrange(desc(Minutes))
                                                headers_stats <- c(t("player_type"), t("player_called_up"), t("player_played"), t("player_mins"), t("player_goals"), t("player_yellow_cards"), t("player_red_cards"))
                                                
                                                tabla_stats_jugadoras <- tags$table(tags$thead(tags$tr(map(headers_stats, tags$th))), tags$tbody(if(nrow(stats_jugadoras_stage_lang) > 0) { map(1:nrow(stats_jugadoras_stage_lang), function(p_idx) { 
@@ -1713,10 +1761,7 @@ if (hubo_cambios) {
                                                    tags$td(p$Minutes), 
                                                    tags$td(p$Goals), 
                                                    tags$td(p$Yellows), 
-                                                   # ###################################### #
-                                                   # ##       AQUÍ ESTÁ LA CORRECCIÓN      ##
-                                                   # ###################################### #
-                                                   tags$td(p$Reds) # Era p.Redes
+                                                   tags$td(p$Reds)
                                                  ) 
                                                }) } else { tags$tr(tags$td(colspan=length(headers_stats), t("match_no_data"))) }))
                                                
@@ -1746,29 +1791,23 @@ if (hubo_cambios) {
       id_a <- generar_id_seguro(arb_mk); if (!full_rebuild_needed && !(id_a %in% affected_referee_ids)) { return() }
       current_arb_name <- entidades_df %>% filter(original_name == arb_mk) %>% pull(current_lang_name); message(paste("... Generando perfil para судија:", current_arb_name))
       
-      # CORRECCIÓN: Se une el historial con las competiciones traducidas.
       comp_name_col <- paste0("nombre_completo_", lang)
       
-      historial_arbitro_mk <- arbitros_df %>% filter(ime == arb_mk) %>% left_join(partidos_df, by = "id_partido") %>% mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y"))
-      historial_arbitro <- historial_arbitro_mk %>% 
-        left_join(entidades_df %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% 
-        left_join(entidades_df %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name")) %>%
-        left_join(competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, !!sym(comp_name_col)), by = c("competicion_nombre", "competicion_temporada"))
-      
-      temporadas_summary <- historial_arbitro %>% 
-        group_by(competicion_temporada, !!sym(comp_name_col)) %>% 
-        summarise(
-          competicion_nombre_original = first(competicion_nombre),
-          last_match_date = max(fecha_date, na.rm = TRUE), 
-          num_matches = n(), .groups = 'drop'
-        ) %>% 
-        arrange(desc(last_match_date))
+      temporadas_summary <- stats_arbitros_por_temporada_df %>%
+        filter(ime == arb_mk) %>%
+        left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada")) %>%
+        select(competicion_temporada, competicion_nombre, !!sym(comp_name_col), num_matches)
       
       path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
       contenido_arbitro <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(current_arb_name), tags$h3(t("referee_history_by_competition")), tags$table(tags$thead(tags$tr(tags$th(t("player_season")), tags$th(t("player_competition")), tags$th(t("referee_header_matches")))), tags$tbody(if (nrow(temporadas_summary) > 0) { map(1:nrow(temporadas_summary), function(j) { 
         stage <- temporadas_summary[j,]; details_id <- paste0("details-arbitro-", id_a, "-", j); 
         nombre_competicion_mostrado <- stage[[comp_name_col]]
-        historial_stage <- historial_arbitro %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre_original) %>% arrange(desc(fecha_date)); 
+        
+        historial_stage_mk <- arbitros_df %>% filter(ime == arb_mk) %>% left_join(partidos_df, by = "id_partido") %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre) %>% mutate(fecha_date = as.Date(fecha, format="%d.%m.%Y")) %>% arrange(desc(fecha_date))
+        historial_stage <- historial_stage_mk %>% 
+          left_join(entidades_df %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% 
+          left_join(entidades_df %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name"))
+        
         tagList(
           tags$tr(class = "summary-row", onclick = sprintf("toggleDetails('%s')", details_id), tags$td(stage$competicion_temporada), tags$td(nombre_competicion_mostrado), tags$td(stage$num_matches)), 
           tags$tr(id = details_id, class = "details-row", tags$td(colspan = "3", tags$div(class = "details-content", tags$table(tags$thead(tags$tr(tags$th(t("team_header_date")), tags$th(t("round_prefix")), tags$th(t("match_header_match")), tags$th(t("match_header_result")), tags$th(t("referee_header_role")))), tags$tbody(map(1:nrow(historial_stage), function(p_idx) { partido <- historial_stage[p_idx,]; tags$tr(tags$td(partido$fecha), tags$td(partido$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido$id_partido, ".html")), paste(partido$home_name, "vs", partido$away_name))), tags$td(paste(partido$goles_local, "-", partido$goles_visitante)), tags$td(partido$uloga)) }))))))
@@ -1783,7 +1822,6 @@ if (hubo_cambios) {
       id_e <- generar_id_seguro(est_mk); if (!full_rebuild_needed && !(id_e %in% affected_stadium_ids)) { return() }
       current_est_name <- entidades_df %>% filter(original_name == est_mk) %>% pull(current_lang_name); message(paste("... Generando perfil para стадион:", current_est_name))
       
-      # CORRECCIÓN: Se une el historial con las competiciones traducidas.
       comp_name_col <- paste0("nombre_completo_", lang)
       
       historial_mk <- estadios_df %>% filter(estadio == est_mk) %>% mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>% arrange(desc(fecha_date))
