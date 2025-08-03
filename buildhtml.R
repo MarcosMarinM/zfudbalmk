@@ -531,14 +531,23 @@ cargar_mapa_traduccion <- function(ruta_archivo) {
     return(NULL)
   }
   tryCatch({
-    df <- read.csv(ruta_archivo, stringsAsFactors = FALSE, encoding = "UTF-8")
+    df <- read.csv(ruta_archivo, stringsAsFactors = FALSE, encoding = "UTF-8", check.names = FALSE)
+    
+    # 1. Se identifica el nombre de la primera columna (la clave, ej: 'mk').
+    # 2. Se pivota usando ese nombre de columna dinámicamente.
+    # 3. Se renombra la columna clave a 'original_mk' para consistencia interna.
+    key_col_name <- names(df)[1]
+    
     df %>%
       pivot_longer(
-        cols = -original_mk,
+        cols = -all_of(key_col_name),
         names_to = "lang",
         values_to = "translated_name"
       ) %>%
+      rename(original_mk = !!sym(key_col_name)) %>%
+      # Se elimina cualquier prefijo innecesario de los códigos de idioma
       mutate(lang = str_remove(lang, "latin_|translation_"))
+    
   }, error = function(e) {
     warning(paste("Грешка при вчитување на", basename(ruta_archivo), ":", e$message))
     return(NULL)
@@ -548,7 +557,6 @@ cargar_mapa_traduccion <- function(ruta_archivo) {
 mapa_nombres_jugadoras_long <- cargar_mapa_traduccion("name_corrections.txt")
 mapa_nombres_entidades_long <- cargar_mapa_traduccion("entity_corrections.txt")
 mapa_nombres_competiciones_long <- cargar_mapa_traduccion("competition_translations.txt")
-
 
 ### 8.5. Cargar correcciones de nombres de entidades (equipos, árbitros) ----
 message("Вчитување на датотека за корекции на имиња на ентитети...")
@@ -713,8 +721,9 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
   competiciones_base_df <- partidos_df %>%
     distinct(competicion_nombre, competicion_temporada) %>%
     mutate(
-      nombre_completo_mk = paste(competicion_nombre, competicion_temporada),
-      competicion_id = generar_id_seguro(nombre_completo_mk),
+      # CORRECCIÓN: Se usa 'competicion_nombre' como clave para unir con el archivo de traducciones.
+      # El nombre completo se reconstruirá después.
+      competicion_id = generar_id_seguro(paste(competicion_nombre, competicion_temporada)),
       nombre_lower = tolower(competicion_nombre)
     ) %>%
     mutate(
@@ -730,30 +739,49 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
   
   # --- Lógica de Traducción Robusta para Competiciones ---
   if (!is.null(mapa_nombres_competiciones_long)) {
+    # El archivo de traducciones contiene el nombre COMPLETO (ej: 'Прва ЖФЛ 13/14').
+    # Creamos una columna temporal en `competiciones_base_df` para la unión.
+    competiciones_base_df_temp <- competiciones_base_df %>%
+      mutate(original_mk_join_key = paste(competicion_nombre, competicion_temporada))
+    
     comp_translations_wide <- mapa_nombres_competiciones_long %>%
       pivot_wider(
-        id_cols = original_mk, names_from = lang, 
-        values_from = translated_name, names_prefix = "nombre_completo_"
+        id_cols = original_mk, 
+        names_from = lang, 
+        values_from = translated_name, 
+        names_prefix = "nombre_completo_"
       )
-    competiciones_unicas_df <- competiciones_base_df %>%
-      left_join(comp_translations_wide, by = c("nombre_completo_mk" = "original_mk"))
+    
+    competiciones_unicas_df <- competiciones_base_df_temp %>%
+      left_join(comp_translations_wide, by = c("original_mk_join_key" = "original_mk")) %>%
+      select(-original_mk_join_key) # Eliminamos la columna de unión temporal
   } else {
     competiciones_unicas_df <- competiciones_base_df
   }
   
-  # Fallback jerárquico para todos los idiomas latinos
-  map_transliteration_comp <- c('а'='a','б'='b','в'='v','г'='g','д'='d','ѓ'='gj','е'='e','ж'='z','з'='z','ѕ'='dz','и'='i','ј'='j','к'='k','л'='l','љ'='lj','м'='m','н'='n','њ'='nj','о'='o','п'='p','р'='r','с'='s','т'='t','ќ'='kj','у'='u','ф'='f','х'='h','ц'='c','ч'='c','џ'='dz','ш'='s')
+  # Añadimos el nombre en macedonio como una columna estandarizada
+  competiciones_unicas_df <- competiciones_unicas_df %>%
+    mutate(nombre_completo_mk = paste(competicion_nombre, competicion_temporada))
+  
+  # Fallback jerárquico para todos los idiomas
+  map_transliteration_comp <- c('а'='a','б'='b','в'='v','г'='g','д'='d','ѓ'='gj','е'='e','ж'='ž','з'='z','ѕ'='dz','и'='i','ј'='j','к'='k','л'='l','љ'='lj','м'='m','н'='n','њ'='nj','о'='o','п'='p','р'='r','с'='s','т'='t','ќ'='kj','у'='u','ф'='f','х'='h','ц'='c','ч'='č','џ'='dž','ш'='š')
   
   for (lang_code in setdiff(IDIOMAS_SOPORTADOS, "mk")) {
     target_col <- paste0("nombre_completo_", lang_code)
-    specific_col <- if (target_col %in% names(competiciones_unicas_df)) sym(target_col) else NA
-    fallback_latin_col <- if ("nombre_completo_sq" %in% names(competiciones_unicas_df)) sym("nombre_completo_sq") else NA
+    # Si la columna de traducción no existe (porque no estaba en el archivo), la crea vacía (NA).
+    if (!target_col %in% names(competiciones_unicas_df)) {
+      competiciones_unicas_df[[target_col]] <- NA_character_
+    }
+  }
+  
+  # Se aplica el fallback para rellenar traducciones faltantes
+  for (lang_code in setdiff(IDIOMAS_SOPORTADOS, "mk")) {
+    target_col <- paste0("nombre_completo_", lang_code)
     
     competiciones_unicas_df <- competiciones_unicas_df %>%
       mutate(!!target_col := coalesce(
-        !!specific_col,
-        !!fallback_latin_col,
-        str_replace_all(tolower(nombre_completo_mk), map_transliteration_comp) %>% str_to_title()
+        .data[[target_col]], # 1. Usa la traducción manual si existe
+        str_to_title(str_replace_all(tolower(nombre_completo_mk), map_transliteration_comp)) # 2. Usa transliteración como fallback
       ))
   }
   
@@ -763,6 +791,7 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
 } else {
   competiciones_unicas_df <- tibble()
 }
+
 
 ### 9.6. Determinar el alcance de los cambios para la generación incremental ----
 message("Проверка на промени за инкрементално генерирање...")
@@ -1242,15 +1271,15 @@ if (hubo_cambios) {
       comp_info <- competiciones_unicas_df[i,]; comp_id <- comp_info$competicion_id
       if (!full_rebuild_needed && !(comp_id %in% affected_competition_ids)) { return() }
       
-      comp_nombre_mk <- comp_info$nombre_completo_mk
-      comp_nombre_current_lang <- if(!is.null(mapa_nombres_competiciones_long)) (mapa_nombres_competiciones_long %>% filter(original_mk == comp_nombre_mk, lang == idioma_actual) %>% pull(translated_name)) else comp_nombre_mk
-      if(length(comp_nombre_current_lang)==0) comp_nombre_current_lang <- comp_nombre_mk
+      # Se obtiene el nombre traducido de forma robusta desde el dataframe pre-procesado.
+      comp_name_col <- paste0("nombre_completo_", lang)
+      comp_nombre_current_lang <- comp_info[[comp_name_col]]
       
       message(paste("... Генерирање на страници за натпреварување:", comp_nombre_current_lang))
       
       is_cup <- str_detect(tolower(comp_info$competicion_nombre), "куп"); partidos_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada); ids_partidos_comp <- partidos_comp$id_partido; goles_comp <- goles_df_unificado %>% filter(id_partido %in% ids_partidos_comp); tarjetas_comp <- tarjetas_df_unificado %>% filter(id_partido %in% ids_partidos_comp); apariciones_comp <- apariciones_df %>% filter(id_partido %in% ids_partidos_comp)
       
-      # CORRECCIÓN: Definir el nombre de columna dinámico UNA VEZ para usarlo en todos los subbloques.
+      # Definir el nombre de columna dinámico UNA VEZ para usarlo en todos los subbloques.
       player_name_col <- paste0("PlayerName_", lang)
       player_name_col_sym <- rlang::sym(if(player_name_col %in% names(jugadoras_stats_df)) player_name_col else "PlayerName_mk")
       
@@ -1270,15 +1299,16 @@ if (hubo_cambios) {
       if (!is_cup) {
         calcular_clasificacion <- function(partidos) { if (is.null(partidos) || nrow(partidos) == 0) { return(data.frame(error_msg = t("standings_no_data_message")))}; locales <- partidos %>% select(team = local, GF = goles_local, GA = goles_visitante); visitantes <- partidos %>% select(team = visitante, GF = goles_visitante, GA = goles_local); resultados_por_equipo <- bind_rows(locales, visitantes) %>% mutate(Pts = case_when(GF > GA ~ 3, GF < GA ~ 0, TRUE ~ 1), result = case_when(GF > GA ~ "W", GF < GA ~ "L", TRUE ~ "D")); clasificacion <- resultados_por_equipo %>% group_by(team) %>% summarise(P = n(), Pts = sum(Pts), W = sum(result == "W"), D = sum(result == "D"), L = sum(result == "L"), GF = sum(GF), GA = sum(GA), .groups = 'drop') %>% mutate(GD = GF - GA) %>% arrange(desc(Pts), desc(GD), desc(GF)) %>% mutate(Pos = row_number()) %>% select(Pos, team, P, W, D, L, GF, GA, GD, Pts); return(clasificacion)}
         clasificacion_df_comp_raw <- calcular_clasificacion(partidos_comp)
-        contenido_tabla <- if ("error_msg" %in% names(clasificacion_df_comp_raw)) { tags$p(clasificacion_df_comp_raw$error_msg[1]) } else { clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col); estilos_comp <- estilos_clasificacion_data[[comp_nombre_mk]]; tagList(tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) { tags$div(class = "legend", map(estilos_comp$leyenda, function(item_leyenda) { tags$div(class = "legend-item", tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")), tags$span(item_leyenda$texto)) })) })}
+        
+        # Se extrae el nombre original de la competición SIN temporada para buscarlo en los estilos
+        comp_nombre_base_mk <- comp_info$competicion_nombre 
+        
+        contenido_tabla <- if ("error_msg" %in% names(clasificacion_df_comp_raw)) { tags$p(clasificacion_df_comp_raw$error_msg[1]) } else { clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col); estilos_comp <- estilos_clasificacion_data[[comp_nombre_base_mk]]; tagList(tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) { tags$div(class = "legend", map(estilos_comp$leyenda, function(item_leyenda) { tags$div(class = "legend-item", tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")), tags$span(item_leyenda$texto)) })) })}
         contenido_clasificacion <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("standings_title"), "-", comp_nombre_current_lang)), contenido_tabla)
         pagina_clasificacion_final <- crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), path_to_root_dir = "../..", search_data_json, script_contraseña)
         save_html(pagina_clasificacion_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html")))
       }
-      
-      player_name_col <- paste0("PlayerName_", lang)
-      player_name_col_sym <- rlang::sym(if(player_name_col %in% names(jugadoras_stats_df)) player_name_col else "PlayerName_mk")
-      
+    
       #### 13.2.4. Página de estadísticas de porteras (golmanki) ----
       porteras_comp_df <- apariciones_comp %>% filter(es_portera == TRUE, !is.na(id)) %>% select(id, nombre, equipo, id_partido, minutos_jugados, min_entra, min_sale); minutos_totales_equipo <- partidos_comp %>% group_by(equipo = local) %>% summarise(n_partidos = n()) %>% bind_rows(partidos_comp %>% group_by(equipo = visitante) %>% summarise(n_partidos = n())) %>% group_by(equipo) %>% summarise(minutos_totales_posibles = sum(n_partidos) * 90)
       if (nrow(porteras_comp_df) > 0 && nrow(minutos_totales_equipo) > 0) {
