@@ -251,8 +251,8 @@ generar_id_seguro <- function(nombre) {
   map_id_plain <- c(
     'а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'ѓ'='g', 'е'='e', 
     'ж'='z', 'з'='z', 'ѕ'='dz', 'и'='i', 'ј'='j', 'к'='k', 'л'='l', 
-    'љ'='l', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 
-    'с'='s', 'т'='t', 'ќ'='k', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
+    'љ'='lj', 'м'='m', 'н'='n', 'њ'='n', 'о'='o', 'п'='p', 'р'='r', 
+    'с'='s', 'т'='t', 'ќ'='kj', 'у'='u', 'ф'='f', 'х'='h', 'ц'='c', 
     'ч'='c', 'џ'='dz', 'ш'='s'
   )
   nombre_latin <- str_replace_all(tolower(nombre), map_id_plain)
@@ -349,7 +349,7 @@ crear_botones_navegacion <- function(path_to_lang_root = ".") {
 #' @param search_data_json El string JSON con los datos de búsqueda.
 #' @param script_contraseña El tag de script para la protección por contraseña.
 #' @return Un objeto `html` de htmltools completo.
-crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_dir = ".", search_data_json, script_contraseña) {
+crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_dir = ".", script_contraseña) {
   tags$html(lang = idioma_actual,
             tags$head(
               tags$meta(charset="UTF-8"),
@@ -363,7 +363,6 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_d
               `data-no-search-results-msg` = t("no_search_results"),
               `data-search-prompt-msg` = t("search_prompt"),
               tags$div(class = "container",
-                       # Se llama a la nueva función de selector de idioma pasándole el idioma actual.
                        crear_selector_idioma(idioma_pagina_actual = idioma_actual),
                        tags$h1(tags$a(href = file.path(path_to_root_dir, idioma_actual, "index.html"), style = "color: inherit; text-decoration: none;", t("site_title"))),
                        tags$div(class = "search-container",
@@ -377,11 +376,12 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_d
                                 contenido_principal
                        )
               ),
-              tags$script(type = "application/json", id = "search-data-json", HTML(search_data_json)),
+              # Se elimina el script que incrustaba el JSON aquí.
               tags$script(defer = NA, src = file.path(path_to_root_dir, nombres_carpetas_relativos$assets, "script.js"))
             )
   )
 }
+
 
 
 ### 7.4. Función para generar cronología de partidos ----
@@ -1371,36 +1371,64 @@ let searchData = [];
 
 document.addEventListener('DOMContentLoaded', initializeSearch);
 
-function getSiteRootPath() {
+// --- INICIO DE LA CORRECCIÓN ---
+// Se hace la lógica de rutas más robusta para que funcione
+// tanto en el servidor local de `servr` como en GitHub Pages.
+function getSiteBasePath() {
   const path = window.location.pathname;
-  const docsIndex = path.indexOf('/docs/');
-  if (docsIndex > -1) {
-    return path.substring(0, docsIndex + '/docs/'.length);
+  // Encuentra la parte de la ruta antes de la primera carpeta de idioma.
+  // Ej: de "/repo/mk/page.html" extrae "/repo/"
+  const match = path.match(/^(.*\/)(mk|sq|es|en)\//);
+  if (match && match[1]) {
+    return match[1];
   }
-  return '/';
+  // Fallback para la raíz (ej. `servr` en local)
+  return "/";
 }
 
-/**
- * Extrae el código de idioma de 2 letras de la ruta de la URL.
- * Ej: de "/docs/sq/timovi/equipo.html" extrae "sq". Es el método más fiable.
- */
 function getCurrentLanguageFromPath() {
   const path = window.location.pathname;
-  const match = path.match(/\/docs\/([a-z]{2})\//);
+  // Busca el código de idioma de 2 letras en la ruta.
+  const match = path.match(/\/(mk|sq|es|en)\//);
   if (match && match[1]) {
-    return match[1]; // Devuelve 'sq', 'mk', 'en', etc.
+    return match[1];
   }
-  // Fallback si no se encuentra (ej. en la página raíz de redirección)
   const langAttr = document.documentElement.lang;
   if (langAttr) return langAttr;
   return 'mk';
 }
+// --- FIN DE LA CORRECCIÓN ---
 
 function initializeSearch() {
-  const searchDataElement = document.getElementById('search-data-json');
-  if (searchDataElement) {
-    try { searchData = JSON.parse(searchDataElement.textContent); } catch (e) { console.error('Error parsing search data JSON:', e); }
-  }
+  const lang = getCurrentLanguageFromPath();
+  const basePath = getSiteBasePath();
+  const jsonUrl = `${basePath}${lang}/../assets/search_data_${lang}.json`;
+
+  const searchInput = document.getElementById('search-input');
+  const body = document.body;
+
+  fetch(jsonUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok for search data.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      searchData = data;
+      if (searchInput) {
+        searchInput.disabled = false;
+        searchInput.placeholder = body.dataset.searchPlaceholder || 'Search...';
+      }
+      console.log(`Search index for '${lang}' loaded successfully.`);
+    })
+    .catch(error => {
+      console.error('Error loading search data:', error);
+      if (searchInput) {
+        searchInput.placeholder = body.dataset.searchError || 'Search unavailable';
+      }
+    });
+
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer && !searchContainer.contains(event.target)) {
@@ -1420,8 +1448,8 @@ function toggleDetails(elementId) {
 }
 
 function generateLink(target_id) {
-  const siteRoot = getSiteRootPath();
-  const lang = getCurrentLanguageFromPath(); // Se usa la nueva función robusta.
+  const basePath = getSiteBasePath();
+  const lang = getCurrentLanguageFromPath();
   const parts = target_id.split('-');
   const type = parts[0];
   const id_parts = parts.slice(1);
@@ -1434,13 +1462,15 @@ function generateLink(target_id) {
     case 'arbitro': folder = 'sudii'; break;
     case 'стадион': folder = 'stadioni'; break;
     case 'menu': folder = 'natprevaruvanja'; id = id.replace('competicion-', ''); break;
-    default: return `${siteRoot}${lang}/index.html`;
+    default: return `${basePath}${lang}/index.html`;
   }
-  return `${siteRoot}${lang}/${folder}/${id}.html`;
+  return `${basePath}${lang}/${folder}/${id}.html`;
 }
 
+// ... (El resto del JS, handleSearchInput, showSearchResults, etc., permanece igual)
 function handleSearchInput(event) {
   if (event.key === 'Enter') { event.preventDefault(); showSearchResults(); return; }
+  if (searchData.length === 0) return; 
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const query = input.value.trim().toLowerCase();
@@ -1454,6 +1484,10 @@ function handleSearchInput(event) {
 }
 
 function showSearchResults() {
+  if (searchData.length === 0) {
+     alert(document.body.dataset.searchError || 'Search index is still loading or has failed to load. Please try again in a moment.');
+     return;
+  }
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const mainContent = document.getElementById('main-content');
@@ -1462,11 +1496,11 @@ function showSearchResults() {
   suggestionsContainer.style.display = 'none';
   const query = input.value.trim().toLowerCase();
   const originalQuery = input.value.trim();
-  const siteRoot = getSiteRootPath();
+  const basePath = getSiteBasePath();
   const lang = getCurrentLanguageFromPath();
   
   if (query.length < 2) {
-    mainContent.innerHTML = `<h2>${body.dataset.searchResultsTitle || 'Search Results'}</h2><p>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters.'}</p><div class="nav-buttons"><a href="${siteRoot}${lang}/index.html" class="back-link">← Back</a></div>`;
+    mainContent.innerHTML = `<h2>${body.dataset.searchResultsTitle || 'Search Results'}</h2><p>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters.'}</p><div class="nav-buttons"><a href="${basePath}${lang}/index.html" class="back-link">← Back</a></div>`;
     return;
   }
   
@@ -1535,10 +1569,6 @@ if (hubo_cambios) {
     entidades_df_lang <- entidades_maestro_df %>% 
       select(original_name, current_lang_name = !!sym(entity_name_col))
     
-        # Se reestructura la creación del índice para que los términos de búsqueda
-    # se generen SIEMPRE a partir del nombre original en cirílico.
-    
-    # Para JUGADORAS, se usa `PlayerName_mk` como fuente para la búsqueda.
     search_jugadoras_data <- jugadoras_stats_df %>%
       select(id, DisplayName = !!sym(player_name_col), CyrillicName = PlayerName_mk)
     
@@ -1548,7 +1578,6 @@ if (hubo_cambios) {
              search_terms = sapply(CyrillicName, generar_terminos_busqueda, USE.NAMES = FALSE)) %>% 
       select(Име = DisplayName, Тип, target_id, search_terms)
     
-    # Para ENTIDADES (equipos, árbitros, estadios), se usa `original_name` como fuente.
     search_equipos <- entidades_df_lang %>% 
       filter(original_name %in% nombres_equipos) %>% 
       mutate(Тип = t("team_type"), 
@@ -1570,23 +1599,24 @@ if (hubo_cambios) {
              search_terms = sapply(original_name, generar_terminos_busqueda, USE.NAMES=F)) %>% 
       select(Име = current_lang_name, Тип, target_id, search_terms)
     
-    # Para COMPETICIONES, se usa `nombre_completo_mk` como fuente.
     search_competiciones <- competiciones_unicas_df %>% 
       mutate(Име = !!sym(comp_name_col), 
              Тип = t("competition_type"), 
              target_id = paste0("menu-competicion-", competicion_id), 
              search_terms = sapply(nombre_completo_mk, generar_terminos_busqueda, USE.NAMES = FALSE)) %>% 
       select(Име, Тип, target_id, search_terms)
+    
     search_index_df_lang <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones, search_estadios) %>% arrange(Име)
+    
     search_data_json_lang <- toJSON(search_index_df_lang, auto_unbox = TRUE)
+    ruta_json_salida <- file.path(RUTA_ASSETS_COMPARTIDOS, paste0("search_data_", lang, ".json"))
+    writeLines(search_data_json_lang, ruta_json_salida, useBytes = TRUE)
+    message("     > Índice de búsqueda guardado en: ", basename(ruta_json_salida))
     
     script_contraseña_lang <- tags$script(HTML(
       sprintf(
         "(function() { var p = 'FuckYouFFM'; var s = sessionStorage; var d = document; if (s.getItem('zfudbalmk-password-ok') === p) return; var i; var m = '%s'; while (true) { i = prompt(m, ''); if (i === p) { s.setItem('zfudbalmk-password-ok', i); break; } if (i === null) { d.body.innerHTML = '<div style=\"text-align:center; padding: 50px; font-family: sans-serif;\"><h1>%s</h1><p>%s</p></div>'; throw new Error('Access denied'); } m = '%s'; } })();",
-        t("Внесете ја лозинката / Futni fjalëkalimin / Introduzca la contraseña / Enter the password"),
-        t("zfudbalmk"),
-        t("zfudbalmk"),
-        t("Погрешна лозинка / Fjalëkalim i pasaktë / Contraseña incorrecta / Wrong password")
+        t("password_prompt"), t("access_denied_header"), t("access_denied_body"), t("password_wrong")
       )
     ))
     
@@ -1603,10 +1633,13 @@ if (hubo_cambios) {
                } else { tags$p(t("no_competitions_found")) }
       )
     )
+    # --- INICIO DE LA CORRECCIÓN ---
+    # Se elimina el argumento `search_data_json` de todas las llamadas a `crear_pagina_html`.
     pagina_portal_final <- crear_pagina_html(
       contenido_principal = contenido_portal, titulo_pagina = t("site_title"), path_to_root_dir = "..",
-      search_data_json = search_data_json_lang, script_contraseña = script_contraseña_lang
+      script_contraseña = script_contraseña_lang
     )
+    # --- FIN DE LA CORRECCIÓN ---
     save_html(pagina_portal_final, file = file.path(RUTA_SALIDA_RAIZ, lang, "index.html"))
     
     # --- 3. Páginas de competiciones ---
@@ -1623,19 +1656,16 @@ if (hubo_cambios) {
       partidos_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada)
       jornadas_comp <- if (nrow(partidos_comp) > 0) { data.frame(jornada = unique(partidos_comp$jornada)) %>% mutate(order_key = case_when(str_detect(jornada, "1/16") ~ 1, str_detect(jornada, "1/8") ~ 2, str_detect(jornada, "1/4") ~ 3, str_detect(jornada, "1/2") ~ 4, str_detect(jornada, "Ф$|ф$|финале") ~ 5, !is_cup ~ as.numeric(suppressWarnings(jornada)), TRUE ~ 99)) %>% arrange(order_key) %>% pull(jornada) } else { c() }
       contenido_partidos <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("schedule_title"), "-", comp_nombre_current_lang)), map(jornadas_comp, function(j) { partidos_jornada <- partidos_comp %>% filter(jornada == j) %>% arrange(local); header_text <- if(is_cup) as.character(j) else paste(t("round_prefix"), j); get_logo_tag <- function(nombre_equipo_mk) { nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo_mk) }; tagList(tags$h3(class="jornada-header", header_text), map(1:nrow(partidos_jornada), function(k) { partido <- partidos_jornada[k,]; local_name <- entidades_df_lang %>% filter(original_name == partido$local) %>% pull(current_lang_name); visitante_name <- entidades_df_lang %>% filter(original_name == partido$visitante) %>% pull(current_lang_name); resultado_texto <- paste(partido$goles_local, "-", partido$goles_visitante); if (isTRUE(partido$es_resultado_oficial)) { resultado_texto <- paste(resultado_texto, "*") }; tags$a(class="partido-link", href=file.path("..", nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")), tags$span(class="equipo equipo-local", get_logo_tag(partido$local), tags$span(local_name)), tags$span(class="resultado", resultado_texto), tags$span(class="equipo equipo-visitante", tags$span(visitante_name), get_logo_tag(partido$visitante))) })) }))
-      nombre_archivo_partidos <- paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"); save_html(crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), "../..", search_data_json_lang, script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_partidos))
+      nombre_archivo_partidos <- paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"); save_html(crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_partidos))
       lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_partidos, class="menu-button", t("schedule_title"))
       
       if (!is_cup) {
         clasificacion_df_comp_raw <- stats_clasificacion_por_comp_df %>% filter(competicion_id == comp_id)
-        
         clave_estilo_comp <- paste(comp_info$competicion_nombre, comp_info$competicion_temporada)
-
         contenido_tabla <- if (nrow(clasificacion_df_comp_raw) == 0) { 
           tags$p(t("standings_no_data_message")) 
         } else { 
           clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df_lang, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col)
-          
           estilos_comp <- estilos_clasificacion_data[[clave_estilo_comp]]; 
           tagList(
             tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), 
@@ -1649,14 +1679,14 @@ if (hubo_cambios) {
           )
         }
         contenido_clasificacion <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("standings_title"), "-", comp_nombre_current_lang)), contenido_tabla)
-        nombre_archivo_clasif <- paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"); save_html(crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), "../..", search_data_json_lang, script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_clasif))
+        nombre_archivo_clasif <- paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"); save_html(crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_clasif))
         lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_clasif, class="menu-button", t("standings_title"))
       }
       
       tabla_goleadoras_comp <- stats_goleadoras_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(!is.na(!!player_name_col_sym)) %>% select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, Goals)
       headers_traducidos <- c(t("standings_pos"), t("player_type"), t("team_type"), t("stats_goals"))
       contenido_goleadoras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("scorers_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(map(headers_traducidos, tags$th))), tags$tbody(map(1:nrow(tabla_goleadoras_comp), function(j){ g <- tabla_goleadoras_comp[j,]; tags$tr(tags$td(g$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(g$id, ".html")), g$PlayerName)), tags$td({ teams_mk <- str_split(g$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df_lang %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) } }; tagList(team_tags) }), tags$td(g$Goals)) }))))
-      nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"); save_html(crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), "../..", search_data_json_lang, script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_goleadoras))
+      nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"); save_html(crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_goleadoras))
       lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_goleadoras, class="menu-button", t("scorers_title"))
       
       minutos_totales_equipo_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>% group_by(equipo = local) %>% summarise(n=n()) %>% bind_rows(partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>% group_by(equipo = visitante) %>% summarise(n=n())) %>% group_by(equipo) %>% summarise(minutos_totales_posibles = sum(n) * 90)
@@ -1665,7 +1695,7 @@ if (hubo_cambios) {
         porteras_mas_50 <- tabla_porteras_comp_raw %>% filter(group == "mas_50") %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number()); porteras_menos_50 <- tabla_porteras_comp_raw %>% filter(group == "menos_50", Minutes > 0) %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number())
         generar_tabla_html_porteras <- function(df, table_id) { if (is.null(df) || nrow(df) == 0) { return(tags$p(t("no_data_in_category")))}; tags$table(id = table_id, `data-sort-col` = "3", `data-sort-dir` = "asc", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(class="sortable-header asc", onclick=sprintf("sortTable('%s', 3)", table_id), t("gk_ga_90")), tags$th(t("gk_ga")), tags$th(t("stats_minutes")), tags$th(class="sortable-header", onclick=sprintf("sortTable('%s', 6)", table_id), t("gk_cs")))), tags$tbody(map(1:nrow(df), function(j){ p <- df[j,]; nombre_equipo <- p$TeamName; nombre_equipo_mk <- p$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$tr(tags$td(p$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), nombre_equipo)), tags$td(format(round(p$GA90, 2), nsmall = 2)), tags$td(p$GA), tags$td(p$Minutes), tags$td(p$CS)) })))}
         contenido_porteras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("goalkeepers_title"), "-", comp_nombre_current_lang)), tags$h3(t("gk_stats_header_over_50")), generar_tabla_html_porteras(porteras_mas_50, "tabla-porteras-mas-50"), tags$h3(t("gk_stats_header_under_50")), generar_tabla_html_porteras(porteras_menos_50, "tabla-porteras-menos-50"))
-        nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html"); save_html(crear_pagina_html(contenido_porteras, paste(t("goalkeepers_title"), "-", comp_nombre_current_lang), "../..", search_data_json_lang, script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_porteras))
+        nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html"); save_html(crear_pagina_html(contenido_porteras, paste(t("goalkeepers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_porteras))
         lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_porteras, class="menu-button", t("goalkeepers_title"))
       }
       
@@ -1675,17 +1705,17 @@ if (hubo_cambios) {
       
       if (nrow(tabla_final_defensas) > 0) {
         contenido_defensas <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("defensive_trio_title"), "-", comp_nombre_current_lang)), tags$p(style="text-align:center; font-style:italic; color:#555;", t("defensive_trio_subtitle")), tags$table(class = "main-summary-table", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("defensive_trio_header_trio")), tags$th(t("team_type")), tags$th(t("defensive_trio_header_minutes")), tags$th(t("defensive_trio_header_ga")), tags$th(t("defensive_trio_header_ga90")))), tags$tbody(pmap(tabla_final_defensas, function(...) { fila <- list(...); nombre_equipo <- fila$TeamName; nombre_equipo_mk <- fila$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$tr(tags$td(fila$Pos), tags$td(fila$TrioNames), tags$td(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), onclick="event.stopPropagation();", nombre_equipo)), tags$td(round(fila$MinutesTogether)), tags$td(fila$GA_Together), tags$td(format(round(fila$GA90_Together, 2), nsmall = 2))) }))))
-        nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html"); save_html(crear_pagina_html(contenido_defensas, paste(t("defensive_trio_title"), "-", comp_nombre_current_lang), "../..", search_data_json_lang, script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_defensas))
+        nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html"); save_html(crear_pagina_html(contenido_defensas, paste(t("defensive_trio_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_defensas))
         lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_defensas, class="menu-button", t("defensive_trio_title"))
       }
       
       tabla_sanciones_comp <- stats_sanciones_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(!is.na(!!player_name_col_sym)) %>% select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, YellowCards, RedCards)
       contenido_sanciones <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("disciplinary_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { s <- tabla_sanciones_comp[j,]; tags$tr(tags$td(s$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(s$id, ".html")), s$PlayerName)), tags$td({ teams_mk <- str_split(s$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df_lang %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) }}; tagList(team_tags) }), tags$td(s$YellowCards), tags$td(s$RedCards)) })} else { tags$tr(tags$td(colspan="5", t("disciplinary_no_cards_message"))) })))
-      nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"); save_html(crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), "../..", search_data_json_lang, script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_sanciones))
+      nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"); save_html(crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_sanciones))
       lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_sanciones, class="menu-button", t("disciplinary_title"))
       
       contenido_menu_final <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), tags$div(class="menu-container", lista_botones_menu))
-      save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", search_data_json_lang, script_contraseña_lang), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
+      save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", script_contraseña_lang), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
     })
     
     # --- 4. Páginas de perfiles individuales ---
@@ -1740,7 +1770,7 @@ if (hubo_cambios) {
         tags$ul(class = "timeline", if (exists("cronologia") && nrow(cronologia) > 0) { map(1:nrow(cronologia), function(c) { e <- cronologia[c,]; tags$li(HTML(paste0("<span class='icon'>", e$icono, "</span>")), paste0(formatear_minuto_partido(e$minuto), "' - "), HTML(e$texto_evento)) }) } else { tags$li(t("match_timeline_no_events")) }),
         crear_botones_navegacion(path_to_lang_root = "..")
       )
-      pagina_partido_final <- crear_pagina_html(contenido_partido, paste(local_name, "vs", visitante_name), path_to_root_dir = "../..", search_data_json_lang, script_contraseña_lang)
+      pagina_partido_final <- crear_pagina_html(contenido_partido, paste(local_name, "vs", visitante_name), path_to_root_dir = "../..", script_contraseña_lang)
       save_html(pagina_partido_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$partidos, paste0(id_p, ".html")))
     })
     
@@ -1798,7 +1828,6 @@ if (hubo_cambios) {
         tags$tbody(tbody_content)
       )
       
-      # 1. Crear componentes del título por separado.
       icono_bandera <- if (!is.na(jugadora$codigo_iso)) {
         texto_emergente <- if_else(!is.na(jugadora$nombre_macedonio), jugadora$nombre_macedonio, jugadora$nacionalidad)
         url_bandera <- paste0("https://kapowaz.github.io/square-flags/flags/", jugadora$codigo_iso, ".svg")
@@ -1813,7 +1842,6 @@ if (hubo_cambios) {
         tags$span(style = "font-size: 0.6em; color: #555; vertical-align: middle; font-weight: normal;", posicion_traducida)
       }
       
-      # 2. Ensamblar el título principal.
       titulo_perfil <- tags$h2(
         style = "display: flex; align-items: center; gap: 15px;",
         current_player_name,
@@ -1822,17 +1850,16 @@ if (hubo_cambios) {
         info_posicion
       )
       
-      # 3. Ensamblar el contenido final de la página.
       contenido_jugadora <- tagList(
         crear_botones_navegacion(path_to_lang_root = ".."),
         titulo_perfil,
         tags$h3(t("player_career_summary")),
         tabla_resumen_carrera
       )
-
+      
       pagina_jugadora_final <- crear_pagina_html(
         contenido_jugadora, current_player_name, path_to_root_dir = "../..", 
-        search_data_json_lang, script_contraseña_lang
+        script_contraseña_lang
       )
       save_html(pagina_jugadora_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$jugadoras, paste0(id_j, ".html")))
     })
@@ -1846,7 +1873,7 @@ if (hubo_cambios) {
       path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras); path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
       tabla_resumen_temporadas <- tags$table(class="team-career-summary", tags$thead(tags$tr(tags$th(t("player_season")), tags$th(t("player_competition")))), tags$tbody(map(1:nrow(temporadas_summary), function(j) { stage <- temporadas_summary[j,]; details_id <- paste0("details-", id_t, "-", j); nombre_competicion_mostrado <- stage[[comp_name_col]]; historial_stage_mk <- partidos_df %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre, local == team_mk | visitante == team_mk) %>% mutate(fecha_date = as.Date(fecha, format="%d.%m.%Y")) %>% arrange(fecha_date); historial_stage <- historial_stage_mk %>% left_join(entidades_df_lang %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% left_join(entidades_df_lang %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name")); player_name_col_sym <- sym(if (player_name_col %in% names(jugadoras_stats_df)) player_name_col else "PlayerName_mk"); stats_jugadoras_stage_lang <- stats_jugadoras_por_equipo_temporada_df %>% filter(equipo == team_mk, competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% select(id, PlayerName = !!player_name_col_sym, CalledUp, Played, Minutes, Goals, Yellows, Reds); headers_stats <- c(t("player_type"), t("player_called_up"), t("player_played"), t("player_mins"), t("player_goals"), t("player_yellow_cards"), t("player_red_cards")); tabla_stats_jugadoras <- tags$table(tags$thead(tags$tr(map(headers_stats, tags$th))), tags$tbody(if(nrow(stats_jugadoras_stage_lang) > 0) { map(1:nrow(stats_jugadoras_stage_lang), function(p_idx) { p <- stats_jugadoras_stage_lang[p_idx,]; tags$tr(tags$td(tags$a(href=file.path(path_rel_jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td(p$CalledUp), tags$td(p$Played), tags$td(p$Minutes), tags$td(p$Goals), tags$td(p$Yellows), tags$td(p$Reds)) }) } else { tags$tr(tags$td(colspan=length(headers_stats), t("match_no_data"))) })); tabla_historial_partidos <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")), tags$th(t("team_header_date")), tags$th(t("team_header_home")), tags$th(t("team_header_away")), tags$th(t("match_header_result")))), tags$tbody(map(1:nrow(historial_stage), function(p_idx) { partido <- historial_stage[p_idx,]; tags$tr(tags$td(partido$jornada), tags$td(partido$fecha), tags$td(partido$home_name), tags$td(partido$away_name), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido$id_partido, ".html")), paste(partido$goles_local, "-", partido$goles_visitante)))) }))); tagList(tags$tr(class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id), tags$td(stage$competicion_temporada), tags$td(nombre_competicion_mostrado)), tags$tr(id = details_id, class="details-row", tags$td(colspan="2", tags$div(class="details-content", tags$h4(t("team_player_stats")), tabla_stats_jugadoras, tags$h4(t("team_match_list")), tabla_historial_partidos)))) })))
       contenido_equipo <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(current_team_name), tags$img(class="team-page-crest", src=ruta_relativa_logo_html, alt=paste("Escudo de", current_team_name)), tags$h3(t("team_history_by_competition")), tabla_resumen_temporadas)
-      pagina_equipo_final <- crear_pagina_html(contenido_equipo, current_team_name, path_to_root_dir = "../..", search_data_json_lang, script_contraseña_lang)
+      pagina_equipo_final <- crear_pagina_html(contenido_equipo, current_team_name, path_to_root_dir = "../..", script_contraseña_lang)
       save_html(pagina_equipo_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$timovi, paste0(id_t, ".html")))
     })
     
@@ -1942,7 +1969,6 @@ if (hubo_cambios) {
         contenido_principal = contenido_arbitro,
         titulo_pagina = current_arb_name,
         path_to_root_dir = "../..",
-        search_data_json = search_data_json_lang,
         script_contraseña = script_contraseña_lang
       )
       save_html(pagina_arbitro_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$arbitros, paste0(id_a, ".html")))
@@ -1955,7 +1981,7 @@ if (hubo_cambios) {
       historial <- historial_mk %>% left_join(entidades_df_lang %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% left_join(entidades_df_lang %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name")) %>% left_join(competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, !!sym(comp_name_col)), by = c("competicion_nombre", "competicion_temporada"))
       path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
       contenido_estadio <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(current_est_name), tags$h3(t("stadium_match_history")), tags$table(tags$thead(tags$tr(tags$th(t("team_header_date")), tags$th(t("player_season")), tags$th(t("player_competition")), tags$th(t("round_prefix")), tags$th(t("match_header_match")), tags$th(t("match_header_result")))), tags$tbody(if (nrow(historial) > 0) { map(1:nrow(historial), function(p_idx) { partido <- historial[p_idx, ]; nombre_competicion_mostrado <- partido[[comp_name_col]]; tags$tr(tags$td(partido$fecha), tags$td(partido$competicion_temporada), tags$td(nombre_competicion_mostrado), tags$td(partido$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido$id_partido, ".html")), paste(partido$home_name, "vs", partido$away_name))), tags$td(paste(partido$goles_local, "-", partido$goles_visitante))) }) } else { tags$tr(tags$td(colspan = "6", t("player_no_matches"))) })))
-      pagina_estadio_final <- crear_pagina_html(contenido_estadio, current_est_name, path_to_root_dir = "../..", search_data_json = search_data_json_lang, script_contraseña = script_contraseña_lang)
+      pagina_estadio_final <- crear_pagina_html(contenido_estadio, current_est_name, path_to_root_dir = "../..", script_contraseña_lang)
       save_html(pagina_estadio_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$estadios, paste0(id_e, ".html")))
     })
     

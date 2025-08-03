@@ -3,36 +3,64 @@ let searchData = [];
 
 document.addEventListener('DOMContentLoaded', initializeSearch);
 
-function getSiteRootPath() {
+// --- INICIO DE LA CORRECCIÓN ---
+// Se hace la lógica de rutas más robusta para que funcione
+// tanto en el servidor local de `servr` como en GitHub Pages.
+function getSiteBasePath() {
   const path = window.location.pathname;
-  const docsIndex = path.indexOf('/docs/');
-  if (docsIndex > -1) {
-    return path.substring(0, docsIndex + '/docs/'.length);
+  // Encuentra la parte de la ruta antes de la primera carpeta de idioma.
+  // Ej: de "/repo/mk/page.html" extrae "/repo/"
+  const match = path.match(/^(.*\/)(mk|sq|es|en)\//);
+  if (match && match[1]) {
+    return match[1];
   }
-  return '/';
+  // Fallback para la raíz (ej. `servr` en local)
+  return "/";
 }
 
-/**
- * Extrae el código de idioma de 2 letras de la ruta de la URL.
- * Ej: de "/docs/sq/timovi/equipo.html" extrae "sq". Es el método más fiable.
- */
 function getCurrentLanguageFromPath() {
   const path = window.location.pathname;
-  const match = path.match(/\/docs\/([a-z]{2})\//);
+  // Busca el código de idioma de 2 letras en la ruta.
+  const match = path.match(/\/(mk|sq|es|en)\//);
   if (match && match[1]) {
-    return match[1]; // Devuelve 'sq', 'mk', 'en', etc.
+    return match[1];
   }
-  // Fallback si no se encuentra (ej. en la página raíz de redirección)
   const langAttr = document.documentElement.lang;
   if (langAttr) return langAttr;
   return 'mk';
 }
+// --- FIN DE LA CORRECCIÓN ---
 
 function initializeSearch() {
-  const searchDataElement = document.getElementById('search-data-json');
-  if (searchDataElement) {
-    try { searchData = JSON.parse(searchDataElement.textContent); } catch (e) { console.error('Error parsing search data JSON:', e); }
-  }
+  const lang = getCurrentLanguageFromPath();
+  const basePath = getSiteBasePath();
+  const jsonUrl = `${basePath}${lang}/../assets/search_data_${lang}.json`;
+
+  const searchInput = document.getElementById('search-input');
+  const body = document.body;
+
+  fetch(jsonUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok for search data.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      searchData = data;
+      if (searchInput) {
+        searchInput.disabled = false;
+        searchInput.placeholder = body.dataset.searchPlaceholder || 'Search...';
+      }
+      console.log(`Search index for '${lang}' loaded successfully.`);
+    })
+    .catch(error => {
+      console.error('Error loading search data:', error);
+      if (searchInput) {
+        searchInput.placeholder = body.dataset.searchError || 'Search unavailable';
+      }
+    });
+
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer && !searchContainer.contains(event.target)) {
@@ -52,8 +80,8 @@ function toggleDetails(elementId) {
 }
 
 function generateLink(target_id) {
-  const siteRoot = getSiteRootPath();
-  const lang = getCurrentLanguageFromPath(); // Se usa la nueva función robusta.
+  const basePath = getSiteBasePath();
+  const lang = getCurrentLanguageFromPath();
   const parts = target_id.split('-');
   const type = parts[0];
   const id_parts = parts.slice(1);
@@ -66,13 +94,15 @@ function generateLink(target_id) {
     case 'arbitro': folder = 'sudii'; break;
     case 'стадион': folder = 'stadioni'; break;
     case 'menu': folder = 'natprevaruvanja'; id = id.replace('competicion-', ''); break;
-    default: return `${siteRoot}${lang}/index.html`;
+    default: return `${basePath}${lang}/index.html`;
   }
-  return `${siteRoot}${lang}/${folder}/${id}.html`;
+  return `${basePath}${lang}/${folder}/${id}.html`;
 }
 
+// ... (El resto del JS, handleSearchInput, showSearchResults, etc., permanece igual)
 function handleSearchInput(event) {
   if (event.key === 'Enter') { event.preventDefault(); showSearchResults(); return; }
+  if (searchData.length === 0) return; 
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const query = input.value.trim().toLowerCase();
@@ -86,6 +116,10 @@ function handleSearchInput(event) {
 }
 
 function showSearchResults() {
+  if (searchData.length === 0) {
+     alert(document.body.dataset.searchError || 'Search index is still loading or has failed to load. Please try again in a moment.');
+     return;
+  }
   const input = document.getElementById('search-input');
   const suggestionsContainer = document.getElementById('search-suggestions');
   const mainContent = document.getElementById('main-content');
@@ -94,11 +128,11 @@ function showSearchResults() {
   suggestionsContainer.style.display = 'none';
   const query = input.value.trim().toLowerCase();
   const originalQuery = input.value.trim();
-  const siteRoot = getSiteRootPath();
+  const basePath = getSiteBasePath();
   const lang = getCurrentLanguageFromPath();
   
   if (query.length < 2) {
-    mainContent.innerHTML = `<h2>${body.dataset.searchResultsTitle || 'Search Results'}</h2><p>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters.'}</p><div class="nav-buttons"><a href="${siteRoot}${lang}/index.html" class="back-link">← Back</a></div>`;
+    mainContent.innerHTML = `<h2>${body.dataset.searchResultsTitle || 'Search Results'}</h2><p>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters.'}</p><div class="nav-buttons"><a href="${basePath}${lang}/index.html" class="back-link">← Back</a></div>`;
     return;
   }
   

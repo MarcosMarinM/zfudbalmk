@@ -123,3 +123,8 @@ legend_direct_relegation,Директно испаѓање,Rënie direkte,Descen
 legend_direct_promotion,Директна промоција,Promovim direkt,Ascenso directo,Direct promotion
 legend_promotion_playoff,Бараж за промоција,Play-off për promovim,Play-off de ascenso,Promotion Play-off
 legend_promotion,Промоција,Promovim,Ascenso,Promotion
+key,mk,sq,es,en
+password_prompt,Внесете ја лозинката,Futni fjalëkalimin,Introduzca la contraseña,Enter password
+access_denied_header,Пристапот е одбиен,Qasja u refuzua,Acceso denegado,Access Denied
+access_denied_body,Процесот е откажан од страна на корисникот,Procesi u anulua nga përdoruesi,Proceso cancelado por el usuario,Process canceled by user
+password_wrong,Погрешна лозинка. Обидете се повторно,Fjalëkalim i pasaktë. Provoni përsëri,Contraseña incorrecta. Inténtelo de nuevo,Wrong password. Try again
