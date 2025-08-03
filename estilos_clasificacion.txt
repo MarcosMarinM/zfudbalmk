@@ -1,22 +1,22 @@
 [COMPETICION: Прва ЖФЛ 23/24]
-1,#008000,Квалификации на Лигата на шампиони
-9,#D4AF37,Бараж за опстанок
-10,#FF0000,Директно испаѓање
+1,#008000,legend_champions_league
+9,#D4AF37,legend_relegation_playoff
+10,#FF0000,legend_direct_relegation
 
 [COMPETICION: Втора ЖФЛ 23/24]
-1,#008000,Директна промоција
-2,#D4AF37,Бараж за промоција
+1,#008000,legend_direct_promotion
+2,#D4AF37,legend_promotion_playoff
 
 [COMPETICION: Бараж за Прва ЖФЛ 24/25]
-1,#008000,Промоција
+1,#008000,legend_promotion
 
 [COMPETICION: Прва ЖФЛ 24/25]
-1,#008000,Квалификации на Лигата на шампиони
-9,#D4AF37,Бараж за опстанок
+1,#008000,legend_champions_league
+9,#D4AF37,legend_relegation_playoff
 
 [COMPETICION: Втора ЖФЛ 24/25]
-1,#008000,Директна промоција
-2,#D4AF37,Бараж за промоција
+1,#008000,legend_direct_promotion
+2,#D4AF37,legend_promotion_playoff
 
 [COMPETICION: Бараж за Прва ЖФЛ 25/26]
-1,#008000,Промоција
+1,#008000,legend_promotion

@@ -3,17 +3,29 @@ let searchData = [];
 
 document.addEventListener('DOMContentLoaded', initializeSearch);
 
-// CORRECCIÓN: Simplifica la obtención de la ruta base del idioma.
-function getLangBasePath() {
+function getSiteRootPath() {
   const path = window.location.pathname;
-  const lang = document.documentElement.lang || 'mk';
-  // Encuentra la parte de la ruta hasta la carpeta del idioma (e.g., /docs/mk/)
-  const langRootIndex = path.indexOf(`/${lang}/`);
-  if (langRootIndex > -1) {
-    return path.substring(0, langRootIndex + lang.length + 2);
+  const docsIndex = path.indexOf('/docs/');
+  if (docsIndex > -1) {
+    return path.substring(0, docsIndex + '/docs/'.length);
   }
-  // Fallback para la página de redirección en la raíz
-  return `./${lang}/`;
+  return '/';
+}
+
+/**
+ * Extrae el código de idioma de 2 letras de la ruta de la URL.
+ * Ej: de "/docs/sq/timovi/equipo.html" extrae "sq". Es el método más fiable.
+ */
+function getCurrentLanguageFromPath() {
+  const path = window.location.pathname;
+  const match = path.match(/\/docs\/([a-z]{2})\//);
+  if (match && match[1]) {
+    return match[1]; // Devuelve 'sq', 'mk', 'en', etc.
+  }
+  // Fallback si no se encuentra (ej. en la página raíz de redirección)
+  const langAttr = document.documentElement.lang;
+  if (langAttr) return langAttr;
+  return 'mk';
 }
 
 function initializeSearch() {
@@ -39,23 +51,24 @@ function toggleDetails(elementId) {
   if (detailsRow) { detailsRow.style.display = (detailsRow.style.display === 'table-row') ? 'none' : 'table-row'; }
 }
 
-// CORRECCIÓN: Usa la nueva función para construir los enlaces de búsqueda.
 function generateLink(target_id) {
-  const basePath = getLangBasePath();
+  const siteRoot = getSiteRootPath();
+  const lang = getCurrentLanguageFromPath(); // Se usa la nueva función robusta.
   const parts = target_id.split('-');
   const type = parts[0];
   const id_parts = parts.slice(1);
   let id = id_parts.join('-');
   let folder;
+
   switch(type) {
     case 'jugadora': folder = 'igraci'; break;
     case 'equipo': folder = 'timovi'; break;
     case 'arbitro': folder = 'sudii'; break;
     case 'стадион': folder = 'stadioni'; break;
     case 'menu': folder = 'natprevaruvanja'; id = id.replace('competicion-', ''); break;
-    default: return `${basePath}index.html`;
+    default: return `${siteRoot}${lang}/index.html`;
   }
-  return `${basePath}${folder}/${id}.html`;
+  return `${siteRoot}${lang}/${folder}/${id}.html`;
 }
 
 function handleSearchInput(event) {
@@ -81,10 +94,11 @@ function showSearchResults() {
   suggestionsContainer.style.display = 'none';
   const query = input.value.trim().toLowerCase();
   const originalQuery = input.value.trim();
-  const basePath = getLangBasePath();
+  const siteRoot = getSiteRootPath();
+  const lang = getCurrentLanguageFromPath();
   
   if (query.length < 2) {
-    mainContent.innerHTML = `<h2>${body.dataset.searchResultsTitle || 'Search Results'}</h2><p>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters.'}</p><div class="nav-buttons"><a href="${basePath}index.html" class="back-link">← Back</a></div>`;
+    mainContent.innerHTML = `<h2>${body.dataset.searchResultsTitle || 'Search Results'}</h2><p>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters.'}</p><div class="nav-buttons"><a href="${siteRoot}${lang}/index.html" class="back-link">← Back</a></div>`;
     return;
   }
   

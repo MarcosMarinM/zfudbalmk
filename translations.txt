@@ -4,7 +4,7 @@ back_button,← Назад,← Prapa,← Volver,← Back
 home_button,🏠 Почетна,🏠 Faqja kryesore,🏠 Inicio,🏠 Home
 search_placeholder,"Пребарај фудбалерка, тим, судија, стадион...","Kërko lojtare, ekip, gjyqtar, stadium...","Buscar jugadora, equipo, árbitro, estadio...","Search for player, team, referee, stadium..."
 search_button,Пребарај,Kërko,Buscar,Search
-search_results_for,"Резултати од пребарувањето за:","Rezultatet e kërkimit për:","Resultados de la búsqueda para:","Search results for:"
+search_results_for,"Резултати од пребарувањето за","Rezultatet e kërkimit për","Resultados de la búsqueda para","Search results for"
 no_search_results,"Нема пронајдени резултати за","Nuk u gjetën rezultate për","No se encontraron resultados para","No results found for"
 search_prompt,"Ве молиме внесете најмалку 2 карактери за да пребарувате.","Ju lutemi, shkruani të paktën 2 karaktere për të kërkuar.","Por favor, introduce al menos 2 caracteres para buscar.","Please enter at least 2 characters to search."
 portal_title,Портал на натпреварувања,Portali i garave,Portal de competiciones,Competitions portal
@@ -115,5 +115,11 @@ position_defender,Одбрана,Mbrojtëse,Defensa,Defender
 position_midfielder,Среден ред,Mesfushore,Centrocampista,Midfielder
 position_forward,Напад,Sulmuese,Delantera,Forward
 referee_main,Главен судија,Gjyqtari kryesor,Árbitra,Referee
-referee_asst1,1-ви помошник,1.ª asistente,Ndihmësi i parë,1st assistant
-referee_asst2,2-ри помошник,2.ª asistente,Ndihmësi i dytë,2nd assistant
+referee_asst1,1-ви помошник,Ndihmësi i parë,1.ª asistente,1st assistant
+referee_asst2,2-ри помошник,Ndihmësi i dytë,2.ª asistente,2nd assistant
+legend_champions_league,Квалификации за Лигата на шампиони,Kualifikimet për Ligën e Kampionëve,Previa de Champions,Champions League Qualifiers
+legend_relegation_playoff,Бараж за опстанок,Play-off për mbijetesë,Play-off por la permanencia,Relegation Play-off
+legend_direct_relegation,Директно испаѓање,Rënie direkte,Descenso directo,Direct relegation
+legend_direct_promotion,Директна промоција,Promovim direkt,Ascenso directo,Direct promotion
+legend_promotion_playoff,Бараж за промоција,Play-off për promovim,Play-off de ascenso,Promotion Play-off
+legend_promotion,Промоција,Promovim,Ascenso,Promotion
