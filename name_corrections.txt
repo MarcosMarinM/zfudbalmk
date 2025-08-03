@@ -1,2 +1,62 @@
-original_mk,latin_sq,latin_es,latin_en
+Адиса Кала,Adisa Kala,Adisa Kala,Adisa Kala
+Алеуна Улдиз,Aleyna Yıldız,Aleyna Yıldız,Aleyna Yıldız
+Алехандра Родригез,Alejandra Rodríguez,Alejandra Rodríguez,Alejandra Rodríguez
+Анѓела Миловановиќ,Anđela Milovanović,Anđela Milovanović,Anđela Milovanović
+Ангела Ресановиќ,Angela Resanović,Angela Resanović,Angela Resanović
+Анѓела Стојановиќ,Anđela Stojanović,Anđela Stojanović,Anđela Stojanović
+Андреа Јовановиќ,Andrea Jovanović,Andrea Jovanović,Andrea Jovanović
+Анита Алексиќ,Anita Aleksić,Anita Aleksić,Anita Aleksić
+Бејза Арифи,Beyza Arifi,Beyza Arifi,Beyza Arifi
+Белма Ќазимоска,Bellma Qazimoska,Belma Kjazimoska,Belma Kjazimoska
+Бисера Јовановиќ,Bisera Jovanović,Bisera Jovanović,Bisera Jovanović
+Брикена Шаќири,Brikena Shaqiri,Brikena Shaqiri,Brikena Shaqiri
+Весна Милојевиќ,Vesna Milojević,Vesna Milojević,Vesna Milojević
+Викториа Алваренга Диас,Victoria Alvarenga Dias,Victoria Alvarenga Dias,Victoria Alvarenga Dias
+Викторија Златковиќ,Viktorija Zlatković,Viktorija Zlatković,Viktorija Zlatković
+Гордана Милошевиќ,Gordana Milošević,Gordana Milošević,Gordana Milošević
+Деспина Пауновиќ,Despina Paunović,Despina Paunović,Despina Paunović
+Диана Алуши,Diana Alushi,Diana Alushi,Diana Alushi
+Елеонора Груиќ,Eleonora Gruić,Eleonora Gruić,Eleonora Gruić
+Елиона Таири,Eliona Tairi,Eliona Tairi,Eliona Tairi
+Елма Шемсовиќ,Elma Šemsović,Elma Šemsović,Elma Šemsović
+Енџи Шерифи,Enxhi Sherifi,Enxhi Sherifi,Enxhi Sherifi
+Ивана Спасиќ,Ivana Spasić,Ivana Spasić,Ivana Spasić
+Ихдина Речи,Ihdina Reçi,Ihdina Reçi,Ihdina Reçi
+Јана Крстиќ,Jana Krstić,Jana Krstić,Jana Krstić
+Јована Вучичевич,Jovana Vučićević,Jovana Vučićević,Jovana Vučićević
+Јована Јовановиќ,Jovana Jovanović,Jovana Jovanović,Jovana Jovanović
+Јулија Живиќ,Julija Živić,Julija Živić,Julija Živić
+Канита Емини,Kanita Emini,Kanita Emini,Kanita Emini
+Карина Бермудез,Karina Bermúdez,Karina Bermúdez,Karina Bermúdez
+Катерине Гонзалес Руеда,Katerine González Rueda,Katerine González Rueda,Katerine González Rueda
+Кешлин Копли,Cashlin Copley,Cashlin Copley,Cashlin Copley
+Кристин Нафула,Christine Nafula,Christine Nafula,Christine Nafula
+Кристина Пеев,Kristina Peev,Kristina Peev,Kristina Peev
+Летисија Силва,Leticia Silva,Leticia Silva,Leticia Silva
+Мајса Делгадо Бенедито,Maysa Delgado Benedito,Maysa Delgado Benedito,Maysa Delgado Benedito
+Мариан Охадиве,Maryann Ohadiwe,Maryann Ohadiwe,Maryann Ohadiwe
+Марија Јованова Ана,Marija Jovanova Ana,Marija Jovanova Ana,Marija Jovanova Ana
+Маријана Јанков,Marijana Jankov,Marijana Jankov,Marijana Jankov
+Марина Јовановиќ,Marina Jovanović,Marina Jovanović,Marina Jovanović
+Мариса Васкез,Marissa Vásquez,Marissa Vásquez,Marissa Vásquez
+Мартина Денчиќ,Martina Denčić,Martina Denčić,Martina Denčić
+Мелиса Димитриоски,Melissa Dimitrioski,Melissa Dimitrioski,Melissa Dimitrioski
+Мирвет Веселова,Mirvet Veselova,Mirvet Veselova,Mirvet Veselova
+Михаела Гамарц,Mihaela Gamarț,Mihaela Gamarț,Mihaela Gamarț
+Нанока Иригучи,Nanoka Iriguchi,Nanoka Iriguchi,Nanoka Iriguchi
+Нина Миленковиќ,Nina Milenković,Nina Milenković,Nina Milenković
+Оливеира Наталиа Луана,Oliveira Natália Luana,Oliveira Natália Luana,Oliveira Natália Luana
+Прина Хоџа,Prina Hoxha,Prina Hoxha,Prina Hoxha
+Присцила Едитe Силва,Priscila Edite Silva,Priscila Edite Silva,Priscila Edite Silva
+Рафаела Кармо Мартинс,Rafaela Carmo Martins,Rafaela Carmo Martins,Rafaela Carmo Martins
+Рената Фереира да Силва,Renata Ferreira da Silva,Renata Ferreira da Silva,Renata Ferreira da Silva
+Сара Димитриоски,Sarah Dimitrioski,Sarah Dimitrioski,Sarah Dimitrioski
+Севим Илјаз,Sevim İlyaz,Sevim İlyaz,Sevim İlyaz
+Стефанија Петковиќ,Stefanija Petković,Stefanija Petković,Stefanija Petković
+Стефанија Стојановиќ,Stefanija Stojanović,Stefanija Stojanović,Stefanija Stojanović
+Тамара Љубојевиќ,Tamara Ljubojević,Tamara Ljubojević,Tamara Ljubojević
+Тамара Милошевиќ,Tamara Milošević,Tamara Milošević,Tamara Milošević
+Тцхуиссе Гхоуанси,Tchuisse Ghouansi,Tchuisse Ghouansi,Tchuisse Ghouansi
+Тчеури Гоја,Tcheury Goya, Tcheury Goya, Tcheury Goya
 Улза Максути,Yllza Maksuti,Yllza Maksuti,Yllza Maksuti
+Џељане Шаќири,Xhelane Shaqiri,Xhelane Shaqiri,Xhelane Shaqiri

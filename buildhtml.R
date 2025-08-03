@@ -1528,38 +1528,41 @@ if (hubo_cambios) {
       lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_porteras, class="menu-button", t("goalkeepers_title"))
     }
     
-    minutos_totales_equipo_comp <- stats_clasificacion_por_comp_df %>%
-      filter(competicion_id == comp_id) %>%
-      # Los minutos totales son el número de partidos jugados (P) por 90
+    partidos_en_comp <- partidos_df %>%
+      filter(competicion_nombre == comp_info$competicion_nombre, 
+             competicion_temporada == comp_info$competicion_temporada)
+    
+    minutos_totales_equipo_comp <- bind_rows(
+      partidos_en_comp %>% count(TeamName_mk = local),
+      partidos_en_comp %>% count(TeamName_mk = visitante)
+    ) %>%
+      group_by(TeamName_mk) %>%
+      summarise(P = sum(n), .groups = 'drop') %>%
       mutate(minutos_totales_posibles = P * 90) %>%
-      select(TeamName_mk = team, minutos_totales_posibles)
+      select(TeamName_mk, minutos_totales_posibles)
     
     tabla_final_defensas <- stats_trios_defensivos_df %>%
       filter(competicion_id == comp_id) %>%
-      # Unir con los minutos totales para poder aplicar el filtro del 50%
       left_join(minutos_totales_equipo_comp, by = "TeamName_mk") %>%
-      # Filtrar solo los tríos que cumplen el umbral de minutos
       filter(!is.na(minutos_totales_posibles), MinutesTogether >= (minutos_totales_posibles * 0.5)) %>%
-      # Agrupar por equipo para seleccionar el mejor trío de cada uno
       group_by(TeamName_mk) %>%
-      # Ordenar dentro de cada grupo para que el mejor quede primero
       arrange(GA90_Together, GA_Together, desc(MinutesTogether)) %>%
-      # Seleccionar solo el mejor (la primera fila) de cada equipo
       slice_head(n = 1) %>%
       ungroup() %>%
-      # Traducir los nombres para la visualización
       left_join(entidades_df_mk, by = c("TeamName_mk" = "original_name")) %>%
       mutate(TeamName = current_lang_name) %>%
+      # Se añade una comprobación de seguridad para evitar errores si trio_key fuera NA
+      filter(!is.na(trio_key)) %>%
       rowwise() %>%
       mutate(TrioNames = paste(sapply(strsplit(trio_key, "-")[[1]], function(id_jug) {
         name <- (jugadoras_stats_df %>% filter(id == id_jug) %>% pull(!!player_name_col_sym))
         if(length(name)==0) id_jug else name
       }), collapse = " - ")) %>%
       ungroup() %>%
-      # Ordenar la tabla final globalmente por rendimiento
       arrange(GA90_Together, GA_Together, desc(MinutesTogether)) %>%
       mutate(Pos = row_number()) %>%
       select(Pos, TrioNames, TeamName, TeamName_mk, MinutesTogether, GA_Together, GA90_Together, trio_key)
+    # --- FIN DE LA CORRECCIÓN ---
     
     if (nrow(tabla_final_defensas) > 0) {
       contenido_defensas <- tagList(
