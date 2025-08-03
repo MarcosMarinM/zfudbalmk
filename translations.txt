@@ -114,3 +114,6 @@ position_goalkeeper,Голманка,Portiere,Portera,Goalkeeper
 position_defender,Одбрана,Mbrojtëse,Defensa,Defender
 position_midfielder,Среден ред,Mesfushore,Centrocampista,Midfielder
 position_forward,Напад,Sulmuese,Delantera,Forward
+referee_main,Главен судија,Gjyqtari kryesor,Árbitra,Referee
+referee_asst1,1-ви помошник,1.ª asistente,Ndihmësi i parë,1st assistant
+referee_asst2,2-ри помошник,2.ª asistente,Ndihmësi i dytë,2nd assistant

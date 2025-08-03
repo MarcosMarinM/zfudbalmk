@@ -30,19 +30,19 @@ mk,sq,es,en
 Бараж за Прва ЖФЛ 23/24,Barazh për Ligën e Parë të Femrave 23/24,Play-off de ascenso a la Primera Liga Femenina 23/24,Play-off for the First Women's League 23/24
 Бараж за Прва ЖФЛ 24/25,Barazh për Ligën e Parë të Femrave 24/25,Play-off de ascenso a la Primera Liga Femenina 24/25,Play-off for the First Women's League 24/25
 Бараж за Прва ЖФЛ 25/26,Barazh për Ligën e Parë të Femrave 25/26,Play-off de ascenso a la Primera Liga Femenina 25/26,Play-off for the First Women's League 25/26
-КУП на РМ за Жени 13/14,Kupa e RM për Femra 13/14,Copa Femenina de Macedonia del Norte 13/14,North Macedonian Women's Cup 13/14
-КУП на РМ за Жени 14/15,Kupa e RM për Femra 14/15,Copa Femenina de Macedonia del Norte 14/15,North Macedonian Women's Cup 14/15
-КУП на РМ за Жени 15/16,Kupa e RM për Femra 15/16,Copa Femenina de Macedonia del Norte 15/16,North Macedonian Women's Cup 15/16
-КУП на РМ за Жени 16/17,Kupa e RM për Femra 16/17,Copa Femenina de Macedonia del Norte 16/17,North Macedonian Women's Cup 16/17
-КУП на РМ за Жени 17/18,Kupa e RM për Femra 17/18,Copa Femenina de Macedonia del Norte 17/18,North Macedonian Women's Cup 17/18
-КУП на РМ за Жени 18/19,Kupa e RM për Femra 18/19,Copa Femenina de Macedonia del Norte 18/19,North Macedonian Women's Cup 18/19
-КУП на РМ за Жени 19/20,Kupa e RM për Femra 19/20,Copa Femenina de Macedonia del Norte 19/20,North Macedonian Women's Cup 19/20
-КУП на РМ за Жени 20/21,Kupa e RM për Femra 20/21,Copa Femenina de Macedonia del Norte 20/21,North Macedonian Women's Cup 20/21
-КУП на РМ за Жени 21/22,Kupa e RM për Femra 21/22,Copa Femenina de Macedonia del Norte 21/22,North Macedonian Women's Cup 21/22
-КУП на РМ за Жени 22/23,Kupa e RM për Femra 22/23,Copa Femenina de Macedonia del Norte 22/23,North Macedonian Women's Cup 22/23
-КУП на РМ за Жени 23/24,Kupa e RM për Femra 23/24,Copa Femenina de Macedonia del Norte 23/24,North Macedonian Women's Cup 23/24
-КУП на РМ за Жени 24/25,Kupa e RM për Femra 24/25,Copa Femenina de Macedonia del Norte 24/25,North Macedonian Women's Cup 24/25
-КУП на РМ за Жени 25/26,Kupa e RM për Femra 25/26,Copa Femenina de Macedonia del Norte 25/26,North Macedonian Women's Cup 25/26
+КУП на РМ за Жени 13/14,Kupa e RM për Femra 13/14,Copa de la República de Macedonia13/14,Macedonian Women's Cup 13/14
+КУП на РМ за Жени 14/15,Kupa e RM për Femra 14/15,Copa de la República de Macedonia14/15,Macedonian Women's Cup 14/15
+КУП на РМ за Жени 15/16,Kupa e RM për Femra 15/16,Copa de la República de Macedonia15/16,Macedonian Women's Cup 15/16
+КУП на РМ за Жени 16/17,Kupa e RM për Femra 16/17,Copa de la República de Macedonia16/17,Macedonian Women's Cup 16/17
+КУП на РМ за Жени 17/18,Kupa e RM për Femra 17/18,Copa de la República de Macedonia17/18,Macedonian Women's Cup 17/18
+КУП на РМ за Жени 18/19,Kupa e RM për Femra 18/19,Copa de la República de Macedonia18/19,Macedonian Women's Cup 18/19
+КУП на РМ за Жени 19/20,Kupa e RM për Femra 19/20,Copa de la República de Macedonia19/20,Macedonian Women's Cup 19/20
+КУП на РМ за Жени 20/21,Kupa e RM për Femra 20/21,Copa de la República de Macedonia20/21,Macedonian Women's Cup 20/21
+КУП на РМ за Жени 21/22,Kupa e RM për Femra 21/22,Copa de la República de Macedonia21/22,Macedonian Women's Cup 21/22
+КУП на РМ за Жени 22/23,Kupa e RM për Femra 22/23,Copa de la República de Macedonia22/23,Macedonian Women's Cup 22/23
+КУП на РМ за Жени 23/24,Kupa e RM për Femra 23/24,Copa de la República de Macedonia23/24,Macedonian Women's Cup 23/24
+КУП на РМ за Жени 24/25,Kupa e RM për Femra 24/25,Copa de la República de Macedonia24/25,Macedonian Women's Cup 24/25
+КУП на РМ за Жени 25/26,Kupa e RM për Femra 25/26,Copa de la República de Macedonia25/26,Macedonian Women's Cup 25/26
 Младинска Женска Фудбалска Лига 18/19,Liga e të Rejave 18/19,Liga Femenina Juvenil 18/19,Women's Youth League 18/19
 Младинска Женска Фудбалска Лига 19/20,Liga e të Rejave 19/20,Liga Femenina Juvenil 19/20,Women's Youth League 19/20
 Младинска Женска Фудбалска Лига 20/21,Liga e të Rejave 20/21,Liga Femenina Juvenil 20/21,Women's Youth League 20/21

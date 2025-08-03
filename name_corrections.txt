@@ -1,3 +1,4 @@
+original_mk,latin_sq,latin_es,latin_en
 Адиса Кала,Adisa Kala,Adisa Kala,Adisa Kala
 Алеуна Улдиз,Aleyna Yıldız,Aleyna Yıldız,Aleyna Yıldız
 Алехандра Родригез,Alejandra Rodríguez,Alejandra Rodríguez,Alejandra Rodríguez
