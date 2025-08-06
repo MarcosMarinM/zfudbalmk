@@ -415,6 +415,94 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
   return(tarjetas_df_final)
 }
 
+### 2.3. Extraer tanda de penaltis ----
+
+#' Extrae la información de la tanda de penaltis del texto del acta.
+#'
+#' Busca un bloque de texto específico que contiene los lanzadores de penaltis,
+#' parsea cada lanzamiento para identificar al jugador, su equipo y si marcó o falló.
+#'
+#' @param texto_acta Texto completo del PDF.
+#' @param equipo_local_nombre Nombre del equipo local.
+#' @param equipo_visitante_nombre Nombre del equipo visitante.
+#' @param alineacion_local Dataframe con la alineación del equipo local.
+#' @param alineacion_visitante Dataframe con la alineación del equipo visitante.
+#' @return Un dataframe con los lanzamientos de la tanda de penaltis.
+extraer_tanda_penales <- function(texto_acta, equipo_local_nombre, equipo_visitante_nombre, alineacion_local, alineacion_visitante) {
+  # Patrón para encontrar el inicio de la sección de interés.
+  # Puede ser "Пен/АГ" o la línea de goleadores "Стрелец/Мин..."
+  inicio_bloque_pattern <- "Пен/АГ|Стрелец/Мин[^\n]+"
+  
+  # Extraer todo el texto DESPUÉS de nuestro punto de inicio.
+  texto_despues_inicio <- str_extract(texto_acta, paste0(inicio_bloque_pattern, "[\\s\\S]*"))
+  
+  if (is.na(texto_despues_inicio)) {
+    return(data.frame())
+  }
+  
+  # Ahora, desde ese texto extraído, tomamos solo hasta la siguiente sección ("Опомени:").
+  # Esto evita el look-behind de longitud variable.
+  bloque_penales_raw <- str_extract(texto_despues_inicio, "[\\s\\S]+?(?=Опомени:|Забелешка|ПОТВРДЕН)")
+  
+  # Eliminamos la propia línea de "Пен/АГ" del bloque para no procesarla por error.
+  bloque_penales_raw <- str_remove(bloque_penales_raw, inicio_bloque_pattern)
+  
+  if (is.na(bloque_penales_raw)) {
+    return(data.frame())
+  }
+  
+  lineas_penales <- str_split(bloque_penales_raw, "\\n")[[1]]
+  lineas_penales <- lineas_penales[str_detect(lineas_penales, "^\\s*[PO]\\s+\\d{1,2}")]
+  
+  if (length(lineas_penales) == 0) {
+    return(data.frame())
+  }
+  
+  # Se determina la columna de división (similar a las alineaciones)
+  split_col <- 80 
+  
+  lineas_local <- str_sub(lineas_penales, 1, split_col - 1)
+  lineas_visitante <- str_sub(lineas_penales, split_col, -1)
+  
+  penales_df <- data.frame()
+  
+  # Función interna para procesar una columna de lanzadores
+  procesar_columna_penales <- function(lineas, equipo_nombre, alineacion_equipo) {
+    df_columna <- data.frame()
+    regex_lanzador <- "^\\s*([PO])\\s+(\\d{1,2})\\s+([\\p{L}\\s.'-]+)"
+    
+    for (linea in lineas) {
+      match <- str_match(linea, regex_lanzador)
+      if (!is.na(match[1, 1])) {
+        resultado_lanzamiento <- ifelse(match[1, 2] == "P", "Gol", "Fallo")
+        dorsal_lanzador <- as.integer(match[1, 3])
+        nombre_lanzador_raw <- str_trim(match[1, 4])
+        
+        info_jugadora <- filter(alineacion_equipo, dorsal == dorsal_lanzador)
+        
+        nombre_jugadora <- if(nrow(info_jugadora) > 0) info_jugadora$nombre[1] else nombre_lanzador_raw
+        id_jugadora <- if(nrow(info_jugadora) > 0) info_jugadora$id[1] else NA_character_
+        
+        df_columna <- rbind(df_columna, data.frame(
+          jugadora = nombre_jugadora,
+          id_jugadora = id_jugadora,
+          dorsal = dorsal_lanzador,
+          equipo = equipo_nombre,
+          resultado_penal = resultado_lanzamiento
+        ))
+      }
+    }
+    return(df_columna)
+  }
+  
+  penales_local_df <- procesar_columna_penales(lineas_local, equipo_local_nombre, alineacion_local)
+  penales_visitante_df <- procesar_columna_penales(lineas_visitante, equipo_visitante_nombre, alineacion_visitante)
+  
+  # Combinar los resultados de ambos equipos
+  penales_df <- rbind(penales_local_df, penales_visitante_df)
+  
+  return(penales_df)
+}
 
 ## -------------------------------------------------------------------------- ##
 ##  3. FUNCIÓN PRINCIPAL DE PROCESAMIENTO POR ACTA
@@ -430,6 +518,17 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
 #' @param acta_path La ruta al archivo PDF del acta.
 #' @return Una lista que contiene dataframes para `partido_info`, `goles`, `tarjetas`,
 #'   `alineacion_local`, etc., así como un `resumen_texto` y `nota_arbitro`.
+#' Procesa un único archivo PDF de un acta de partido.
+#'
+#' Esta es la función principal que orquesta todo el proceso para un acta:
+#' lee el PDF, extrae la información general del partido, llama a las funciones
+#' de parseo de alineaciones, goles y tarjetas, y finalmente compila todos los
+
+#' datos en una lista estructurada y un resumen de texto.
+#'
+#' @param acta_path La ruta al archivo PDF del acta.
+#' @return Una lista que contiene dataframes para `partido_info`, `goles`, `tarjetas`,
+#'   `alineacion_local`, etc., así como un `resumen_texto` y `nota_arbitro`.
 procesar_acta <- function(acta_path) {
   # Lectura y preparación inicial del texto del PDF.
   nombre_archivo <- basename(acta_path)
@@ -439,7 +538,7 @@ procesar_acta <- function(acta_path) {
   if (is.null(texto_acta) || nchar(texto_acta) == 0) stop("El PDF está vacío o no se pudo leer el texto.")
   
   # Extracción de la información principal del partido (competición, equipos, resultado).
-  regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+\\*?)"
+  regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+.*)"
   partido_info_match <- str_match(texto_acta, regex_principal)
   if (is.na(partido_info_match[1, 1])) {
     stop(paste("Información principal no encontrada en", nombre_archivo))
@@ -448,11 +547,15 @@ procesar_acta <- function(acta_path) {
   competicion_temporada <- str_trim(partido_info_match[, 3])
   equipo_local <- str_trim(partido_info_match[, 4])
   equipo_visitante <- str_trim(partido_info_match[, 5])
-  resultado_final_str <- partido_info_match[, 6]
+  resultado_final_str <- str_trim(str_split(partido_info_match[, 6], "\\n")[[1]][1])
   
-  # Detección de resultado oficial (marcado con *) y limpieza del marcador.
-  es_resultado_oficial <- str_detect(resultado_final_str, "\\*") && str_detect(tolower(texto_acta), "службен резултат")
-  resultado_limpio <- str_remove(resultado_final_str, "\\*")
+  # Detección de resultado oficial y de tanda de penaltis
+  es_resultado_oficial <- str_detect(resultado_final_str, "\\*") || str_detect(tolower(texto_acta), "службен резултат")
+  penales_match <- str_match(resultado_final_str, "PEN\\s*(\\d+):(\\d+)")
+  penales_local <- if (!is.na(penales_match[1,1])) as.integer(penales_match[1,2]) else NA_integer_
+  penales_visitante <- if (!is.na(penales_match[1,1])) as.integer(penales_match[1,3]) else NA_integer_
+  
+  resultado_limpio <- str_remove_all(resultado_final_str, "\\(PEN.*?\\)|\\*|\\(.*?\\)") %>% str_trim()
   goles_split <- as.integer(str_split(resultado_limpio, ":", simplify = TRUE))
   goles_local <- goles_split[1]
   goles_visitante <- goles_split[2]
@@ -513,7 +616,7 @@ procesar_acta <- function(acta_path) {
     }
   }
   
-  partido_df <- data.frame(id_partido, competicion_nombre, competicion_temporada, jornada, fecha, hora, local = equipo_local, visitante = equipo_visitante, goles_local, goles_visitante, es_resultado_oficial)
+  partido_df <- data.frame(id_partido, competicion_nombre, competicion_temporada, jornada, fecha, hora, local = equipo_local, visitante = equipo_visitante, goles_local, goles_visitante, penales_local, penales_visitante, es_resultado_oficial)
   
   pos_start_players <- str_locate(texto_acta, "Голови\\s+Ж Ц\\s+З")
   pos_end_players <- str_locate(texto_acta, "Шеф на стручен штаб|Резервни играчи|Официјални претставници")
@@ -576,6 +679,9 @@ procesar_acta <- function(acta_path) {
   tarjetas_partido_actual <- extraer_tarjetas(texto_acta, equipo_local, equipo_visitante, alineacion_local, alineacion_visitante)
   if(nrow(tarjetas_partido_actual) > 0) tarjetas_partido_actual$id_partido <- id_partido
   
+  penales_partido_actual <- extraer_tanda_penales(texto_acta, equipo_local, equipo_visitante, alineacion_local, alineacion_visitante)
+  if(nrow(penales_partido_actual) > 0) penales_partido_actual$id_partido <- id_partido
+  
   formatear_jugadoras <- function(df, tipo_jugadora) {
     if (is.null(df) || nrow(df) == 0) return(paste("  No se encontraron", tolower(tipo_jugadora), "s."))
     subset_df <- filter(df, tipo == tipo_jugadora)
@@ -599,11 +705,26 @@ procesar_acta <- function(acta_path) {
     apply(df_tarjetas, 1, function(t) paste0("  - Min ", formatear_minuto_partido(as.numeric(t['minuto'])), ": [", t['tipo'], "] para ", t['jugadora'], " (", t['equipo'], ") por '", t['motivo'], "'"))
   }
   
+  formatear_penales_texto <- function(df_penales) {
+    if (is.null(df_penales) || nrow(df_penales) == 0) return(NULL)
+    
+    lanzadores_local <- df_penales %>% filter(equipo == equipo_local)
+    lanzadores_visitante <- df_penales %>% filter(equipo == equipo_visitante)
+    
+    textos_local <- apply(lanzadores_local, 1, function(p) {
+      paste0("    ", if(p['resultado_penal'] == "Gol") "✓" else "✕", " ", p['jugadora'], " (", p['dorsal'], ")")
+    })
+    
+    textos_visitante <- apply(lanzadores_visitante, 1, function(p) {
+      paste0("    ", if(p['resultado_penal'] == "Gol") "✓" else "✕", " ", p['jugadora'], " (", p['dorsal'], ")")
+    })
+    
+    c(paste("  ", equipo_local), textos_local, paste("  ", equipo_visitante), textos_visitante)
+  }
+  
   if (!is.null(cambios_local_df) && nrow(cambios_local_df) > 0) cambios_local_df <- cambios_local_df[order(cambios_local_df$minuto), ]
   if (!is.null(cambios_visitante_df) && nrow(cambios_visitante_df) > 0) cambios_visitante_df <- cambios_visitante_df[order(cambios_visitante_df$minuto), ]
   
-  # --- INICIO DE LA CORRECCIÓN ---
-  # Se reconstruyen las cadenas de texto de los árbitros usando las nuevas variables.
   arbitro_principal_str <- if (!is.na(arbitro_principal_ciudad)) paste0(arbitro_principal_nombre, " (", arbitro_principal_ciudad, ")") else arbitro_principal_nombre
   arbitro_asist_1_str <- if (!is.na(arbitro_asist_1_ciudad)) paste0(arbitro_asist_1_nombre, " (", arbitro_asist_1_ciudad, ")") else arbitro_asist_1_nombre
   arbitro_asist_2_str <- if (!is.na(arbitro_asist_2_ciudad)) paste0(arbitro_asist_2_nombre, " (", arbitro_asist_2_ciudad, ")") else arbitro_asist_2_nombre
@@ -615,6 +736,7 @@ procesar_acta <- function(acta_path) {
     paste("Estadio:", estadio), 
     paste("Resultado final:", resultado_final_str, if(es_resultado_oficial) "(Resultado oficial)" else ""),
     "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
+    if (!is.na(penales_local)) c("\n--- TANDA DE PENALTIS ---", formatear_penales_texto(penales_partido_actual)),
     "\n--- SANCIONES (TARJETAS) ---", formatear_tarjetas_texto(tarjetas_partido_actual),
     "\n--- ÁRBITRAS Y OFICIALES ---", 
     paste("  Árbitro/a principal:", arbitro_principal_str), 
@@ -627,12 +749,12 @@ procesar_acta <- function(acta_path) {
     "  Suplentes:", formatear_jugadoras(alineacion_visitante, "Suplente"), "  Cambios:", if(!is.null(cambios_visitante_df) && nrow(cambios_visitante_df) > 0) cambios_visitante_df$texto else "  No se registraron cambios.",
     "\n======================================================================\n"
   )
-  # --- FIN DE LA CORRECCIÓN ---
   
   return(list(
     partido_info = partido_df, 
     goles = goles_partido_actual, 
     tarjetas = tarjetas_partido_actual, 
+    penales = penales_partido_actual,
     resumen_texto = unlist(resumen_actual_lines), 
     alineacion_local = alineacion_local, 
     alineacion_visitante = alineacion_visitante, 

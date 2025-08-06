@@ -128,3 +128,5 @@ password_prompt,Внесете ја лозинката,Futni fjalëkalimin,Intro
 access_denied_header,Пристапот е одбиен,Qasja u refuzua,Acceso denegado,Access Denied
 access_denied_body,Процесот е откажан од страна на корисникот,Procesi u anulua nga përdoruesi,Proceso cancelado por el usuario,Process canceled by user
 password_wrong,Погрешна лозинка. Обидете се повторно,Fjalëkalim i pasaktë. Provoni përsëri,Contraseña incorrecta. Inténtelo de nuevo,Wrong password. Try again
+penalties_title,Танда на пенали,Gjuajtjet e penalltive,Tanda de penaltis,Penalty shootout
+penalties_short,ПЕН,PEN,PEN,PSO
