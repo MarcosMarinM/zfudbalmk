@@ -663,6 +663,29 @@ if (file.exists(ruta_traducciones_comp)) {
 ##  9. PROCESAMIENTO Y TRANSFORMACIÓN DE DATOS PRINCIPALES
 ## -------------------------------------------------------------------------- ##
 
+### 9.0. Asignar Duración de Partido por Competición ----
+message("Асигнирање на времетраење на натпреварот според натпреварување...")
+
+# Se crea una nueva columna 'duracion_partido' en el dataframe principal.
+# Se utiliza case_when para aplicar las reglas de duración de forma condicional.
+# El valor por defecto es 90 minutos para cualquier otra competición.
+partidos_df <- partidos_df %>%
+  mutate(
+    duracion_partido = case_when(
+      str_detect(tolower(competicion_nombre), "младинска") ~ 80, # Partidos de 80 mins
+      str_detect(tolower(competicion_nombre), "кадетска")  ~ 60, # Partidos de 60 mins
+      TRUE                                                  ~ 90  # Default para el resto
+    )
+  )
+
+# Imprimimos un resumen para verificar que se aplicaron las duraciones.
+message("Резиме на времетраење на натпревари:")
+print(
+  partidos_df %>%
+    count(competicion_nombre, duracion_partido) %>%
+    as.data.frame()
+)
+
 ### 9.1. Aplicar correcciones y reordenar nombres ----
 message("Примена на корекции и преуредување на имиња...")
 
@@ -732,19 +755,32 @@ apariciones_df_raw <- map_dfr(resultados_exitosos, ~bind_rows(
 )) %>% mutate(nombre = str_squish(nombre))
 
 minutos_df_raw <- map_dfr(resultados_exitosos, function(res) {
-  if(is.null(res)) return(NULL); id_p <- res$partido_info$id_partido
-  calcular_minutos_equipo <- function(alineacion, cambios) {
+  if(is.null(res)) return(NULL)
+  id_p <- res$partido_info$id_partido
+  
+  # Obtenemos la duración correcta para este partido desde el dataframe modificado
+  duracion <- (partidos_df %>% filter(id_partido == id_p) %>% pull(duracion_partido))[1]
+  # Si por alguna razón no se encuentra, usamos 90 como fallback seguro.
+  if (length(duracion) == 0 || is.na(duracion)) { duracion <- 90 }
+  
+  calcular_minutos_equipo <- function(alineacion, cambios, duracion_partido) {
     if(is.null(alineacion) || nrow(alineacion) == 0) return(NULL)
-    jugadoras_con_minutos <- alineacion %>% mutate(min_entra = if_else(tipo == "Titular", 0, NA_real_), min_sale = if_else(tipo == "Titular", 90, 0))
+    # Usamos duracion_partido en lugar de '90'
+    jugadoras_con_minutos <- alineacion %>% mutate(min_entra = if_else(tipo == "Titular", 0, NA_real_), min_sale = if_else(tipo == "Titular", duracion_partido, 0))
     if (!is.null(cambios) && nrow(cambios) > 0) {
       cambios_procesados <- cambios %>% mutate(d_entra = as.numeric(str_match(texto, "Entra .*?\\((\\d+)\\)")[, 2]), d_sale  = as.numeric(str_match(texto, "por .*?\\((\\d+)\\)")[, 2])) %>% select(minuto, d_entra, d_sale) %>% filter(!is.na(d_entra) & !is.na(d_sale))
       for (i in 1:nrow(cambios_procesados)) {
         cambio <- cambios_procesados[i, ]; jugadoras_con_minutos <- jugadoras_con_minutos %>% mutate(min_sale = if_else(dorsal == cambio$d_sale, as.numeric(cambio$minuto), min_sale), min_entra = if_else(dorsal == cambio$d_entra, as.numeric(cambio$minuto), min_entra))
       }
     }
-    jugadoras_con_minutos %>% mutate(min_sale = if_else(!is.na(min_entra) & tipo == "Suplente" & min_sale == 0, 90, min_sale), minutos_jugados = if_else(is.na(min_entra), 0, min_sale - min_entra)) %>% mutate(minutos_jugados = pmax(0, minutos_jugados))
+    # Usamos duracion_partido aquí también para los suplentes no sustituidos
+    jugadoras_con_minutos %>% mutate(min_sale = if_else(!is.na(min_entra) & tipo == "Suplente" & min_sale == 0, duracion_partido, min_sale), minutos_jugados = if_else(is.na(min_entra), 0, min_sale - min_entra)) %>% mutate(minutos_jugados = pmax(0, minutos_jugados))
   }
-  min_local <- calcular_minutos_equipo(res$alineacion_local, res$cambios_local); min_visitante <- calcular_minutos_equipo(res$alineacion_visitante, res$cambios_visitante)
+  
+  # Pasamos la duración correcta a la función
+  min_local <- calcular_minutos_equipo(res$alineacion_local, res$cambios_local, duracion)
+  min_visitante <- calcular_minutos_equipo(res$alineacion_visitante, res$cambios_visitante, duracion)
+  
   bind_rows(min_local, min_visitante) %>% mutate(id_partido = id_p)
 })
 
@@ -1099,14 +1135,62 @@ stats_clasificacion_por_comp_df <- competiciones_unicas_df %>%
   filter(!str_detect(tolower(competicion_nombre), "куп")) %>%
   group_by(competicion_id, competicion_nombre, competicion_temporada) %>%
   reframe({
-    partidos_comp <- partidos_df %>% filter(competicion_nombre == first(.$competicion_nombre), competicion_temporada == first(.$competicion_temporada))
-    if (nrow(partidos_comp) == 0) return(tibble())
-    locales <- partidos_comp %>% select(team = local, GF = goles_local, GA = goles_visitante)
-    visitantes <- partidos_comp %>% select(team = visitante, GF = goles_visitante, GA = goles_local)
+    
+    # ======================================================================== #
+    # ==                            ¡AQUÍ ESTÁ LA CORRECCIÓN!               == #
+    # ======================================================================== #
+    # Se utiliza cur_group() para obtener los valores exactos del grupo actual.
+    # Esto evita mezclar partidos de diferentes temporadas que tienen el mismo
+    # nombre de competición.
+    grupo_actual <- cur_group()
+    partidos_comp_raw <- partidos_df %>% 
+      filter(competicion_nombre == grupo_actual$competicion_nombre, 
+             competicion_temporada == grupo_actual$competicion_temporada)
+    
+    if (nrow(partidos_comp_raw) == 0) return(tibble())
+    
+    # --- LÓGICA DE CORRECCIÓN DE GOLES ---
+    # (El resto del código de esta sección no necesita cambios)
+    partidos_comp <- partidos_comp_raw %>%
+      mutate(
+        goles_local_calc = goles_local,
+        goles_visitante_calc = goles_visitante,
+        goles_local_calc = case_when(
+          isTRUE(es_resultado_oficial) & goles_local > goles_visitante ~ 3,
+          isTRUE(es_resultado_oficial) & goles_visitante > goles_local ~ 0,
+          isTRUE(es_resultado_oficial) & goles_local == goles_visitante ~ 3,
+          TRUE ~ goles_local_calc
+        ),
+        goles_visitante_calc = case_when(
+          isTRUE(es_resultado_oficial) & goles_local > goles_visitante ~ 0,
+          isTRUE(es_resultado_oficial) & goles_visitante > goles_local ~ 3,
+          isTRUE(es_resultado_oficial) & goles_local == goles_visitante ~ 0,
+          TRUE ~ goles_visitante_calc
+        )
+      )
+    
+    locales <- partidos_comp %>% 
+      select(team = local, GF = goles_local_calc, GA = goles_visitante_calc)
+    
+    visitantes <- partidos_comp %>% 
+      select(team = visitante, GF = goles_visitante_calc, GA = goles_local_calc)
+    
     bind_rows(locales, visitantes) %>%
-      mutate(Pts = case_when(GF > GA ~ 3, GF < GA ~ 0, TRUE ~ 1), result = case_when(GF > GA ~ "W", GF < GA ~ "L", TRUE ~ "D")) %>%
+      mutate(
+        Pts = case_when(GF > GA ~ 3, GF < GA ~ 0, TRUE ~ 1),
+        result = case_when(GF > GA ~ "W", GF < GA ~ "L", TRUE ~ "D")
+      ) %>%
       group_by(team) %>%
-      summarise(P = n(), Pts = sum(Pts), W = sum(result == "W"), D = sum(result == "D"), L = sum(result == "L"), GF = sum(GF), GA = sum(GA), .groups = 'drop') %>%
+      summarise(
+        P = n(),
+        Pts = sum(Pts, na.rm = TRUE),
+        W = sum(result == "W", na.rm = TRUE),
+        D = sum(result == "D", na.rm = TRUE),
+        L = sum(result == "L", na.rm = TRUE),
+        GF = sum(GF, na.rm = TRUE),
+        GA = sum(GA, na.rm = TRUE),
+        .groups = 'drop'
+      ) %>%
       mutate(GD = GF - GA) %>%
       arrange(desc(Pts), desc(GD), desc(GF)) %>%
       mutate(Pos = row_number())
@@ -1166,11 +1250,10 @@ stats_ga <- porteras_apariciones_df %>%
 
 # Paso 2: Calcular las Porterías a Cero (CS) de forma explícita y robusta
 stats_cs <- porteras_apariciones_df %>%
-  filter(minutos_jugados >= 90) %>%
-  # #################################################################### #
-  # ##       AQUÍ ESTÁ LA CORRECCIÓN: Se seleccionan solo las columnas necesarias de partidos_df      ##
-  # #################################################################### #
-  left_join(partidos_df %>% select(id_partido, local, visitante, goles_local, goles_visitante), by = "id_partido") %>%
+  # Unimos con partidos_df para obtener la duración de cada partido
+  left_join(partidos_df %>% select(id_partido, duracion_partido, local, visitante, goles_local, goles_visitante), by = "id_partido") %>%
+  # Una CS requiere jugar el partido completo (minutos >= duración)
+  filter(minutos_jugados >= duracion_partido) %>%
   mutate(goles_recibidos_partido = if_else(local == equipo, goles_visitante, goles_local)) %>%
   filter(goles_recibidos_partido == 0) %>%
   group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
@@ -1812,7 +1895,12 @@ if (hubo_cambios) {
       nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"); save_html(crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_goleadoras))
       lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_goleadoras, class="menu-button", t("scorers_title"))
       
-      minutos_totales_equipo_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>% group_by(equipo = local) %>% summarise(n=n()) %>% bind_rows(partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>% group_by(equipo = visitante) %>% summarise(n=n())) %>% group_by(equipo) %>% summarise(minutos_totales_posibles = sum(n) * 90)
+      minutos_totales_equipo_comp <- partidos_df %>% 
+        filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada) %>%
+        select(local, visitante, duracion_partido) %>%
+        pivot_longer(cols = c(local, visitante), names_to = "tipo_equipo", values_to = "equipo") %>%
+        group_by(equipo) %>%
+        summarise(minutos_totales_posibles = sum(duracion_partido, na.rm = TRUE), .groups = 'drop')
       tabla_porteras_comp_raw <- stats_porteras_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% left_join(entidades_df_lang, by = c("TeamName_mk" = "original_name")) %>% left_join(minutos_totales_equipo_comp, by = c("TeamName_mk" = "equipo")) %>% mutate(pct_minutos = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Minutes / minutos_totales_posibles) * 100, 0), group = if_else(pct_minutos >= 50, "mas_50", "menos_50")) %>% select(id, PlayerName = !!player_name_col_sym, TeamName = current_lang_name, TeamName_mk, GA90, GA, Minutes, CS, group)
       if (nrow(tabla_porteras_comp_raw) > 0) {
         porteras_mas_50 <- tabla_porteras_comp_raw %>% filter(group == "mas_50") %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number()); porteras_menos_50 <- tabla_porteras_comp_raw %>% filter(group == "menos_50", Minutes > 0) %>% arrange(GA90, desc(CS)) %>% mutate(Pos = row_number())
@@ -1822,14 +1910,44 @@ if (hubo_cambios) {
         lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_porteras, class="menu-button", t("goalkeepers_title"))
       }
       
-      partidos_en_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada)
-      minutos_totales_equipo_comp <- bind_rows(partidos_en_comp %>% count(TeamName_mk = local), partidos_en_comp %>% count(TeamName_mk = visitante)) %>% group_by(TeamName_mk) %>% summarise(P = sum(n), .groups = 'drop') %>% mutate(minutos_totales_posibles = P * 90) %>% select(TeamName_mk, minutos_totales_posibles)
-      tabla_final_defensas <- stats_trios_defensivos_df %>% filter(competicion_id == comp_id) %>% left_join(minutos_totales_equipo_comp, by = "TeamName_mk") %>% filter(!is.na(minutos_totales_posibles), MinutesTogether >= (minutos_totales_posibles * 0.5)) %>% group_by(TeamName_mk) %>% arrange(GA90_Together, GA_Together, desc(MinutesTogether)) %>% slice_head(n = 1) %>% ungroup() %>% left_join(entidades_df_lang, by = c("TeamName_mk" = "original_name")) %>% mutate(TeamName = current_lang_name) %>% filter(!is.na(trio_key)) %>% rowwise() %>% mutate(TrioNames = paste(sapply(strsplit(trio_key, "-")[[1]], function(id_jug) { name <- (jugadoras_stats_df %>% filter(id == id_jug) %>% pull(!!player_name_col_sym)); if(length(name)==0) id_jug else name }), collapse = " - ")) %>% ungroup() %>% arrange(GA90_Together, GA_Together, desc(MinutesTogether)) %>% mutate(Pos = row_number()) %>% select(Pos, TrioNames, TeamName, TeamName_mk, MinutesTogether, GA_Together, GA90_Together, trio_key)
-      
-      if (nrow(tabla_final_defensas) > 0) {
-        contenido_defensas <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("defensive_trio_title"), "-", comp_nombre_current_lang)), tags$p(style="text-align:center; font-style:italic; color:#555;", t("defensive_trio_subtitle")), tags$table(class = "main-summary-table", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("defensive_trio_header_trio")), tags$th(t("team_type")), tags$th(t("defensive_trio_header_minutes")), tags$th(t("defensive_trio_header_ga")), tags$th(t("defensive_trio_header_ga90")))), tags$tbody(pmap(tabla_final_defensas, function(...) { fila <- list(...); nombre_equipo <- fila$TeamName; nombre_equipo_mk <- fila$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$tr(tags$td(fila$Pos), tags$td(fila$TrioNames), tags$td(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), onclick="event.stopPropagation();", nombre_equipo)), tags$td(round(fila$MinutesTogether)), tags$td(fila$GA_Together), tags$td(format(round(fila$GA90_Together, 2), nsmall = 2))) }))))
-        nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html"); save_html(crear_pagina_html(contenido_defensas, paste(t("defensive_trio_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_defensas))
-        lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_defensas, class="menu-button", t("defensive_trio_title"))
+      if (!str_detect(tolower(comp_info$competicion_nombre), "младинска|кадетска")) {
+        
+        # El código original para calcular y mostrar los tríos va aquí dentro.
+        partidos_en_comp <- partidos_df %>% filter(competicion_nombre == comp_info$competicion_nombre, competicion_temporada == comp_info$competicion_temporada)
+        minutos_totales_equipo_comp <- bind_rows(partidos_en_comp %>% count(TeamName_mk = local), partidos_en_comp %>% count(TeamName_mk = visitante)) %>% group_by(TeamName_mk) %>% summarise(P = sum(n), .groups = 'drop') %>% mutate(minutos_totales_posibles = P * 90) %>% select(TeamName_mk, minutos_totales_posibles)
+        
+        # Usamos la versión corregida del cálculo de TrioNames para evitar el error anterior,
+        # por si decides reactivar esto en el futuro.
+        tabla_final_defensas <- stats_trios_defensivos_df %>%
+          filter(competicion_id == comp_id, !is.na(trio_key)) %>%
+          left_join(minutos_totales_equipo_comp, by = "TeamName_mk") %>%
+          filter(!is.na(minutos_totales_posibles), MinutesTogether >= (minutos_totales_posibles * 0.5)) %>%
+          group_by(TeamName_mk) %>%
+          arrange(GA90_Together, GA_Together, desc(MinutesTogether)) %>%
+          slice_head(n = 1) %>%
+          ungroup() %>%
+          left_join(entidades_df_lang, by = c("TeamName_mk" = "original_name")) %>%
+          mutate(TeamName = current_lang_name) %>%
+          rowwise() %>%
+          mutate(TrioNames = {
+            ids_del_trio <- strsplit(trio_key, "-")[[1]]
+            nombres_encontrados <- jugadoras_stats_df %>% filter(id %in% ids_del_trio) %>% select(id, PlayerName = !!player_name_col_sym)
+            nombres_ordenados <- sapply(ids_del_trio, function(id_actual) {
+              nombre <- (nombres_encontrados %>% filter(id == id_actual) %>% pull(PlayerName))[1]
+              if (is.na(nombre)) id_actual else nombre
+            })
+            paste(nombres_ordenados, collapse = " - ")
+          }) %>%
+          ungroup() %>%
+          arrange(GA90_Together, GA_Together, desc(MinutesTogether)) %>%
+          mutate(Pos = row_number()) %>%
+          select(Pos, TrioNames, TeamName, TeamName_mk, MinutesTogether, GA_Together, GA90_Together, trio_key)
+        
+        if (nrow(tabla_final_defensas) > 0) {
+          contenido_defensas <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("defensive_trio_title"), "-", comp_nombre_current_lang)), tags$p(style="text-align:center; font-style:italic; color:#555;", t("defensive_trio_subtitle")), tags$table(class = "main-summary-table", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("defensive_trio_header_trio")), tags$th(t("team_type")), tags$th(t("defensive_trio_header_minutes")), tags$th(t("defensive_trio_header_ga")), tags$th(t("defensive_trio_header_ga90")))), tags$tbody(pmap(tabla_final_defensas, function(...) { fila <- list(...); nombre_equipo <- fila$TeamName; nombre_equipo_mk <- fila$TeamName_mk; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$tr(tags$td(fila$Pos), tags$td(fila$TrioNames), tags$td(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), onclick="event.stopPropagation();", nombre_equipo)), tags$td(round(fila$MinutesTogether)), tags$td(fila$GA_Together), tags$td(format(round(fila$GA90_Together, 2), nsmall = 2))) }))))
+          nombre_archivo_defensas <- paste0(comp_id, "_defanzivno_trio.html"); save_html(crear_pagina_html(contenido_defensas, paste(t("defensive_trio_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_defensas))
+          lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_defensas, class="menu-button", t("defensive_trio_title"))
+        }
       }
       
       tabla_sanciones_comp <- stats_sanciones_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(!is.na(!!player_name_col_sym)) %>% select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, YellowCards, RedCards)

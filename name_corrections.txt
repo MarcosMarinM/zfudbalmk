@@ -60,4 +60,5 @@ original_mk,latin_sq,latin_es,latin_en
 Тцхуиссе Гхоуанси,Tchuisse Ghouansi,Tchuisse Ghouansi,Tchuisse Ghouansi
 Тчеури Гоја,Tcheury Goya, Tcheury Goya, Tcheury Goya
 Улза Максути,Yllza Maksuti,Yllza Maksuti,Yllza Maksuti
+Уртина Шемшедини,Urtina Shemshedini,Urtina Shemshedini,Urtina Shemshedini
 Џељане Шаќири,Xhelane Shaqiri,Xhelane Shaqiri,Xhelane Shaqiri
