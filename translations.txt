@@ -24,7 +24,7 @@ team_type,Тим,Ekip,Equipo,Team
 referee_type,Судија,Gjyqtar,Árbitao,Referee
 stadium_type,Стадион,Stadium,Estadio,Stadium
 competition_type,Натпреварување,Garë,Competición,Competition
-site_title,Фудбалски портал МК,Portali i futbollit MK,Portal de fútbol MK,MK Football Portal
+site_title,@zfudbalmk,@zfudbalmk,@zfudbalmk,@zfudbalmk
 no_competitions_found,Не се пронајдени натпреварувања.,Nuk u gjetën gara.,No se encontraron competiciones.,No competitions found.
 round_prefix,Коло,Raundi,Jornada,Round
 standings_no_data_message,Нема обработени валидни натпревари.,Nuk ka ndeshje të vlefshme të përpunuara.,No hay partidos válidos procesados.,No valid matches have been processed.

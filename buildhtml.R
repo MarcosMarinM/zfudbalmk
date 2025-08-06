@@ -17,6 +17,13 @@ pacman::p_load(
   dplyr, tidyr, purrr, htmltools, stringr, jsonlite
 )
 
+# ============================================================================ #
+# ==           INTERRUPTOR DE PROTECCIÓN POR CONTRASEÑA          == #
+# ============================================================================ #
+# Cambia a TRUE para generar el sitio web con una contraseña de acceso.
+# Cambia a FALSE para generar un sitio web de acceso público y sin contraseña.
+PROTEGER_CON_CONTRASENA <- FALSE 
+# ============================================================================ #
 
 ###  6.2. Gestión de idiomas y traducciones ----
 
@@ -1017,7 +1024,7 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
         str_replace_all(tolower(PlayerName_mk), map_transliteration_player) %>% str_to_title()
       ))
   }
-
+  
   if (!is.null(mapeo_completo_df)) {
     jugadoras_stats_df <- jugadoras_stats_temp %>% left_join(mapeo_completo_df, by = "clave_lower")
   } else {
@@ -1394,6 +1401,8 @@ th { background-color: #f2f2f2; }
 .alineacion-header h3 a { color: #8B0000; }
 )"
 
+writeLines(estilo_css, file.path(RUTA_ASSETS_COMPARTIDOS, "style.css"))
+
 
 ### 12.2. Guardar script de funcionalidades (script.js) ----
 script_js <- r"(
@@ -1641,12 +1650,33 @@ if (hubo_cambios) {
     writeLines(search_data_json_lang, ruta_json_salida, useBytes = TRUE)
     message("     > Índice de búsqueda guardado en: ", basename(ruta_json_salida))
     
-    script_contraseña_lang <- tags$script(HTML(
-      sprintf(
-        "(function() { var p = 'FuckYouFFM'; var s = sessionStorage; var d = document; if (s.getItem('zfudbalmk-password-ok') === p) return; var i; var m = '%s'; while (true) { i = prompt(m, ''); if (i === p) { s.setItem('zfudbalmk-password-ok', i); break; } if (i === null) { d.body.innerHTML = '<div style=\"text-align:center; padding: 50px; font-family: sans-serif;\"><h1>%s</h1><p>%s</p></div>'; throw new Error('Access denied'); } m = '%s'; } })();",
-        t("password_prompt"), t("access_denied_header"), t("access_denied_body"), t("password_wrong")
-      )
-    ))
+    # ========================================================================== #
+    # ==  LÓGICA CONDICIONAL PARA LA CONTRASEÑA (¡SECCIÓN MODIFICADA!)         == #
+    # ========================================================================== #
+    if (PROTEGER_CON_CONTRASENA) {
+      # Si la protección está ACTIVADA, se genera el script de JavaScript.
+      # AVISO: Esta contraseña es visible en el código fuente del HTML. Es una 
+      # barrera casual, no seguridad de alto nivel.
+      la_contrasena <- "secreto123" # <-- ¡Puedes cambiar la contraseña aquí!
+      
+      message("     > Protección por contraseña ACTIVADA.")
+      script_contraseña_lang <- tags$script(HTML(
+        sprintf(
+          # La lógica JS no ha cambiado, solo se usa la variable 'la_contrasena'.
+          "(function() { var p = '%s'; var s = sessionStorage; var d = document; if (s.getItem('zfudbalmk-password-ok') === p) return; var i; var m = '%s'; while (true) { i = prompt(m, ''); if (i === p) { s.setItem('zfudbalmk-password-ok', i); break; } if (i === null) { d.body.innerHTML = '<div style=\"text-align:center; padding: 50px; font-family: sans-serif;\"><h1>%s</h1><p>%s</p></div>'; throw new Error('Access denied'); } m = '%s'; } })();",
+          la_contrasena, # Se inserta la contraseña en el script
+          t("password_prompt"), 
+          t("access_denied_header"), 
+          t("access_denied_body"), 
+          t("password_wrong")
+        )
+      ))
+    } else {
+      # Si la protección está DESACTIVADA, el script es un objeto NULL.
+      # htmltools no renderizará NADA en el HTML final.
+      message("     > Protección por contraseña DESACTIVADA.")
+      script_contraseña_lang <- NULL
+    }
     
     # --- 2. Página de inicio (portal) ---
     message("   > Generando index.html...")
@@ -1661,7 +1691,7 @@ if (hubo_cambios) {
                } else { tags$p(t("no_competitions_found")) }
       )
     )
-    # Se elimina el argumento `search_data_json` de todas las llamadas a `crear_pagina_html`.
+    # Se pasa 'script_contraseña_lang' que será el script o NULL dependiendo del interruptor.
     pagina_portal_final <- crear_pagina_html(
       contenido_principal = contenido_portal, titulo_pagina = t("site_title"), path_to_root_dir = "..",
       script_contraseña = script_contraseña_lang
@@ -1838,7 +1868,7 @@ if (hubo_cambios) {
       alineacion_partido_lang <- apariciones_df %>% filter(id_partido == id_p) %>% left_join(jugadoras_lang_df, by="id")
       render_equipo_html <- function(df_equipo, goles_del_partido, tarjetas_del_partido) { if (is.null(df_equipo) || nrow(df_equipo) == 0) { return(tags$p(t("match_no_data"))) }; starters <- df_equipo %>% filter(tipo == "Titular"); subs <- df_equipo %>% filter(tipo == "Suplente"); crear_lista_jugadoras <- function(df_j) { if (nrow(df_j) == 0) { return(tags$p(style = "color:#777;", t("match_no_players"))) }; tags$ul(pmap(df_j, function(id, PlayerName, dorsal, tipo, es_portera, es_capitana, min_entra, min_sale, minutos_jugados, ...) { eventos_html <- tagList(); goles_jugadora <- goles_del_partido %>% filter(id == !!id, tipo == "Normal"); if (nrow(goles_jugadora) > 0) { walk(1:nrow(goles_jugadora), function(g) { gol <- goles_jugadora[g,]; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event goal", HTML(paste0("⚽︎ ", formatear_minuto_partido(gol$minuto), "'")))) }) }; tarjetas_jugadora <- tarjetas_del_partido %>% filter(id == !!id); if (nrow(tarjetas_jugadora) > 0) { walk(1:nrow(tarjetas_jugadora), function(c) { tarjeta <- tarjetas_jugadora[c,]; card_span <- tags$span(class = if (tarjeta$tipo == "Amarilla") "card-yellow" else "card-red"); eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event", card_span, HTML(paste0("︎ ", formatear_minuto_partido(tarjeta$minuto), "'")))) }) }; if (!is.na(min_entra) && tipo == "Suplente") { eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-in", paste0("↑", min_entra, "'"))) }; if (!is.na(min_sale) && min_sale < 90 && !is.na(minutos_jugados) && minutos_jugados > 0) { eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-out", paste0("↓", min_sale, "'"))) }; icono_p <- if (isTRUE(es_portera)) "🧤" else ""; icono_c <- if (isTRUE(es_capitana)) "(C)" else ""; tags$li(paste0(dorsal, ". "), tags$a(href = file.path(path_rel_jugadoras, paste0(id, ".html")), PlayerName), icono_p, icono_c, eventos_html) })) }; tagList(tags$h4(t("match_starting_lineup")), crear_lista_jugadoras(starters), tags$h4(t("match_substitutes")), crear_lista_jugadoras(subs)) }
       render_penales_html <- function(df_equipo) { if(is.null(df_equipo) || nrow(df_equipo) == 0) { return(NULL) }; tags$ul(pmap(df_equipo, function(PlayerName, id, dorsal, resultado_penal, ...) { tags$li(if(resultado_penal=="Gol") "✅" else "❌", " ", if(is.na(PlayerName)) "NA" else tags$a(href=file.path(path_rel_jugadoras, paste0(id, ".html")), PlayerName), paste0(" (", dorsal, ")")) })) }
-    
+      
       contenido_partido <- tagList(
         crear_botones_navegacion(path_to_lang_root = ".."),
         tags$h2(paste(local_name, "vs", visitante_name)),
@@ -1864,7 +1894,7 @@ if (hubo_cambios) {
         
         tags$h3(t("timeline_title")),
         tags$ul(class = "timeline", if (exists("cronologia") && nrow(cronologia) > 0) { map(1:nrow(cronologia), function(c) { e <- cronologia[c,]; tags$li(HTML(paste0("<span class='icon'>", e$icono, "</span>")), paste0(formatear_minuto_partido(e$minuto), "' - "), HTML(e$texto_evento)) }) } else { tags$li(t("match_timeline_no_events")) }),
-      
+        
         if (!is.na(partido_info$penales_local) && nrow(penales_partido) > 0) {
           tagList(
             tags$h3(t("penalties_title")),

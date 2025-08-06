@@ -3,7 +3,6 @@ let searchData = [];
 
 document.addEventListener('DOMContentLoaded', initializeSearch);
 
-// --- INICIO DE LA CORRECCIÓN ---
 // Se hace la lógica de rutas más robusta para que funcione
 // tanto en el servidor local de `servr` como en GitHub Pages.
 function getSiteBasePath() {
@@ -29,7 +28,6 @@ function getCurrentLanguageFromPath() {
   if (langAttr) return langAttr;
   return 'mk';
 }
-// --- FIN DE LA CORRECCIÓN ---
 
 function initializeSearch() {
   const lang = getCurrentLanguageFromPath();
