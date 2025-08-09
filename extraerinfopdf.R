@@ -218,8 +218,39 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
       split_col <- split_col - 1
     }
   }
-  lineas_local <- str_sub(lineas_raw_originales, 1, split_col - 1)
-  lineas_visitante <- str_sub(lineas_raw_originales, split_col, -1)
+  
+  # --- INICIO DE LA MODIFICACIÓN ---
+  # En lugar de un corte único y rígido, iteramos por cada línea para aplicar un
+  # ajuste fino si se detecta que el corte parte un número por la mitad.
+  lineas_divididas <- map(lineas_raw_originales, function(linea) {
+    # Por defecto, usamos el punto de corte global calculado.
+    split_col_linea <- split_col
+    
+    # Se aplica la regla de corrección: si estamos cortando un número en dos...
+    # (Comprobamos que el carácter ANTES del corte y EN el corte son dígitos).
+    # Añadimos una comprobación para no salirnos de los límites de la cadena.
+    if (split_col_linea > 1 && nchar(linea) >= split_col_linea) {
+      char_antes <- str_sub(linea, split_col_linea - 1, split_col_linea - 1)
+      char_en <- str_sub(linea, split_col_linea, split_col_linea)
+      
+      # Si ambos caracteres son dígitos, movemos el punto de corte un
+      # carácter a la izquierda para esta línea específica.
+      if (str_detect(char_antes, "\\d") && str_detect(char_en, "\\d")) {
+        split_col_linea <- split_col_linea - 1
+      }
+    }
+    
+    # Se realiza el corte para esta línea con el punto de corte (original o ajustado).
+    list(
+      local = str_sub(linea, 1, split_col_linea - 1),
+      visitante = str_sub(linea, split_col_linea, -1)
+    )
+  })
+  
+  # Reconstruimos los vectores de líneas locales y visitantes a partir de la lista.
+  lineas_local <- map_chr(lineas_divididas, "local")
+  lineas_visitante <- map_chr(lineas_divididas, "visitante")
+  # --- FIN DE LA MODIFICACIÓN ---
   
   # Función interna para extraer datos de una columna de texto.
   extraer_de_columna <- function(lineas_columna, equipo_tag) {
@@ -993,7 +1024,7 @@ if (!is.null(tarjetas_df) && nrow(tarjetas_df) > 0) {
 ### 5.4. Escritura del archivo de salida ----
 
 # Generación del archivo de texto final con todos los resúmenes y tablas.
-ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_liga_futbol_R_final.txt")
+ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_completo.txt")
 tryCatch({
   # Se recopilan todos los resúmenes de texto de cada partido.
   resumenes_completos <- unlist(purrr::map(resultados_exitosos, "resumen_texto"))
