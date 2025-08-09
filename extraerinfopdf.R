@@ -672,10 +672,15 @@ procesar_acta <- function(acta_path) {
   linea_pen_ag_full <- str_extract(texto_acta, "Пен/АГ[^\n]+")
   if (!is.na(linea_resultados_full) && !is.na(linea_goleadores_full)) {
     resultados_parciales <- str_split(str_trim(str_match(linea_resultados_full, "Резултат\\s+(.*)")[, 2]), "\\s+")[[1]]
-    goleadores_minutos_nums <- as.integer(str_split(str_trim(str_match(linea_goleadores_full, "Стрелец/Мин\\s+(.*)")[, 2]), "\\s+")[[1]])
+    
+    # ---------- INICIO DE LA MODIFICACIÓN CLAVE ----------
+    # Se extrae el texto de goleadores/minutos sin convertirlo a número aún.
+    goleadores_minutos_raw <- str_split(str_trim(str_match(linea_goleadores_full, "Стрелец/Мин\\s+(.*)")[, 2]), "\\s+")[[1]]
+    # ---------- FIN DE LA MODIFICACIÓN CLAVE ----------
+    
     es_autogol <- rep(FALSE, length(resultados_parciales))
     if (!is.na(linea_pen_ag_full)) {
-      pos_goleadores_abs <- str_locate_all(linea_goleadores_full, "\\b\\d{1,2}\\s+\\d{1,2}\\b")[[1]]
+      pos_goleadores_abs <- str_locate_all(linea_goleadores_full, "\\b\\d{1,2}\\s+(\\d{1,3}|[Xx])\\b")[[1]]
       pos_ag_todas_abs <- str_locate_all(linea_pen_ag_full, "АГ")[[1]]
       pos_header_ag <- str_locate(linea_pen_ag_full, "Пен/АГ")
       pos_ag_validas_abs <- pos_ag_todas_abs[pos_ag_todas_abs[, "start"] > pos_header_ag[, "end"], , drop = FALSE]
@@ -691,9 +696,22 @@ procesar_acta <- function(acta_path) {
     }
     resultados_previo <- c(0, 0)
     for (i in 1:length(resultados_parciales)) {
-      if (any(is.na(goleadores_minutos_nums)) || (i * 2) > length(goleadores_minutos_nums)) break
+      if ((i * 2) > length(goleadores_minutos_raw)) break
       marcador_actual <- as.integer(str_split(resultados_parciales[i], ":")[[1]]); if (any(is.na(marcador_actual))) next
-      dorsal_gol <- goleadores_minutos_nums[(i * 2) - 1]; minuto_gol <- goleadores_minutos_nums[i * 2]; if (is.na(dorsal_gol) || is.na(minuto_gol)) next
+      
+      # ---------- INICIO DE LA MODIFICACIÓN CLAVE ----------
+      dorsal_gol <- as.integer(goleadores_minutos_raw[(i * 2) - 1])
+      minuto_gol_str <- goleadores_minutos_raw[i * 2]
+      
+      minuto_gol <- if (is.na(minuto_gol_str) || tolower(minuto_gol_str) == "x") {
+        NA_integer_
+      } else {
+        as.integer(minuto_gol_str)
+      }
+      
+      if (is.na(dorsal_gol)) next
+      # ---------- FIN DE LA MODIFICACIÓN CLAVE ----------
+      
       tipo_gol <- if (length(es_autogol) >= i && es_autogol[i]) "Autogol" else "Normal"
       equipo_acreditado_gol <- NA
       if (marcador_actual[1] > resultados_previo[1]) equipo_acreditado_gol <- equipo_local
@@ -725,14 +743,28 @@ procesar_acta <- function(acta_path) {
       paste("  -", j['dorsal'], nombre_display)
     })
   }
+  
+  # ---------- INICIO DE LA MODIFICACIÓN CLAVE ----------
   formatear_goles_texto <- function(df_goles) {
     if (is.null(df_goles) || nrow(df_goles) == 0) return("No hubo goles o no se pudieron procesar.")
     apply(df_goles, 1, function(g) {
-      minuto_formateado <- formatear_minuto_partido(as.numeric(g['minuto']))
-      if (g['tipo'] == "Autogol") paste0("Min ", minuto_formateado, " - Gol de ", g['jugadora'], " (", g['equipo_jugadora'], ", autogol)")
-      else paste0("Min ", minuto_formateado, " - Gol de ", g['jugadora'], " (", g['equipo_acreditado'], ")")
+      minuto_num <- as.numeric(g['minuto'])
+      
+      prefix_minuto <- if (is.na(minuto_num)) {
+        "" # No mostrar nada si el minuto es NA
+      } else {
+        paste0("Min ", formatear_minuto_partido(minuto_num), " - ")
+      }
+      
+      if (g['tipo'] == "Autogol") {
+        paste0(prefix_minuto, "Gol de ", g['jugadora'], " (", g['equipo_jugadora'], ", autogol)")
+      } else {
+        paste0(prefix_minuto, "Gol de ", g['jugadora'], " (", g['equipo_acreditado'], ")")
+      }
     })
   }
+  # ---------- FIN DE LA MODIFICACIÓN CLAVE ----------
+  
   formatear_tarjetas_texto <- function(df_tarjetas) {
     if(is.null(df_tarjetas) || nrow(df_tarjetas) == 0) return("  No se registraron tarjetas.")
     df_tarjetas <- df_tarjetas[order(df_tarjetas$minuto), ]

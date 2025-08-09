@@ -39,9 +39,9 @@ th { background-color: #f2f2f2; }
 .partido-link span.equipo-visitante, .partido-link-placeholder span.equipo-visitante { 
   justify-content: flex-start; /* Alinea contenido (logo+texto) a la izquierda */
 }
-/* Estilo para el resultado, ocupa el 6% central fijo */
+/* Estilo para el resultado, ocupa el 12% central fijo */
 .partido-link span.resultado, .partido-link-placeholder span.resultado { 
-  flex: 0 0 6%; /* No crece, no encoge, base del 6% */
+  flex: 0 0 12%; /* No crece, no encoge, base del 12% */
   font-size: 1.2em; 
   font-weight: bold; 
   text-align: center; 
