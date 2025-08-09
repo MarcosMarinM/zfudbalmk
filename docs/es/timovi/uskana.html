@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Uskana</title>
+  <link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<html lang="es">
+  <body data-search-results-title="Resultados de la búsqueda para" data-no-search-results-msg="No se encontraron resultados para" data-search-prompt-msg="Por favor, introduce al menos 2 caracteres para buscar.">
+    <div class="container">
+      <div class="language-selector" style="text-align: right; margin-bottom: 15px; font-size: 0.9em;">
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/es/&#39;, &#39;/mk/&#39;); return false;">[ Македонски ]</a>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/es/&#39;, &#39;/sq/&#39;); return false;">[ Shqip ]</a>
+         
+        <span style="font-weight: bold; color: #333;">[ Castellano ]</span>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/es/&#39;, &#39;/en/&#39;); return false;">[ English ]</a>
+      </div>
+      <h1>
+        <a href="../../es/index.html" style="color: inherit; text-decoration: none;">@zfudbalmk</a>
+      </h1>
+      <div class="search-container">
+        <form action="#" onsubmit="showSearchResults(); return false;">
+          <input type="text" id="search-input" class="search-input" placeholder="Buscar jugadora, equipo, árbitro, estadio..." onkeyup="handleSearchInput(event)"/>
+          <button type="submit" class="search-button">Buscar</button>
+        </form>
+        <div id="search-suggestions"></div>
+      </div>
+      <div id="main-content">
+        <div class="nav-buttons">
+          <a href="#" onclick="history.back(); return false;" class="back-link">← Volver</a>
+          <a href="../index.html" class="back-link">🏠 Inicio</a>
+        </div>
+        <h2>Uskana</h2>
+        <img class="team-page-crest" src="../../assets/logos/uskana.png" alt="Escudo de Uskana"/>
+        <h3>Historial por competición</h3>
+        <table class="team-career-summary">
+          <thead>
+            <tr>
+              <th>Temporada</th>
+              <th>Competición</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="summary-row" onclick="toggleDetails(&#39;details-uskana-1&#39;)">
+              <td>24/25</td>
+              <td>Liga Femenina Cadete 24/25</td>
+            </tr>
+            <tr id="details-uskana-1" class="details-row">
+              <td colspan="2">
+                <div class="details-content">
+                  <h4>Estadísticas de jugadoras</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Jugadora</th>
+                        <th>Convocada</th>
+                        <th>Jugados</th>
+                        <th>Min.</th>
+                        <th>Gol.</th>
+                        <th>Tarjetas amarillas</th>
+                        <th>Tarjetas rojas</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <a href="../igraci/268343.html">Luiza Ahmedi</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269501.html">Arianesa Arslanoska</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269502.html">Shaqire Arslani</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269503.html">Aurora Arslani</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269532.html">Era Sejdini</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>3</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269533.html">Elif Šerifoska</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269534.html">Nurija Šerifoska</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269535.html">Shefkije Alimi</a>
+                        </td>
+                        <td>25</td>
+                        <td>25</td>
+                        <td>1500</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269897.html">Albijana Dauti</a>
+                        </td>
+                        <td>21</td>
+                        <td>21</td>
+                        <td>1260</td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/269898.html">Bora Limani</a>
+                        </td>
+                        <td>21</td>
+                        <td>21</td>
+                        <td>1260</td>
+                        <td>5</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/254579.html">Melek Shaqiri</a>
+                        </td>
+                        <td>15</td>
+                        <td>15</td>
+                        <td>900</td>
+                        <td>13</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h4>Lista de partidos</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Jornada</th>
+                        <th>Fecha</th>
+                        <th>Local</th>
+                        <th>Visitante</th>
+                        <th>Resultado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>12.10.2024</td>
+                        <td>Top Gol</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613462.html">3 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>19.10.2024</td>
+                        <td>Poreče</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613463.html">1 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>3</td>
+                        <td>23.10.2024</td>
+                        <td>Uskana</td>
+                        <td>Shkëndija</td>
+                        <td>
+                          <a href="../natprevari/8613476.html">0 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>5</td>
+                        <td>23.10.2024</td>
+                        <td>Uskana</td>
+                        <td>Tikvešanki</td>
+                        <td>
+                          <a href="../natprevari/8613489.html">0 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>4</td>
+                        <td>27.10.2024</td>
+                        <td>Plačkovica</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613478.html">3 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>6</td>
+                        <td>09.11.2024</td>
+                        <td>Bashkimi</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613493.html">5 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>7</td>
+                        <td>16.11.2024</td>
+                        <td>Uskana</td>
+                        <td>Dži-Dži</td>
+                        <td>
+                          <a href="../natprevari/8613502.html">1 - 5</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>8</td>
+                        <td>23.11.2024</td>
+                        <td>Brera Tiverija</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613508.html">1 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>9</td>
+                        <td>30.11.2024</td>
+                        <td>Uskana</td>
+                        <td>Ljuboten</td>
+                        <td>
+                          <a href="../natprevari/8613515.html">1 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>10</td>
+                        <td>07.12.2024</td>
+                        <td>Skopje 2014</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613523.html">12 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>11</td>
+                        <td>09.12.2024</td>
+                        <td>Uskana</td>
+                        <td>Kočani</td>
+                        <td>
+                          <a href="../natprevari/8613528.html">1 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>13</td>
+                        <td>25.03.2025</td>
+                        <td>Uskana</td>
+                        <td>Biljanini Izvori</td>
+                        <td>
+                          <a href="../natprevari/8613541.html">1 - 4</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>15</td>
+                        <td>29.03.2025</td>
+                        <td>Uskana</td>
+                        <td>Poreče</td>
+                        <td>
+                          <a href="../natprevari/8613554.html">1 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>16</td>
+                        <td>31.03.2025</td>
+                        <td>Shkëndija</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613567.html">1 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>14</td>
+                        <td>03.04.2025</td>
+                        <td>Uskana</td>
+                        <td>Top Gol</td>
+                        <td>
+                          <a href="../natprevari/8613553.html">4 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>17</td>
+                        <td>05.04.2025</td>
+                        <td>Uskana</td>
+                        <td>Plačkovica</td>
+                        <td>
+                          <a href="../natprevari/8613569.html">3 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>12</td>
+                        <td>09.04.2025</td>
+                        <td>Kamenica Sasa</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613538.html">2 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>18</td>
+                        <td>13.04.2025</td>
+                        <td>Tikvešanki</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613580.html">0 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>19</td>
+                        <td>17.04.2025</td>
+                        <td>Uskana</td>
+                        <td>Bashkimi</td>
+                        <td>
+                          <a href="../natprevari/8613584.html">2 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>20</td>
+                        <td>27.04.2025</td>
+                        <td>Dži-Dži</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613593.html">0 - 5</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>21</td>
+                        <td>03.05.2025</td>
+                        <td>Uskana</td>
+                        <td>Brera Tiverija</td>
+                        <td>
+                          <a href="../natprevari/8613599.html">2 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>22</td>
+                        <td>06.05.2025</td>
+                        <td>Ljuboten</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613606.html">0 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>23</td>
+                        <td>17.05.2025</td>
+                        <td>Uskana</td>
+                        <td>Skopje 2014</td>
+                        <td>
+                          <a href="../natprevari/8613614.html">0 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>24</td>
+                        <td>25.05.2025</td>
+                        <td>Kočani</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613619.html">3 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>25</td>
+                        <td>28.05.2025</td>
+                        <td>Uskana</td>
+                        <td>Kamenica Sasa</td>
+                        <td>
+                          <a href="../natprevari/8613629.html">1 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>26</td>
+                        <td>31.05.2025</td>
+                        <td>Biljanini Izvori</td>
+                        <td>Uskana</td>
+                        <td>
+                          <a href="../natprevari/8613632.html">1 - 0</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script defer src="../../assets/script.js"></script>
+  </body>
+</html>
+</html>

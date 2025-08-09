@@ -176,31 +176,33 @@ if (dir.exists(ruta_logos_fuente)) {
 
 ### 7.1. Funciones de formato de texto y sanitización ----
 
-#' Genera un conjunto exhaustivo de términos de búsqueda a partir de un nombre cirílico.
+#' Genera un conjunto exhaustivo pero optimizado de términos de búsqueda.
 #'
-#' Esta función mejorada crea un índice de búsqueda extremadamente robusto.
-#' Primero, translitera los caracteres base no ambiguos. Luego, de forma iterativa,
-#' expande el conjunto de nombres generando todas las permutaciones posibles para
-#' cada carácter cirílico ambiguo (ej. 'ќ' -> 'kj', 'k', 'c', 'ć', etc.).
-#' Finalmente, aplica una capa de simplificación a todo el conjunto para aplanar
-#' los diacríticos, asegurando la máxima cobertura de búsqueda.
+#' Esta función utiliza una estrategia de "expansión lineal" para evitar la
+#' explosión combinatoria. En lugar de crear permutaciones de permutaciones,
+#' genera un nuevo término por cada regla de sustitución aplicada al nombre original.
+#' Esto mantiene la riqueza de variantes de búsqueda deseadas por el usuario
+#' sin que el tamaño del índice de búsqueda crezca de forma exponencial.
 #'
 #' @param nombre Un string con el nombre en cirílico.
-#' @return Un string con todos los términos de búsqueda únicos separados por espacios.
+#' @return Un string con todos los términos de búsqueda únicos y optimizados separados por espacios.
 generar_terminos_busqueda <- function(nombre) {
   if (is.na(nombre) || nchar(trimws(nombre)) == 0) return("")
   
   nombre_lower <- tolower(nombre)
   
-  # Mapa de caracteres base (no ambiguos)
+  # Contenedor para todos los términos generados
+  all_terms <- c(nombre_lower)
+  
+  # --- Listas de variantes del usuario ---
   map_base <- c(
-    'а'='a', 'б'='b', 'в'='v', 'г'='g', 'д'='d', 'з'='z', 'и'='i',
+    'б'='b', 'в'='v', 'г'='g', 'д'='d', 'з'='z', 'и'='i',
     'к'='k', 'м'='m', 'н'='n', 'о'='o', 'п'='p', 'р'='r',
-    'с'='s', 'т'='t', 'ф'='f', 'х'='h'
+    'т'='t', 'ф'='f', 'х'='h'
   )
   
-  # Mapa maestro de variantes para caracteres ambiguos.
   mapa_variaciones <- list(
+    'а' = c('a', 'ah'), 'с' = c('s', 'ss', 'ß'),
     'ч' = c('č', 'ch', 'c', 'ç', 'cz', 'tch'),
     'ш' = c('š', 'sh', 's', 'sch', 'x'),
     'ж' = c('ž', 'zh', 'z', 'x', 'j', 'gs'),
@@ -217,35 +219,34 @@ generar_terminos_busqueda <- function(nombre) {
     'ј' = c('j', 'y', 'i', 'g')
   )
   
-  # Paso 1: Transliteración base inicial
-  versions <- c(nombre_lower, stringr::str_replace_all(nombre_lower, map_base))
+  # --- Proceso de Generación Lineal ---
   
-  # Paso 2: Expansión permutacional iterativa
-  # Para cada carácter ambiguo, se expande el conjunto de versiones existentes.
+  # 1. Añadir la transliteración base
+  all_terms <- c(all_terms, str_replace_all(nombre_lower, map_base))
+  
+  # 2. Expansión lineal: Por cada regla de `mapa_variaciones`, crear un nuevo
+  #    término a partir del nombre ORIGINAL.
   for (char_cyrillic in names(mapa_variaciones)) {
-    variants <- mapa_variaciones[[char_cyrillic]]
-    # Contenedor para las nuevas versiones generadas en esta iteración
-    expanded_versions <- c()
-    for (variant in variants) {
-      # Aplicar la sustitución a todas las versiones existentes hasta ahora
-      expanded_versions <- c(expanded_versions, stringr::str_replace_all(versions, char_cyrillic, variant))
+    # Optimización: solo procesar si el carácter existe en el nombre
+    if (str_detect(nombre_lower, fixed(char_cyrillic))) {
+      for (variant in mapa_variaciones[[char_cyrillic]]) {
+        new_term <- str_replace_all(nombre_lower, fixed(char_cyrillic), variant)
+        all_terms <- c(all_terms, new_term)
+      }
     }
-    # Añadir las nuevas permutaciones al conjunto principal
-    versions <- unique(c(versions, expanded_versions))
   }
   
-  # Paso 3: Mapa de simplificación final a ASCII
+  # 3. Aplicar simplificación final a todos los términos generados
   map_ascii_simplification <- c(
     'č'='c', 'š'='s', 'ž'='z', 'đ'='d', 'ć'='c', 'ǵ'='g',
-    'ḱ'='k', 'ń'='n', 'ĺ'='l', 'ñ'='n', 'ë'='e', 'ç'='c', 'q'='k', 'x'='z'
+    'ḱ'='k', 'ń'='n', 'ĺ'='l', 'ñ'='n', 'ë'='e', 'ç'='c', 'q'='k', 'x'='z', 'ß'='s'
   )
   
-  # Paso 4: Aplicar simplificación a todo el conjunto
-  simplified_versions <- stringr::str_replace_all(versions, map_ascii_simplification)
+  simplified_terms <- str_replace_all(all_terms, map_ascii_simplification)
   
-  # Paso 5: Combinar y devolver
-  final_versions <- unique(c(versions, simplified_versions))
-  return(paste(final_versions, collapse = " "))
+  # 4. Combinar, eliminar duplicados y devolver
+  final_terms <- unique(c(all_terms, simplified_terms))
+  return(paste(final_terms, collapse = " "))
 }
 
 
@@ -771,17 +772,8 @@ if (nrow(partidos_df_placeholders) > 0 && nrow(partidos_df_reales) > 0) {
   partidos_df <- partidos_df_reales
 }
 
-# Renombrar la sección de duración de partido
-message("9.0.1. Асигнирање на времетраење на натпреварот според натпреварување...")
-
-
-
 ### 9.0.1. Asignar Duración de Partido por Competición ----
-message("Асигнирање на времетраење на натпреварот според натпреварување...")
-
-# Se crea una nueva columna 'duracion_partido' en el dataframe principal.
-# Se utiliza case_when para aplicar las reglas de duración de forma condicional.
-# El valor por defecto es 90 minutos para cualquier otra competición.
+message("9.0.1. Асигнирање на времетраење на натпреварот според натпреварување...")
 partidos_df <- partidos_df %>%
   mutate(
     duracion_partido = case_when(
@@ -791,13 +783,20 @@ partidos_df <- partidos_df %>%
     )
   )
 
-# Imprimimos un resumen para verificar que se aplicaron las duraciones.
 message("Резиме на времетраење на натпревари:")
 print(
   partidos_df %>%
     count(competicion_nombre, duracion_partido) %>%
     as.data.frame()
 )
+
+### 9.0.2. Aplicar correcciones iniciales a nombres de equipos ----
+message("9.0.2. Примена на првични корекции на имиња на тимови...")
+if (!is.null(mapa_conversiones)) {
+  # Aplicar correcciones a 'partidos_df' (equipos, estadios) ANTES de cualquier otro procesamiento.
+  # Esto asegura que los nombres de los calendarios Excel también se corrijan.
+  partidos_df <- aplicar_conversiones(partidos_df, c("local", "visitante"), mapa_conversiones)
+}
 
 ### 9.1. Aplicar correcciones y reordenar nombres ----
 message("Примена на корекции и преуредување на имиња...")
@@ -807,10 +806,8 @@ if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
   # --- Paso 1: Aplicar correcciones de 'conversions.txt' a TODOS los nombres relevantes ---
   # Esta es la primera y principal aplicación de las correcciones de nombres.
   if (!is.null(mapa_conversiones)) {
-    # Aplicar a 'partidos_df' (equipos, estadios)
-    partidos_df <- aplicar_conversiones(partidos_df, c("local", "visitante", "estadio"), mapa_conversiones)
-    
     # Aplicar a los detalles de cada partido en 'resultados_exitosos'
+    # La corrección de 'partidos_df' ya se hizo en la sección 9.0.2.
     resultados_exitosos <- map(resultados_exitosos, function(res) {
       if (is.null(res)) return(NULL)
       
@@ -1056,25 +1053,25 @@ if (!file.exists(ruta_cache_info)) {
   stop("Не е пронајдена датотеката со информации за кеш (cache_info.rds). Ве молиме, прво извршете го Скрипт 1.")
 }
 info_cambios <- readRDS(ruta_cache_info)
-hubo_cambios <- info_cambios$hubo_cambios
+
+# Determinar si hubo cambios en los PDF o si se cargaron calendarios nuevos
+hubo_cambios_pdf <- info_cambios$hubo_cambios
+hubo_cambios_excel <- exists("partidos_df_placeholders") && nrow(partidos_df_placeholders) > 0
+hubo_cambios <- hubo_cambios_pdf || hubo_cambios_excel
 
 # Variable de control para la reconstrucción completa
 full_rebuild_needed <- FALSE
 
-# Si no hubo cambios, se puede omitir la regeneración de archivos.
+# Si no hubo ningún tipo de cambio, se puede omitir la regeneración de archivos.
 if (!hubo_cambios) {
-  message("Не се пронајдени промени во записниците. Нема потреба од регенерирање на HTML-датотеките.")
+  message("Не се пронајдени промени во записниците или календарите. Нема потреба од регенерирање на HTML-датотеките.")
 } else {
-  # Si se eliminaron archivos, es necesaria una reconstrucción completa para asegurar la consistencia.
-  # Es complejo determinar qué estadísticas (ej. rachas, porcentajes) se ven afectadas sin el estado anterior.
+  # Si se eliminaron archivos PDF, es necesaria una reconstrucción completa para asegurar la consistencia.
   if (length(info_cambios$archivos_eliminados_nombres) > 0) {
     message("Детектирани се избришани записници. Ќе се изврши целосна реконструкција на сајтот.")
     full_rebuild_needed <- TRUE
-  } else if (length(info_cambios$archivos_nuevos_nombres) > 0) {
-    message("Детектирани се нови или изменети записници. Ќе се изврши инкрементално ажурирање.")
-    
-    # Extraer los IDs de partido de los archivos nuevos/modificados
-    ids_partidos_afectados <- str_match(info_cambios$archivos_nuevos_nombres, "match_(\\d+)_")[, 2]
+  } else {
+    message("Детектирани се нови или изменети записници/календари. Ќе се изврши инкрементално ажурирање.")
     
     # Inicializar conjuntos de entidades afectadas
     affected_competition_ids <- character(0)
@@ -1084,33 +1081,49 @@ if (!hubo_cambios) {
     affected_referee_ids <- character(0)
     affected_stadium_ids <- character(0)
     
-    # Identificar todas las entidades relacionadas con los partidos afectados
-    partidos_afectados_df <- partidos_df %>% 
-      filter(id_partido %in% ids_partidos_afectados) %>%
-      left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada"))
+    # --- Paso 1: Identificar entidades afectadas por actas PDF nuevas/modificadas ---
+    ids_partidos_afectados <- str_match(info_cambios$archivos_nuevos_nombres, "match_(\\d+)_")[, 2]
     
-    if(nrow(partidos_afectados_df) > 0) {
-      affected_competition_ids <- unique(c(affected_competition_ids, na.omit(partidos_afectados_df$competicion_id)))
-      affected_match_ids <- unique(c(affected_match_ids, partidos_afectados_df$id_partido))
-      affected_team_ids <- unique(c(affected_team_ids, 
-                                    generar_id_seguro(partidos_afectados_df$local), 
-                                    generar_id_seguro(partidos_afectados_df$visitante)))
+    if (length(na.omit(ids_partidos_afectados)) > 0) {
+      partidos_afectados_df <- partidos_df %>% 
+        filter(id_partido %in% ids_partidos_afectados) %>%
+        left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada"))
+      
+      if(nrow(partidos_afectados_df) > 0) {
+        affected_competition_ids <- unique(c(affected_competition_ids, na.omit(partidos_afectados_df$competicion_id)))
+        affected_match_ids <- unique(c(affected_match_ids, partidos_afectados_df$id_partido))
+        affected_team_ids <- unique(c(affected_team_ids, 
+                                      generar_id_seguro(partidos_afectados_df$local), 
+                                      generar_id_seguro(partidos_afectados_df$visitante)))
+      }
+      
+      jugadoras_afectadas_df <- apariciones_df %>% filter(id_partido %in% ids_partidos_afectados)
+      if(nrow(jugadoras_afectadas_df) > 0) {
+        affected_player_ids <- unique(c(affected_player_ids, na.omit(jugadoras_afectadas_df$id)))
+      }
+      
+      arbitros_afectados_df <- arbitros_df %>% filter(id_partido %in% ids_partidos_afectados)
+      if(nrow(arbitros_afectados_df) > 0) {
+        affected_referee_ids <- unique(c(affected_referee_ids, generar_id_seguro(na.omit(arbitros_afectados_df$ime))))
+      }
+      
+      estadios_afectados_df <- estadios_df %>% filter(id_partido %in% ids_partidos_afectados)
+      if(nrow(estadios_afectados_df) > 0) {
+        affected_stadium_ids <- unique(c(affected_stadium_ids, generar_id_seguro(na.omit(estadios_afectados_df$estadio))))
+      }
     }
     
-    jugadoras_afectadas_df <- apariciones_df %>% filter(id_partido %in% ids_partidos_afectados)
-    if(nrow(jugadoras_afectadas_df) > 0) {
-      affected_player_ids <- unique(c(affected_player_ids, na.omit(jugadoras_afectadas_df$id)))
+    # --- Paso 2: Añadir competiciones de calendarios Excel a la lista de afectadas ---
+    if (exists("partidos_df_placeholders") && nrow(partidos_df_placeholders) > 0) {
+      ids_placeholders <- partidos_df_placeholders %>%
+        left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada")) %>%
+        pull(competicion_id)
+      
+      # Añadir los IDs de las competiciones placeholder al conjunto de afectadas
+      affected_competition_ids <- unique(c(affected_competition_ids, na.omit(ids_placeholders)))
     }
     
-    arbitros_afectados_df <- arbitros_df %>% filter(id_partido %in% ids_partidos_afectados)
-    if(nrow(arbitros_afectados_df) > 0) {
-      affected_referee_ids <- unique(c(affected_referee_ids, generar_id_seguro(na.omit(arbitros_afectados_df$ime))))
-    }
-    
-    estadios_afectados_df <- estadios_df %>% filter(id_partido %in% ids_partidos_afectados)
-    if(nrow(estadios_afectados_df) > 0) {
-      affected_stadium_ids <- unique(c(affected_stadium_ids, generar_id_seguro(na.omit(estadios_afectados_df$estadio))))
-    }
+    # Mensaje final de resumen de cambios
     message(paste("Идентификувани се", length(affected_competition_ids), "натпреварувања,",
                   length(affected_match_ids), "натпревари, и",
                   length(affected_player_ids), "фудбалерки за ажурирање."))
@@ -1544,10 +1557,30 @@ th { background-color: #f2f2f2; }
 .partido-link { transition: background-color 0.2s; }
 .partido-link-placeholder { cursor: default; }
 .partido-link:hover { background-color: #ced4da; }
-.partido-link span.equipo { flex: 1; display: flex; align-items: center; font-weight: bold; }
-.partido-link span.equipo-local { text-align: right; margin-right: 15px; justify-content: flex-end; }
-.partido-link span.equipo-visitante { text-align: left; margin-left: 15px; }
-.partido-link span.resultado { font-size: 1.2em; font-weight: bold; text-align: center; }
+/* --- INICIO DEL BLOQUE CORREGIDO --- */
+/* Estilo común para los contenedores de equipo en ambos tipos de enlaces (real y placeholder) */
+.partido-link span.equipo, .partido-link-placeholder span.equipo { 
+  flex: 1 1 40%; /* Ocupa el 40% del espacio, permitiendo encoger/crecer */
+  display: flex; 
+  align-items: center; 
+  font-weight: bold; 
+}
+/* Estilo para el equipo local, alineado a la derecha */
+.partido-link span.equipo-local, .partido-link-placeholder span.equipo-local { 
+  justify-content: flex-end; /* Alinea contenido (logo+texto) a la derecha */
+}
+/* Estilo para el equipo visitante, alineado a la izquierda */
+.partido-link span.equipo-visitante, .partido-link-placeholder span.equipo-visitante { 
+  justify-content: flex-start; /* Alinea contenido (logo+texto) a la izquierda */
+}
+/* Estilo para el resultado, ocupa el 6% central fijo */
+.partido-link span.resultado, .partido-link-placeholder span.resultado { 
+  flex: 0 0 6%; /* No crece, no encoge, base del 6% */
+  font-size: 1.2em; 
+  font-weight: bold; 
+  text-align: center; 
+}
+/* --- FIN DEL BLOQUE CORREGIDO --- */
 .jornada-header { background-color: #8B0000; color: white; padding: 10px; border-radius: 5px; margin-top: 30px; }
 .timeline { list-style: none; padding-left: 0; } .timeline li { padding: 8px 0; border-bottom: 1px dotted #ccc; display: flex; align-items: center; }
 .timeline .icon { margin-right: 10px; font-size: 1.2em; width: 24px; text-align: center; }
@@ -1981,6 +2014,8 @@ if (hubo_cambios) {
                 )
               }
             })
+          ) 
+        }) 
       )
       
       nombre_archivo_partidos <- paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"); save_html(crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_partidos))

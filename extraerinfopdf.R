@@ -537,6 +537,9 @@ procesar_acta <- function(acta_path) {
   texto_acta <- tryCatch({ paste(pdf_text(acta_path), collapse = "\n\n") }, error = function(e) { stop(paste("Error al leer PDF:", e$message)) })
   if (is.null(texto_acta) || nchar(texto_acta) == 0) stop("El PDF está vacío o no se pudo leer el texto.")
   
+  # --- CORRECCIÓN ESPECIAL: Limpiar el nombre "ЖФК ЏИ-ЏИ" en todo el texto ANTES del parseo ---
+  texto_acta <- str_replace_all(texto_acta, "ЖФК ЏИ-ЏИ", "ЖФК ЏИ")
+  
   # Extracción de la información principal del partido (competición, equipos, resultado).
   regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+.*)"
   partido_info_match <- str_match(texto_acta, regex_principal)
