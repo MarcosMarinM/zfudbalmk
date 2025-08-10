@@ -412,50 +412,24 @@ parsear_bloque_jugadoras_final <- function(bloque_texto, es_partido_seleccion = 
 extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_nombre, alineacion_local, alineacion_visitante) {
   tarjetas_df_final <- data.frame()
   
-  # Regex principal (con motivo) y secundaria (sin motivo)
-  regex_amarilla_con_motivo <- "(\\d{1,2})\\s+[\\p{L}\\s.'-]+?\\s+\\((\\d{1,3})\\s*-\\s*([^)]+?)\\)"
-  regex_amarilla_sin_motivo <- "(\\d{1,2})\\s+([\\p{L}\\s.'-]+?)\\s+\\((\\d{1,3})\\)"
-  
   # Extracción de tarjetas amarillas.
   bloque_amarillas_raw <- str_extract(texto_acta, "Опомени:([\\s\\S]*?)(?=Исклучување:|Ж: Жолт картон|ПОТВРДЕН|ОДИГРАН)")
   if (!is.na(bloque_amarillas_raw)) {
     texto_limpio <- str_remove(bloque_amarillas_raw, "Опомени:") %>% str_replace_all("\\n", " ") %>% str_squish()
+    regex_tarjeta_amarilla <- "(\\d{1,2})\\s+[\\p{L}\\s.'-]+?\\s+\\((\\d{1,3})\\s*-\\s*([^)]+?)\\)"
     bloques_por_equipo <- str_split(texto_limpio, paste0("(?=", equipo_local_nombre, "|", equipo_visitante_nombre, ")"))[[1]]
-    
     for (bloque_equipo in bloques_por_equipo) {
       if (str_trim(bloque_equipo) == "") next
       equipo_actual <- if (str_detect(bloque_equipo, paste0("^", equipo_local_nombre))) equipo_local_nombre else equipo_visitante_nombre
-      
-      # Intento 1: Regex con motivo
-      matches <- str_match_all(bloque_equipo, regex_amarilla_con_motivo)[[1]]
-      
-      # Intento 2: Si la primera falla, usar regex sin motivo
-      if (nrow(matches) == 0) {
-        matches_sin_motivo <- str_match_all(bloque_equipo, regex_amarilla_sin_motivo)[[1]]
-        # Se reestructura el dataframe para que tenga el mismo formato que el de 'con motivo'
-        if(nrow(matches_sin_motivo) > 0) {
-          matches <- cbind(matches_sin_motivo, "No especificado")
-          # Se reordenan las columnas para que coincidan: texto completo, dorsal, minuto, motivo
-          matches <- matches[, c(1, 2, 4, 5)] 
-        }
-      }
-      
+      matches <- str_match_all(bloque_equipo, regex_tarjeta_amarilla)[[1]]
       if (nrow(matches) > 0) {
         for (i in 1:nrow(matches)) {
-          dorsal_tarjeta <- as.integer(matches[i, 2])
-          minuto_tarjeta <- as.integer(matches[i, 3])
-          motivo_tarjeta <- str_trim(matches[i, 4])
-          
+          dorsal_tarjeta <- as.integer(matches[i, 2]); minuto_tarjeta <- as.integer(matches[i, 3]); motivo_tarjeta <- str_trim(matches[i, 4])
           alineacion_a_buscar <- if (equipo_actual == equipo_local_nombre) alineacion_local else alineacion_visitante
           info_jugadora <- filter(alineacion_a_buscar, dorsal == dorsal_tarjeta)
-          
           nombre_jugadora <- if(nrow(info_jugadora) > 0) info_jugadora$nombre[1] else paste("Desconocida (Dorsal", dorsal_tarjeta, ")")
           id_jugadora <- if(nrow(info_jugadora) > 0) info_jugadora$id[1] else NA_character_
-          
-          tarjetas_df_final <- rbind(tarjetas_df_final, data.frame(
-            jugadora = nombre_jugadora, id_jugadora = id_jugadora, equipo = equipo_actual, 
-            dorsal = dorsal_tarjeta, minuto = minuto_tarjeta, tipo = "Amarilla", motivo = motivo_tarjeta
-          ))
+          tarjetas_df_final <- rbind(tarjetas_df_final, data.frame(jugadora = nombre_jugadora, id_jugadora = id_jugadora, equipo = equipo_actual, dorsal = dorsal_tarjeta, minuto = minuto_tarjeta, tipo = "Amarilla", motivo = motivo_tarjeta))
         }
       }
     }
@@ -470,7 +444,7 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
       if (str_trim(bloque_equipo) == "") next
       equipo_actual <- if (str_detect(bloque_equipo, paste0("^", equipo_local_nombre))) equipo_local_nombre else equipo_visitante_nombre
       
-      # Caso: Doble amarilla (normalmente tiene motivos, se mantiene la lógica original)
+      # Caso: Doble amarilla.
       regex_doble_amarilla <- "(\\d{1,2})\\s+([\\p{L}\\s.'-]+?)\\s+\\((\\d{1,3})\\s*-\\s*(.+?)\\s+и\\s+(\\d{1,3})\\s*-\\s*(.+?)\\)"
       matches_doble <- str_match_all(bloque_equipo, regex_doble_amarilla)[[1]]
       if (nrow(matches_doble) > 0) {
@@ -485,37 +459,18 @@ extraer_tarjetas <- function(texto_acta, equipo_local_nombre, equipo_visitante_n
         bloque_equipo <- str_remove_all(bloque_equipo, regex_doble_amarilla)
       }
       
-      # Caso: Roja directa (se aplica la misma lógica dual que para las amarillas)
+      # Caso: Roja directa.
       if (str_trim(bloque_equipo) != "") {
-        regex_roja_con_motivo <- "(\\d{1,2})\\s+[\\p{L}\\s.'-]+?\\s+\\((\\d{1,3})\\s*-\\s*([^)]+?)\\)"
-        regex_roja_sin_motivo <- "(\\d{1,2})\\s+[\\p{L}\\s.'-]+?)\\s+\\((\\d{1,3})\\)"
-        
-        matches_roja <- str_match_all(bloque_equipo, regex_roja_con_motivo)[[1]]
-        
-        if (nrow(matches_roja) == 0) {
-          matches_sin_motivo_roja <- str_match_all(bloque_equipo, regex_roja_sin_motivo)[[1]]
-          if (nrow(matches_sin_motivo_roja) > 0) {
-            matches_roja <- cbind(matches_sin_motivo_roja, "No especificado")
-            matches_roja <- matches_roja[, c(1, 2, 4, 5)] 
-          }
-        }
-        
+        regex_roja_directa <- "(\\d{1,2})\\s+[\\p{L}\\s.'-]+?\\s+\\((\\d{1,3})\\s*-\\s*([^)]+?)\\)"
+        matches_roja <- str_match_all(bloque_equipo, regex_roja_directa)[[1]]
         if(nrow(matches_roja) > 0) {
           for(i in 1:nrow(matches_roja)) {
-            dorsal_tarjeta <- as.integer(matches_roja[i, 2])
-            minuto_tarjeta <- as.integer(matches_roja[i, 3])
-            motivo_tarjeta <- str_trim(matches_roja[i, 4])
-            
+            dorsal_tarjeta <- as.integer(matches_roja[i, 2]); minuto_tarjeta <- as.integer(matches_roja[i, 3]); motivo_tarjeta <- str_trim(matches_roja[i, 4])
             alineacion_a_buscar <- if (equipo_actual == equipo_local_nombre) alineacion_local else alineacion_visitante
             info_jugadora <- filter(alineacion_a_buscar, dorsal == dorsal_tarjeta)
-            
             nombre_jugadora <- if(nrow(info_jugadora) > 0) info_jugadora$nombre[1] else paste("Desconocida (Dorsal", dorsal_tarjeta, ")")
             id_jugadora <- if(nrow(info_jugadora) > 0) info_jugadora$id[1] else NA_character_
-            
-            tarjetas_df_final <- rbind(tarjetas_df_final, data.frame(
-              jugadora=nombre_jugadora, id_jugadora=id_jugadora, equipo=equipo_actual, 
-              dorsal=dorsal_tarjeta, minuto=minuto_tarjeta, tipo="Roja", motivo=motivo_tarjeta
-            ))
+            tarjetas_df_final <- rbind(tarjetas_df_final, data.frame(jugadora=nombre_jugadora, id_jugadora=id_jugadora, equipo=equipo_actual, dorsal=dorsal_tarjeta, minuto=minuto_tarjeta, tipo="Roja", motivo=motivo_tarjeta))
           }
         }
       }
@@ -741,8 +696,7 @@ procesar_acta <- function(acta_path) {
     categoria = categoria_partido, fecha, hora, 
     local = equipo_local, visitante = equipo_visitante, 
     goles_local, goles_visitante, penales_local, penales_visitante, 
-    es_resultado_oficial,
-    es_partido_seleccion # Se añade la bandera al dataframe
+    es_resultado_oficial
   )
   
   pos_start_players <- str_locate(texto_acta, "Голови\\s+Ж Ц\\s+З")
@@ -1158,7 +1112,7 @@ if (!is.null(tarjetas_df) && nrow(tarjetas_df) > 0) {
 ### 5.4. Escritura del archivo de salida ----
 
 # Generación del archivo de texto final con todos los resúmenes y tablas.
-ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_completo.txt")
+ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_total.txt")
 tryCatch({
   # Se recopilan todos los resúmenes de texto de cada partido.
   resumenes_completos <- unlist(purrr::map(resultados_exitosos, "resumen_texto"))
