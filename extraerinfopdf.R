@@ -197,7 +197,7 @@ cargar_y_procesar_posiciones <- function(ruta_xls, ids_jugadoras_validas) {
 #' @param bloque_texto El fragmento de texto del PDF que contiene las alineaciones.
 #' @return Una lista con dataframes para `alineacion_local`, `cambios_local`,
 #'   `alineacion_visitante` y `cambios_visitante`.
-parsear_bloque_jugadoras_final <- function(bloque_texto) {
+parsear_bloque_jugadoras_final <- function(bloque_texto, es_partido_seleccion = FALSE, equipo_local_nombre = "") {
   lineas_raw_originales <- str_split(bloque_texto, "\\n")[[1]]
   regex_sub_local <- "\\((\\d{1,2})\\)\\s*\\d{1,3}\\b"
   all_matches <- str_locate_all(lineas_raw_originales, regex_sub_local)
@@ -219,48 +219,45 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
     }
   }
   
-  # --- INICIO DE LA MODIFICACIÓN ---
-  # En lugar de un corte único y rígido, iteramos por cada línea para aplicar un
-  # ajuste fino si se detecta que el corte parte un número por la mitad.
   lineas_divididas <- map(lineas_raw_originales, function(linea) {
-    # Por defecto, usamos el punto de corte global calculado.
     split_col_linea <- split_col
-    
-    # Se aplica la regla de corrección: si estamos cortando un número en dos...
-    # (Comprobamos que el carácter ANTES del corte y EN el corte son dígitos).
-    # Añadimos una comprobación para no salirnos de los límites de la cadena.
     if (split_col_linea > 1 && nchar(linea) >= split_col_linea) {
       char_antes <- str_sub(linea, split_col_linea - 1, split_col_linea - 1)
       char_en <- str_sub(linea, split_col_linea, split_col_linea)
-      
-      # Si ambos caracteres son dígitos, movemos el punto de corte un
-      # carácter a la izquierda para esta línea específica.
       if (str_detect(char_antes, "\\d") && str_detect(char_en, "\\d")) {
         split_col_linea <- split_col_linea - 1
       }
     }
-    
-    # Se realiza el corte para esta línea con el punto de corte (original o ajustado).
     list(
       local = str_sub(linea, 1, split_col_linea - 1),
       visitante = str_sub(linea, split_col_linea, -1)
     )
   })
   
-  # Reconstruimos los vectores de líneas locales y visitantes a partir de la lista.
   lineas_local <- map_chr(lineas_divididas, "local")
   lineas_visitante <- map_chr(lineas_divididas, "visitante")
-  # --- FIN DE LA MODIFICACIÓN ---
   
-  # Función interna para extraer datos de una columna de texto.
-  extraer_de_columna <- function(lineas_columna, equipo_tag) {
+  # --- INICIO DE LA MODIFICACIÓN ---
+  # Se modifica la función interna para que maneje la lógica condicional de parseo.
+  extraer_de_columna <- function(lineas_columna, equipo_tag, es_partido_seleccion, equipo_local_nombre) {
     lineas_procesadas <- list()
     i <- 1
     while (i <= length(lineas_columna)) {
       linea_actual_texto <- lineas_columna[i]
       if (i < length(lineas_columna)) {
         linea_siguiente_texto <- lineas_columna[i+1]
-        if ( (str_detect(linea_actual_texto, "\\b\\d{1,2}\\b\\s+[\\p{L}]") && !str_detect(linea_actual_texto, "\\b\\d{5,6}\\b")) &&
+        
+        # Lógica para unir líneas partidas (ej. nombre en una línea, ID en la siguiente).
+        # Para equipos extranjeros (sin ID), esta lógica no debe aplicarse.
+        usa_logica_id <- TRUE
+        if (es_partido_seleccion) {
+          es_local_macedonia <- str_detect(equipo_local_nombre, "Македонија")
+          # La columna actual es de Macedonia si (es local y el local es Macedonia) O (es visitante y el local NO es Macedonia)
+          es_columna_macedonia <- (equipo_tag == "local" && es_local_macedonia) || (equipo_tag == "visitante" && !es_local_macedonia)
+          if (!es_columna_macedonia) usa_logica_id <- FALSE
+        }
+        
+        if ( usa_logica_id && (str_detect(linea_actual_texto, "\\b\\d{1,2}\\b\\s+[\\p{L}]") && !str_detect(linea_actual_texto, "\\b\\d{5,6}\\b")) &&
              (str_detect(linea_siguiente_texto, "^\\s*(\\d{5,6})\\s*$") || str_detect(linea_siguiente_texto, "^\\s+[\\p{L}]")) ) {
           linea_unida <- paste(str_squish(linea_actual_texto), str_squish(linea_siguiente_texto))
           lineas_procesadas[[length(lineas_procesadas) + 1]] <- list(texto = linea_unida, idx_original = i)
@@ -277,29 +274,65 @@ parsear_bloque_jugadoras_final <- function(bloque_texto) {
       lineas_procesadas[[length(lineas_procesadas) + 1]] <- list(texto = linea_actual_texto, idx_original = i)
       i <- i + 1
     }
+    
     jugadoras_col <- list()
-    regex_jugadora_definitiva <- "^\\s*(\\d{1,2})\\b\\s+([\\p{L}][\\p{L}\\s'-]*)\\s+.*?(\\d{5,6})\\b"
+    
+    # Determinar si la columna actual corresponde al equipo extranjero
+    es_columna_extranjera <- FALSE
+    if (es_partido_seleccion) {
+      es_local_macedonia <- str_detect(equipo_local_nombre, "Македонија")
+      es_columna_macedonia <- (equipo_tag == "local" && es_local_macedonia) || (equipo_tag == "visitante" && !es_local_macedonia)
+      es_columna_extranjera <- !es_columna_macedonia
+    }
+    
+    # Se elige la expresión regular según el tipo de equipo
+    if (es_columna_extranjera) {
+      # Regex estructuralmente robusta. Identifica el final del nombre buscando
+      # un separador de columna (dos o más espacios), lo que es inmune
+      # al contenido que venga después (goles, tarjetas, etc.).
+      regex_jugadora <- "^\\s*(\\d{1,2})\\b\\s+([\\p{L}'’\\s.-]+?)\\s{2,}"
+    } else {
+      # Regex original: estricta, requiere un ID numérico de 5 o 6 dígitos.
+      regex_jugadora <- "^\\s*(\\d{1,2})\\b\\s+([\\p{L}][\\p{L}\\s'-]*)\\s+.*?(\\d{5,6})\\b"
+    }
+    
     for(item in lineas_procesadas) {
       linea_texto <- item$texto
       linea_idx_original <- item$idx_original
-      player_matches <- str_locate_all(linea_texto, regex_jugadora_definitiva)[[1]]
-      player_data <- str_match_all(linea_texto, regex_jugadora_definitiva)[[1]]
+      player_matches <- str_locate_all(linea_texto, regex_jugadora)[[1]]
+      player_data <- str_match_all(linea_texto, regex_jugadora)[[1]]
+      
       if (nrow(player_data) > 0) {
         for (p in 1:nrow(player_data)) {
           nombre_raw <- player_data[p, 3]
-          es_portera <- str_detect(nombre_raw, "\\s+Г\\b")
-          es_capitana <- str_detect(nombre_raw, "\\s+К\\b")
+          es_portera <- str_detect(linea_texto, "\\s+Г\\b") # Se busca en la línea original para capturar "Г К"
+          es_capitana <- str_detect(linea_texto, "\\s+К\\b")
           nombre_limpio <- str_remove_all(nombre_raw, "\\b[GKКГ]\\b") %>% str_squish()
-          jugadoras_col[[length(jugadoras_col) + 1]] <- list(dorsal = as.integer(player_data[p, 2]), nombre = nombre_limpio, es_portera = es_portera, es_capitana = es_capitana, id = player_data[p, 4], equipo = equipo_tag, pos_start = player_matches[p, "start"], pos_end = player_matches[p, "end"], linea_idx = linea_idx_original)
+          
+          # Se asigna el ID si existe, o NA si es el equipo extranjero
+          id_jugadora <- if (es_columna_extranjera) NA_character_ else player_data[p, 4]
+          
+          jugadoras_col[[length(jugadoras_col) + 1]] <- list(
+            dorsal = as.integer(player_data[p, 2]),
+            nombre = nombre_limpio,
+            es_portera = es_portera,
+            es_capitana = es_capitana,
+            id = id_jugadora,
+            equipo = equipo_tag,
+            pos_start = player_matches[p, "start"],
+            pos_end = player_matches[p, "end"],
+            linea_idx = linea_idx_original
+          )
         }
       }
     }
     return(jugadoras_col)
   }
+  # --- FIN DE LA MODIFICACIÓN ---
   
-  # Se procesan las columnas local y visitante.
-  jugadoras_local <- extraer_de_columna(lineas_local, "local")
-  jugadoras_visitante <- extraer_de_columna(lineas_visitante, "visitante")
+  # Se procesan las columnas local y visitante, pasando los nuevos argumentos.
+  jugadoras_local <- extraer_de_columna(lineas_local, "local", es_partido_seleccion, equipo_local_nombre)
+  jugadoras_visitante <- extraer_de_columna(lineas_visitante, "visitante", es_partido_seleccion, equipo_local_nombre)
   jugadoras_visitante <- map(jugadoras_visitante, function(j) { j$pos_start <- j$pos_start + split_col; j$pos_end <- j$pos_end + split_col; return(j) })
   jugadoras <- c(jugadoras_local, jugadoras_visitante)
   
@@ -572,7 +605,7 @@ procesar_acta <- function(acta_path) {
   texto_acta <- str_replace_all(texto_acta, "ЖФК ЏИ-ЏИ", "ЖФК ЏИ")
   
   # Extracción de la información principal del partido (competición, equipos, resultado).
-  regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s]+?)\\s+(\\d{2}/\\d{2})\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+.*)"
+  regex_principal <- "ЗАПИСНИК\\s*\\n\\s*([\\p{L}\\s.'’\\d-]+?)(?:\\s+(\\d{2}/\\d{2}))?\\s*\\n\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)\\s*[-–]\\s*([^-–\\n]+(?:\\s*/\\s*[^ -–\\n]+)?)[\\s\\S]*?(\\d+:\\d+.*)"
   partido_info_match <- str_match(texto_acta, regex_principal)
   if (is.na(partido_info_match[1, 1])) {
     stop(paste("Información principal no encontrada en", nombre_archivo))
@@ -583,6 +616,10 @@ procesar_acta <- function(acta_path) {
   equipo_visitante <- str_trim(partido_info_match[, 5])
   resultado_final_str <- str_trim(str_split(partido_info_match[, 6], "\\n")[[1]][1])
   
+  # Detección de partidos de la selección nacional.
+  # Se crea una bandera booleana para condicionar lógicas posteriores.
+  es_partido_seleccion <- str_detect(equipo_local, "Македонија") |
+    str_detect(equipo_visitante, "Македонија")  
   # Detección de resultado oficial y de tanda de penaltis
   es_resultado_oficial <- str_detect(resultado_final_str, "\\*") || str_detect(tolower(texto_acta), "службен резултат")
   penales_match <- str_match(resultado_final_str, "PEN\\s*(\\d+):(\\d+)")
@@ -601,6 +638,10 @@ procesar_acta <- function(acta_path) {
   jornada_match <- str_match(texto_acta, "Коло:\\s*([^\\s\\n]+)"); jornada <- if (!is.na(jornada_match[1, 2])) str_trim(jornada_match[, 2]) else NA_character_
   estadio_match <- str_match(texto_acta, "Игралиште:\\s*([^\n]+)")
   estadio <- if (!is.na(estadio_match[1, 1])) str_remove(estadio_match[1, 2], "\\s+Р\\.бр:.*$") %>% str_trim() else "Desconocido"
+  
+  # Extracción de la categoría del partido.
+  categoria_match <- str_match(texto_acta, "Категорија:\\s*([^\\n]+)")
+  categoria_partido <- if (!is.na(categoria_match[1, 2])) str_trim(categoria_match[, 2]) else NA_character_
   
   # Función interna para extraer datos de líneas con formato "Etiqueta: Valor".
   extraer_info <- function(texto, etiqueta) {
@@ -650,7 +691,13 @@ procesar_acta <- function(acta_path) {
     }
   }
   
-  partido_df <- data.frame(id_partido, competicion_nombre, competicion_temporada, jornada, fecha, hora, local = equipo_local, visitante = equipo_visitante, goles_local, goles_visitante, penales_local, penales_visitante, es_resultado_oficial)
+  partido_df <- data.frame(
+    id_partido, competicion_nombre, competicion_temporada, jornada, 
+    categoria = categoria_partido, fecha, hora, 
+    local = equipo_local, visitante = equipo_visitante, 
+    goles_local, goles_visitante, penales_local, penales_visitante, 
+    es_resultado_oficial
+  )
   
   pos_start_players <- str_locate(texto_acta, "Голови\\s+Ж Ц\\s+З")
   pos_end_players <- str_locate(texto_acta, "Шеф на стручен штаб|Резервни играчи|Официјални претставници")
@@ -659,7 +706,11 @@ procesar_acta <- function(acta_path) {
   
   if (!is.na(pos_start_players[1,1]) && !is.na(pos_end_players[1,1])) {
     bloque_jugadoras_completo <- str_sub(texto_acta, pos_start_players[1, "start"], pos_end_players[1, "start"] -1)
-    resultados_parseo <- parsear_bloque_jugadoras_final(bloque_jugadoras_completo)
+    resultados_parseo <- parsear_bloque_jugadoras_final(
+      bloque_texto = bloque_jugadoras_completo,
+      es_partido_seleccion = es_partido_seleccion,
+      equipo_local_nombre = equipo_local
+    )
     if(length(resultados_parseo) > 0) {
       alineacion_local <- resultados_parseo$alineacion_local; cambios_local_df <- resultados_parseo$cambios_local
       alineacion_visitante <- resultados_parseo$alineacion_visitante; cambios_visitante_df <- resultados_parseo$cambios_visitante
@@ -797,8 +848,13 @@ procesar_acta <- function(acta_path) {
   
   resumen_actual_lines <- c(
     "\n======================================================================", paste("INICIO DEL ACTA:", nombre_archivo), "======================================================================",
-    paste("COMPETICIÓN:", competicion_nombre, competicion_temporada),
-    paste("RESUMEN DEL PARTIDO:", equipo_local, "vs", equipo_visitante, "(ID:", id_partido, ")"), paste("Fecha:", fecha, "| Hora:", hora, "| Jornada:", jornada),
+    paste("COMPETICIÓN:", competicion_nombre, if (!is.na(competicion_temporada)) competicion_temporada else ""),
+    paste("RESUMEN DEL PARTIDO:", equipo_local, "vs", equipo_visitante, "(ID:", id_partido, ")"),
+    paste(
+      paste("Fecha:", fecha, "| Hora:", hora),
+      if (!is.na(jornada)) paste("| Jornada:", jornada) else "",
+      if (!is.na(categoria_partido)) paste("| Categoría:", categoria_partido) else ""
+    ),
     paste("Estadio:", estadio), 
     paste("Resultado final:", resultado_final_str, if(es_resultado_oficial) "(Resultado oficial)" else ""),
     "\n--- GOLES ---", formatear_goles_texto(goles_partido_actual),
@@ -1056,7 +1112,7 @@ if (!is.null(tarjetas_df) && nrow(tarjetas_df) > 0) {
 ### 5.4. Escritura del archivo de salida ----
 
 # Generación del archivo de texto final con todos los resúmenes y tablas.
-ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_completo.txt")
+ruta_salida_txt <- file.path(Sys.getenv("HOME"), "Downloads", "resumen_sele.txt")
 tryCatch({
   # Se recopilan todos los resúmenes de texto de cada partido.
   resumenes_completos <- unlist(purrr::map(resultados_exitosos, "resumen_texto"))
