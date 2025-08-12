@@ -287,10 +287,10 @@ parsear_bloque_jugadoras_final <- function(bloque_texto, es_partido_seleccion = 
     
     # Se elige la expresión regular según el tipo de equipo
     if (es_columna_extranjera) {
-      # Regex estructuralmente robusta. Identifica el final del nombre buscando
-      # un separador de columna (dos o más espacios), lo que es inmune
-      # al contenido que venga después (goles, tarjetas, etc.).
-      regex_jugadora <- "^\\s*(\\d{1,2})\\b\\s+([\\p{L}'’\\s.-]+?)\\s{2,}"
+      # Regex mejorada: Define la estructura del nombre (palabras separadas por espacios)
+      # en lugar de depender de lo que viene después. Esto captura correctamente
+      # los nombres incluso si la línea termina inmediatamente después de ellos.
+      regex_jugadora <- "^\\s*(\\d{1,2})\\b\\s+([\\p{L}'’.-]+(?:\\s[\\p{L}'’.-]+)*)"
     } else {
       # Regex original: estricta, requiere un ID numérico de 5 o 6 dígitos.
       regex_jugadora <- "^\\s*(\\d{1,2})\\b\\s+([\\p{L}][\\p{L}\\s'-]*)\\s+.*?(\\d{5,6})\\b"
@@ -901,7 +901,7 @@ procesar_acta <- function(acta_path) {
 ### 4.1. Definición de rutas y carga de caché ----
 
 # Ruta a la carpeta que contiene las actas en PDF.
-ruta_pdfs <- "Actas"
+ruta_pdfs <- "/Users/marcosmarinm/Downloads/Reprezentacija"
 # Ruta para el archivo de caché donde se guardarán los resultados procesados.
 ruta_cache <- "actas_cache.rds"
 
