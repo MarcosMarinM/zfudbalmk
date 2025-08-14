@@ -77,6 +77,10 @@ th { background-color: #f2f2f2; }
 .legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
 .legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
 .team-logo { height: 24px; width: 24px; object-fit: contain; }
+.team-logo.national-team-flag {
+  border-radius: 50%;
+  border: 1px solid #ccc; /* Un borde sutil para las banderas */
+}
 .team-cell { display: flex; align-items: center; }
 .team-cell .team-logo { margin-right: 12px; }
 .partido-link .team-logo { height: 28px; width: 28px; }

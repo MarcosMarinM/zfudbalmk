@@ -387,7 +387,24 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
 }
 
 
-
+#' Crea un enlace para un equipo solo si no es una selección nacional.
+#' @param nombre_equipo_mk El nombre original del equipo en macedonio.
+#' @param nombre_equipo_lang El nombre del equipo en el idioma actual.
+#' @param path_to_root Ruta relativa a la carpeta de equipos (ej. "..").
+#' @return Un tag `<a>` de htmltools si es un club, o un `<span>` si es una selección.
+crear_enlace_equipo_condicional <- function(nombre_equipo_mk, nombre_equipo_lang, path_to_root = "..") {
+  # Usamos la función existente para determinar si es una selección nacional.
+  es_seleccion_nacional <- !is.na(get_national_team_iso(nombre_equipo_mk))
+  
+  if (es_seleccion_nacional) {
+    # Si es una selección, devuelve el nombre como texto plano (dentro de un span por consistencia).
+    return(tags$span(nombre_equipo_lang))
+  } else {
+    # Si es un club, crea el hipervínculo a su página de perfil.
+    ruta_perfil_equipo <- file.path(path_to_root, nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html"))
+    return(tags$a(href = ruta_perfil_equipo, nombre_equipo_lang))
+  }
+}
 
 # ============================================================================ #
 # ==           INTERRUPTOR DE PROTECCIÓN POR CONTRASEÑA          == #
@@ -803,6 +820,29 @@ if (file.exists(ruta_unificacion_id)) {
 }
 
 
+# Pegue este bloque al final de la sección 8, por ejemplo, como ### 8.9.
+
+### 8.9. Cargar traducciones de países (NUEVO) ----
+message("Вчитување на преводи за имиња на држави...")
+
+ruta_traducciones_paises <- "country_translations.txt"
+mapa_traducciones_paises_df <- NULL
+if (file.exists(ruta_traducciones_paises)) {
+  tryCatch({
+    mapa_traducciones_paises_df <- read.csv(
+      ruta_traducciones_paises, 
+      stringsAsFactors = FALSE, 
+      encoding = "UTF-8",
+      check.names = FALSE # Importante para manejar columnas como 'translation_es'
+    )
+    message(paste("Преводите за држави се вчитани успешно со", nrow(mapa_traducciones_paises_df), "записи."))
+  }, error = function(e) {
+    warning("Грешка при вчитување на country_translations.txt. Имињата на државите може да не се преведат правилно.")
+  })
+} else {
+  message("Датотеката country_translations.txt не е пронајдена. Ќе се користи стандардна транслитерација за имињата на државите.")
+}
+
 ## -------------------------------------------------------------------------- ##
 ##  9. PROCESAMIENTO Y TRANSFORMACIÓN DE DATOS PRINCIPALES
 ## -------------------------------------------------------------------------- ##
@@ -871,6 +911,9 @@ if (!is.null(mapa_conversiones)) {
 # CAMBIO CLAVE: Este bloque se ejecuta ANTES de cualquier otra corrección de nombres.
 if (!is.null(mapa_unificacion_id_df) && nrow(mapa_unificacion_id_df) > 0) {
   message("Aplicando reglas de unificación de ID maestras...")
+  
+  # Primero reordenamos los nombres canónicos ANTES de crear el mapa.
+  mapa_unificacion_id_df$nombre_canonico <- reordenar_nombre_jugadora(mapa_unificacion_id_df$nombre_canonico)
   
   id_map <- setNames(mapa_unificacion_id_df$id_canonico, mapa_unificacion_id_df$id_a_unificar)
   name_map <- setNames(mapa_unificacion_id_df$nombre_canonico, mapa_unificacion_id_df$id_a_unificar)
@@ -1088,19 +1131,38 @@ message("Идентификување, преведување и подреду�
 
 if (exists("partidos_df") && nrow(partidos_df) > 0) {
   
+  # NUEVO: Calcular el año numérico más reciente entre las competiciones reales.
+  # Esto se usará para posicionar correctamente "Репрезентација".
+  max_real_season_numeric <- partidos_df %>%
+    filter(competicion_nombre != "Репрезентација") %>%
+    distinct(competicion_temporada) %>%
+    mutate(
+      start_year = as.integer(str_extract(competicion_temporada, "^\\d{2,4}")),
+      # Convertir '23' a '2023' para comparación correcta
+      sort_year = if_else(nchar(as.character(start_year)) == 2, 2000 + start_year, start_year)
+    ) %>%
+    pull(sort_year) %>%
+    max(na.rm = TRUE) # Asegurarse de manejar NA si la lista está vacía
+  
+  # Si no hay temporadas reales (ej. dataframe vacío), establecemos un valor por defecto seguro.
+  if (is.infinite(max_real_season_numeric)) max_real_season_numeric <- 2000 
+  
   # 1. Se procesan todas las competiciones reales, EXCLUYENDO la de "Репрезентација".
   competiciones_base_df <- partidos_df %>%
     filter(competicion_nombre != "Репрезентација") %>%
     distinct(competicion_nombre, competicion_temporada) %>%
     mutate(
       competicion_id = generar_id_seguro(paste(competicion_nombre, competicion_temporada)),
-      nombre_lower = tolower(competicion_nombre)
+      nombre_lower = tolower(competicion_nombre),
+      # Calcular el año de inicio numérico para la ordenación
+      start_year = as.integer(str_extract(competicion_temporada, "^\\d{2,4}")),
+      sort_year = if_else(nchar(as.character(start_year)) == 2, 2000 + start_year, start_year)
     ) %>%
     mutate(
       importancia_score = case_when(
         str_detect(nombre_lower, "куп") ~ 1, str_detect(nombre_lower, "прва") ~ 2,
         str_detect(nombre_lower, "втора") ~ 3, str_detect(nombre_lower, "трета") ~ 4,
-        str_detect(nombre_lower, "младинска") ~ 5, str_detect(nombre_lower, "кадетска") ~ 6,
+        str_detect(nombre_lower, "младинска") ~ 5, str_detect(nombre_lower, "кадетска") ~ 6, str_detect(nombre_lower, "пријателски") ~ 7,
         TRUE ~ 7
       ),
       baraz_modifier = if_else(str_detect(nombre_lower, "бараж"), 0.5, 0),
@@ -1108,21 +1170,32 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
     )
   
   # 2. Se crea manualmente la entrada para la pseudo-competición "Репрезентација".
-  # Se le da un 'final_score' muy bajo (ej. 0) para que aparezca la primera.
+  # Asignarle un 'sort_year' intermedio.
   competicion_seleccion_df <- tibble(
     competicion_nombre = "Репрезентација",
-    competicion_temporada = "Сите",
-    competicion_id = "reprezentacija", # ID fija y simple
+    competicion_temporada = "Сите", 
+    competicion_id = "reprezentacija", 
     nombre_lower = "репрезентација",
-    importancia_score = 0,
+    importancia_score = 0, 
     baraz_modifier = 0,
-    final_score = 0
+    final_score = 0,
+    # La sitúa numéricamente justo por encima de la temporada más reciente real.
+    sort_year = max_real_season_numeric + 0.5 
   )
   
   # 3. Se combinan las competiciones reales con la de la selección.
-  competiciones_combinadas_df <- bind_rows(competiciones_base_df, competicion_seleccion_df)
+  # La columna `orden_primario` se crea AQUÍ para asegurar que todas las columnas necesarias existan.
+  competiciones_combinadas_df <- bind_rows(competiciones_base_df, competicion_seleccion_df) %>%
+    mutate(
+      orden_primario = case_when(
+        # CORRECCIÓN CLAVE: Usar `sort_year` para la comparación numérica
+        sort_year == max_real_season_numeric ~ 1, # Temporada más reciente: la primera.
+        competicion_id == "reprezentacija"   ~ 2, # Selección: justo después de la temporada más reciente.
+        TRUE                                 ~ 3  # Todas las demás temporadas (más antiguas): las últimas.
+      )
+    )
   
-  # --- Lógica de Traducción Robusta para Competiciones ---
+  # --- Lógica de Traducción Robusta para Competiciones (sin cambios) ---
   if (!is.null(mapa_nombres_competiciones_long)) {
     competiciones_combinadas_df_temp <- competiciones_combinadas_df %>%
       mutate(original_mk_join_key = paste(competicion_nombre, competicion_temporada))
@@ -1145,7 +1218,7 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
   competiciones_unicas_df <- competiciones_unicas_df %>%
     mutate(nombre_completo_mk = if_else(
       competicion_nombre == "Репрезентација", 
-      "Репрезентација", # Nombre simple para la selección
+      "Репрезентација", 
       paste(competicion_nombre, competicion_temporada))
     )
   
@@ -1162,14 +1235,18 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
     target_col <- paste0("nombre_completo_", lang_code)
     competiciones_unicas_df <- competiciones_unicas_df %>%
       mutate(!!target_col := case_when(
-        competicion_id == "reprezentacija" ~ t("competition_reprezentacija"), # Usar clave de traducción
+        competicion_id == "reprezentacija" ~ t("competition_reprezentacija"), 
         !is.na(.data[[target_col]]) ~ .data[[target_col]],
         TRUE ~ str_to_title(str_replace_all(tolower(nombre_completo_mk), map_transliteration_comp))
       ))
   }
   
+  # Modificar la función arrange()
   competiciones_unicas_df <- competiciones_unicas_df %>%
-    arrange(final_score, desc(competicion_temporada), nombre_completo_mk) # Ordenar por el score
+    arrange(orden_primario,              # 1. Prioridad: ¿Temporada actual, Selección, o temporada antigua?
+            final_score,                 # 2. Prioridad: Importancia de la competición (Copa, Primera, Segunda...)
+            desc(competicion_temporada), # 3. Prioridad: Temporadas más recientes primero (para las de 'orden_primario = 3')
+            nombre_completo_mk)          # 4. Prioridad: Desempate alfabético por nombre.
   
 } else {
   competiciones_unicas_df <- tibble()
@@ -1232,6 +1309,46 @@ for (lang_code in setdiff(IDIOMAS_SOPORTADOS, "mk")) {
       str_replace_all(tolower(original_name), map_transliteration_entity) %>% str_to_title()
     ))
 }
+
+
+### INICIO DE LA MEJORA (VERSIÓN CORREGIDA): Integrar traducciones de países ###
+message("10.3.1. Интегрирање на преводи за држави во главниот датафрејм на ентитетите...")
+
+if (!is.null(mapa_traducciones_paises_df) && nrow(mapa_traducciones_paises_df) > 0) {
+  
+  # Preparar el dataframe de traducciones de países para la unión
+  paises_para_unir <- mapa_traducciones_paises_df %>%
+    # CORRECCIÓN CLAVE: Se renombra 'original_mk' a 'original_name' para que coincida con la columna de unión del dataframe maestro.
+    rename(original_name = original_mk) %>%
+    # Ahora se renombran las columnas de traducción para evitar conflictos.
+    rename_with(~ paste0("country_", .), .cols = -original_name)
+  
+  # Unir el dataframe maestro de entidades con las traducciones de países
+  # Este left_join ahora funcionará porque ambos dataframes tienen una columna 'original_name'.
+  entidades_maestro_df <- entidades_maestro_df %>%
+    left_join(paises_para_unir, by = "original_name")
+  
+  # Bucle para actualizar cada columna de idioma, dando prioridad a la traducción del país
+  for (lang_code in setdiff(IDIOMAS_SOPORTADOS, "mk")) {
+    col_entidad <- paste0("translated_name_", lang_code)
+    col_pais <- paste0("country_translation_", lang_code) # Corregido para que coincida con el prefijo
+    
+    # Solo proceder si ambas columnas existen
+    if (col_entidad %in% names(entidades_maestro_df) && col_pais %in% names(entidades_maestro_df)) {
+      entidades_maestro_df <- entidades_maestro_df %>%
+        mutate(
+          !!col_entidad := coalesce(.data[[col_pais]], .data[[col_entidad]])
+        )
+    }
+  }
+  
+  # Limpiar las columnas auxiliares de "country_"
+  entidades_maestro_df <- entidades_maestro_df %>%
+    select(-starts_with("country_"))
+  
+  message("Преводите за држави се успешно интегрирани.")
+}
+### FIN DE LA MEJORA (VERSIÓN CORREGIDA) ###
 
 ### 9.6. Determinar el alcance de los cambios para la generación incremental ----
 message("Проверка на промени за инкрементално генерирање...")
@@ -1707,6 +1824,16 @@ ids_partidos_seleccion <- partidos_df %>%
   pull(id_partido) %>%
   unique()
 
+### INICIO DE LA MODIFICACIÓN ###
+# Equipos a excluir de la generación de páginas individuales:
+# Son todas las selecciones que han jugado contra Macedonia.
+equipos_en_partidos_seleccion <- c(
+  (partidos_df %>% filter(id_partido %in% ids_partidos_seleccion) %>% pull(local)),
+  (partidos_df %>% filter(id_partido %in% ids_partidos_seleccion) %>% pull(visitante))
+)
+team_names_to_skip_mk <- unique(equipos_en_partidos_seleccion[equipos_en_partidos_seleccion != "Македонија"])
+### FIN DE LA MODIFICACIÓN ###
+
 # Jugadoras a excluir de la generación de páginas individuales:
 # Aparecen en un partido de la selección Y no juegan en el equipo "Македонија" en ese partido.
 player_ids_to_skip <- apariciones_df %>%
@@ -1732,6 +1859,7 @@ stadium_ids_to_skip <- estadios_df %>%
   na.omit() %>% # Asegurarse de que no haya NA en los nombres de estadios
   generar_id_seguro() # Convertir a ID seguro para la comparación en el loop
 
+message(paste("   >", length(team_names_to_skip_mk), "selecciones nacionales extranjeras serán excluidas de los perfiles de equipo."))
 message(paste("   >", length(player_ids_to_skip), "jugadoras no-macedonias en partidos de la selección serán excluidas de los perfiles individuales."))
 message(paste("   >", length(referee_ids_to_skip), "árbitros de partidos de la selección serán excluidos de los perfiles individuales."))
 message(paste("   >", length(stadium_ids_to_skip), "estadios de partidos de la selección serán excluidos de los perfiles individuales."))
@@ -2196,13 +2324,35 @@ if (hubo_cambios) {
           contenido_lista_partidos <- tagList(
             crear_botones_navegacion(path_to_lang_root = ".."), 
             tags$h2(paste(comp_nombre_current_lang, "-", cat_actual)),
+            
+            ### INICIO DE LA MODIFICACIÓN ###
             map(1:nrow(partidos_categoria), function(k) {
               partido <- partidos_categoria[k,]; is_placeholder_match <- is.na(partido$id_partido)
               local_name <- entidades_df_lang$current_lang_name[match(partido$local, entidades_df_lang$original_name)]
               visitante_name <- entidades_df_lang$current_lang_name[match(partido$visitante, entidades_df_lang$original_name)]
               resultado_texto <- if (is_placeholder_match) " - " else { res_base <- paste(partido$goles_local, "-", partido$goles_visitante); if (!is.na(partido$penales_local)) res_base <- sprintf("%s (%s - %s)", res_base, partido$penales_local, partido$penales_visitante); if (isTRUE(partido$es_resultado_oficial)) res_base <- paste(res_base, "*"); res_base }
-              contenido_comun <- tagList(tags$span(class="equipo equipo-local", get_logo_tag(partido$local), tags$span(local_name)), tags$span(class="resultado", resultado_texto), tags$span(class="equipo equipo-visitante", tags$span(visitante_name), get_logo_tag(partido$visitante)))
-              if (is_placeholder_match) tags$div(class = "partido-link-placeholder", contenido_comun) else tags$a(class = "partido-link", href = file.path("..", nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")), contenido_comun)
+              
+              # El contenido visual del partido (equipos y resultado)
+              contenido_comun <- tagList(
+                tags$span(class="equipo equipo-local", get_logo_tag(partido$local), tags$span(local_name)), 
+                tags$span(class="resultado", resultado_texto), 
+                tags$span(class="equipo equipo-visitante", tags$span(visitante_name), get_logo_tag(partido$visitante))
+              )
+              
+              # Se envuelve todo en un tagList para añadir la fecha encima del enlace del partido.
+              tagList(
+                # Se añade la fecha del partido aquí, usando la columna 'fecha' del objeto 'partido'.
+                tags$p(
+                  style = "text-align: center; margin-bottom: 2px; margin-top: 15px; font-size: 0.9em; color: #555;", 
+                  partido$fecha
+                ),
+                # El bloque if/else original para crear el enlace o el placeholder.
+                if (is_placeholder_match) {
+                  tags$div(class = "partido-link-placeholder", contenido_comun)
+                } else {
+                  tags$a(class = "partido-link", href = file.path("..", nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")), contenido_comun)
+                }
+              )
             })
           )
           
@@ -2292,8 +2442,9 @@ if (hubo_cambios) {
       partido_comp_info <- competiciones_unicas_df %>% filter(competicion_nombre == partido_info$competicion_nombre, competicion_temporada == partido_info$competicion_temporada)
       comp_nombre_current_lang <- partido_comp_info[[comp_name_col]][1]
       is_cup_match <- str_detect(tolower(partido_info$competicion_nombre), "куп")
-      jornada_texto <- if(partido_info$es_partido_seleccion) { # Si es partido de la selección
-        "" # Vaciar el texto de la jornada
+      jornada_texto <- if(partido_info$es_partido_seleccion) { 
+        # Si es partido de la selección, usar la categoría del partido.
+        partido_info$categoria 
       } else if(is_cup_match) { # Si es partido de copa
         partido_info$jornada
       } else { # Para ligas normales
@@ -2318,7 +2469,8 @@ if (hubo_cambios) {
         
         tags$div(class = "alineacion-header", 
                  tags$img(class = logo_class, src = logo_src, alt = nombre_equipo_lang), 
-                 tags$h3(tags$a(href = file.path(path_rel_timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), nombre_equipo_lang))
+                 
+                 tags$h3(crear_enlace_equipo_condicional(nombre_equipo_mk, nombre_equipo_lang))
         )
       }
       alineacion_partido_lang <- apariciones_df %>% filter(id_partido == id_p) %>% left_join(jugadoras_lang_df, by="id")
@@ -2514,7 +2666,21 @@ if (hubo_cambios) {
         nombre_comp_stage_nat_lang <- (competiciones_unicas_df %>% filter(competicion_id == "reprezentacija"))[[comp_name_col]][1]
         flag_url_mk <- paste0("https://hatscripts.github.io/circle-flags/flags/", get_national_team_iso("Македонија"), ".svg")
         
-        summary_row_nat <- tags$tr(class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id_nat), tags$td(stage_nat$competicion_temporada), tags$td(class="team-cell", tags$img(class="team-logo national-team-flag", src = flag_url_mk, alt = nombre_equipo_stage_nat_lang), tags$a(href = file.path(path_rel_timovi, paste0(generar_id_seguro(stage_nat$equipo), ".html")), onclick="event.stopPropagation();", nombre_equipo_stage_nat_lang)), tags$td(nombre_comp_stage_nat_lang), tags$td(stage_nat$Played), tags$td(stage_nat$Goals), tags$td(stage_nat$Minutes))
+        summary_row_nat <- tags$tr(
+          class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id_nat), 
+          tags$td(stage_nat$competicion_temporada), 
+          tags$td(class="team-cell", 
+                  tags$img(class="team-logo national-team-flag", src = flag_url_mk, alt = nombre_equipo_stage_nat_lang), 
+                  ### LÍNEA MODIFICADA ###
+                  # Se reemplaza tags$a por la nueva función, que devolverá texto plano.
+                  crear_enlace_equipo_condicional(stage_nat$equipo, nombre_equipo_stage_nat_lang)
+          ), 
+          tags$td(nombre_comp_stage_nat_lang), 
+          tags$td(stage_nat$Played), 
+          tags$td(stage_nat$Goals), 
+          tags$td(stage_nat$Minutes)
+        )
+        
         details_row_nat <- tags$tr(id=details_id_nat, class="details-row", tags$td(colspan="6", details_div_nat))
         
         lista_filas_carrera <- append(lista_filas_carrera, list(summary_row_nat, details_row_nat))
@@ -2611,6 +2777,10 @@ if (hubo_cambios) {
     
     
     walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_mk) {
+        if (!is.na(get_national_team_iso(team_mk))) {
+          return() 
+        }
+      
       id_t <- generar_id_seguro(team_mk); if (!full_rebuild_needed && !(id_t %in% affected_team_ids)) { return() }
       
       current_team_name <- entidades_df_lang %>% filter(original_name == team_mk) %>% pull(current_lang_name)

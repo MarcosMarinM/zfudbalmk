@@ -130,3 +130,11 @@ access_denied_body,Процесот е откажан од страна на к�
 password_wrong,Погрешна лозинка. Обидете се повторно,Fjalëkalim i pasaktë. Provoni përsëri,Contraseña incorrecta. Inténtelo de nuevo,Wrong password. Try again
 penalties_title,Танда на пенали,Gjuajtjet e penalltive,Tanda de penaltis,Penalty shootout
 penalties_short,ПЕН,PEN,PEN,PSO
+competition_reprezentacija,Репрезентација,Kombëtarja,Selección nacional,National team
+category_page_title,Натпревари по категорија,Ndeshjet sipas kategorisë,Partidos por categoría,Matches by category
+match_header_category,Категорија,Kategoria,Categoría,Category
+match_header_status,Наст.Nd.,Part.,Apps
+national_team_all_time_stats,Статистика на сите времиња за репрезентацијата,Statistikat e të gjitha kohërave për ekipin kombëtar,National team statistics,Estadísticas de la selección
+category_header,Категорија,Kategoria,Category,Categoría
+player_stats_for_category,Статистика на фудбалерки за оваа категорија,Statistikat e lojtarëve për këtë kategori,Player statistics for this category,Estadísticas de jugadoras para esta categoría
+match_list_for_category,Список на натпревари за оваа категорија,Lista e ndeshjeve për këtë kategori,Match list for this category,Lista de partidos para esta categoría

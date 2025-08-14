@@ -20,3 +20,8 @@
 
 [COMPETICION: Бараж за Прва ЖФЛ 25/26]
 1,#008000,legend_promotion
+
+[COMPETICION: Прва ЖФЛ 25/26]
+1,#008000,legend_champions_league
+9,#D4AF37,legend_relegation_playoff
+10,#FF0000,legend_direct_relegation

@@ -60,3 +60,4 @@ mk,sq,es,en
 Кадетска Женска Фудбалска Лига 24/25,Liga e Kadeteve 24/25,Liga Femenina Cadete 24/25,Women's Cadet League 24/25
 Кадетска Женска Фудбалска Лига 25/26,Liga e Kadeteve 25/26,Liga Femenina Cadete 25/26,Women's Cadet League 25/26
 Пријателски Турнир Речица 25/26,Turne miqësor në Reçicë 25/26,Torneo amistoso de Rečica 25/26,Friendly Tournament Rečica 25/26
+Репрезентација,Kombëtarja,Selección nacional,National team

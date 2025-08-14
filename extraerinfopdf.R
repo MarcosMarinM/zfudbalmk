@@ -901,7 +901,7 @@ procesar_acta <- function(acta_path) {
 ### 4.1. Definición de rutas y carga de caché ----
 
 # Ruta a la carpeta que contiene las actas en PDF.
-ruta_pdfs <- "/Users/marcosmarinm/Downloads/Reprezentacija"
+ruta_pdfs <- "Actas"
 # Ruta para el archivo de caché donde se guardarán los resultados procesados.
 ruta_cache <- "actas_cache.rds"
 
@@ -1137,3 +1137,4 @@ tryCatch({
   message("\nError al escribir el archivo de salida.")
   message(paste("Error original:", e$message))
 })
+

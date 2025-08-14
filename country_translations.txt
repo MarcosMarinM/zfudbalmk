@@ -1,0 +1,212 @@
+original_mk,translation_sq,translation_es,translation_en
+Авганистан,Afganistan,Afganistán,Afghanistan
+Албанија,Shqipëri,Albania,Albania
+Алжир,Algjeri,Argelia,Algeria
+Американска Самоа,Samoa Amerikane,Samoa Americana,American Samoa
+Андора,Andorra,Andorra,Andorra
+Ангола,Angola,Angola,Angola
+Ангвила,Angilë,Anguila,Anguilla
+Антигва и Барбуда,Antigua e Barbuda,Antigua y Barbuda,Antigua and Barbuda
+Аргентина,Argjentina,Argentina,Argentina
+Ерменија,Armeni,Armenia,Armenia
+Аруба,Aruba,Aruba,Aruba
+Австралија,Australi,Australia,Australia
+Австрија,Austri,Austria,Austria
+Азербејџан,Azerbejxhan,Azerbaiyán,Azerbaijan
+Бахами,Bahamet,Bahamas,Bahamas
+Бахреин,Bahrejn,Bahréin,Bahrain
+Бангладеш,Bangladesh,Bangladesh,Bangladesh
+Барбадос,Barbados,Barbados,Barbados
+Белорусија,Bjellorusi,Bielorrusia,Belarus
+Белгија,Belgjikë,Bélgica,Belgium
+Белизе,Belizë,Belice,Belize
+Бенин,Benin,Benín,Benin
+Бермуди,Bermudë,Bermudas,Bermuda
+Бутан,Butan,Bután,Bhutan
+Боливија,Bolivi,Bolivia,Bolivia
+Босна и Херцеговина,Bosnja dhe Hercegovina,Bosnia y Herzegovina,Bosnia and Herzegovina
+Боцвана,Botsvanë,Botsuana,Botswana
+Бразил,Brazil,Brasil,Brazil
+Брунеј,Brunej,Brunéi,Brunei
+Бугарија,Bullgari,Bulgaria,Bulgaria
+Буркина Фасо,Burkina Faso,Burkina Faso,Burkina Faso
+Бурунди,Burundi,Burundi,Burundi
+Зелениот ’Рт,Kepi i Gjelbër,Cabo Verde,Cabo Verde
+Камбоџа,Kamboxha,Camboya,Cambodia
+Камерун,Kamerun,Camerún,Cameroon
+Канада,Kanada,Canadá,Canada
+Кајмански Острови,Ishujt Kajman,Islas Caimán,Cayman Islands
+Централноафриканска Република,Republika e Qendrës Afrikane,República Centroafricana,Central African Republic
+Чад,Chad,Chad,Chad
+Чиле,Kili,Chile,Chile
+Кина,Kinë,China,China
+Колумбија,Kolumbi,Colombia,Colombia
+Комори,Komore,Comoras,Comoros
+Конго,Kongo,Congo,Congo
+Демократска Република Конго,Republika Demokratike e Kongos,República Democrática del Congo,Democratic Republic of the Congo
+Кукови Острови,Ishujt Kuk,Islas Cook,Cook Islands
+Костарика,Kosta Rika,Costa Rica,Costa Rica
+Хрватска,Kroaci,Croacia,Croatia
+Куба,Kubë,Cuba,Cuba
+Курасао,Kurasa,Curazao,Curaçao
+Кипар,Qipro,Chipre,Cyprus
+Чешка,Çeki,Chequia,Czechia
+Данска,Danimarkë,Dinamarca,Denmark
+Џибути,Xhibuti,Yibuti,Djibouti
+Доминика,Dominikë,Dominica,Dominica
+Доминиканска Република,Republika Dominikane,República Dominicana,Dominican Republic
+Еквадор,Ekuador,Ecuador,Ecuador
+Египет,Egjipt,Egipto,Egypt
+Ел Салвадор,El Salvador,El Salvador,El Salvador
+Англија,Angli,Inglaterra,England
+Екваторска Гвинеја,Guinea Ekuatoriale,Guinea Ecuatorial,Equatorial Guinea
+Еритреја,Eritre,Eritrea,Eritrea
+Естонија,Estoni,Estonia,Estonia
+Есватини,Eswatini,Eswatini,Eswatini
+Етиопија,Etiopi,Etiopía,Ethiopia
+Фарски Острови,Ishujt Faroe,Islas Feroe,Faroe Islands
+Фиџи,Fiji,Fiji,Fiji
+Финска,Finne,Finlandia,Finland
+Франција,Francë,Francia,France
+Габон,Gabon,Gabón,Gabon
+Гамбија,Gambia,Gambia,Gambia
+Грузија,Gjeorgji,Georgia,Georgia
+Германија,Gjermani,Alemania,Germany
+Гана,Ganë,Ghana,Ghana
+Гибралтар,Bregu i Shtetit,Gibraltar,Gibraltar
+Грција,Greqi,Grecia,Greece
+Гренада,Grenada,Granada,Grenada
+Гуам,Guam,Guam,Guam
+Гватемала,Guatemalë,Guatemala,Guatemala
+Гвинеја,Guine,Guinea,Guinea
+Гвинеја-Бисао,Guine-Bisau,Guinea-Bissau,Guinea-Bissau
+Гвајана,Guajanë,Guyana,Guyana
+Хаити,Haiti,Haití,Haiti
+Хондурас,Honduras,Honduras,Honduras
+Хонгконг,Hong Kong,Hong Kong,Hong Kong
+Унгарија,Hungari,Hungría,Hungary
+Исланд,Islandë,Islandia,Iceland
+Индија,Indi,India,India
+Индонезија,Indonezi,Indonesia,Indonesia
+Иран,Iran,Irán,Iran
+Ирак,Irak,Irak,Iraq
+Ирска,Irlandë,Irlanda,Ireland
+Израел,Izrael,Israel,Israel
+Италија,Itali,Italia,Italy
+Брегот на Слоновата Коска,Bregu i Fildishtë,Costa de Marfil,Ivory Coast
+Јамајка,Xhamajkë,Jamaica,Jamaica
+Јапонија,Japoni,Japón,Japan
+Јордан,Jordani,Jordania,Jordan
+Казахстан,Kazakistan,Kazajistán,Kazakhstan
+Кенија,Kenia,Kenia,Kenya
+Косово,Kosovë,Kosovo,Kosovo
+Кувајт,Kuvajt,Kuwait,Kuwait
+Киргистан,Kirgistan,Kirguistán,Kyrgyzstan
+Лаос,Laos,Laos,Laos
+Латвија,Letoni,Letonia,Latvia
+Либан,Liban,Líbano,Lebanon
+Лесото,Lesoto,Lesoto,Lesotho
+Либерија,Liberi,Liberia,Liberia
+Либија,Libi,Libia,Libya
+Лихтенштајн,Lihtenshtajn,Liechtenstein,Liechtenstein
+Литванија,Lituania,Lituania,Lithuania
+Луксембург,Luksemburg,Luxemburgo,Luxembourg
+Макао,Makao,Macao,Macao
+Мадагаскар,Madagaskar,Madagascar,Madagascar
+Малави,Malavi,Malawi,Malawi
+Малезија,Malesia,Malasia,Malaysia
+Малдиви,Maldivet,Maldivas,Maldives
+Мали,Mali,Malí,Mali
+Малта,Maltë,Malta,Malta
+Мавританија,Mauritani,Mauritania,Mauritania
+Маврициус,Mauricius,Mauricio,Mauritius
+Мексико,Meksikë,México,Mexico
+Молдавија,Moldavi,Moldavia,Moldova
+Монголија,Mongoli,Mongolia,Mongolia
+Црна Гора,Mali Zi,Montenegro,Montenegro
+Монтсерат,Montserrat,Montserrat,Montserrat
+Мароко,Marokë,Marruecos,Morocco
+Мозамбик,Mozambik,Mozambique,Mozambique
+Мјанмар,Mianmar,Myanmar,Myanmar
+Намибија,Namibi,Namibia,Namibia
+Непал,Nepal,Nepal,Nepal
+Холандија,Holandë,Países Bajos,Netherlands
+Нова Каледонија,Kaledonia e Re,Nueva Caledonia,New Caledonia
+Нов Зеланд,Zelanda e Re,Nueva Zelanda,New Zealand
+Никарагва,Nikaragua,Nicaragua,Nicaragua
+Нигер,Niger,Níger,Niger
+Нигерија,Nigeri,Nigeria,Nigeria
+Северна Кореја,Koreja e Veriut,Corea del Norte,North Korea
+Македонија,Maqedonia,Macedonia,Macedonia
+Северна Ирска,Irlanda e Veriut,Irlanda del Norte,Northern Ireland
+Норвешка,Norvegji,Noruega,Norway
+Оман,Oman,Omán,Oman
+Пакистан,Pakistan,Pakistán,Pakistan
+Палестина,Palestinë,Palestina,Palestine
+Панама,Panamë,Panamá,Panama
+Папуа Нова Гвинеја,Papua Guinea e Re,Papúa Nueva Guinea,Papua New Guinea
+Парагвај,Paraguai,Paraguay,Paraguay
+Перу,Peru,Perú,Peru
+Филипини,Filipine,Filipinas,Philippines
+Полска,Poloni,Polonia,Poland
+Португалија,Portugali,Portugal,Portugal
+Порторико,Porto Riko,Puerto Rico,Puerto Rico
+Катар,Katar,Catar,Qatar
+Романија,Rumani,Rumania,Romania
+Русија,Rusi,Rusia,Russia
+Руанда,Ruandë,Ruanda,Rwanda
+Свети Китс и Невис,Shën Kitsi dhe Nevis,San Cristóbal y las Nieves,Saint Kitts and Nevis
+Света Луција,Shën Lucia,Santa Lucía,Saint Lucia
+Свети Винсент и Гренадини,Shën Vincenti dhe Grenadinet,San Vicente y las Granadinas,Saint Vincent and the Grenadines
+Самоа,Samoa,Samoa,Samoa
+Сан Марино,San Marino,San Marino,San Marino
+Сао Томе и Принсипе,Sao Tomë dhe Prinçi,Santo Tomé y Príncipe,São Tomé and Príncipe
+Саудиска Арабија,Arabia Saudite,Arabia Saudí,Saudi Arabia
+Шкотска,Skoci,Escocia,Scotland
+Сенегал,Senegal,Senegal,Senegal
+Србија,Serbi,Serbia,Serbia
+Сејшели,Seishellet,Seychelles,Seychelles
+Сиера Леоне,Sierra Leone,Sierra Leona,Sierra Leone
+Сингапур,Singapor,Singapur,Singapore
+Словачка,Sllovaki,Eslovaquia,Slovakia
+Словенија,Slloveni,Eslovenia,Slovenia
+Соломонски Острови,Ishujt Solomon,Islas Salomón,Solomon Islands
+Сомалија,Somali,Somalia,Somalia
+Јужна Африка,Afrika e Jugut,Sudáfrica,South Africa
+Јужна Кореја,Koreja e Jugut,Corea del Sur,South Korea
+Јужен Судан,Sudani i Jugut,Sudán del Sur,South Sudan
+Шпанија,Spanjë,España,Spain
+Шри Ланка,Sri Lanka,Sri Lanka,Sri Lanka
+Судан,Sudani,Sudán,Sudan
+Суринам,Surinami,Surinam,Suriname
+Шведска,Suedi,Suecia,Sweden
+Швајцарија,Zvicërr,Suiza,Switzerland
+Сирија,Siri,Siria,Syria
+Тајван,Tajvan,Taiwán,Taiwan
+Таџикистан,Taxhikistan,Tayikistán,Tajikistan
+Танзанија,Tanzani,Tanzania,Tanzania
+Тајланд,Tailanda,Tailandia,Thailand
+Источен Тимор,Timor Lindor,Timor Oriental,Timor-Leste
+Того,Togo,Togo,Togo
+Тонга,Tonga,Tonga,Tonga
+Тринидад и Тобаго,Trinidadi dhe Tobago,Trinidad y Tobago,Trinidad and Tobago
+Тунис,Tunizi,Túnez,Tunisia
+Турција,Turqi,Turquía,Turkey
+Туркменистан,Turkmenistan,Turkmenistán,Turkmenistan
+Острови Туркс и Кајкос,Ishujt Turq dhe Kaikos,Islas Turcas y Caicos,Turks and Caicos Islands
+Тувалу,Tuvalu,Tuvalu,Tuvalu
+Уганда,Uganda,Uganda,Uganda
+Украина,Ukrain,Ucrania,Ukraine
+Обединети Арапски Емирати,Emiratët e Bashkuara Arabe,Emiratos Árabes Unidos,United Arab Emirates
+Соединети Држави,Shtetet e Bashkuara,Estados Unidos,United States
+Уругвај,Urugua,Uruguay,Uruguay
+Узбекистан,Uzbekistan,Uzbekistán,Uzbekistan
+Вануату,Vanuatu,Vanuatu,Vanuatu
+Венецуела,Venezuelë,Venezuela,Venezuela
+Виетнам,Vietnam,Vietnam,Vietnam
+Британски Девствени Острови,Ishujt Vergjina Britanike,Islas Vírgenes Británicas,British Virgin Islands
+Американски Девствени Острови,Ishujt Vergjina Amerikane,Islas Vírgenes de EE. UU.,US Virgin Islands
+Велс,Uells,Gales,Wales
+Јемен,Jemen,Yemen,Yemen
+Замбија,Zambia,Zambia,Zambia
+Зимбабве,Zimbabwe,Zimbabue,Zimbabwe
