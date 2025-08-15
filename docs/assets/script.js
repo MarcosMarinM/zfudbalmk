@@ -3,23 +3,23 @@ let searchData = [];
 
 document.addEventListener('DOMContentLoaded', initializeSearch);
 
-// Se hace la lógica de rutas más robusta para que funcione
-// tanto en el servidor local de `servr` como en GitHub Pages.
+// Make the path logic more robust to work on both the `servr` local server
+// and GitHub Pages.
 function getSiteBasePath() {
   const path = window.location.pathname;
-  // Encuentra la parte de la ruta antes de la primera carpeta de idioma.
-  // Ej: de "/repo/mk/page.html" extrae "/repo/"
+  // Find the part of the path before the first language folder.
+  // E.g., from "/repo/mk/page.html" extracts "/repo/"
   const match = path.match(/^(.*\/)(mk|sq|es|en)\//);
   if (match && match[1]) {
     return match[1];
   }
-  // Fallback para la raíz (ej. `servr` en local)
+  // Fallback for the root (e.g., `servr` locally)
   return "/";
 }
 
 function getCurrentLanguageFromPath() {
   const path = window.location.pathname;
-  // Busca el código de idioma de 2 letras en la ruta.
+  // Look for the 2-letter language code in the path.
   const match = path.match(/\/(mk|sq|es|en)\//);
   if (match && match[1]) {
     return match[1];
@@ -97,7 +97,6 @@ function generateLink(target_id) {
   return `${basePath}${lang}/${folder}/${id}.html`;
 }
 
-// ... (El resto del JS, handleSearchInput, showSearchResults, etc., permanece igual)
 function handleSearchInput(event) {
   if (event.key === 'Enter') { event.preventDefault(); showSearchResults(); return; }
   if (searchData.length === 0) return; 

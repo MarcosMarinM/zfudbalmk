@@ -23,30 +23,10 @@ th { background-color: #f2f2f2; }
 .partido-link { transition: background-color 0.2s; }
 .partido-link-placeholder { cursor: default; }
 .partido-link:hover { background-color: #ced4da; }
-/* --- INICIO DEL BLOQUE CORREGIDO --- */
-/* Estilo común para los contenedores de equipo en ambos tipos de enlaces (real y placeholder) */
-.partido-link span.equipo, .partido-link-placeholder span.equipo { 
-  flex: 1 1 40%; /* Ocupa el 40% del espacio, permitiendo encoger/crecer */
-  display: flex; 
-  align-items: center; 
-  font-weight: bold; 
-}
-/* Estilo para el equipo local, alineado a la derecha */
-.partido-link span.equipo-local, .partido-link-placeholder span.equipo-local { 
-  justify-content: flex-end; /* Alinea contenido (logo+texto) a la derecha */
-}
-/* Estilo para el equipo visitante, alineado a la izquierda */
-.partido-link span.equipo-visitante, .partido-link-placeholder span.equipo-visitante { 
-  justify-content: flex-start; /* Alinea contenido (logo+texto) a la izquierda */
-}
-/* Estilo para el resultado, ocupa el 12% central fijo */
-.partido-link span.resultado, .partido-link-placeholder span.resultado { 
-  flex: 0 0 12%; /* No crece, no encoge, base del 12% */
-  font-size: 1.2em; 
-  font-weight: bold; 
-  text-align: center; 
-}
-/* --- FIN DEL BLOQUE CORREGIDO --- */
+.partido-link span.equipo, .partido-link-placeholder span.equipo { flex: 1 1 40%; display: flex; align-items: center; font-weight: bold; }
+.partido-link span.equipo-local, .partido-link-placeholder span.equipo-local { justify-content: flex-end; }
+.partido-link span.equipo-visitante, .partido-link-placeholder span.equipo-visitante { justify-content: flex-start; }
+.partido-link span.resultado, .partido-link-placeholder span.resultado { flex: 0 0 12%; font-size: 1.2em; font-weight: bold; text-align: center; }
 .jornada-header { background-color: #8B0000; color: white; padding: 10px; border-radius: 5px; margin-top: 30px; }
 .timeline { list-style: none; padding-left: 0; } .timeline li { padding: 8px 0; border-bottom: 1px dotted #ccc; display: flex; align-items: center; }
 .timeline .icon { margin-right: 10px; font-size: 1.2em; width: 24px; text-align: center; }
@@ -77,27 +57,14 @@ th { background-color: #f2f2f2; }
 .legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
 .legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
 .team-logo { height: 24px; width: 24px; object-fit: contain; }
-.team-logo.national-team-flag {
-  border-radius: 50%;
-  border: 1px solid #ccc; /* Un borde sutil para las banderas */
-}
+.team-logo.national-team-flag { border-radius: 50%; border: 1px solid #ccc; }
 .team-cell { display: flex; align-items: center; }
 .team-cell .team-logo { margin-right: 12px; }
 .partido-link .team-logo { height: 28px; width: 28px; }
 .partido-link .equipo-local .team-logo { margin-right: 10px; }
 .partido-link .equipo-visitante .team-logo { margin-left: 10px; }
 .alineacion-header { text-align: center; margin-bottom: 20px; }
-.alineacion-header .match-page-crest, .team-page-crest {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  margin: 10px auto;
-  display: block;
-}
-.alineacion-header h3 {
-  border-bottom: none;
-  padding-bottom: 0;
-  margin-bottom: 5px;
-}
+.alineacion-header .match-page-crest, .team-page-crest { width: 120px; height: 120px; object-fit: contain; margin: 10px auto; display: block; }
+.alineacion-header h3 { border-bottom: none; padding-bottom: 0; margin-bottom: 5px; }
 .alineacion-header h3 a { color: #8B0000; }
 
