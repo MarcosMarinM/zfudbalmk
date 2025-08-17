@@ -22,6 +22,7 @@ original_mk,latin_sq,latin_es,latin_en
 Гордана Милошевиќ,Gordana Milošević,Gordana Milošević,Gordana Milošević
 Деспина Пауновиќ,Despina Paunović,Despina Paunović,Despina Paunović
 Диана Алуши,Diana Alushi,Diana Alushi,Diana Alushi
+Евелин Шварц,Evelyn Schwarz,Evelyn Schwarz,Evelyn Schwarz
 Едона Шабани,Edona Shabani,Edona Shabani,Edona Shabani
 Елеонора Груиќ,Eleonora Gruić,Eleonora Gruić,Eleonora Gruić
 Елиона Таири,Eliona Tairi,Eliona Tairi,Eliona Tairi

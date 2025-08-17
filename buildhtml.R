@@ -1161,12 +1161,12 @@ if (!is.null(mapa_unificacion_id_df) && nrow(mapa_unificacion_id_df) > 0) {
 }
 
 
-### 10.5. Apply Name Reordering Idempotently
-message("Applying idempotent name reordering...")
+### 10.5. Apply Name Corrections and Reordering Idempotently
+message("Applying idempotent name corrections and reordering...")
 
 # This attribute acts as a flag. It's saved to the cache along with the data.
 # On the next run, if the attribute exists, this block will be skipped.
-if (is.null(attr(resultados_exitosos, "nombres_reordenados"))) {
+if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
   
   message("   > Data has not been processed yet. Applying corrections and reordering now...")
   
@@ -1175,29 +1175,46 @@ if (is.null(attr(resultados_exitosos, "nombres_reordenados"))) {
     if (is.null(res)) return(NULL)
     
     # --- INICIO DE LA CORRECCIÓN ---
-    # STEP 1: APPLY CORRECTIONS from conversions.txt CONSISTENTLY
-    # This ensures team names inside the cached object match the main partidos_df.
+    # STEP 1: APPLY CORRECTIONS from conversions.txt CONSISTENTLY and IDEMPOTENTLY.
     if (!is.null(mapa_conversiones)) {
-      # Correct team names in the main info block and event dataframes
+      # Correct team, player, and entity names across the entire cached object.
       res$partido_info <- aplicar_conversiones(res$partido_info, c("local", "visitante"), mapa_conversiones)
-      if (nrow(res$goles) > 0) res$goles <- aplicar_conversiones(res$goles, c("equipo_jugadora", "equipo_acreditado"), mapa_conversiones)
-      if (nrow(res$tarjetas) > 0) res$tarjetas <- aplicar_conversiones(res$tarjetas, "equipo", mapa_conversiones)
+      res$estadio <- recode(res$estadio, !!!mapa_conversiones)
+      res$arbitro_principal_nombre <- recode(res$arbitro_principal_nombre, !!!mapa_conversiones)
+      res$arbitro_asist_1_nombre <- recode(res$arbitro_asist_1_nombre, !!!mapa_conversiones)
+      res$arbitro_asist_2_nombre <- recode(res$arbitro_asist_2_nombre, !!!mapa_conversiones)
+      
+      if (nrow(res$alineacion_local) > 0) res$alineacion_local <- aplicar_conversiones(res$alineacion_local, "nombre", mapa_conversiones)
+      if (nrow(res$alineacion_visitante) > 0) res$alineacion_visitante <- aplicar_conversiones(res$alineacion_visitante, "nombre", mapa_conversiones)
+      if (nrow(res$goles) > 0) res$goles <- aplicar_conversiones(res$goles, c("jugadora", "equipo_jugadora", "equipo_acreditado"), mapa_conversiones)
+      if (nrow(res$tarjetas) > 0) res$tarjetas <- aplicar_conversiones(res$tarjetas, c("jugadora", "equipo"), mapa_conversiones)
       if (!is.null(res$penales) && nrow(res$penales) > 0) {
-        res$penales <- aplicar_conversiones(res$penales, "equipo", mapa_conversiones)
+        res$penales <- aplicar_conversiones(res$penales, c("jugadora", "equipo"), mapa_conversiones)
       }
     }
     # --- FIN DE LA CORRECCIÓN ---
     
     # STEP 2: REORDER PLAYER AND REFEREE NAMES
-    if (nrow(res$alineacion_local) > 0) res$alineacion_local$nombre <- reordenar_nombre_idempotente(res$alineacion_local$nombre)
-    if (nrow(res$alineacion_visitante) > 0) res$alineacion_visitante$nombre <- reordenar_nombre_idempotente(res$alineacion_visitante$nombre)
-    if (nrow(res$goles) > 0) res$goles$jugadora <- reordenar_nombre_idempotente(res$goles$jugadora)
-    if (nrow(res$tarjetas) > 0) res$tarjetas$jugadora <- reordenar_nombre_idempotente(res$tarjetas$jugadora)
-    if (!is.null(res$penales) && nrow(res$penales) > 0) res$penales$jugadora <- reordenar_nombre_idempotente(res$penales$jugadora)
+    # Renombrado reordenar_nombre_idempotente a reordenar_nombre_simple para claridad.
+    reordenar_nombre_simple <- function(nombres) {
+      sapply(nombres, function(nombre) {
+        if (is.na(nombre) || !stringr::str_detect(nombre, "\\s+")) return(nombre)
+        palabras <- stringr::str_split(nombre, "\\s+")[[1]]
+        primer_nombre <- palabras[length(palabras)]
+        apellido <- paste(palabras[-length(palabras)], collapse = " ")
+        return(paste(primer_nombre, apellido))
+      }, USE.NAMES = FALSE)
+    }
     
-    res$arbitro_principal_nombre <- reordenar_nombre_idempotente(res$arbitro_principal_nombre)
-    res$arbitro_asist_1_nombre <- reordenar_nombre_idempotente(res$arbitro_asist_1_nombre)
-    res$arbitro_asist_2_nombre <- reordenar_nombre_idempotente(res$arbitro_asist_2_nombre)
+    if (nrow(res$alineacion_local) > 0) res$alineacion_local$nombre <- reordenar_nombre_simple(res$alineacion_local$nombre)
+    if (nrow(res$alineacion_visitante) > 0) res$alineacion_visitante$nombre <- reordenar_nombre_simple(res$alineacion_visitante$nombre)
+    if (nrow(res$goles) > 0) res$goles$jugadora <- reordenar_nombre_simple(res$goles$jugadora)
+    if (nrow(res$tarjetas) > 0) res$tarjetas$jugadora <- reordenar_nombre_simple(res$tarjetas$jugadora)
+    if (!is.null(res$penales) && nrow(res$penales) > 0) res$penales$jugadora <- reordenar_nombre_simple(res$penales$jugadora)
+    
+    res$arbitro_principal_nombre <- reordenar_nombre_simple(res$arbitro_principal_nombre)
+    res$arbitro_asist_1_nombre <- reordenar_nombre_simple(res$arbitro_asist_1_nombre)
+    res$arbitro_asist_2_nombre <- reordenar_nombre_simple(res$arbitro_asist_2_nombre)
     
     return(res)
   })
@@ -1208,11 +1225,11 @@ if (is.null(attr(resultados_exitosos, "nombres_reordenados"))) {
   }
   
   # Set the flag to TRUE after processing.
-  attr(resultados_exitosos, "nombres_reordenados") <- TRUE
-  message("   > Name reordering and corrections complete. Data has been marked as processed.")
+  attr(resultados_exitosos, "nombres_procesados") <- TRUE
+  message("   > Name corrections and reordering complete. Data has been marked as processed.")
   
 } else {
-  message("   > Names have already been reordered and corrected in a previous run. Skipping.")
+  message("   > Names have already been corrected and reordered in a previous run. Skipping.")
 }
 
 ### 10.6. Consolidate and Unify Player Data
