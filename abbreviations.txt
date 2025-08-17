@@ -1,0 +1,6 @@
+original_mk,abbr_mk,abbr_sq,abbr_es,abbr_en
+Каменица Саса,САС,SAS,SAS,SAS
+Фудбал Старс,ФСТ,FST,FST,FST
+Џи-Џи,ЏИЏ,DŽI,DŽI,DŽI
+АС Јунајтед,ЈУН,UNI,UNI,UNI
+Брера Тиверија,ТИВ,TIV,TIV,TIV

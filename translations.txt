@@ -134,7 +134,15 @@ competition_reprezentacija,Репрезентација,Kombëtarja,Selección n
 category_page_title,Натпревари по категорија,Ndeshjet sipas kategorisë,Partidos por categoría,Matches by category
 match_header_category,Категорија,Kategoria,Categoría,Category
 match_header_status,Наст.Nd.,Part.,Apps
-national_team_all_time_stats,Статистика на сите времиња за репрезентацијата,Statistikat e të gjitha kohërave për ekipin kombëtar,National team statistics,Estadísticas de la selección
-category_header,Категорија,Kategoria,Category,Categoría
-player_stats_for_category,Статистика на фудбалерки за оваа категорија,Statistikat e lojtarëve për këtë kategori,Player statistics for this category,Estadísticas de jugadoras para esta categoría
-match_list_for_category,Список на натпревари за оваа категорија,Lista e ndeshjeve për këtë kategori,Match list for this category,Lista de partidos para esta categoría
+national_team_all_time_stats,Статистика на сите времиња за репрезентацијата,Statistikat e të gjitha kohërave për ekipin kombëtar,Estadísticas de la selección,National team statistics
+category_header,Категорија,Kategoria, Categoría,Category
+player_stats_for_category,Статистика на фудбалерки за оваа категорија,Statistikat e lojtarëve për këtë kategori,Estadísticas de jugadoras para esta categoría,Player statistics for this category
+match_list_for_category,Список на натпревари за оваа категорија,Lista e ndeshjeve për këtë kategori,Lista de partidos para esta categoría,Match list for this category
+latest_results_title,Последни резултати,Rezultatet e fundit,Últimos resultados,Latest results
+round_prefix_short,Коло,Raundi,Jornada,Round
+all_results_link,Сите резултати,Të gjitha rezultatet,Todos los resultados,All results
+mini_standings_pos,П,P,P,P
+mini_standings_team,Тим, Ekipi,Equipo,Team
+mini_standings_p,К,N,PJ,P
+mini_standings_pts,Бод,Pikë,Pts.,Pts
+standings_main_title,Табели,Tabelat,Clasificaciones,Standings
