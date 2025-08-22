@@ -1,7 +1,38 @@
 
 let searchData = [];
 
-document.addEventListener('DOMContentLoaded', initializeSearch);
+document.addEventListener('DOMContentLoaded', function() {
+  initializeSearch();
+  initializeMobileMenu();
+});
+
+function initializeMobileMenu() {
+  const hamburger = document.getElementById('hamburger-icon');
+  const nav = document.querySelector('.navbar');
+  const closeBtn = document.getElementById('close-nav-btn');
+  const dropdownBtn = document.querySelector('.dropdown .dropbtn');
+
+  if (hamburger && nav && closeBtn) {
+    hamburger.addEventListener('click', () => {
+      nav.classList.add('mobile-active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      nav.classList.remove('mobile-active');
+    });
+  }
+
+  // Lógica para desplegar el submenú en móvil con un toque
+  if (dropdownBtn) {
+    dropdownBtn.addEventListener('click', (event) => {
+      if (window.innerWidth <= 768) { // Solo en vista móvil
+        event.preventDefault(); // Evita que el enlace # se active
+        const parentDropdown = dropdownBtn.parentElement;
+        parentDropdown.classList.toggle('open');
+      }
+    });
+  }
+}
 
 // Make the path logic more robust to work on both the `servr` local server
 // and GitHub Pages.
@@ -61,6 +92,11 @@ function initializeSearch() {
 
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
+    const navbar = document.querySelector('.navbar');
+    if (navbar && navbar.contains(event.target)) {
+      return;
+    }
+
     if (searchContainer && !searchContainer.contains(event.target)) {
       const suggestions = document.getElementById('search-suggestions');
       if(suggestions) suggestions.style.display = 'none';
@@ -163,5 +199,26 @@ function sortTable(tableId, columnIndex) {
   tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
   table.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
   if(header) header.classList.add(newDir);
+}
+function showLetter(letter) {
+  // Hide all letter groups
+  document.querySelectorAll('.letter-group').forEach(group => {
+    group.classList.remove('active');
+  });
+  // Deactivate all letter links
+  document.querySelectorAll('.letter-nav a').forEach(link => {
+    link.classList.remove('active');
+  });
+
+  // Show the selected letter group
+  const selectedGroup = document.getElementById('group-' + letter);
+  if (selectedGroup) {
+    selectedGroup.classList.add('active');
+  }
+  // Activate the selected letter link
+  const selectedLink = document.querySelector(`.letter-nav a[data-letter="${letter}"]`);
+  if (selectedLink) {
+    selectedLink.classList.add('active');
+  }
 }
 

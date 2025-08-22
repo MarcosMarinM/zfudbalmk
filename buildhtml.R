@@ -232,13 +232,13 @@ crear_selector_idioma <- function(idioma_pagina_actual) {
 
 
 #' @title Create the standard navigation buttons (Back, Home).
+#' @description THIS FUNCTION IS INTENTIONALLY DISABLED. It now returns NULL to
+#' prevent the Back/Home buttons from being rendered on any page.
 #' @param path_to_lang_root Relative path to the current language root (e.g., '..').
-#' @return An htmltools `div` object.
+#' @return NULL
 crear_botones_navegacion <- function(path_to_lang_root = ".") {
-  tags$div(class = "nav-buttons",
-           tags$a(t("back_button"), href = "#", onclick = "history.back(); return false;", class = "back-link"),
-           tags$a(t("home_button"), href = file.path(path_to_lang_root, "index.html"), class = "back-link")
-  )
+  # Returns NULL to effectively remove the buttons from the entire site.
+  return(NULL)
 }
 
 #' @title Create the base structure of an HTML page (template).
@@ -246,8 +246,13 @@ crear_botones_navegacion <- function(path_to_lang_root = ".") {
 #' @param titulo_pagina The title that will appear in the browser tab (already translated).
 #' @param path_to_root_dir Relative path to the root 'docs/' directory.
 #' @param script_contraseña The script tag for password protection.
+#' @param current_page_id A string identifying the current page for the navbar (e.g., "home", "players").
 #' @return A complete htmltools `html` object.
-crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_dir = ".", script_contraseña) {
+crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_dir = ".", script_contraseña, current_page_id = "home") {
+  
+  # Determine the relative path to the language root for links in the navbar
+  path_to_lang_root <- if (path_to_root_dir == "..") "." else ".."
+  
   tags$html(lang = idioma_actual,
             tags$head(
               tags$meta(charset="UTF-8"),
@@ -260,9 +265,16 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_d
               `data-search-results-title` = t("search_results_for"),
               `data-no-search-results-msg` = t("no_search_results"),
               `data-search-prompt-msg` = t("search_prompt"),
+              
               tags$div(class = "container",
                        crear_selector_idioma(idioma_pagina_actual = idioma_actual),
-                       tags$h1(tags$a(href = file.path(path_to_root_dir, idioma_actual, "index.html"), style = "color: inherit; text-decoration: none;", t("site_title"))),
+                       
+                       # --- NUEVO: Contenedor para alinear título y menú ---
+                       tags$div(class="header-main",
+                                tags$h1(tags$a(href = file.path(path_to_lang_root, "index.html"), style = "color: inherit; text-decoration: none;", t("site_title"))),
+                                crear_barra_navegacion(path_to_lang_root = path_to_lang_root, current_page_id = current_page_id)
+                       ),
+                       
                        tags$div(class = "search-container",
                                 tags$form(action = "#", onsubmit = "showSearchResults(); return false;",
                                           tags$input(type = "text", id = "search-input", class = "search-input", placeholder = t("search_placeholder"), onkeyup = "handleSearchInput(event)"),
@@ -279,6 +291,69 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_d
   )
 }
 
+
+
+#' @title Create the main navigation bar.
+#' @description Generates the full <nav> element with dropdowns and hamburger icon.
+#' @param path_to_lang_root Relative path to the current language root (e.g., '.').
+#' @param current_page_id An identifier for the current page to set the 'active' class.
+#' @return An htmltools `nav` object.
+crear_barra_navegacion <- function(path_to_lang_root = ".", current_page_id = "home") {
+  
+  crear_item_menu <- function(id, texto, href) {
+    tags$li(tags$a(class = if (id == current_page_id) "active" else "", href = href, texto))
+  }
+  
+  temporada_actual <- obtener_temporada_actual()
+  competiciones_menu_df <- competiciones_unicas_df %>%
+    filter(competicion_temporada == temporada_actual, !str_detect(competicion_nombre, "Пријателски|Бараж"))
+  
+  comp_dropdown_items <- map(1:nrow(competiciones_menu_df), function(i) {
+    comp <- competiciones_menu_df[i, ]; comp_name_lang <- comp[[paste0("nombre_completo_", idioma_actual)]]
+    tags$a(href = file.path(path_to_lang_root, nombres_carpetas_relativos$competiciones, paste0(comp$competicion_id, ".html")), comp_name_lang)
+  })
+  
+  comp_dropdown_items <- append(comp_dropdown_items,
+                                list(tags$hr(), tags$a(href = file.path(path_to_lang_root, paste0(nombres_archivos_traducidos$archive, ".html")), t("menu_archive")))
+  )
+  
+  tags$nav(
+    class = "navbar",
+    tags$a(href = "javascript:void(0);", class = "hamburger-icon", id = "hamburger-icon",
+           tags$span(class="bar"), tags$span(class="bar"), tags$span(class="bar")
+    ),
+    tags$ul(
+      class = "nav-links",
+      tags$li(class="close-btn-li", tags$a(href="javascript:void(0);", id="close-nav-btn", "×")),
+      
+      crear_item_menu("home", t("menu_home"), file.path(path_to_lang_root, "index.html")),
+      tags$li(
+        class = "dropdown",
+        tags$a(href = "javascript:void(0)", class = if (current_page_id == "competitions") "dropbtn active" else "dropbtn", 
+               HTML(paste(t("menu_competitions"), " &#9662;"))
+        ),
+        tags$div(class = "dropdown-content", comp_dropdown_items)
+      ),
+      crear_item_menu("national_team", t("menu_national_team"), file.path(path_to_lang_root, nombres_carpetas_relativos$competiciones, "reprezentacija.html")),
+      crear_item_menu("players", t("menu_players"), file.path(path_to_lang_root, paste0(nombres_archivos_traducidos$players, ".html"))),
+      crear_item_menu("teams", t("menu_teams"), file.path(path_to_lang_root, paste0(nombres_archivos_traducidos$teams, ".html"))),
+      crear_item_menu("about", t("menu_about"), file.path(path_to_lang_root, paste0(nombres_archivos_traducidos$about, ".html")))
+    )
+  )
+}
+
+
+#' @title Extracts the surname for sorting purposes.
+#' @description Assumes the name is in "Firstname Lastname" format and returns the last word.
+#' @param nombre A single string with a full name.
+#' @return The extracted surname, or the full name if it's a single word.
+extraer_apellido <- function(nombre) {
+  if (is.na(nombre) || !str_detect(nombre, "\\s")) {
+    return(nombre)
+  }
+  palabras <- str_split(nombre, "\\s+")[[1]]
+  return(palabras[length(palabras)])
+}
 
 ### 8.4. Function to Generate Match Timeline
 
@@ -442,7 +517,7 @@ crear_bloque_resultados_competicion <- function(comp_info, partidos_jornada_df, 
   # Nueva ruta que apunta directamente a la página de CALENDARIO (Распоред)
   ruta_raspored <- file.path(
     nombres_carpetas_relativos$competiciones, 
-    paste0(comp_info$competicion_id, "_", nombres_archivos_mk$partidos, ".html")
+    paste0(comp_info$competicion_id, "_", nombres_archivos_traducidos$partidos, ".html")
   )
   
   # Helper to create each individual match block (vertical layout)
@@ -529,7 +604,7 @@ crear_tabla_clasificacion_portada <- function(comp_info, stats_clasificacion_por
   # ¡NUEVO! Ruta a la página de la TABLA COMPLETA de la competición.
   ruta_tabla_completa <- file.path(
     nombres_carpetas_relativos$competiciones, 
-    paste0(comp_info$competicion_id, "_", nombres_archivos_mk$clasificacion, ".html")
+    paste0(comp_info$competicion_id, "_", nombres_archivos_traducidos$clasificacion, ".html")
   )
   
   # El contenedor principal ahora incluye el título y la tabla.
@@ -665,11 +740,15 @@ nombres_carpetas_relativos <- list(
   logos = "logos"
 )
 
-nombres_archivos_mk <- list(
+nombres_archivos_traducidos <- list(
   partidos = "raspored", 
   clasificacion = "tabela", 
   goleadoras = "strelci", 
-  sanciones = "disciplinska"
+  sanciones = "disciplinska",
+  archive = "arhiva",
+  about = "za-zfudbalmk",
+  players = "fudbalerki",
+  teams = "klubovi"
 )
 
 # 8.6.4. Create the directory structure.
@@ -2184,6 +2263,22 @@ th { background-color: #f2f2f2; }
 .alineacion-header .match-page-crest, .team-page-crest { width: 120px; height: 120px; object-fit: contain; margin: 10px auto; display: block; }
 .alineacion-header h3 { border-bottom: none; padding-bottom: 0; margin-bottom: 5px; }
 .alineacion-header h3 a { color: #8B0000; }
+
+/* --- ESTILOS PARA LA NUEVA CABECERA PRINCIPAL --- */
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 10px;
+}
+.header-main h1 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin: 0;
+  text-align: left;
+}
+
 /* --- STYLES FOR THE NEW HOMEPAGE RESULTS BLOCKS (V2) --- */
 .main-content-title { text-align: left; font-size: 1.5em; color: #333; margin-bottom: 20px; }
 .competition-results-block { margin-bottom: 50px; }
@@ -2254,8 +2349,189 @@ th { background-color: #f2f2f2; }
 .mini-standings-title-link:hover .mini-standings-title {
   color: #CC0000;
 }
-)"
+/* --- STYLES FOR THE RESPONSIVE NAVBAR --- */
+.navbar {
+  background-color: transparent; /* El fondo lo maneja .nav-links */
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.nav-links {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  background-color: #333;
+  border-radius: 5px;
+}
+.nav-links li a, .dropbtn {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 10px 14px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  border-radius: 5px;
+}
+.nav-links li > a:hover, .dropdown:hover .dropbtn {
+  background-color: #CC0000;
+}
+.nav-links li a.active {
+  background-color: #8B0000;
+  font-weight: bold;
+}
+.dropdown { position: relative; }
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #8B0000;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1001;
+  border-radius: 5px;
+}
+.dropdown-content a {
+  color: #CC0100;
+  font-weight: bold;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+.dropdown-content a:hover { background-color: #CC0100; }
+.dropdown:hover .dropdown-content { display: block; }
+.dropdown-content hr {
+  border: 0;
+  border-top: 1px solid #ddd; margin: 5px 0;
+}
+/* Estilos del icono de hamburguesa (oculto en desktop) */
+.hamburger-icon { display: none; }
+.close-btn-li { display: none; }
 
+/* Media Query para pantallas pequeñas (móviles) */
+@media screen and (max-width: 850px) {
+  .header-main {
+    border-bottom: none; /* Quitar la línea inferior en móvil */
+  }
+  .navbar {
+    background-color: transparent;
+  }
+  .nav-links {
+    display: none; /* Oculta la lista de links por defecto */
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 20, 20, 0.98);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    border-radius: 0;
+  }
+  .navbar.mobile-active .nav-links {
+    display: flex; /* Muestra el menú overlay cuando está activo */
+  }
+  .nav-links li {
+    margin: 15px 0;
+  }
+  .nav-links li a {
+    font-size: 1.5em;
+    background-color: transparent; /* Quitar fondo en móvil */
+  }
+  .dropdown-content {
+    position: static;
+    display: none;
+    background-color: transparent;
+    box-shadow: none;
+    padding-left: 20px;
+    border: none;
+  }
+  .dropdown:hover .dropdown-content {
+     display: none;
+  }
+  .dropdown.open .dropdown-content {
+     display: block;
+  }
+  .dropdown .dropbtn {
+     display: flex; align-items: center; justify-content: center;
+  }
+  .hamburger-icon {
+    display: block;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 2001; /* Debe estar por encima del overlay del menú */
+  }
+  .hamburger-icon .bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: #333;
+    transition: all 0.3s ease-in-out;
+  }
+  .close-btn-li {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 25px;
+  }
+  #close-nav-btn {
+    font-size: 3em;
+    font-weight: bold;
+    color: white;
+  }
+}
+/* --- STYLES FOR LETTER-BASED NAVIGATION --- */
+.letter-nav {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+.letter-nav a {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+}
+.letter-nav a:hover {
+  background-color: #CC0000;
+  color: white;
+}
+.letter-nav a.active {
+  background-color: #8B0000;
+  color: white;
+  border-color: #8B0000;
+}
+.letter-group {
+  display: none;
+}
+.letter-group.active {
+  display: block;
+}
+.player-list ul, .team-list ul {
+  list-style: none;
+  padding: 0;
+  columns: 3;
+  column-gap: 20px;
+}
+.player-list li, .team-list li {
+  padding: 5px 0;
+}
+@media (max-width: 768px) {
+  .player-list ul, .team-list ul { columns: 2; }
+}
+@media (max-width: 480px) {
+  .player-list ul, .team-list ul { columns: 1; }
+}
+)"
 
 
 writeLines(estilo_css, file.path(RUTA_ASSETS_COMPARTIDOS, "style.css"))
@@ -2265,7 +2541,38 @@ writeLines(estilo_css, file.path(RUTA_ASSETS_COMPARTIDOS, "style.css"))
 script_js <- r"(
 let searchData = [];
 
-document.addEventListener('DOMContentLoaded', initializeSearch);
+document.addEventListener('DOMContentLoaded', function() {
+  initializeSearch();
+  initializeMobileMenu();
+});
+
+function initializeMobileMenu() {
+  const hamburger = document.getElementById('hamburger-icon');
+  const nav = document.querySelector('.navbar');
+  const closeBtn = document.getElementById('close-nav-btn');
+  const dropdownBtn = document.querySelector('.dropdown .dropbtn');
+
+  if (hamburger && nav && closeBtn) {
+    hamburger.addEventListener('click', () => {
+      nav.classList.add('mobile-active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      nav.classList.remove('mobile-active');
+    });
+  }
+
+  // Lógica para desplegar el submenú en móvil con un toque
+  if (dropdownBtn) {
+    dropdownBtn.addEventListener('click', (event) => {
+      if (window.innerWidth <= 768) { // Solo en vista móvil
+        event.preventDefault(); // Evita que el enlace # se active
+        const parentDropdown = dropdownBtn.parentElement;
+        parentDropdown.classList.toggle('open');
+      }
+    });
+  }
+}
 
 // Make the path logic more robust to work on both the `servr` local server
 // and GitHub Pages.
@@ -2325,6 +2632,11 @@ function initializeSearch() {
 
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
+    const navbar = document.querySelector('.navbar');
+    if (navbar && navbar.contains(event.target)) {
+      return;
+    }
+
     if (searchContainer && !searchContainer.contains(event.target)) {
       const suggestions = document.getElementById('search-suggestions');
       if(suggestions) suggestions.style.display = 'none';
@@ -2428,6 +2740,27 @@ function sortTable(tableId, columnIndex) {
   table.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
   if(header) header.classList.add(newDir);
 }
+function showLetter(letter) {
+  // Hide all letter groups
+  document.querySelectorAll('.letter-group').forEach(group => {
+    group.classList.remove('active');
+  });
+  // Deactivate all letter links
+  document.querySelectorAll('.letter-nav a').forEach(link => {
+    link.classList.remove('active');
+  });
+
+  // Show the selected letter group
+  const selectedGroup = document.getElementById('group-' + letter);
+  if (selectedGroup) {
+    selectedGroup.classList.add('active');
+  }
+  // Activate the selected letter link
+  const selectedLink = document.querySelector(`.letter-nav a[data-letter="${letter}"]`);
+  if (selectedLink) {
+    selectedLink.classList.add('active');
+  }
+}
 )"
 writeLines(script_js, file.path(RUTA_ASSETS_COMPARTIDOS, "script.js"))
 message("style.css and script.js files saved to the assets folder.")
@@ -2444,6 +2777,8 @@ if (hubo_cambios) {
   for (lang in IDIOMAS_SOPORTADOS) {
     
     idioma_actual <<- lang
+    nombres_archivos_traducidos <- nombres_archivos_mk
+    
     message(paste("\n--- Generating pages for language:", toupper(lang), "---"))
     
     # 13.1.1. Prepare language-specific data and scripts.
@@ -2563,7 +2898,7 @@ if (hubo_cambios) {
         ultima_jornada_jugada <- max(as.numeric(ultima_jornada_jugada_df$jornada), na.rm = TRUE)
         if (!is.infinite(ultima_jornada_jugada) && !is.na(ultima_jornada_jugada)) {
           partidos_para_mostrar <- partidos_df %>%
-            filter(competicion_nombre == nombre_comp_mk, competicion_temporada == temporada_actual_str, as.numeric(jornada) == ultima_jornada_jugada)
+            filter(competicion_nombre == nombre_comp_mk, competicion_temporada == temporada_actual_str, jornada == ultima_jornada_jugada)
           if (nrow(partidos_para_mostrar) > 0) {
             bloque_resultados_html <- crear_bloque_resultados_competicion(
               comp_info, partidos_para_mostrar, comp_nombre_actual_lang, entidades_df_lang, ancho_ficha_calculado_px
@@ -2575,7 +2910,6 @@ if (hubo_cambios) {
       tabla_clasificacion_html <- crear_tabla_clasificacion_portada(
         comp_info, stats_clasificacion_por_comp_df, entidades_df_lang, 
         abreviaturas_actual_lang_df, estilos_clasificacion_data,
-        # ¡Pasamos el nombre de la competición a la función de la tabla!
         comp_nombre_lang = comp_nombre_actual_lang 
       )
       
@@ -2586,7 +2920,6 @@ if (hubo_cambios) {
       tags$h3(class="main-content-title", t("latest_results_title")),
       map(lista_componentes_html, "resultados"),
       
-      # ¡Añadimos el título principal para las clasificaciones!
       tags$h3(class="main-content-title standings-grid-title", t("standings_main_title")),
       tags$div(class="standings-grid-container",
                map(lista_componentes_html, "clasificacion")
@@ -2600,6 +2933,166 @@ if (hubo_cambios) {
       script_contraseña = script_contraseña_lang
     )
     save_html(pagina_portal_final, file = file.path(RUTA_SALIDA_RAIZ, lang, "index.html"))
+    
+    # 13.1.2.bis. Generate new static and list pages
+    message("   > Generating new list and static pages...")
+    
+    # --- GENERATE COMPETITION ARCHIVE PAGE ---
+    path_to_archive_page <- file.path(RUTA_SALIDA_RAIZ, lang, "arhiva.html")
+    message("     > Generating: ", basename(path_to_archive_page))
+    
+    competiciones_archivo <- competiciones_unicas_df %>%
+      filter(competicion_id != "reprezentacija") %>%
+      mutate(temporada_num = as.numeric(str_extract(competicion_temporada, "^\\d{2}"))) %>%
+      arrange(desc(temporada_num)) %>%
+      group_by(competicion_temporada)
+    
+    contenido_archivo <- tagList(
+      crear_botones_navegacion(path_to_lang_root = "."),
+      tags$h2(t("archive_page_title")),
+      map(group_split(competiciones_archivo), function(df_temporada) {
+        temporada <- df_temporada$competicion_temporada[1]
+        tagList(
+          tags$h3(paste(t("player_season"), temporada)),
+          tags$ul(
+            map(1:nrow(df_temporada), function(i) {
+              comp <- df_temporada[i,]
+              tags$li(
+                tags$a(
+                  href = file.path(nombres_carpetas_relativos$competiciones, paste0(comp$competicion_id, ".html")),
+                  comp[[comp_name_col]]
+                )
+              )
+            })
+          )
+        )
+      })
+    )
+    save_html(crear_pagina_html(contenido_archivo, t("archive_page_title"), "..", script_contraseña_lang, "competitions"), file = path_to_archive_page)
+    
+    
+    # --- GENERATE TEAMS LIST PAGE ---
+    path_to_teams_page <- file.path(RUTA_SALIDA_RAIZ, lang, "klubovi.html")
+    message("     > Generating: ", basename(path_to_teams_page))
+    
+    # CORRECCIÓN: Se añade rowwise() para aplicar la función get_national_team_iso()
+    # a cada fila individualmente, evitando el error de vectorización.
+    # También se simplifica la lógica del filtro.
+    equipos_para_listar <- entidades_df_lang %>%
+      filter(original_name %in% nombres_equipos) %>%
+      rowwise() %>%
+      filter(is.na(get_national_team_iso(original_name))) %>%
+      ungroup() %>%
+      arrange(current_lang_name)
+    
+    contenido_equipos <- tagList(
+      crear_botones_navegacion(path_to_lang_root = "."),
+      tags$h2(t("teams_list_title")),
+      tags$div(
+        class = "team-list",
+        tags$ul(
+          map(1:nrow(equipos_para_listar), function(i) {
+            equipo <- equipos_para_listar[i,]
+            tags$li(
+              tags$a(
+                href = file.path(nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(equipo$original_name), ".html")),
+                equipo$current_lang_name
+              )
+            )
+          })
+        )
+      )
+    )
+    save_html(crear_pagina_html(contenido_equipos, t("teams_list_title"), "..", script_contraseña_lang, "teams"), file = path_to_teams_page)
+    
+    
+    # --- GENERATE PLAYERS LIST PAGE ---
+    path_to_players_page <- file.path(RUTA_SALIDA_RAIZ, lang, "fudbalerki.html")
+    message("     > Generating: ", basename(path_to_players_page))
+    
+    jugadoras_para_listar <- jugadoras_stats_df %>%
+      filter(!str_starts(id, "player_gen_")) %>%
+      mutate(
+        apellido = sapply(!!sym(player_name_col), extraer_apellido),
+        letra_inicial = toupper(substr(apellido, 1, 1))
+      )
+    
+    if (lang == 'mk') {
+      # Special sorting for Macedonian alphabet
+      jugadoras_para_listar <- jugadoras_para_listar %>% arrange(apellido, .locale = "mk")
+      alfabeto_df <- jugadoras_para_listar %>% 
+        distinct(letra_inicial) %>% 
+        arrange(letra_inicial, .locale = "mk")
+      alfabeto <- alfabeto_df$letra_inicial
+    } else {
+      jugadoras_para_listar <- jugadoras_para_listar %>% arrange(apellido)
+      alfabeto <- sort(unique(jugadoras_para_listar$letra_inicial))
+    }
+    
+    grupos_por_letra <- split(jugadoras_para_listar, jugadoras_para_listar$letra_inicial)
+    
+    contenido_jugadoras <- tagList(
+      crear_botones_navegacion(path_to_lang_root = "."),
+      tags$h2(t("players_list_title")),
+      tags$p(t("players_list_select_letter")),
+      tags$div(
+        class = "letter-nav",
+        map(alfabeto, function(letra) {
+          tags$a(
+            href = "javascript:void(0);",
+            onclick = paste0("showLetter('", letra, "')"),
+            `data-letter` = letra,
+            class = if(letra == alfabeto[1]) "active" else "",
+            letra
+          )
+        })
+      ),
+      tags$div(
+        id = "player-list-container",
+        class = "player-list",
+        map(alfabeto, function(letra) {
+          grupo <- grupos_por_letra[[letra]]
+          
+          if (!is.null(grupo) && nrow(grupo) > 0) {
+
+            tags$div(
+              class = if(letra == alfabeto[1]) "letter-group active" else "letter-group",
+              id = paste0("group-", letra),
+              tags$h3(letra),
+              tags$ul(
+                map(1:nrow(grupo), function(i) {
+                  jugadora <- grupo[i,]
+                  tags$li(
+                    tags$a(
+                      href = file.path(nombres_carpetas_relativos$jugadoras, paste0(jugadora$id, ".html")),
+                      jugadora[[player_name_col]]
+                    )
+                  )
+                })
+              )
+            )
+          } else {
+            NULL
+          }
+        })
+      )
+    )
+    save_html(crear_pagina_html(contenido_jugadoras, t("players_list_title"), "..", script_contraseña_lang, "players"), file = path_to_players_page)
+    
+    
+    # --- GENERATE ABOUT PAGE ---
+    path_to_about_page <- file.path(RUTA_SALIDA_RAIZ, lang, "za-zfudbalmk.html")
+    message("     > Generating: ", basename(path_to_about_page))
+    contenido_about <- tagList(
+      crear_botones_navegacion(path_to_lang_root = "."),
+      tags$h2(t("about_page_title")),
+      tags$div(
+        class = "about-content",
+        HTML(t("about_page_content"))
+      )
+    )
+    save_html(crear_pagina_html(contenido_about, t("about_page_title"), "..", script_contraseña_lang, "about"), file = path_to_about_page)
+    
     
     # 13.1.3. Generate Competition Pages.
     message("   > Generating competition pages...")
@@ -2636,7 +3129,7 @@ if (hubo_cambios) {
           tags$div(class = "menu-container", lista_botones_menu_seleccion)
         )
         save_html(
-          crear_pagina_html(contenido_menu_seleccion, comp_nombre_current_lang, "../..", script_contraseña_lang),
+          crear_pagina_html(contenido_menu_seleccion, comp_nombre_current_lang, "../..", script_contraseña_lang, current_page_id = "national_team"),
           file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html"))
         )
         
@@ -2741,15 +3234,15 @@ if (hubo_cambios) {
           c() 
         }       
         contenido_partidos <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("schedule_title"), "-", comp_nombre_current_lang)), map(jornadas_comp, function(j) { partidos_jornada <- partidos_comp %>% filter(jornada == j) %>% arrange(local); header_text <- if(is_cup || is_friendly_comp) as.character(j) else paste(t("round_prefix"), j); get_logo_tag <- function(nombre_equipo_mk) { nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo_mk) }; tagList(tags$h3(class="jornada-header", header_text), map(1:nrow(partidos_jornada), function(k) { partido <- partidos_jornada[k,]; is_placeholder_match <- is.na(partido$id_partido); local_name <- entidades_df_lang$current_lang_name[match(partido$local, entidades_df_lang$original_name)]; visitante_name <- entidades_df_lang$current_lang_name[match(partido$visitante, entidades_df_lang$original_name)]; resultado_texto <- if (is_placeholder_match) " - " else { res_base <- paste(partido$goles_local, "-", partido$goles_visitante); if (!is.na(partido$penales_local)) res_base <- sprintf("%s (%s - %s)", res_base, partido$penales_local, partido$penales_visitante); if (isTRUE(partido$es_resultado_oficial)) res_base <- paste(res_base, "*"); res_base }; contenido_comun <- tagList(tags$span(class="equipo equipo-local", get_logo_tag(partido$local), tags$span(local_name)), tags$span(class="resultado", resultado_texto), tags$span(class="equipo equipo-visitante", tags$span(visitante_name), get_logo_tag(partido$visitante))); if (is_placeholder_match) tags$div(class = "partido-link-placeholder", contenido_comun) else tags$a(class = "partido-link", href = file.path("..", nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")), contenido_comun) })) }))
-        nombre_archivo_partidos <- paste0(comp_id, "_", nombres_archivos_mk$partidos, ".html"); save_html(crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_partidos))
+        nombre_archivo_partidos <- paste0(comp_id, "_", nombres_archivos_traducidos$partidos, ".html"); save_html(crear_pagina_html(contenido_partidos, paste(t("schedule_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_partidos))
         lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_partidos, class="menu-button", t("schedule_title"))
         if (!is_placeholder_only_comp) {
           tabla_goleadoras_comp <- stats_goleadoras_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(!is.na(!!player_name_col_sym)) %>% select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, Goals); headers_traducidos <- c(t("standings_pos"), t("player_type"), t("team_type"), t("stats_goals")); contenido_goleadoras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("scorers_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(map(headers_traducidos, tags$th))), tags$tbody(map(1:nrow(tabla_goleadoras_comp), function(j){ g <- tabla_goleadoras_comp[j,]; tags$tr(tags$td(g$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(g$id, ".html")), g$PlayerName)), tags$td({ teams_mk <- str_split(g$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df_lang %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) } }; tagList(team_tags) }), tags$td(g$Goals)) }))))
-          nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_mk$goleadoras, ".html"); save_html(crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_goleadoras))
+          nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_traducidos$goleadoras, ".html"); save_html(crear_pagina_html(contenido_goleadoras, paste(t("scorers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_goleadoras))
           lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_goleadoras, class="menu-button", t("scorers_title"))
         }
         if (!is_cup && !is_friendly_comp && !is_placeholder_only_comp) {
-          clasificacion_df_comp_raw <- stats_clasificacion_por_comp_df %>% filter(competicion_id == comp_id); clave_estilo_comp <- paste(comp_info$competicion_nombre, comp_info$competicion_temporada); contenido_tabla <- if (nrow(clasificacion_df_comp_raw) == 0) { tags$p(t("standings_no_data_message")) } else { clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df_lang, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col); estilos_comp <- estilos_clasificacion_data[[clave_estilo_comp]]; tagList(tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) { tags$div(class = "legend", map(estilos_comp$leyenda, function(item_leyenda) { tags$div(class = "legend-item", tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")), tags$span(t(item_leyenda$texto_key))) })) }) }; contenido_clasificacion <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("standings_title"), "-", comp_nombre_current_lang)), contenido_tabla); nombre_archivo_clasif <- paste0(comp_id, "_", nombres_archivos_mk$clasificacion, ".html"); save_html(crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_clasif)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_clasif, class="menu-button", t("standings_title"))
+          clasificacion_df_comp_raw <- stats_clasificacion_por_comp_df %>% filter(competicion_id == comp_id); clave_estilo_comp <- paste(comp_info$competicion_nombre, comp_info$competicion_temporada); contenido_tabla <- if (nrow(clasificacion_df_comp_raw) == 0) { tags$p(t("standings_no_data_message")) } else { clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>% left_join(entidades_df_lang, by = c("team" = "original_name")) %>% select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts); nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts"); claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts"); nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE); mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos); clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col); estilos_comp <- estilos_clasificacion_data[[clave_estilo_comp]]; tagList(tags$table(tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))), tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) { fila <- clasificacion_df_comp[j,]; nombre_equipo <- fila[[t("standings_team")]]; posicion_equipo <- fila[[t("standings_pos")]]; nombre_equipo_original <- clasificacion_df_comp_raw$team[j]; nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_original), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); regla_actual <- NULL; if (!is.null(estilos_comp)) { regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo); if (nrow(regla_match) > 0) { regla_actual <- regla_match[1,] } }; tags$tr(map(seq_along(fila), function(k) { cell_value <- fila[[k]]; col_name <- names(fila)[k]; if (col_name == t("standings_pos") && !is.null(regla_actual)) { tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value) } else if (col_name == t("standings_team")) { tags$td(class = "team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)) } else { tags$td(cell_value) }})) }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) { tags$div(class = "legend", map(estilos_comp$leyenda, function(item_leyenda) { tags$div(class = "legend-item", tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")), tags$span(t(item_leyenda$texto_key))) })) }) }; contenido_clasificacion <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("standings_title"), "-", comp_nombre_current_lang)), contenido_tabla); nombre_archivo_clasif <- paste0(comp_id, "_", nombres_archivos_traducidos$clasificacion, ".html"); save_html(crear_pagina_html(contenido_clasificacion, paste(t("standings_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_clasif)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_clasif, class="menu-button", t("standings_title"))
           # 1. Calcular minutos totales POSIBLES solo de partidos JUGADOS.
           minutos_totales_equipo_comp <- partidos_df %>%
             filter(
@@ -2820,10 +3313,10 @@ if (hubo_cambios) {
           # }
           
           tabla_sanciones_comp <- stats_sanciones_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(!is.na(!!player_name_col_sym)) %>% select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, YellowCards, RedCards); contenido_sanciones <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("disciplinary_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { s <- tabla_sanciones_comp[j,]; tags$tr(tags$td(s$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(s$id, ".html")), s$PlayerName)), tags$td({ teams_mk <- str_split(s$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df_lang %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) }}; tagList(team_tags) }), tags$td(s$YellowCards), tags$td(s$RedCards)) })} else { tags$tr(tags$td(colspan="5", t("disciplinary_no_cards_message"))) })))
-          nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_mk$sanciones, ".html"); save_html(crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_sanciones)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_sanciones, class="menu-button", t("disciplinary_title"))
+          nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_traducidos$sanciones, ".html"); save_html(crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_sanciones)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_sanciones, class="menu-button", t("disciplinary_title"))
         }
         contenido_menu_final <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), tags$div(class="menu-container", lista_botones_menu))
-        save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", script_contraseña_lang), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
+        save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", script_contraseña_lang, current_page_id = "competitions"), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
       }
     })
     

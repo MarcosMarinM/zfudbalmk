@@ -21,9 +21,46 @@
          
         <span style="font-weight: bold; color: #333;">[ English ]</span>
       </div>
-      <h1>
-        <a href="../../en/index.html" style="color: inherit; text-decoration: none;">@zfudbalmk</a>
-      </h1>
+      <div class="header-main">
+        <h1>
+          <a href="../index.html" style="color: inherit; text-decoration: none;">@zfudbalmk</a>
+        </h1>
+        <nav class="navbar">
+          <a href="javascript:void(0);" class="hamburger-icon" id="hamburger-icon">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </a>
+          <ul class="nav-links">
+            <li class="close-btn-li">
+              <a href="javascript:void(0);" id="close-nav-btn">×</a>
+            </li>
+            <li>
+              <a class="active" href="../index.html">Home</a>
+            </li>
+            <li class="dropdown">
+              <a href="javascript:void(0)" class="dropbtn">Competitions  &#9662;</a>
+              <div class="dropdown-content">
+                <a href="../natprevaruvanja/prva_zfl_25_26.html">Women's First League 25/26</a>
+                <hr/>
+                <a href="../arhiva.html">Archive</a>
+              </div>
+            </li>
+            <li>
+              <a class="" href="../natprevaruvanja/reprezentacija.html">National Team</a>
+            </li>
+            <li>
+              <a class="" href="../fudbalerki.html">Players</a>
+            </li>
+            <li>
+              <a class="" href="../klubovi.html">Clubs</a>
+            </li>
+            <li>
+              <a class="" href="../za-zfudbalmk.html">About</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
       <div class="search-container">
         <form action="#" onsubmit="showSearchResults(); return false;">
           <input type="text" id="search-input" class="search-input" placeholder="Search for player, team, referee, stadium..." onkeyup="handleSearchInput(event)"/>
@@ -32,10 +69,6 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <div class="nav-buttons">
-          <a href="#" onclick="history.back(); return false;" class="back-link">← Back</a>
-          <a href="../index.html" class="back-link">🏠 Home</a>
-        </div>
         <h2>Goalkeeper stats - Women's First League 23/24</h2>
         <h3>Players with 50% or more of minutes played</h3>
         <table id="tabla-porteras-mas-50" data-sort-col="3" data-sort-dir="asc">
@@ -82,6 +115,20 @@
             <tr>
               <td>3</td>
               <td>
+                <a href="../igraci/250905.html">Vedrana Komnenova</a>
+              </td>
+              <td class="team-cell">
+                <img class="team-logo" src="../../assets/logos/skopje_2014.png" alt="Skopje 2014"/>
+                <a href="../timovi/skopje_2014.html">Skopje 2014</a>
+              </td>
+              <td>1.39</td>
+              <td>29</td>
+              <td>1872</td>
+              <td>6</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>
                 <a href="../igraci/137354.html">Diana Alushi</a>
               </td>
               <td class="team-cell">
@@ -94,21 +141,21 @@
               <td>1</td>
             </tr>
             <tr>
-              <td>4</td>
+              <td>5</td>
               <td>
-                <a href="../igraci/250905.html">Vedrana Komnenova</a>
+                <a href="../igraci/145303.html">Natali Talevska</a>
               </td>
               <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/skopje_2014.png" alt="Skopje 2014"/>
-                <a href="../timovi/skopje_2014.html">Skopje 2014</a>
+                <img class="team-logo" src="../../assets/logos/top_gol.png" alt="Top Gol"/>
+                <a href="../timovi/top_gol.html">Top Gol</a>
               </td>
-              <td>2.16</td>
-              <td>60</td>
-              <td>2502</td>
-              <td>6</td>
+              <td>2.44</td>
+              <td>61</td>
+              <td>2250</td>
+              <td>4</td>
             </tr>
             <tr>
-              <td>5</td>
+              <td>6</td>
               <td>
                 <a href="../igraci/256693.html">Iman Šljivo</a>
               </td>
@@ -122,7 +169,7 @@
               <td>1</td>
             </tr>
             <tr>
-              <td>6</td>
+              <td>7</td>
               <td>
                 <a href="../igraci/146001.html">Kristina Pavloska</a>
               </td>
@@ -134,20 +181,6 @@
               <td>57</td>
               <td>1387</td>
               <td>2</td>
-            </tr>
-            <tr>
-              <td>7</td>
-              <td>
-                <a href="../igraci/145303.html">Natali Talevska</a>
-              </td>
-              <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/top_gol.png" alt="Top Gol"/>
-                <a href="../timovi/top_gol.html">Top Gol</a>
-              </td>
-              <td>4.81</td>
-              <td>154</td>
-              <td>2880</td>
-              <td>4</td>
             </tr>
           </tbody>
         </table>

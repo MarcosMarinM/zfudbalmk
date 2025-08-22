@@ -71,7 +71,7 @@ original_mk,latin_sq,latin_es,latin_en
 Тамара Љубојевиќ,Tamara Ljubojević,Tamara Ljubojević,Tamara Ljubojević
 Тамара Милошевиќ,Tamara Milošević,Tamara Milošević,Tamara Milošević
 Тцхуиссе Гхоуанси,Tchuisse Ghouansi,Tchuisse Ghouansi,Tchuisse Ghouansi
-Тчеури Гоја,Tcheury Goya, Tcheury Goya, Tcheury Goya
+Тчеури Гоја,Tcheury Goya,Tcheury Goya,Tcheury Goya
 Улза Максути,Yllza Maksuti,Yllza Maksuti,Yllza Maksuti
 Уртина Шемшедини,Urtina Shemshedini,Urtina Shemshedini,Urtina Shemshedini
 Фјола Авдиљи,Fjola Abdili,Fjola Abdili,Fjola Abdili 
