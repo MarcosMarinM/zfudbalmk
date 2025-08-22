@@ -3012,6 +3012,7 @@ if (hubo_cambios) {
     
     jugadoras_para_listar <- jugadoras_stats_df %>%
       filter(!str_starts(id, "player_gen_")) %>%
+      filter(!is.na(!!sym(player_name_col)) & trimws(!!sym(player_name_col)) != "") %>%
       mutate(
         apellido = sapply(!!sym(player_name_col), extraer_apellido),
         letra_inicial = toupper(substr(apellido, 1, 1))
@@ -3559,12 +3560,12 @@ if (hubo_cambios) {
         
         summary_row_nat <- tags$tr(
           class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id_nat), 
-          tags$td(stage_nat$competicion_temporada), 
+          tags$td(t("season_all")),
           tags$td(class="team-cell", 
                   tags$img(class="team-logo national-team-flag", src = flag_url_mk, alt = nombre_equipo_stage_nat_lang), 
                   crear_enlace_equipo_condicional(stage_nat$equipo, nombre_equipo_stage_nat_lang)
           ), 
-          tags$td(nombre_comp_stage_nat_lang), 
+          tags$td(t("competition_reprezentacija")),
           tags$td(stage_nat$Played), 
           tags$td(stage_nat$Goals), 
           tags$td(stage_nat$Minutes)

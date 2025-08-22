@@ -10,6 +10,7 @@ original_mk,latin_sq,latin_es,latin_en
 Анита Алексиќ,Anita Aleksić,Anita Aleksić,Anita Aleksić
 Арита Јашари,Arita Jashari,Arita Jashari,Arita Jashari
 Ајури Тераваки,Ayuri Terawaki,Ayuri Terawaki,Ayuri Terawaki
+Афра Жута,Afra Zhuta,Afra Zhuta,Afra Zhuta
 Бејза Арифи,Beyza Arifi,Beyza Arifi,Beyza Arifi
 Белма Ќазимоска,Bellma Qazimoska,Belma Kjazimoska,Belma Kjazimoska
 Бисера Јовановиќ,Bisera Jovanović,Bisera Jovanović,Bisera Jovanović
