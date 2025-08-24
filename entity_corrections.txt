@@ -2,3 +2,4 @@ original_mk,latin_sq,latin_es,latin_en
 АС Јунајтед,AS United,AS United,AS United
 Шкендија,Shkëndija,Shkëndija,Shkëndija
 Башкими,Bashkimi,Bashkimi,Bashkimi
+Шкупи,Shkupi,Shkupi,Shkupi

@@ -11,6 +11,7 @@ original_mk,latin_sq,latin_es,latin_en
 Арита Јашари,Arita Jashari,Arita Jashari,Arita Jashari
 Ајури Тераваки,Ayuri Terawaki,Ayuri Terawaki,Ayuri Terawaki
 Афра Жута,Afra Zhuta,Afra Zhuta,Afra Zhuta
+Беатриз Тарантино,Beatriz Tarantino,Beatriz Tarantino,Beatriz Tarantino
 Бејза Арифи,Beyza Arifi,Beyza Arifi,Beyza Arifi
 Белма Ќазимоска,Bellma Qazimoska,Belma Kjazimoska,Belma Kjazimoska
 Бисера Јовановиќ,Bisera Jovanović,Bisera Jovanović,Bisera Jovanović
@@ -56,11 +57,13 @@ original_mk,latin_sq,latin_es,latin_en
 Милка Голубовиќ,Milka Golubović,Milka Golubović,Milka Golubović
 Мирвет Веселова,Mirvet Veselova,Mirvet Veselova,Mirvet Veselova
 Михаела Гамарц,Mihaela Gamarț,Mihaela Gamarț,Mihaela Gamarț
+Најели Кироз,Nayeli Quiroz,Nayeli Quiroz,Nayeli Quiroz
 Нанока Иригучи,Nanoka Iriguchi,Nanoka Iriguchi,Nanoka Iriguchi
 Нина Миленковиќ,Nina Milenković,Nina Milenković,Nina Milenković
 Оливеира Наталиа Луана,Oliveira Natália Luana,Oliveira Natália Luana,Oliveira Natália Luana
 Прина Хоџа,Prina Hoxha,Prina Hoxha,Prina Hoxha
 Присцила Едитe Силва,Priscila Edite Silva,Priscila Edite Silva,Priscila Edite Silva
+Рајане Каликсто,Rayane Calixto,Rayane Calixto,Rayane Calixto
 Рафаела Кармо Мартинс,Rafaela Carmo Martins,Rafaela Carmo Martins,Rafaela Carmo Martins
 Рената Фереира да Силва,Renata Ferreira da Silva,Renata Ferreira da Silva,Renata Ferreira da Silva
 Сара Димитриоски,Sarah Dimitrioski,Sarah Dimitrioski,Sarah Dimitrioski
@@ -78,8 +81,14 @@ original_mk,latin_sq,latin_es,latin_en
 Фјола Авдиљи,Fjola Abdili,Fjola Abdili,Fjola Abdili 
 Џељане Шаќири,Xhelane Shaqiri,Xhelane Shaqiri,Xhelane Shaqiri
 Џенета Шабани,Xheneta Shabani,Xheneta Shabani,Xheneta Shabani
+Џесика Тајнара,Jessica Thaynnara,Jessica Thaynnara,Jessica Thaynnara
 Шаќире Арслани,Shaqire Arslani,Shaqire Arslani,Shaqire Arslani
 Шефкије Алими,Shefkije Alimi,Shefkije Alimi,Shefkije Alimi
 Ширета Брахими,Shireta Brahimi,Shireta Brahimi,Shireta Brahimi
 Шкурте Ода,Shkurte Oda,Shkurte Oda,Shkurte Oda
 Шќипе Бојку,Shqipe Bojku,Shqipe Bojku,Shqipe Bojku
+
+
+"Калито Да Силва Рајане",""
+"Најели Куирос Кархуатанта","Најели Кироз"
+"Гилхермино Тарантино",""

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shkupi</title>
+  <link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<html lang="es">
+  <body data-search-results-title="Resultados de la búsqueda para" data-no-search-results-msg="No se encontraron resultados para" data-search-prompt-msg="Por favor, introduce al menos 2 caracteres para buscar.">
+    <div class="container">
+      <div class="language-selector" style="text-align: right; margin-bottom: 15px; font-size: 0.9em;">
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/es/&#39;, &#39;/mk/&#39;); return false;">[ Македонски ]</a>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/es/&#39;, &#39;/sq/&#39;); return false;">[ Shqip ]</a>
+         
+        <span style="font-weight: bold; color: #333;">[ Castellano ]</span>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/es/&#39;, &#39;/en/&#39;); return false;">[ English ]</a>
+      </div>
+      <div class="header-main">
+        <h1>
+          <a href="../index.html" style="color: inherit; text-decoration: none;">@zfudbalmk</a>
+        </h1>
+        <nav class="navbar">
+          <a href="javascript:void(0);" class="hamburger-icon" id="hamburger-icon">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </a>
+          <ul class="nav-links">
+            <li class="close-btn-li">
+              <a href="javascript:void(0);" id="close-nav-btn">×</a>
+            </li>
+            <li>
+              <a class="active" href="../index.html">Inicio</a>
+            </li>
+            <li class="dropdown">
+              <a href="javascript:void(0)" class="dropbtn">Competiciones  &#9662;</a>
+              <div class="dropdown-content">
+                <a href="../natprevaruvanja/prva_zfl_25_26.html">Primera Liga Femenina 25/26</a>
+                <hr/>
+                <a href="../arhiva.html">Archivo</a>
+              </div>
+            </li>
+            <li>
+              <a class="" href="../natprevaruvanja/reprezentacija.html">Selección</a>
+            </li>
+            <li>
+              <a class="" href="../fudbalerki.html">Futbolistas</a>
+            </li>
+            <li>
+              <a class="" href="../klubovi.html">Clubes</a>
+            </li>
+            <li>
+              <a class="" href="../za-zfudbalmk.html">Acerca de</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="search-container">
+        <form action="#" onsubmit="showSearchResults(); return false;">
+          <input type="text" id="search-input" class="search-input" placeholder="Buscar jugadora, equipo, árbitro, estadio..." onkeyup="handleSearchInput(event)"/>
+          <button type="submit" class="search-button">Buscar</button>
+        </form>
+        <div id="search-suggestions"></div>
+      </div>
+      <div id="main-content">
+        <h2>Shkupi</h2>
+        <img class="team-page-crest" src="../../assets/logos/skupi.png" alt="Crest of Shkupi"/>
+        <h3>Historial por competición</h3>
+        <table class="team-career-summary">
+          <thead>
+            <tr>
+              <th>Temporada</th>
+              <th>Competición</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="summary-row" onclick="toggleDetails(&#39;details-skupi-1&#39;)">
+              <td>20/21</td>
+              <td>Primera Liga Femenina 20/21</td>
+            </tr>
+            <tr id="details-skupi-1" class="details-row">
+              <td colspan="2">
+                <div class="details-content">
+                  <h4>Estadísticas de jugadoras</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Jugadora</th>
+                        <th>Convocada</th>
+                        <th>Jugados</th>
+                        <th>Min.</th>
+                        <th>Gol.</th>
+                        <th>Tarjetas amarillas</th>
+                        <th>Tarjetas rojas</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <a href="../igraci/157289.html">Nurije Zendeli</a>
+                        </td>
+                        <td>20</td>
+                        <td>20</td>
+                        <td>1800</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990053.html">Azra Abdulova</a>
+                        </td>
+                        <td>19</td>
+                        <td>19</td>
+                        <td>1710</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/129109.html">Biljana Paneska</a>
+                        </td>
+                        <td>18</td>
+                        <td>18</td>
+                        <td>1620</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990052.html">Kjendresa Abdulov</a>
+                        </td>
+                        <td>15</td>
+                        <td>15</td>
+                        <td>1350</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990109.html">Anesa Reči</a>
+                        </td>
+                        <td>20</td>
+                        <td>15</td>
+                        <td>1350</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990108.html">Nedžmije Vljahen</a>
+                        </td>
+                        <td>18</td>
+                        <td>14</td>
+                        <td>1260</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990105.html">Alberta Rašidi</a>
+                        </td>
+                        <td>12</td>
+                        <td>12</td>
+                        <td>1080</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990106.html">Rudina Selman</a>
+                        </td>
+                        <td>18</td>
+                        <td>12</td>
+                        <td>1080</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990120.html">Zibuše Kurtiš</a>
+                        </td>
+                        <td>17</td>
+                        <td>12</td>
+                        <td>1080</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990104.html">Tevide Redžepi</a>
+                        </td>
+                        <td>11</td>
+                        <td>11</td>
+                        <td>990</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990113.html">Fatuš Sadiki</a>
+                        </td>
+                        <td>15</td>
+                        <td>10</td>
+                        <td>900</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990111.html">Fjola Bekjiri</a>
+                        </td>
+                        <td>19</td>
+                        <td>9</td>
+                        <td>810</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990139.html">Hafsa Iljazi</a>
+                        </td>
+                        <td>10</td>
+                        <td>9</td>
+                        <td>810</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990107.html">Sumeja Ismani</a>
+                        </td>
+                        <td>12</td>
+                        <td>8</td>
+                        <td>720</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990112.html">Zejnep Eljezi</a>
+                        </td>
+                        <td>17</td>
+                        <td>8</td>
+                        <td>720</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990110.html">Katerina Miševska</a>
+                        </td>
+                        <td>8</td>
+                        <td>5</td>
+                        <td>450</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990164.html">Besiana Beriša</a>
+                        </td>
+                        <td>5</td>
+                        <td>5</td>
+                        <td>450</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990165.html">Fetija Zendel</a>
+                        </td>
+                        <td>4</td>
+                        <td>4</td>
+                        <td>360</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990163.html">Malsore Guri</a>
+                        </td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>270</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990167.html">Arta Rama</a>
+                        </td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>270</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990168.html">Rita Vehapi</a>
+                        </td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>270</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990166.html">Emire Šaziju</a>
+                        </td>
+                        <td>6</td>
+                        <td>2</td>
+                        <td>180</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h4>Lista de partidos</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Jornada</th>
+                        <th>Fecha</th>
+                        <th>Local</th>
+                        <th>Visitante</th>
+                        <th>Resultado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>16.08.2020</td>
+                        <td>Shkupi</td>
+                        <td>Borec</td>
+                        <td>
+                          <a href="../natprevari/3267891.html">3 - 3</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>22.08.2020</td>
+                        <td>Atletiko</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267893.html">1 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>3</td>
+                        <td>02.09.2020</td>
+                        <td>Shkupi</td>
+                        <td>Kamenica Sasa</td>
+                        <td>
+                          <a href="../natprevari/3267906.html">0 - 9</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>4</td>
+                        <td>06.09.2020</td>
+                        <td>Cevitana</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267910.html">11 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>6</td>
+                        <td>12.09.2020</td>
+                        <td>Shkëndija</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267927.html">4 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>7</td>
+                        <td>27.09.2020</td>
+                        <td>Shkupi</td>
+                        <td>Ljuboten</td>
+                        <td>
+                          <a href="../natprevari/3267936.html">2 - 3</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>8</td>
+                        <td>03.10.2020</td>
+                        <td>Skopje 2014</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267944.html">8 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>9</td>
+                        <td>11.10.2020</td>
+                        <td>Shkupi</td>
+                        <td>Top Gol</td>
+                        <td>
+                          <a href="../natprevari/3267951.html">2 - 7</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>10</td>
+                        <td>18.10.2020</td>
+                        <td>AS United</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267961.html">8 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>11</td>
+                        <td>07.11.2020</td>
+                        <td>Shkupi</td>
+                        <td>Rečica</td>
+                        <td>
+                          <a href="../natprevari/3267966.html">4 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>12</td>
+                        <td>11.11.2020</td>
+                        <td>Plačkovica</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267978.html">0 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>13</td>
+                        <td>15.11.2020</td>
+                        <td>Shkupi</td>
+                        <td>Kočani</td>
+                        <td>
+                          <a href="../natprevari/3267981.html">3 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>14</td>
+                        <td>18.11.2020</td>
+                        <td>Istatov</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3267995.html">9 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>15</td>
+                        <td>21.11.2020</td>
+                        <td>Shkupi</td>
+                        <td>Brera Tiverija</td>
+                        <td>
+                          <a href="../natprevari/3267996.html">0 - 7</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>16</td>
+                        <td>28.02.2021</td>
+                        <td>Borec</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3268011.html">5 - 1</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>17</td>
+                        <td>14.03.2021</td>
+                        <td>Shkupi</td>
+                        <td>Atletiko</td>
+                        <td>
+                          <a href="../natprevari/3268013.html">1 - 2</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>18</td>
+                        <td>20.03.2021</td>
+                        <td>Kamenica Sasa</td>
+                        <td>Shkupi</td>
+                        <td>
+                          <a href="../natprevari/3268026.html">9 - 0</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>19</td>
+                        <td>27.03.2021</td>
+                        <td>Shkupi</td>
+                        <td>Cevitana</td>
+                        <td>
+                          <a href="../natprevari/3268030.html">1 - 7</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>21</td>
+                        <td>04.04.2021</td>
+                        <td>Shkupi</td>
+                        <td>Shkëndija</td>
+                        <td>
+                          <a href="../natprevari/3268047.html">1 - 6</a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>23</td>
+                        <td>09.05.2021</td>
+                        <td>Shkupi</td>
+                        <td>Skopje 2014</td>
+                        <td>
+                          <a href="../natprevari/3268064.html">2 - 14</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            <tr class="summary-row" onclick="toggleDetails(&#39;details-skupi-2&#39;)">
+              <td>20/21</td>
+              <td>Copa de la República de Macedonia 20/21</td>
+            </tr>
+            <tr id="details-skupi-2" class="details-row">
+              <td colspan="2">
+                <div class="details-content">
+                  <h4>Estadísticas de jugadoras</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Jugadora</th>
+                        <th>Convocada</th>
+                        <th>Jugados</th>
+                        <th>Min.</th>
+                        <th>Gol.</th>
+                        <th>Tarjetas amarillas</th>
+                        <th>Tarjetas rojas</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <a href="../igraci/129109.html">Biljana Paneska</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/157289.html">Nurije Zendeli</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990052.html">Kjendresa Abdulov</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990053.html">Azra Abdulova</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990106.html">Rudina Selman</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990109.html">Anesa Reči</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990110.html">Katerina Miševska</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990163.html">Malsore Guri</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990164.html">Besiana Beriša</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990166.html">Emire Šaziju</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990168.html">Rita Vehapi</a>
+                        </td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>90</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990108.html">Nedžmije Vljahen</a>
+                        </td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990111.html">Fjola Bekjiri</a>
+                        </td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990112.html">Zejnep Eljezi</a>
+                        </td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990113.html">Fatuš Sadiki</a>
+                        </td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a href="../igraci/990120.html">Zibuše Kurtiš</a>
+                        </td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h4>Lista de partidos</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Jornada</th>
+                        <th>Fecha</th>
+                        <th>Local</th>
+                        <th>Visitante</th>
+                        <th>Resultado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>10.03.2021</td>
+                        <td>Shkupi</td>
+                        <td>Kamenica Sasa</td>
+                        <td>
+                          <a href="../natprevari/3345461.html">1 - 7</a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script defer src="../../assets/script.js"></script>
+  </body>
+</html>
+</html>
