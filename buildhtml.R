@@ -1176,6 +1176,35 @@ if (file.exists(ruta_roles_forzados)) {
   message("player_role_overrides.txt not found. Continuing without role overrides.")
 }
 
+### 9.12. Load City Translations
+message("Loading city name translations...")
+
+ruta_traducciones_ciudades <- "gradovi.txt"
+mapa_ciudades_long_df <- NULL
+if (file.exists(ruta_traducciones_ciudades)) {
+  tryCatch({
+    mapa_ciudades_df <- read.csv(
+      ruta_traducciones_ciudades, 
+      stringsAsFactors = FALSE, 
+      encoding = "UTF-8",
+      check.names = FALSE
+    )
+    
+    mapa_ciudades_long_df <- mapa_ciudades_df %>%
+      pivot_longer(
+        cols = -en, 
+        names_to = "lang",
+        values_to = "translated_city"
+      )
+    
+    message(paste("City translations loaded successfully with", nrow(mapa_ciudades_df), "entries."))
+  }, error = function(e) {
+    warning("Error loading gradovi.txt. City names will not be translated.")
+  })
+} else {
+  message("gradovi.txt file not found. City names will not be translated.")
+}
+
 #### 10. MAIN DATA PROCESSING AND TRANSFORMATION (VERSIÓN REORDENADA Y CORREGIDA) ####
 
 ### 10.0. Load, Unify, and Cleanse All Raw Data
@@ -1665,7 +1694,14 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
   }
   
   jugadoras_stats_df <- jugadoras_stats_df %>%
-    select(id, starts_with("PlayerName_"), Team, posicion_final_unificada, nacionalidad, edad, codigo_iso, nombre_macedonio, CalledUp, Played, Starter, Minutes, Goals, Yellows, Reds) %>% 
+    select(
+      id, starts_with("PlayerName_"), Team, 
+      posicion_final_unificada, 
+      fecha_nacimiento,           
+      ciudad_nacimiento,         
+      nacionalidad, edad, codigo_iso, nombre_macedonio, 
+      CalledUp, Played, Starter, Minutes, Goals, Yellows, Reds
+    ) %>% 
     arrange(desc(Goals), desc(Minutes))
 }
 
@@ -1898,6 +1934,39 @@ national_team_career_summary_df <- apariciones_df %>%
 # 11.5.6. Optional: print a summary to verify.
 message("   > National team career summaries processed. Rows: ", nrow(national_team_career_summary_df))
 
+message("Calculating career summaries for the National Team by category...")
+
+national_team_career_by_category_df <- apariciones_df %>%
+  filter(!is.na(id)) %>%
+  left_join(partidos_df %>% select(id_partido, es_partido_seleccion, categoria), by = "id_partido") %>%
+  filter(es_partido_seleccion == TRUE, equipo == "Македонија", !is.na(categoria)) %>%
+  group_by(id, categoria) %>%
+  summarise(
+    CalledUp = n_distinct(id_partido),
+    Played = sum(minutos_jugados > 0, na.rm=TRUE),
+    Starter = sum(tipo=="Titular", na.rm=TRUE),
+    Minutes = sum(minutos_jugados, na.rm=TRUE),
+    .groups = 'drop'
+  ) %>%
+  left_join(
+    goles_df_unificado %>%
+      filter(!is.na(id), tipo == "Normal") %>%
+      left_join(partidos_df %>% select(id_partido, es_partido_seleccion, categoria), by = "id_partido") %>%
+      filter(es_partido_seleccion == TRUE, equipo_jugadora == "Македонија", !is.na(categoria)) %>%
+      group_by(id, categoria) %>%
+      summarise(Goals = n(), .groups = 'drop'),
+    by = c("id", "categoria")
+  ) %>%
+  left_join(
+    tarjetas_df_unificado %>%
+      filter(!is.na(id)) %>%
+      left_join(partidos_df %>% select(id_partido, es_partido_seleccion, categoria), by = "id_partido") %>%
+      filter(es_partido_seleccion == TRUE, equipo == "Македонија", !is.na(categoria)) %>%
+      group_by(id, categoria) %>%
+      summarise(Yellows = sum(tipo == "Amarilla", na.rm=T), Reds = sum(tipo == "Roja", na.rm=T), .groups = 'drop'),
+    by = c("id", "categoria")
+  ) %>%
+  mutate(across(c(CalledUp, Played, Starter, Minutes, Goals, Yellows, Reds), ~replace_na(., 0)))
 
 ### 11.6. Calculate Career Summaries per Player
 career_summary_jugadoras_df <- apariciones_df %>%
@@ -2104,7 +2173,7 @@ th { background-color: #f2f2f2; }
 #search-results-list a:hover { text-decoration: underline; }
 .search-result-type { font-size: 0.85em; color: #6c757d; margin-left: 8px; }
 .clickable-row { cursor: pointer; }
-.clickable-row:hover { background-color: #FFF0F0; }
+.clickable-row:hover { background-color: #f8f9fa; }
 .legend { margin-top: 20px; padding: 10px; text-align: left; font-size: 0.9em; }
 .legend-item { display: inline-flex; align-items: center; margin-right: 20px; margin-bottom: 5px; }
 .legend-color-box { width: 15px; height: 15px; border: 1px solid #ccc; margin-right: 8px; flex-shrink: 0; }
@@ -2119,23 +2188,8 @@ th { background-color: #f2f2f2; }
 .alineacion-header .match-page-crest, .team-page-crest { width: 120px; height: 120px; object-fit: contain; margin: 10px auto; display: block; }
 .alineacion-header h3 { border-bottom: none; padding-bottom: 0; margin-bottom: 5px; }
 .alineacion-header h3 a { color: #8B0000; }
-
-/* --- ESTILOS PARA LA NUEVA CABECERA PRINCIPAL --- */
-.header-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #dee2e6;
-  padding-bottom: 10px;
-}
-.header-main h1 {
-  border-bottom: none;
-  padding-bottom: 0;
-  margin: 0;
-  text-align: left;
-}
-
-/* --- STYLES FOR THE NEW HOMEPAGE RESULTS BLOCKS (V2) --- */
+.header-main { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; }
+.header-main h1 { border-bottom: none; padding-bottom: 0; margin: 0; text-align: left; }
 .main-content-title { text-align: left; font-size: 1.5em; color: #333; margin-bottom: 20px; }
 .competition-results-block { margin-bottom: 50px; }
 .results-header { display: flex; justify-content: space-between; align-items: flex-end; }
@@ -2156,18 +2210,11 @@ th { background-color: #f2f2f2; }
 .score { font-weight: bold; font-size: 1.1em; color: #CC0000; }
 .score-separator, .score-separator-placeholder { font-size: 1.1em; color: #CC0000; line-height: 0.5; }
 .score-separator-placeholder { visibility: hidden; }
-/* Custom scrollbar for better aesthetics */
 .results-scroll-container::-webkit-scrollbar { height: 8px; }
 .results-scroll-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
 .results-scroll-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 .results-scroll-container::-webkit-scrollbar-thumb:hover { background: #aaa; }
-/* --- STYLES FOR THE NEW HOMEPAGE STANDINGS GRID --- */
-.standings-grid-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-top: 20px;
-}
+.standings-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 20px; }
 .mini-standings-container { background-color: #fff; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px; }
 .mini-standings-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
 .mini-standings-table th { text-align: center; color: #6c757d; font-weight: bold; padding-bottom: 8px; border-bottom: 1px solid #dee2e6;}
@@ -2178,215 +2225,125 @@ th { background-color: #f2f2f2; }
 .logo-cell { width: 20px; padding-right: 4px !important; padding-left: 0 !important; }
 .abbr-cell { text-align: left !important; font-weight: bold; }
 .pts-cell { font-weight: bold; }
-
-/* Responsive Grid for Standings */
-@media (max-width: 900px) {
-  .standings-grid-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 500px) {
-  .standings-grid-container {
-    grid-template-columns: 1fr;
-  }
-}
-/* --- STYLES FOR MINI-STANDINGS HEADERS --- */
+@media (max-width: 900px) { .standings-grid-container { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .standings-grid-container { grid-template-columns: 1fr; } }
 .standings-grid-title { margin-top: 40px !important; }
 .mini-standings-title-link { text-decoration: none; color: inherit; }
-.mini-standings-title {
-  font-size: 1em;
-  text-align: center;
-  margin: 0 0 10px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #dee2e6;
-  font-weight: bold;
-  color: #333;
-}
-.mini-standings-title-link:hover .mini-standings-title {
-  color: #CC0000;
-}
-/* --- STYLES FOR THE RESPONSIVE NAVBAR --- */
-.navbar {
-  background-color: transparent; /* El fondo lo maneja .nav-links */
-  position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-.nav-links {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  background-color: #333;
-  border-radius: 5px;
-}
-.nav-links li a, .dropbtn {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 10px 14px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-  border-radius: 5px;
-}
-.nav-links li > a:hover, .dropdown:hover .dropbtn {
-  background-color: #CC0000;
-}
-.nav-links li a.active {
-  background-color: #8B0000;
-  font-weight: bold;
-}
+.mini-standings-title { font-size: 1em; text-align: center; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #333; }
+.mini-standings-title-link:hover .mini-standings-title { color: #CC0000; }
+.navbar { background-color: transparent; position: relative; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.nav-links { list-style-type: none; margin: 0; padding: 0; display: flex; background-color: #333; border-radius: 5px; }
+.nav-links li a, .dropbtn { display: block; color: white; text-align: center; padding: 10px 14px; text-decoration: none; transition: background-color 0.3s; border-radius: 5px; }
+.nav-links li > a:hover, .dropdown:hover .dropbtn { background-color: #CC0000; }
+.nav-links li a.active { background-color: #8B0000; font-weight: bold; }
 .dropdown { position: relative; }
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #8B0000;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1001;
-  border-radius: 5px;
-}
-.dropdown-content a {
-  color: #CC0100;
-  font-weight: bold;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: left;
-}
+.dropdown-content { display: none; position: absolute; background-color: #8B0000; min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1001; border-radius: 5px; }
+.dropdown-content a { color: #CC0100; font-weight: bold; padding: 12px 16px; text-decoration: none; display: block; text-align: left; }
 .dropdown-content a:hover { background-color: #CC0100; }
 .dropdown:hover .dropdown-content { display: block; }
-.dropdown-content hr {
-  border: 0;
-  border-top: 1px solid #ddd; margin: 5px 0;
-}
-/* Estilos del icono de hamburguesa (oculto en desktop) */
+.dropdown-content hr { border: 0; border-top: 1px solid #ddd; margin: 5px 0; }
 .hamburger-icon { display: none; }
 .close-btn-li { display: none; }
-
-/* Media Query para pantallas pequeñas (móviles) */
 @media screen and (max-width: 850px) {
-  .header-main {
-    border-bottom: none; /* Quitar la línea inferior en móvil */
-  }
-  .navbar {
-    background-color: transparent;
-  }
-  .nav-links {
-    display: none; /* Oculta la lista de links por defecto */
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(20, 20, 20, 0.98);
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    border-radius: 0;
-  }
-  .navbar.mobile-active .nav-links {
-    display: flex; /* Muestra el menú overlay cuando está activo */
-  }
-  .nav-links li {
-    margin: 15px 0;
-  }
-  .nav-links li a {
-    font-size: 1.5em;
-    background-color: transparent; /* Quitar fondo en móvil */
-  }
-  .dropdown-content {
-    position: static;
-    display: none;
-    background-color: transparent;
-    box-shadow: none;
-    padding-left: 20px;
-    border: none;
-  }
-  .dropdown:hover .dropdown-content {
-     display: none;
-  }
-  .dropdown.open .dropdown-content {
-     display: block;
-  }
-  .dropdown .dropbtn {
-     display: flex; align-items: center; justify-content: center;
-  }
-  .hamburger-icon {
-    display: block;
-    cursor: pointer;
-    padding: 10px;
-    z-index: 2001; /* Debe estar por encima del overlay del menú */
-  }
-  .hamburger-icon .bar {
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px auto;
-    background-color: #333;
-    transition: all 0.3s ease-in-out;
-  }
-  .close-btn-li {
-    display: block;
-    position: absolute;
-    top: 20px;
-    right: 25px;
-  }
-  #close-nav-btn {
-    font-size: 3em;
-    font-weight: bold;
-    color: white;
-  }
+  .header-main { border-bottom: none; }
+  .navbar { background-color: transparent; }
+  .nav-links { display: none; flex-direction: column; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(20, 20, 20, 0.98); justify-content: center; align-items: center; z-index: 2000; border-radius: 0; }
+  .navbar.mobile-active .nav-links { display: flex; }
+  .nav-links li { margin: 15px 0; }
+  .nav-links li a { font-size: 1.5em; background-color: transparent; }
+  .dropdown-content { position: static; display: none; background-color: transparent; box-shadow: none; padding-left: 20px; border: none; }
+  .dropdown:hover .dropdown-content { display: none; }
+  .dropdown.open .dropdown-content { display: block; }
+  .dropdown .dropbtn { display: flex; align-items: center; justify-content: center; }
+  .hamburger-icon { display: block; cursor: pointer; padding: 10px; z-index: 2001; }
+  .hamburger-icon .bar { display: block; width: 25px; height: 3px; margin: 5px auto; background-color: #333; transition: all 0.3s ease-in-out; }
+  .close-btn-li { display: block; position: absolute; top: 20px; right: 25px; }
+  #close-nav-btn { font-size: 3em; font-weight: bold; color: white; }
 }
-/* --- STYLES FOR LETTER-BASED NAVIGATION --- */
-.letter-nav {
-  text-align: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  background: #f1f1f1;
-  border-radius: 5px;
-}
-.letter-nav a {
-  display: inline-block;
-  padding: 5px 10px;
-  margin: 2px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  color: #333;
-  text-decoration: none;
-  font-weight: bold;
-}
-.letter-nav a:hover {
-  background-color: #CC0000;
-  color: white;
-}
-.letter-nav a.active {
-  background-color: #8B0000;
-  color: white;
-  border-color: #8B0000;
-}
-.letter-group {
-  display: none;
-}
-.letter-group.active {
-  display: block;
-}
-.player-list ul, .team-list ul {
-  list-style: none;
-  padding: 0;
-  columns: 3;
-  column-gap: 20px;
-}
-.player-list li, .team-list li {
-  padding: 5px 0;
-}
+.letter-nav { text-align: center; margin-bottom: 20px; padding: 10px; background: #f1f1f1; border-radius: 5px; }
+.letter-nav a { display: inline-block; padding: 5px 10px; margin: 2px; background-color: #fff; border: 1px solid #ccc; border-radius: 3px; color: #333; text-decoration: none; font-weight: bold; }
+.letter-nav a:hover { background-color: #CC0000; color: white; }
+.letter-nav a.active { background-color: #8B0000; color: white; border-color: #8B0000; }
+.letter-group { display: none; }
+.letter-group.active { display: block; }
+.player-list ul, .team-list ul { list-style: none; padding: 0; columns: 3; column-gap: 20px; }
+.player-list li, .team-list li { padding: 5px 0; }
+@media (max-width: 768px) { .player-list ul, .team-list ul { columns: 2; } }
+@media (max-width: 480px) { .player-list ul, .team-list ul { columns: 1; } }
+.player-profile-header-new { display: flex; align-items: center; background-color: #f8f9fa; border-radius: 8px; padding: 20px; gap: 30px; margin-bottom: 30px; border: 1px solid #e9ecef; flex-wrap: wrap; }
+.player-name-container { flex: 1 1 40%; }
+.player-name-new { font-size: 2.5em; color: #1a1a1a; margin: 0; padding: 0; border: none; font-weight: 700; line-height: 1.2; }
+.player-bio { flex: 1 1 50%; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.bio-item { display: flex; align-items: center; gap: 10px; }
+.bio-icon { color: #8B0000; }
+.bio-text { display: flex; flex-direction: column; }
+.bio-label { font-size: 0.8em; color: #6c757d; }
+.bio-value { font-size: 1em; font-weight: 600; color: #212529; }
+.stats-summary-card { position: relative; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.07); padding: 25px; margin-bottom: 40px; border: 1px solid #e9ecef; }
+.season-tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background-color: #8B0000; color: white; font-weight: bold; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; }
+.stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; text-align: center; }
+.stat-item { padding: 10px 0; }
+.stat-icon { height: 32px; width: 32px; margin: 0 auto 10px auto; color: #8B0000; }
+.stat-icon.card-icon { height: 28px; width: 20px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.2); }
+.stat-icon.card-icon.yellow { background-color: #ffc107; }
+.stat-icon.card-icon.red { background-color: #dc3545; }
+.stat-value { font-size: 2em; font-weight: 700; color: #1a1a1a; display: block; line-height: 1; }
+.stat-label { font-size: 0.8em; color: #6c757d; margin-top: 5px; }
+.season-accordion-container h3 { text-align: center; border: none; color: #333; }
+.season-accordion { border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 10px; overflow: hidden; }
+.season-header { cursor: pointer; padding: 15px; background-color: #f8f9fa; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+.season-header:hover { background-color: #e9ecef; }
+.season-arrow { transition: transform 0.3s ease; }
+.season-accordion.active .season-arrow { transform: rotate(180deg); }
+.season-arrow::before { content: '▼'; font-size: 0.8em; color: #6c757d; }
+.season-content { display: none; padding: 15px; border-top: 1px solid #dee2e6; }
+.tab-nav { margin-bottom: 15px; border-bottom: 1px solid #dee2e6; }
+.tab-button { background: none; border: none; padding: 10px 15px; cursor: pointer; font-size: 1em; color: #6c757d; font-weight: 600; border-bottom: 3px solid transparent; }
+.tab-button.active { color: #8B0000; border-bottom-color: #8B0000; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.stats-table-season th, .matches-table-season th { font-size: 0.9em; padding: 8px; }
+.stats-table-season td, .matches-table-season td { font-size: 0.9em; padding: 8px; }
+.team-cell-with-logo { display: flex; align-items: center; gap: 10px; }
+.team-cell-with-logo img { height: 20px; width: 20px; flex-shrink: 0; }
+.team-cell-with-logo a { font-weight: normal; }
+.team-logo-small.national-team-flag { border-radius: 50%; border: 1px solid #ccc; }
 @media (max-width: 768px) {
-  .player-list ul, .team-list ul { columns: 2; }
+  .player-profile-header-new { flex-direction: column; align-items: flex-start; }
+  .player-name-new { font-size: 2em; text-align: left; }
+  .player-bio { width: 100%; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-item { margin-bottom: 15px; }
 }
 @media (max-width: 480px) {
-  .player-list ul, .team-list ul { columns: 1; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
+.sub-tab-nav { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e9ecef; }
+.sub-tab-button { background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 20px; padding: 5px 12px; cursor: pointer; font-size: 0.85em; font-weight: 500; color: #333; transition: all 0.2s ease; }
+.sub-tab-button:hover { background-color: #e0e0e0; }
+.sub-tab-button.active { background-color: #8B0000; color: white; border-color: #8B0000; }
+.sub-tab-panel { display: none; }
+.sub-tab-panel.active { display: block; }
+.card-icon-header { display: inline-block; width: 10px; height: 14px; border-radius: 2px; vertical-align: middle; }
+.card-icon-header.yellow { background-color: #ffc107; border: 1px solid #c69500; }
+.card-icon-header.red { background-color: #dc3545; border: 1px solid #a71d2a; }
+.match-list-container { font-size: 0.9em; }
+.match-list-header { display: grid; grid-template-columns: 1.5fr 5fr 0.8fr 0.8fr 1fr; gap: 10px; font-weight: bold; color: #6c757d; padding: 10px; border-bottom: 2px solid #dee2e6; margin-bottom: 5px; }
+.match-list-header > div:nth-child(3), .match-list-header > div:nth-child(4), .match-list-header > div:nth-child(5) { text-align: center; }
+.match-list-row { display: grid; grid-template-columns: 1.5fr 5fr 0.8fr 0.8fr 1fr; gap: 10px; align-items: center; padding: 12px 10px; border-bottom: 1px solid #e9ecef; transition: background-color 0.2s; }
+.match-list-row.clickable-row { cursor: pointer; }
+.match-list-row.clickable-row:hover { background-color: #f8f9fa; }
+.cell-match { display: flex; align-items: center; justify-content: space-between; }
+.team-home, .team-away { display: flex; align-items: center; gap: 8px; flex: 1; font-weight: 500; }
+.team-home { justify-content: flex-end; text-align: right; }
+.team-away { justify-content: flex-start; text-align: left; }
+.team-home .team-logo-small, .team-away .team-logo-small { height: 20px; width: 20px; }
+.match-score { background-color: #e9ecef; font-weight: bold; padding: 5px 10px; border-radius: 4px; margin: 0 10px; white-space: nowrap; }
+.cell-goals, .cell-minutes, .cell-link { text-align: center; }
+.cell-cards { text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
+.card-icon-table { display: inline-block; width: 8px; height: 12px; border-radius: 1px; }
+.card-icon-table.yellow { background-color: #ffc107; }
+.card-icon-table.red { background-color: #dc3545; }
 )"
 
 
@@ -2400,6 +2357,7 @@ let searchData = [];
 document.addEventListener('DOMContentLoaded', function() {
   initializeSearch();
   initializeMobileMenu();
+  initializePlayerProfileInteractions();
 });
 
 function initializeMobileMenu() {
@@ -2409,20 +2367,14 @@ function initializeMobileMenu() {
   const dropdownBtn = document.querySelector('.dropdown .dropbtn');
 
   if (hamburger && nav && closeBtn) {
-    hamburger.addEventListener('click', () => {
-      nav.classList.add('mobile-active');
-    });
-
-    closeBtn.addEventListener('click', () => {
-      nav.classList.remove('mobile-active');
-    });
+    hamburger.addEventListener('click', () => { nav.classList.add('mobile-active'); });
+    closeBtn.addEventListener('click', () => { nav.classList.remove('mobile-active'); });
   }
 
-  // Lógica para desplegar el submenú en móvil con un toque
   if (dropdownBtn) {
     dropdownBtn.addEventListener('click', (event) => {
-      if (window.innerWidth <= 768) { // Solo en vista móvil
-        event.preventDefault(); // Evita que el enlace # se active
+      if (window.innerWidth <= 768) {
+        event.preventDefault();
         const parentDropdown = dropdownBtn.parentElement;
         parentDropdown.classList.toggle('open');
       }
@@ -2430,27 +2382,88 @@ function initializeMobileMenu() {
   }
 }
 
-// Make the path logic more robust to work on both the `servr` local server
-// and GitHub Pages.
+// --- INICIO: FUNCIONES MEJORADAS PARA PERFIL DE JUGADORA ---
+function initializePlayerProfileInteractions() {
+    const accordions = document.querySelectorAll('.season-accordion');
+    if (!accordions.length) return;
+
+    accordions.forEach(accordion => {
+        const header = accordion.querySelector('.season-header');
+        header.addEventListener('click', () => {
+            accordion.classList.toggle('active');
+            const content = accordion.querySelector('.season-content');
+            content.style.display = accordion.classList.contains('active') ? 'block' : 'none';
+        });
+    });
+    
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const clickedButton = event.currentTarget;
+            const seasonId = clickedButton.dataset.seasonId;
+            const tabTarget = clickedButton.dataset.tabTarget;
+            switchTab(seasonId, tabTarget, clickedButton);
+        });
+    });
+
+    document.querySelectorAll('.sub-tab-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const clickedButton = event.currentTarget;
+            const seasonId = clickedButton.dataset.seasonId;
+            const subtabTarget = clickedButton.dataset.subtabTarget;
+            switchSubTab(seasonId, subtabTarget, clickedButton);
+        });
+    });
+}
+
+function switchTab(seasonId, tabToShow, clickedButton) {
+    const seasonContent = clickedButton.closest('.season-content');
+    if (!seasonContent) return;
+
+    seasonContent.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    seasonContent.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    const panelToShow = seasonContent.querySelector(`#${tabToShow}-${seasonId}`);
+    if (panelToShow) {
+        panelToShow.classList.add('active');
+    }
+    clickedButton.classList.add('active');
+}
+
+function switchSubTab(seasonId, competitionId, clickedButton) {
+    const parentTabPanel = clickedButton.closest('.tab-panel');
+    if (!parentTabPanel) return;
+
+    parentTabPanel.querySelectorAll('.sub-tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    parentTabPanel.querySelectorAll('.sub-tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    const panelToShow = parentTabPanel.querySelector(`#matches-${seasonId}-${competitionId}`);
+    if (panelToShow) {
+        panelToShow.classList.add('active');
+    }
+    clickedButton.classList.add('active');
+}
+// --- FIN: FUNCIONES MEJORADAS PARA PERFIL DE JUGADORA ---
+
+
 function getSiteBasePath() {
   const path = window.location.pathname;
-  // Find the part of the path before the first language folder.
-  // E.g., from "/repo/mk/page.html" extracts "/repo/"
   const match = path.match(/^(.*\/)(mk|sq|es|en)\//);
-  if (match && match[1]) {
-    return match[1];
-  }
-  // Fallback for the root (e.g., `servr` locally)
+  if (match && match[1]) { return match[1]; }
   return "/";
 }
 
 function getCurrentLanguageFromPath() {
   const path = window.location.pathname;
-  // Look for the 2-letter language code in the path.
   const match = path.match(/\/(mk|sq|es|en)\//);
-  if (match && match[1]) {
-    return match[1];
-  }
+  if (match && match[1]) { return match[1]; }
   const langAttr = document.documentElement.lang;
   if (langAttr) return langAttr;
   return 'mk';
@@ -2460,15 +2473,12 @@ function initializeSearch() {
   const lang = getCurrentLanguageFromPath();
   const basePath = getSiteBasePath();
   const jsonUrl = `${basePath}${lang}/../assets/search_data_${lang}.json`;
-
   const searchInput = document.getElementById('search-input');
   const body = document.body;
 
   fetch(jsonUrl)
     .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok for search data.');
-      }
+      if (!response.ok) { throw new Error('Network response was not ok for search data.'); }
       return response.json();
     })
     .then(data => {
@@ -2481,26 +2491,23 @@ function initializeSearch() {
     })
     .catch(error => {
       console.error('Error loading search data:', error);
-      if (searchInput) {
-        searchInput.placeholder = body.dataset.searchError || 'Search unavailable';
-      }
+      if (searchInput) { searchInput.placeholder = body.dataset.searchError || 'Search unavailable'; }
     });
 
   document.addEventListener('click', function(event) {
     const searchContainer = document.querySelector('.search-container');
     const navbar = document.querySelector('.navbar');
-    if (navbar && navbar.contains(event.target)) {
-      return;
-    }
-
+    if (navbar && navbar.contains(event.target)) { return; }
     if (searchContainer && !searchContainer.contains(event.target)) {
       const suggestions = document.getElementById('search-suggestions');
       if(suggestions) suggestions.style.display = 'none';
     }
-  });
-  document.addEventListener('click', function(event) {
+    
     const clickableRow = event.target.closest('.clickable-row');
-    if (clickableRow && clickableRow.dataset.href) { window.location.href = clickableRow.dataset.href; }
+    if (clickableRow && clickableRow.dataset.href) { 
+      if (event.target.closest('a')) { return; }
+      window.location.href = clickableRow.dataset.href; 
+    }
   });
 }
 
@@ -2596,28 +2603,18 @@ function sortTable(tableId, columnIndex) {
   table.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
   if(header) header.classList.add(newDir);
 }
-function showLetter(letter) {
-  // Hide all letter groups
-  document.querySelectorAll('.letter-group').forEach(group => {
-    group.classList.remove('active');
-  });
-  // Deactivate all letter links
-  document.querySelectorAll('.letter-nav a').forEach(link => {
-    link.classList.remove('active');
-  });
 
-  // Show the selected letter group
+function showLetter(letter) {
+  document.querySelectorAll('.letter-group').forEach(group => { group.classList.remove('active'); });
+  document.querySelectorAll('.letter-nav a').forEach(link => { link.classList.remove('active'); });
   const selectedGroup = document.getElementById('group-' + letter);
-  if (selectedGroup) {
-    selectedGroup.classList.add('active');
-  }
-  // Activate the selected letter link
+  if (selectedGroup) { selectedGroup.classList.add('active'); }
   const selectedLink = document.querySelector(`.letter-nav a[data-letter="${letter}"]`);
-  if (selectedLink) {
-    selectedLink.classList.add('active');
-  }
+  if (selectedLink) { selectedLink.classList.add('active'); }
 }
 )"
+
+
 writeLines(script_js, file.path(RUTA_ASSETS_COMPARTIDOS, "script.js"))
 message("style.css and script.js files saved to the assets folder.")
 
@@ -2911,7 +2908,7 @@ if (hubo_cambios) {
           grupo <- grupos_por_letra[[letra]]
           
           if (!is.null(grupo) && nrow(grupo) > 0) {
-
+            
             tags$div(
               class = if(letra == alfabeto[1]) "letter-group active" else "letter-group",
               id = paste0("group-", letra),
@@ -3371,6 +3368,10 @@ if (hubo_cambios) {
       save_html(pagina_partido_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$partidos, paste0(id_p, ".html")))
     })
     
+    
+    # ==============================================================================
+    # == INICIO DEL BLOQUE FINAL v5 DE PERFIL DE JUGADORA (REEMPLAZAR)             ==
+    # ==============================================================================
     walk(1:nrow(jugadoras_stats_df), function(i) {
       jugadora <- jugadoras_stats_df[i,]; id_j <- jugadora$id;
       if (id_j %in% player_ids_to_skip) { return() }
@@ -3379,148 +3380,164 @@ if (hubo_cambios) {
       
       current_player_name <- jugadora[[player_name_col]]
       
-      # 13.1.35. Prepare relative paths.
-      path_rel_timovi <- file.path("..", nombres_carpetas_relativos$timovi)
-      path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
-      
-      # 13.1.36. List to accumulate career table HTML rows.
-      lista_filas_carrera <- list()
-      
-      # 13.1.37. STEP 1: Process NATIONAL TEAM career.
-      nat_team_player_summary <- national_team_career_summary_df %>% filter(id == id_j)
-      if (nrow(nat_team_player_summary) > 0) {
-        stage_nat <- nat_team_player_summary[1,]
-        details_id_nat <- paste0("details-", id_j, "-national")
-        
-        historial_nacional_partidos <- apariciones_df %>%
-          filter(id == id_j, equipo == "Македонија") %>%
-          left_join(partidos_df %>% 
-                      select(id_partido, fecha, local, visitante, goles_local, goles_visitante, categoria, es_partido_seleccion), 
-                    by = "id_partido") %>%
-          filter(es_partido_seleccion == TRUE) %>%
-          mutate(fecha_parsed = as.Date(fecha, format="%d.%m.%Y")) %>%
-          arrange(desc(fecha_parsed)) %>%
-          left_join(entidades_df_lang %>% select(original_name, local_lang=current_lang_name), by=c("local"="original_name")) %>% 
-          left_join(entidades_df_lang %>% select(original_name, visitante_lang=current_lang_name), by=c("visitante"="original_name"))
-        
-        tabla_partidos_nacional <- tags$table(
-          tags$thead(tags$tr(
-            tags$th(t("team_header_date")), tags$th(t("match_header_match")), 
-            tags$th(t("match_header_category")), tags$th(t("match_header_result")), 
-            tags$th(t("match_header_status")), tags$th(t("player_mins"))
-          )),
-          tags$tbody(if(nrow(historial_nacional_partidos) > 0) { 
-            map(1:nrow(historial_nacional_partidos), function(p_idx){ 
-              partido_row <- historial_nacional_partidos[p_idx,]
-              status_partido <- if (partido_row$tipo == "Titular") t("player_starter") else if (!is.na(partido_row$minutos_jugados) && partido_row$minutos_jugados > 0) t("player_status_played_sub") else t("player_status_called_up")
-              tags$tr(tags$td(partido_row$fecha), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido_row$id_partido, ".html")), paste(partido_row$local_lang, "vs", partido_row$visitante_lang))), tags$td(partido_row$categoria), tags$td(paste(partido_row$goles_local,"-",partido_row$goles_visitante)), tags$td(status_partido), tags$td(if(is.na(partido_row$minutos_jugados)) 0 else partido_row$minutos_jugados))
-            }) 
-          } else { 
-            tags$tr(tags$td(colspan="6", t("player_no_matches")))
-          })
-        )
-        
-        details_div_nat <- tags$div(class="details-content", tags$h4(t("player_match_list")), tabla_partidos_nacional)
-        nombre_equipo_stage_nat_lang <- (entidades_df_lang %>% filter(original_name == stage_nat$equipo))$current_lang_name[1]
-        nombre_comp_stage_nat_lang <- (competiciones_unicas_df %>% filter(competicion_id == "reprezentacija"))[[comp_name_col]][1]
-        flag_url_mk <- paste0("https://hatscripts.github.io/circle-flags/flags/", get_national_team_iso("Македонија"), ".svg")
-        
-        summary_row_nat <- tags$tr(
-          class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id_nat), 
-          tags$td(t("season_all")),
-          tags$td(class="team-cell", 
-                  tags$img(class="team-logo national-team-flag", src = flag_url_mk, alt = nombre_equipo_stage_nat_lang), 
-                  crear_enlace_equipo_condicional(stage_nat$equipo, nombre_equipo_stage_nat_lang)
-          ), 
-          tags$td(t("competition_reprezentacija")),
-          tags$td(stage_nat$Played), 
-          tags$td(stage_nat$Goals), 
-          tags$td(stage_nat$Minutes)
-        )
-        
-        details_row_nat <- tags$tr(id=details_id_nat, class="details-row", tags$td(colspan="6", details_div_nat))
-        
-        lista_filas_carrera <- append(lista_filas_carrera, list(summary_row_nat, details_row_nat))
-      }
-      
-      # 13.1.38. STEP 2: Process CLUB career.
-      player_career_clubs_df <- career_summary_jugadoras_df %>% 
-        filter(id == id_j, equipo != "Македонија") %>%
-        left_join(competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, !!sym(comp_name_col)), by=c("competicion_nombre", "competicion_temporada")) %>% 
-        left_join(entidades_df_lang, by = c("equipo" = "original_name"))
-      
-      if (nrow(player_career_clubs_df) > 0) {
-        partidos_jugadora_details <- apariciones_df %>% filter(id == id_j) %>%
-          left_join(partidos_df %>% select(id_partido, jornada, fecha, local, visitante, goles_local, goles_visitante), by = "id_partido") %>% 
-          left_join(entidades_df_lang %>% select(original_name, local_lang=current_lang_name), by=c("local"="original_name")) %>% 
-          left_join(entidades_df_lang %>% select(original_name, visitante_lang=current_lang_name), by=c("visitante"="original_name"))
-        
-        filas_club_nested <- map(1:nrow(player_career_clubs_df), function(j) {
-          stage <- player_career_clubs_df[j,]; details_id <- paste0("details-", id_j, "-club-", j)
-          nombre_equipo_stage_mk <- stage$equipo; nombre_equipo_stage_lang <- stage$current_lang_name
-          nombre_comp_stage_lang <- stage[[comp_name_col]]
-          
-          nombre_archivo_final_stage <- paste0(generar_id_seguro(nombre_equipo_stage_mk), ".png")
-          if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final_stage))) { nombre_archivo_final_stage <- "NOLOGO.png" }
-          logo_src_stage <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final_stage)
-          
-          partidos_stage <- partidos_jugadora_details %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre, equipo == stage$equipo)
-          goles_stage <- goles_df_unificado %>% filter(id == id_j, id_partido %in% partidos_stage$id_partido, equipo_jugadora == stage$equipo)
-          tarjetas_stage <- tarjetas_df_unificado %>% filter(id == id_j, id_partido %in% partidos_stage$id_partido, equipo == stage$equipo)
-          
-          tabla_detalles_stats <- tags$table(tags$tbody(tags$tr(tags$td(t("team_type")), tags$td(nombre_equipo_stage_lang)), tags$tr(tags$td(t("player_called_up")), tags$td(stage$CalledUp)), tags$tr(tags$td(t("player_played")), tags$td(stage$Played)), tags$tr(tags$td(t("player_starter")), tags$td(stage$Starter)), tags$tr(tags$td(t("player_mins")), tags$td(stage$Minutes)), tags$tr(tags$td(t("player_goals")), tags$td(stage$Goals)), tags$tr(tags$td(t("player_yellow_cards")), tags$td(stage$Yellows)), tags$tr(tags$td(t("player_red_cards")), tags$td(stage$Reds))))
-          tabla_partidos <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")),tags$th(t("match_header_match")),tags$th(t("match_header_result")),tags$th(t("player_status")), tags$th(t("player_mins")))), tags$tbody(if(nrow(partidos_stage)>0) { map(1:nrow(partidos_stage), function(p_idx){ partido_row <- partidos_stage[p_idx,]; status_partido <- if (partido_row$tipo == "Titular") t("player_starter") else if (!is.na(partido_row$minutos_jugados) && partido_row$minutos_jugados > 0) t("player_status_played_sub") else t("player_status_called_up"); tags$tr(tags$td(partido_row$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido_row$id_partido, ".html")),paste(partido_row$local_lang,"vs",partido_row$visitante_lang))), tags$td(paste(partido_row$goles_local,"-",partido_row$goles_visitante)), tags$td(status_partido), tags$td(if(is.na(partido_row$minutos_jugados)) 0 else partido_row$minutos_jugados)) }) } else { tags$tr(tags$td(colspan="5", t("player_no_matches"))) }))
-          tabla_goles <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")), tags$th(t("match_header_match")), tags$th(t("match_header_minute")))), tags$tbody(if(nrow(goles_stage)>0){ map(1:nrow(goles_stage), function(g_idx){ goal_row <- goles_stage[g_idx,]; g_partido<-filter(partidos_stage, id_partido==goal_row$id_partido) %>% head(1); tags$tr(tags$td(g_partido$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(goal_row$id_partido, ".html")),paste(g_partido$local_lang,"vs",g_partido$visitante_lang))), tags$td(formatear_minuto_partido(goal_row$minuto)))}) } else { tags$tr(tags$td(colspan="3", t("player_no_goals"))) }))
-          tabla_tarjetas <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")), tags$th(t("match_header_match")), tags$th(t("match_header_card")), tags$th(t("match_header_minute")), tags$th(t("match_header_reason")))), tags$tbody(if(nrow(tarjetas_stage)>0){ map(1:nrow(tarjetas_stage), function(t_idx){ card_row <- tarjetas_stage[t_idx,]; t_partido<-filter(partidos_stage, id_partido==card_row$id_partido) %>% head(1); icon<-if(card_row$tipo=="Amarilla")tags$span(class="card-yellow")else tags$span(class="card-red"); tags$tr(tags$td(t_partido$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(card_row$id_partido, ".html")),paste(t_partido$local_lang,"vs",t_partido$visitante_lang))), tags$td(icon), tags$td(formatear_minuto_partido(card_row$minuto)), tags$td(card_row$motivo))}) } else { tags$tr(tags$td(colspan="5", t("player_no_cards"))) }))
-          
-          details_div <- tags$div(class="details-content", tags$h4(t("player_detailed_stats")), tabla_detalles_stats, tags$h4(t("player_match_list")), tabla_partidos, tags$h4(t("player_goal_list")), tabla_goles, tags$h4(t("player_card_list")), tabla_tarjetas)
-          summary_row <- tags$tr(class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id), tags$td(stage$competicion_temporada), tags$td(class="team-cell", tags$img(class = "team-logo", src = logo_src_stage, alt = nombre_equipo_stage_lang), tags$a(href=file.path(path_rel_timovi, paste0(generar_id_seguro(nombre_equipo_stage_mk), ".html")), onclick="event.stopPropagation();", nombre_equipo_stage_lang)), tags$td(nombre_comp_stage_lang), tags$td(stage$Played), tags$td(stage$Goals), tags$td(stage$Minutes))
-          details_row <- tags$tr(id=details_id, class="details-row", tags$td(colspan="6", details_div))
-          
-          list(summary_row, details_row)
-        })
-        
-        lista_filas_carrera <- append(lista_filas_carrera, unlist(filas_club_nested, recursive = FALSE))
-      }
-      
-      # 13.1.39. STEP 3: Build the final table.
-      if (length(lista_filas_carrera) > 0) {
-        tbody_content <- tagList(lista_filas_carrera)
-      } else {
-        tbody_content <- tags$tr(tags$td(colspan="6", t("player_no_career_data")))
-      }
-      
-      tabla_resumen_carrera <- tags$table(
-        class="career-summary-table",
-        tags$thead(tags$tr(tags$th(t("player_season")), tags$th(t("team_type")), tags$th(t("player_competition")), tags$th(t("player_apps")), tags$th(t("player_goals")), tags$th(t("player_mins")))),
-        tags$tbody(tbody_content)
-      )
-      
-      # 13.1.40. Profile header.
-      icono_bandera <- if (!is.na(jugadora$codigo_iso)) {
-        texto_emergente <- if_else(!is.na(jugadora$nombre_macedonio), jugadora$nombre_macedonio, jugadora$nacionalidad)
-        url_bandera <- paste0("https://kapowaz.github.io/square-flags/flags/", jugadora$codigo_iso, ".svg")
-        tags$img(src = url_bandera, alt = texto_emergente, title = texto_emergente, style = "height: 0.9em; width: auto; border: 1px solid #ccc;")
-      }
-      info_edad <- if (!is.na(jugadora$edad)) {
-        tags$span(style = "font-size: 0.6em; color: #555; vertical-align: middle; font-weight: normal;", paste0(jugadora$edad, t("player_age_suffix")))
+      # --- 1. CONSTRUIR LA CABECERA DEL PERFIL ---
+      info_items <- list()
+      if (!is.na(jugadora$codigo_iso)) {
+        info_items[[length(info_items) + 1]] <- tags$div(class="bio-item", tags$div(class="bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L8.35 12H11v7.93zM13 19.93V12h2.65l4.14 2.21c-.43 3.32-3.26 5.95-6.79 6.72zM13 4.07V10h2.65l4.14-2.21C19.37 4.56 16.54 2 13 2.07zM11 4.07c3.53 0 6.37 2.49 6.79 5.72L13 10H11V4.07zM4.26 8.21C4.08 7.43 4 6.64 4 5.86c0-1.03.24-2 .66-2.87l4.14 2.22H4.26zm.43 7.58c.2.6.46 1.17.78 1.7L9.61 14H4.69z"/></svg>')), tags$div(class="bio-text", tags$span(class="bio-label", t("player_nationality")), tags$span(class="bio-value", jugadora$nombre_macedonio %||% jugadora$nacionalidad)))
       }
       mapa_pos_traducida <- c("goalkeeper" = t("position_goalkeeper"), "defender" = t("position_defender"), "midfielder" = t("position_midfielder"), "forward" = t("position_forward"))
-      posicion_traducida <- recode(jugadora$posicion_final_unificada, !!!mapa_pos_traducida, .default = jugadora$posicion_final_unificada)
-      info_posicion <- if (!is.na(jugadora$posicion_final_unificada)) {
-        tags$span(style = "font-size: 0.6em; color: #555; vertical-align: middle; font-weight: normal;", posicion_traducida)
+      if (!is.na(jugadora$posicion_final_unificada) && jugadora$posicion_final_unificada != "") {
+        posicion_traducida <- recode(jugadora$posicion_final_unificada, !!!mapa_pos_traducida, .default = jugadora$posicion_final_unificada)
+        info_items[[length(info_items) + 1]] <- tags$div(class="bio-item", tags$div(class="bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>')), tags$div(class="bio-text", tags$span(class="bio-label", t("player_position")), tags$span(class="bio-value", posicion_traducida)))
       }
-      titulo_perfil <- tags$h2(
-        style = "display: flex; align-items: center; gap: 15px;",
-        current_player_name, icono_bandera, info_edad, info_posicion
-      )
+      if (!is.na(jugadora$fecha_nacimiento)) {
+        fecha_formateada <- format(as.Date(jugadora$fecha_nacimiento), format = "%d.%m.%Y")
+        edad_texto <- if (!is.na(jugadora$edad)) paste0("(", jugadora$edad, " ", t("player_age_suffix"), ")") else ""
+        info_items[[length(info_items) + 1]] <- tags$div(class="bio-item", tags$div(class="bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>')), tags$div(class="bio-text", tags$span(class="bio-label", t("player_birth_date")), tags$span(class="bio-value", paste(fecha_formateada, edad_texto))))
+      }
+      ciudad_original_en <- jugadora$ciudad_nacimiento
+      if (!is.na(ciudad_original_en) && ciudad_original_en != "") {
+        ciudad_a_mostrar <- ciudad_original_en
+        if (!is.null(mapa_ciudades_long_df)) {
+          traduccion <- mapa_ciudades_long_df %>% filter(lang == idioma_actual, en == ciudad_original_en) %>% pull(translated_city)
+          if (length(traduccion) > 0) { ciudad_a_mostrar <- traduccion[1] }
+        }
+        info_items[[length(info_items) + 1]] <- tags$div(class="bio-item", tags$div(class="bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>')), tags$div(class="bio-text", tags$span(class="bio-label", t("player_birth_place")), tags$span(class="bio-value", ciudad_a_mostrar)))
+      }
       
-      # 13.1.41. Final content and file saving.
+      # --- 2. CONSTRUIR TARJETA DE ESTADÍSTICAS ---
+      player_career_data <- career_summary_jugadoras_df %>% filter(id == id_j)
+      stats_summary_card_html <- NULL
+      if (nrow(player_career_data) > 0) {
+        latest_season_info <- player_career_data %>% filter(!str_detect(competicion_nombre, "Пријателски|Бараж")) %>% mutate(start_year = as.integer(substr(competicion_temporada, 1, 2))) %>% arrange(desc(start_year)) %>% slice(1)
+        if (nrow(latest_season_info) > 0) {
+          latest_season <- latest_season_info$competicion_temporada[1]
+          latest_season_stats <- player_career_data %>% filter(competicion_temporada == latest_season, !str_detect(competicion_nombre, "Пријателски|Бараж")) %>% summarise(CalledUp=sum(CalledUp, na.rm=T), Starter=sum(Starter, na.rm=T), Goals=sum(Goals, na.rm=T), Yellows=sum(Yellows, na.rm=T), Reds=sum(Reds, na.rm=T)) %>% mutate(SubOn = CalledUp - Starter)
+          stats_summary_card_html <- tags$div(class="stats-summary-card", tags$div(class="season-tag", latest_season), tags$div(class="stats-grid", tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'), tags$span(class="stat-value", latest_season_stats$CalledUp), tags$span(class="stat-label", t("player_apps"))), tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'), tags$span(class="stat-value", latest_season_stats$Starter), tags$span(class="stat-label", t("player_starter"))), tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>'), tags$span(class="stat-value", latest_season_stats$SubOn), tags$span(class="stat-label", t("player_sub_on"))), tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76l-2.12 2.12M12 2v2M7.76 7.76l2.12 2.12M2 12h2M7.76 16.24l2.12-2.12M12 22v-2M16.24 16.24l-2.12-2.12M22 12h-2"></path></svg>'), tags$span(class="stat-value", latest_season_stats$Goals), tags$span(class="stat-label", t("player_goals"))), tags$div(class="stat-item", HTML('<div class="stat-icon card-icon yellow"></div>'), tags$span(class="stat-value", latest_season_stats$Yellows), tags$span(class="stat-label", t("player_yellow_cards_short"))), tags$div(class="stat-item", HTML('<div class="stat-icon card-icon red"></div>'), tags$span(class="stat-value", latest_season_stats$Reds), tags$span(class="stat-label", t("player_red_cards_short")))))
+        }
+      }
+      
+      # --- 3. CONSTRUIR EL ACORDEÓN DE ESTADÍSTICAS ---
+      
+      generar_logo_html <- function(nombre_equipo_mk) {
+        iso_code <- get_national_team_iso(nombre_equipo_mk)
+        if (!is.na(iso_code)) {
+          tags$img(class="team-logo-small national-team-flag", src = paste0("https://hatscripts.github.io/circle-flags/flags/", iso_code, ".svg"))
+        } else {
+          logo_path <- paste0(generar_id_seguro(nombre_equipo_mk), ".png")
+          if (!file.exists(file.path(RUTA_LOGOS_DESTINO, logo_path))) { logo_path <- "NOLOGO.png" }
+          tags$img(class="team-logo-small", src=file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, logo_path))
+        }
+      }
+      
+      career_accordion_html <- NULL
+      if (nrow(player_career_data) > 0) {
+        partidos_jugadora_details <- apariciones_df %>%
+          filter(id == id_j) %>%
+          left_join(
+            partidos_df %>% select(id_partido, local, visitante, goles_local, goles_visitante, fecha, es_partido_seleccion, categoria),
+            by = "id_partido"
+          ) %>% # <-- ESTA ES LA LÍNEA CORREGIDA
+          left_join(entidades_df_lang %>% select(original_name, local_lang=current_lang_name), by=c("local"="original_name")) %>%
+          left_join(entidades_df_lang %>% select(original_name, visitante_lang=current_lang_name), by=c("visitante"="original_name"))
+        national_team_data_player <- national_team_career_by_category_df %>% filter(id == id_j)
+        seasons_club <- player_career_data %>% filter(equipo != "Македонија") %>% distinct(competicion_temporada) %>% mutate(type = "club")
+        seasons_nat <- if(nrow(national_team_data_player) > 0) tibble(competicion_temporada = t("competition_reprezentacija"), type = "national") else tibble()
+        all_seasons <- bind_rows(seasons_nat, seasons_club) %>% mutate(start_year = ifelse(type == "club", as.integer(substr(competicion_temporada, 1, 2)), 999)) %>% arrange(desc(start_year))
+        
+        career_accordion_html <- tags$div(class="season-accordion-container",
+                                          tags$h3(t("player_stats_by_season")),
+                                          map(1:nrow(all_seasons), function(s_idx) {
+                                            season_info <- all_seasons[s_idx, ]; season_name <- season_info$competicion_temporada; season_type <- season_info$type; season_id_safe <- paste0(str_replace_all(tolower(season_name), "[^a-z0-9]", "-"), "-", s_idx)
+                                            if(season_type == "national") {
+                                              stats_tab_content <- tags$table(class="stats-table-season",
+                                                                              tags$thead(tags$tr(tags$th(t("category_header")), tags$th(t("player_apps")), tags$th(t("player_starter")), tags$th(t("player_goals")), tags$th(HTML('<span class="card-icon-header yellow"></span>')), tags$th(HTML('<span class="card-icon-header red"></span>')), tags$th(t("player_mins")))),
+                                                                              tags$tbody(map(1:nrow(national_team_data_player), function(k) {
+                                                                                stage <- national_team_data_player[k, ]; tags$tr(tags$td(stage$categoria), tags$td(stage$Played), tags$td(stage$Starter), tags$td(stage$Goals), tags$td(stage$Yellows), tags$td(stage$Reds), tags$td(stage$Minutes))
+                                                                              }))
+                                              )
+                                              matches_data_season <- partidos_jugadora_details %>% filter(es_partido_seleccion == TRUE, equipo == "Македонија")
+                                              categories_in_season <- matches_data_season %>% pull(categoria) %>% unique() %>% sort()
+                                              matches_tab_content <- tagList(
+                                                tags$div(class="sub-tab-nav", map(seq_along(categories_in_season), function(c_idx){ current_category <- categories_in_season[c_idx]; tags$button(class=if(c_idx==1)"sub-tab-button active" else "sub-tab-button", `data-season-id`=season_id_safe, `data-subtab-target`=current_category, current_category) })),
+                                                map(seq_along(categories_in_season), function(c_idx){
+                                                  current_category <- categories_in_season[c_idx]; matches_in_comp <- matches_data_season %>% filter(categoria == current_category)
+                                                  tags$div(id=paste0("matches-", season_id_safe, "-", current_category), class=if(c_idx==1)"sub-tab-panel active" else "sub-tab-panel",
+                                                           tags$div(class="match-list-container",
+                                                                    tags$div(class="match-list-header", tags$div(t("team_header_date")), tags$div(t("match_header_match")), tags$div(t("category_header")), tags$div(t("player_goals")), tags$div(t("match_header_card")), tags$div(t("player_mins"))),
+                                                                    map(1:nrow(matches_in_comp), function(p_idx){
+                                                                      partido_row <- matches_in_comp[p_idx,]; goles_partido_jugadora <- goles_df_unificado %>% filter(id_partido == partido_row$id_partido, id == id_j); tarjetas_partido_jugadora <- tarjetas_df_unificado %>% filter(id_partido == partido_row$id_partido, id == id_j);
+                                                                      tags$div(class="match-list-row clickable-row", `data-href`=file.path("..", nombres_carpetas_relativos$partidos, paste0(partido_row$id_partido, ".html")),
+                                                                               tags$div(class="cell-date", partido_row$fecha),
+                                                                               tags$div(class="cell-match", tags$span(class="team-home", partido_row$local_lang, generar_logo_html(partido_row$local)), tags$span(class="match-score", paste(partido_row$goles_local, ":", partido_row$goles_visitante)), tags$span(class="team-away", generar_logo_html(partido_row$visitante), partido_row$visitante_lang)),
+                                                                               tags$div(class="cell-competition", partido_row$categoria),
+                                                                               tags$div(class="cell-goals", if(nrow(goles_partido_jugadora)>0) nrow(goles_partido_jugadora) else "0"),
+                                                                               tags$div(class="cell-cards", if(nrow(tarjetas_partido_jugadora)>0) tagList(if("Amarilla" %in% tarjetas_partido_jugadora$tipo) tags$span(class="card-icon-table yellow"), if("Roja" %in% tarjetas_partido_jugadora$tipo) tags$span(class="card-icon-table red"))),
+                                                                               tags$div(class="cell-minutes", if(is.na(partido_row$minutos_jugados)) "0" else partido_row$minutos_jugados)
+                                                                      )
+                                                                    })
+                                                           )
+                                                  )
+                                                })
+                                              )
+                                            } else {
+                                              stats_data_season <- player_career_data %>% filter(competicion_temporada == season_name) %>% left_join(competiciones_unicas_df, by=c("competicion_nombre", "competicion_temporada")) %>% left_join(entidades_df_lang, by = c("equipo" = "original_name"))
+                                              stats_tab_content <- tags$table(class="stats-table-season",
+                                                                              tags$thead(tags$tr(tags$th(t("player_competition")), tags$th(t("team_type")), tags$th(t("player_apps")), tags$th(t("player_starter")), tags$th(t("player_goals")), tags$th(HTML('<span class="card-icon-header yellow"></span>')), tags$th(HTML('<span class="card-icon-header red"></span>')), tags$th(t("player_mins")))),
+                                                                              tags$tbody(map(1:nrow(stats_data_season), function(k){
+                                                                                stage <- stats_data_season[k, ]; comp_url <- file.path("..", nombres_carpetas_relativos$competiciones, paste0(stage$competicion_id, ".html")); team_url <- file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(stage$equipo), ".html"));
+                                                                                tags$tr(tags$td(tags$a(href = comp_url, stage[[comp_name_col]])), tags$td(class="team-cell-with-logo", generar_logo_html(stage$equipo), tags$a(href=team_url, stage$current_lang_name)), tags$td(stage$Played), tags$td(stage$Starter), tags$td(stage$Goals), tags$td(stage$Yellows), tags$td(stage$Reds), tags$td(stage$Minutes))
+                                                                              }))
+                                              )
+                                              # CORRECCIÓN AQUÍ: Asegurarse de que `partidos_jugadora_details` tiene las columnas necesarias antes de filtrar.
+                                              matches_data_season <- partidos_jugadora_details %>% 
+                                                left_join(competiciones_unicas_df, by=c("competicion_nombre", "competicion_temporada")) %>%
+                                                filter(competicion_temporada == season_name)
+                                              
+                                              competitions_in_season <- matches_data_season %>% distinct(competicion_id, .keep_all = TRUE) %>% select(competicion_id, competicion_nombre_lang = !!sym(comp_name_col))
+                                              matches_tab_content <- tagList(
+                                                tags$div(class="sub-tab-nav", map(1:nrow(competitions_in_season), function(c_idx){ comp <- competitions_in_season[c_idx,]; tags$button(class=if(c_idx==1)"sub-tab-button active" else "sub-tab-button", `data-season-id`=season_id_safe, `data-subtab-target`=comp$competicion_id, comp$competicion_nombre_lang) })),
+                                                map(1:nrow(competitions_in_season), function(c_idx){
+                                                  comp <- competitions_in_season[c_idx,]; matches_in_comp <- matches_data_season %>% filter(competicion_id == comp$competicion_id)
+                                                  tags$div(id=paste0("matches-", season_id_safe, "-", comp$competicion_id), class=if(c_idx==1)"sub-tab-panel active" else "sub-tab-panel",
+                                                           tags$div(class="match-list-container",
+                                                                    tags$div(class="match-list-header", tags$div(t("team_header_date")), tags$div(t("match_header_match")), tags$div(t("player_goals")), tags$div(t("match_header_card")), tags$div(t("player_mins"))),
+                                                                    map(1:nrow(matches_in_comp), function(p_idx){
+                                                                      partido_row <- matches_in_comp[p_idx,]; goles_partido_jugadora <- goles_df_unificado %>% filter(id_partido == partido_row$id_partido, id == id_j); tarjetas_partido_jugadora <- tarjetas_df_unificado %>% filter(id_partido == partido_row$id_partido, id == id_j);
+                                                                      tags$div(class="match-list-row clickable-row", `data-href`=file.path("..", nombres_carpetas_relativos$partidos, paste0(partido_row$id_partido, ".html")),
+                                                                               tags$div(class="cell-date", partido_row$fecha),
+                                                                               tags$div(class="cell-match", tags$span(class="team-home", partido_row$local_lang, generar_logo_html(partido_row$local)), tags$span(class="match-score", paste(partido_row$goles_local, ":", partido_row$goles_visitante)), tags$span(class="team-away", generar_logo_html(partido_row$visitante), partido_row$visitante_lang)),
+                                                                               tags$div(class="cell-goals", if(nrow(goles_partido_jugadora)>0) nrow(goles_partido_jugadora) else "0"),
+                                                                               tags$div(class="cell-cards", if(nrow(tarjetas_partido_jugadora)>0) tagList(if("Amarilla" %in% tarjetas_partido_jugadora$tipo) tags$span(class="card-icon-table yellow"), if("Roja" %in% tarjetas_partido_jugadora$tipo) tags$span(class="card-icon-table red"))),
+                                                                               tags$div(class="cell-minutes", if(is.na(partido_row$minutos_jugados)) "0" else partido_row$minutos_jugados)
+                                                                      )
+                                                                    })
+                                                           )
+                                                  )
+                                                })
+                                              )
+                                            }
+                                            tags$div(class="season-accordion",
+                                                     tags$div(class="season-header", tags$span(class="season-header-title", season_name), tags$span(class="season-arrow")),
+                                                     tags$div(class="season-content",
+                                                              tags$div(class="tab-nav",
+                                                                       tags$button(class="tab-button active", `data-season-id`=season_id_safe, `data-tab-target`="stats", t("tab_stats")),
+                                                                       tags$button(class="tab-button", `data-season-id`=season_id_safe, `data-tab-target`="matches", t("tab_matches"))),
+                                                              tags$div(id=paste0("stats-", season_id_safe), class="tab-panel active", stats_tab_content),
+                                                              tags$div(id=paste0("matches-", season_id_safe), class="tab-panel", matches_tab_content)
+                                                     )
+                                            )
+                                          })
+        )
+      }
+      
+      # --- 4. ENSAMBLAR LA PÁGINA FINAL ---
+      
       contenido_jugadora <- tagList(
         crear_botones_navegacion(path_to_lang_root = ".."),
-        titulo_perfil,
-        tags$h3(t("player_career_summary")),
-        tabla_resumen_carrera
+        tags$div(class = "player-profile-header-new", tags$div(class = "player-name-container", tags$h2(class = "player-name-new", current_player_name)), if(length(info_items) > 0) tags$div(class = "player-bio", info_items)),
+        stats_summary_card_html,
+        career_accordion_html
       )
       pagina_jugadora_final <- crear_pagina_html(
         contenido_jugadora, current_player_name, path_to_root_dir = "../..", 
@@ -3528,6 +3545,12 @@ if (hubo_cambios) {
       )
       save_html(pagina_jugadora_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$jugadoras, paste0(id_j, ".html")))
     })
+    # ============================================================================
+    # == FIN DEL BLOQUE FINAL v5 DE PERFIL DE JUGADORA                           ==
+    # ============================================================================
+  
+    
+    
     
     walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_mk) {
       if (!is.na(get_national_team_iso(team_mk))) {

@@ -1,0 +1,219 @@
+mk,sq,es,en
+Агино,Agino,Agino,Agino
+Арачиново,Haraçina,Aračinovo,Aračinovo
+Бардовци,Bardhoci,Bardovci,Bardovci
+Башибос,Bashibos,Bašibos,Bašibos
+Башино Село,Bashino Sella,Bašino Selo,Bašino Selo
+Белчишта,Belçishta,Belčišta,Belčišta
+Беранци,Beranci,Beranci,Beranci
+Берово,Berova,Berovo,Berovo
+Битола,Manastiri,Bitola,Bitola
+Богданци,Bogdanca,Bogdanci,Bogdanci
+Богомила,Bogomila,Bogomila,Bogomila
+Боговиње,Bogovina,Bogovinje,Bogovinje
+Бороец,Boroveci,Boroec,Boroec
+Брвеница,Bërvenica,Brvenica,Brvenica
+Бучин,Buçin,Bučin,Bučin
+Будаково,Budakova,Budakovo,Budakovo
+Бујковци,Bujkoci,Bujkovci,Bujkovci
+Царев Двор,Carev Dvor,Carev Dvor,Carev Dvor
+Чашка,Çashka,Čaška,Čaška
+Чегране,Çegrani,Čegrane,Čegrane
+Челопек,Çelopeku,Čelopek,Čelopek
+Чешиново,Çeshinova,Češinovo,Češinovo
+Четирце,Çetirca,Četirce,Četirce
+Црнилиште,Cërnilishti,Crnilište,Crnilište
+Црнобуки,Cërnobuki,Crnobuki,Crnobuki
+Далбеговци,Dallbegoci,Dalbegovci,Dalbegovci
+Дебар,Dibra,Debar,Debar
+Дебреше,Debresha,Debreše,Debreše
+Дедебалци,Dedebalci,Dedebalci,Dedebalci
+Делчево,Dellçeva,Delčevo,Delčevo
+Дељадровци,Deladroci,Deljadrovci,Deljadrovci
+Делогожди,Dollogozhda,Delogoždi,Delogoždi
+Демир Хисар,Demir Hisari,Demir Hisar,Demir Hisar
+Демир Капија,Demir Kapia,Demir Kapija,Demir Kapija
+Десово,Desova,Desovo,Desovo
+Добри Дол,Dobërdoli,Dobri Dol,Dobri Dol
+Добромири,Dobromiri,Dobromiri,Dobromiri
+Доброшане,Dobroshani,Dobrošane,Dobrošane
+Доброште,Dobroshti,Dobrošte,Dobrošte
+Добрушево,Dobrusheva,Dobruševo,Dobruševo
+Долна Бањица,Banjica e Poshtme,Dolna Banjica,Dolna Banjica
+Долна Белица,Belica e Poshtme,Dolna Belica,Dolna Belica
+Долна Чарлија,Çarlija e Poshtme,Dolna Čarlija,Dolna Čarlija
+Долнени,Dollneni,Dolneni,Dolneni
+Долни Дисан,Disani i Poshtëm,Dolni Disan,Dolni Disan
+Долни Коњари,Kojnara e Poshtme,Dolni Konjari,Dolni Konjari
+Долно Оризари,Orizarja e Poshtme,Dolno Orizari,Dolno Orizari
+Долно Палчиште,Pallçishti i Poshtëm,Dolno Palčište,Dolno Palčište
+Долно Српци,Sërpca e Poshtme,Dolno Srpci,Dolno Srpci
+Долно Свиларе,Svillara e Poshtme,Dolno Svilare,Dolno Svilare
+Дреновци,Drenoci,Drenovci,Drenovci
+Дреново,Drenova,Drenovo,Drenovo
+Џепчиште,Xhepçishti,Džepčište,Džepčište
+Ерековци,Erekovci,Erekovci,Erekovci
+Форино,Forina,Forino,Forino
+Гевгелија,Gjevgjelia,Gevgelija,Gevgelija
+Глоѓи,Gllogja,Glogji,Glogji
+Голема Речица,Reçica e Madhe,Golema Rečica,Golema Rečica
+Големо Коњари,Kojnara e Madhe,Golemo Konjari,Golemo Konjari
+Горна Бањица,Banjica e Epërme,Gorna Banjica,Gorna Banjica
+Горно Јаболчиште,Jabollçishti i Epërm,Gorno Jabolčište,Gorno Jabolčište
+Горно Врановци,Vranoci i Epërm,Gorno Vranovci,Gorno Vranovci
+Гостивар,Gostivari,Gostivar,Gostivar
+Градец,Gradeci,Gradec,Gradec
+Градско,Gradsko,Gradsko,Gradsko
+Градско Балдовци,Baldoci i Gradskos,Gradsko Baldovci,Gradsko Baldovci
+Грешница,Greshnica,Grešnica,Grešnica
+Грнчари,Gërçari,Grnčari,Grnčari
+Инџиково,Inxhikova,Indžikovo,Indžikovo
+Ивањевци,Ivanjevci,Ivanjevci,Ivanjevci
+Јегуновце,Jegunoci,Jegunovce,Jegunovce
+Јосифово,Josifova,Josifovo,Josifovo
+Кадино,Kadina,Kadino,Kadino
+Кадино Село,Kadina Sella,Kadino Selo,Kadino Selo
+Камењане,Kamenjani,Kamenjane,Kamenjane
+Канатларци,Kanatlarci,Kanatlarci,Kanatlarci
+Карбинци,Karbinci,Karbinci,Karbinci
+Кавадарци,Kavadari,Kavadarci,Kavadarci
+Кичево,Kërçova,Kičevo,Kičevo
+Кочани,Koçani,Kočani,Kočani
+Корешница,Koreshnica,Korešnica,Korešnica
+Косел,Koseli,Kosel,Kosel
+Кратово,Kratova,Kratovo,Kratovo
+Кравари,Kravari,Kravari,Kravari
+Крива Паланка,Kriva Pallanka,Kriva Palanka,Kriva Palanka
+Кривогаштани,Krivogashtani,Krivogaštani,Krivogaštani
+Криволак,Krivolaku,Krivolak,Krivolak
+Крклино,Kërklina,Krklino,Krklino
+Крушеани,Krusheani,Krušeani,Krušeani
+Крушево,Krusheva,Kruševo,Kruševo
+Кукуречани,Kukureçani,Kukurečani,Kukurečani
+Куманово,Kumanova,Kumanovo,Kumanovo
+Куратица,Kuratica,Kuratica,Kuratica
+Лабуништа,Llabunishti,Labuništa,Labuništa
+Лажани,Llazhani,Lažani,Lažani
+Лешани,Leshani,Lešani,Lešani
+Лескоец,Leskoeci,Leskoec,Leskoec
+Липково,Likovë,Lipkovo,Lipkovo
+Лисичани,Lisiçani,Lisičani,Lisičani
+Лисолај,Lisolaj,Lisolaj,Lisolaj
+Љубин,Lubini,Ljubin,Ljubin
+Љуботен,Luboteni,Ljuboten,Ljuboten
+Логоварди,Logovardi,Logovardi,Logovardi
+Лопате,Llopati,Lopate,Lopate
+Лопатица,Llopatica,Lopatica,Lopatica
+Ложани,Llozhani,Ložani,Ložani
+Лознани,Lloznani,Loznani,Loznani
+Лозово,Llozova,Lozovo,Lozovo
+Македонска Каменица,Kamenica e Maqedonisë,Makedonska Kamenica,Makedonska Kamenica
+Македонски Брод,Brodi,Makedonski Brod,Makedonski Brod
+Мала Речица,Reçica e Vogël,Mala Rečica,Mala Rečica
+Мало Коњари,Kojnara e Vogël,Malo Konjari,Malo Konjari
+Марена,Marena,Marena,Marena
+Марино,Marino,Marino,Marino
+Мартолци,Martolci,Martolci,Martolci
+Матејче,Mateçi,Matejče,Matejče
+Мажучиште,Mazhuçishti,Mažučište,Mažučište
+Мешеишта,Mesheishti,Mešeišta,Mešeišta
+Миладиновци,Milladinoci,Miladinovci,Miladinovci
+Милетино,Miletina,Miletino,Miletino
+Мислешево,Mislleshova,Misleševo,Misleševo
+Могила,Mogila,Mogila,Mogila
+Мороишта,Morovishti,Moroišta,Moroišta
+Мрзенци,Mërzenci,Mrzenci,Mrzenci
+Мусинци,Musinci,Musinci,Musinci
+Небрегово,Nebregova,Nebregovo,Nebregovo
+Неготино,Negotina,Negotino,Negotino
+Нераште,Nerashti,Nerašte,Nerašte
+Никиштане,Nikishtani,Nikištane,Nikištane
+Ношпал,Noshpali,Nošpal,Nošpal
+Нов Дојран,Dojrani i Ri,Nov Dojran,Nov Dojran
+Новаци,Novaci,Novaci,Novaci
+Ново Коњарево,Kojnareva e Re,Novo Konjarevo,Novo Konjarevo
+Ново Село,Novosella,Novo Selo,Novo Selo
+Обршани,Obrshani,Obršani,Obršani
+Охрид,Ohër,Ohrid,Ohrid
+Октиси,Oktisi,Oktisi,Oktisi
+Орашац,Orashaci,Orašac,Orašac
+Отља,Hotla,Otlja,Otlja
+Пашино Рувци,Pashino Ruvci,Pašino Ruvci,Pašino Ruvci
+Пчиња,Pçinja,Pčinja,Pčinja
+Пехчево,Peçeva,Pehčevo,Pehčevo
+Пепелиште,Pepelishti,Pepelište,Pepelište
+Петровец,Petroveci,Petrovec,Petrovec
+Пирава,Pirava,Pirava,Pirava
+Пирок,Piroku,Pirok,Pirok
+Подмочани,Podmoçani,Podmočani,Podmočani
+Поешево,Poesheva,Poeševo,Poeševo
+Порој,Poroji,Poroj,Poroj
+Пресил,Presill,Presil,Presil
+Прилеп,Prilepi,Prilep,Prilep
+Пробиштип,Probishtipi,Probištip,Probištip
+Пршовце,Përshoci,Pršovce,Pršovce
+Ржаничино,Rzhaniçina,R'žaničino,R'žaničino
+Радолишта,Radolishti,Radolišta,Radolišta
+Радовиш,Radovishti,Radoviš,Radoviš
+Радово,Radova,Radovo,Radovo
+Радожда,Radozhda,Radožda,Radožda
+Раштак,Rashtaku,Raštak,Raštak
+Ресен,Resnja,Resen,Resen
+Ропалце,Ropallca,Ropalce,Ropalce
+Росоман,Rosomani,Rosoman,Rosoman
+Самоков,Samokovi,Samokov,Samokov
+Сарај,Saraji,Saraj,Saraj
+Шемшево,Shemshova,Šemševo,Šemševo
+Сенокос,Senokosi,Senokos,Senokos
+Сирково,Sirkova,Sirkovo,Sirkovo
+Шишево,Shishova,Šiševo,Šiševo
+Скопје,Shkup,Skopie,Skopje
+Слатино (Дебарца),Sllatina (Debarca),Slatino (Debarca),Slatino (Debarca)
+Слатино (Теарце),Sllatina (Tearca),Slatino (Tearce),Slatino (Tearce)
+Слупчане,Sllupçani,Slupčane,Slupčane
+Смилковци,Smillkoci,Smilkovci,Smilkovci
+Сопот (Кавадарци),Sopoti (Kavadarci),Sopot (Kavadarci),Sopot (Kavadarci)
+Средно Коњари,Kojnara e Mesme,Sredno Konjari,Sredno Konjari
+Старо Нагоричане,Nagoriçani i Vjetër,Staro Nagoričane,Staro Nagoričane
+Штип,Shtipi,Štip,Štip
+Стримница,Strimnica,Strimnica,Strimnica
+Струга,Struga,Struga,Struga
+Струмица,Strumica,Strumica,Strumica
+Студена Бара,Studena Bara,Studena Bara,Studena Bara
+Студеничани,Studeniçani,Studeničani,Studeničani
+Сушица,Sushica,Sušica,Sušica
+Свети Николе,Sveti Nikolla,Sveti Nikole,Sveti Nikole
+Теарце,Tearca,Tearce,Tearce
+Теранци,Teranci,Teranci,Teranci
+Тетово,Tetova,Tetovo,Tetovo
+Трап,Trapi,Trap,Trap
+Тромеѓа,Tromegja,Tromegja,Tromegja
+Трубарево,Trubareva,Trubarevo,Trubarevo
+Тумчевиште,Tumçevishti,Tumčeviste,Tumčeviste
+Турново,Turnova,Turnovo,Turnovo
+Удово,Udova,Udovo,Udovo
+Умин Дол,Umin Dol,Umin Dol,Umin Dol
+Валандово,Vallandova,Valandovo,Valandovo
+Василево,Vasileva,Vasilevo,Vasilevo
+Ваташа,Vatasha,Vataša,Vataša
+Велес,Velesi,Veles,Veles
+Велешта,Veleshta,Velešta,Velešta
+Велмеј,Vellmej,Velmej,Velmej
+Вевчани,Vevçani,Vevčani,Vevčani
+Виница,Vinica,Vinica,Vinica
+Воѓани,Vogjani,Vogjani,Vogjani
+Волино,Volino,Volino,Volino
+Волково,Vollkova,Volkovo,Volkovo
+Возарци,Vozarci,Vozarci,Vozarci
+Враниште,Vranishti,Vranište,Vranište
+Врапчиште,Vrapçishti,Vrapčište,Vrapčište
+Вратница,Vratnica,Vratnica,Vratnica
+Забрчани,Zabërçani,Zabrčani,Zabrčani
+Заграчани,Zagraçani,Zagračani,Zagračani
+Зајас,Zajazi,Zajas,Zajas
+Зелениково,Zelenikova,Zelenikovo,Zelenikovo
+Желино,Zhelina,Želino,Želino
+Житоше,Zhitoshi,Žitoše,Žitoše
+Злести,Zlesti,Zlesti,Zlesti
+Злетово,Zletova,Zletovo,Zletovo
+Зрновци,Zërnoci,Zrnovci,Zrnovci
