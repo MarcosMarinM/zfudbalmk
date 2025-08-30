@@ -1235,32 +1235,52 @@ resultados_exitosos <- map(resultados_exitosos, function(res) {
   return(res)
 })
 
-# 10.0.3. Apply master ID unification
+# 10.0.3. Apply master ID unification (NEW LOGIC: based on incorrect name)
 if (!is.null(mapa_unificacion_id_df) && nrow(mapa_unificacion_id_df) > 0) {
-  message("   > Applying master ID unification rules...")
+  message("   > Applying master ID unification rules (by name)...")
+  
+  # Asegurar que el nombre canónico en el mapa también esté en el formato correcto.
   mapa_unificacion_id_df$nombre_canonico <- reordenar_nombre_idempotente(mapa_unificacion_id_df$nombre_canonico)
-  id_map <- setNames(mapa_unificacion_id_df$id_canonico, mapa_unificacion_id_df$id_a_unificar)
-  name_map <- setNames(mapa_unificacion_id_df$nombre_canonico, mapa_unificacion_id_df$id_a_unificar)
-  aplicar_mapeo_id <- function(df, col_id = "id", col_nombre = "nombre") {
-    if (is.null(df) || nrow(df) == 0 || !col_id %in% names(df) || !col_nombre %in% names(df)) return(df)
-    indices_a_cambiar <- which(df[[col_id]] %in% names(id_map))
-    if (length(indices_a_cambiar) > 0) {
-      ids_originales_en_filas <- df[[col_id]][indices_a_cambiar]
-      df[[col_id]][indices_a_cambiar] <- id_map[ids_originales_en_filas]
-      df[[col_nombre]][indices_a_cambiar] <- name_map[ids_originales_en_filas]
+  
+  # Nueva función que unifica usando un left_join por el nombre.
+  aplicar_unificacion_por_nombre <- function(df, mapa, col_nombre_df, col_id_df) {
+    # Si el dataframe es nulo, está vacío o no tiene las columnas necesarias, devolverlo sin cambios.
+    if (is.null(df) || nrow(df) == 0 || !col_nombre_df %in% names(df) || !col_id_df %in% names(df)) {
+      return(df)
     }
-    return(df)
+    
+    # Preparar el mapa para el join, renombrando 'nombre_incorrecto' para que coincida con la columna del df.
+    mapa_para_join <- mapa %>%
+      rename(!!col_nombre_df := nombre_incorrecto)
+    
+    df %>%
+      left_join(mapa_para_join, by = col_nombre_df) %>%
+      mutate(
+        # Reemplazar el nombre y el ID originales por los canónicos solo si se encontró una coincidencia.
+        # coalesce() elige el primer valor no-NA.
+        !!col_nombre_df := coalesce(nombre_canonico, .data[[col_nombre_df]]),
+        !!col_id_df := coalesce(id_canonico, .data[[col_id_df]])
+      ) %>%
+      # Eliminar las columnas auxiliares que se añadieron desde el mapa.
+      select(-any_of(c("id_canonico", "nombre_canonico")))
   }
+  
+  # Aplicar la nueva función de unificación a todas las partes relevantes de los datos.
   resultados_exitosos <- map(resultados_exitosos, function(res) {
     if(is.null(res)) return(NULL)
+    
+    # Estandarizar nombres de columnas de ID si es necesario (ej. 'id_jugadora' -> 'id')
     if ("id_jugadora" %in% names(res$goles)) res$goles <- rename(res$goles, id = id_jugadora)
     if ("id_jugadora" %in% names(res$tarjetas)) res$tarjetas <- rename(res$tarjetas, id = id_jugadora)
     if ("id_jugadora" %in% names(res$penales)) res$penales <- rename(res$penales, id = id_jugadora)
-    res$alineacion_local <- aplicar_mapeo_id(res$alineacion_local, "id", "nombre")
-    res$alineacion_visitante <- aplicar_mapeo_id(res$alineacion_visitante, "id", "nombre")
-    res$goles <- aplicar_mapeo_id(res$goles, "id", "jugadora")
-    res$tarjetas <- aplicar_mapeo_id(res$tarjetas, "id", "jugadora")
-    res$penales <- aplicar_mapeo_id(res$penales, "id", "jugadora")
+    
+    # Aplicar la unificación por nombre a cada dataframe
+    res$alineacion_local <- aplicar_unificacion_por_nombre(res$alineacion_local, mapa_unificacion_id_df, col_nombre_df = "nombre", col_id_df = "id")
+    res$alineacion_visitante <- aplicar_unificacion_por_nombre(res$alineacion_visitante, mapa_unificacion_id_df, col_nombre_df = "nombre", col_id_df = "id")
+    res$goles <- aplicar_unificacion_por_nombre(res$goles, mapa_unificacion_id_df, col_nombre_df = "jugadora", col_id_df = "id")
+    res$tarjetas <- aplicar_unificacion_por_nombre(res$tarjetas, mapa_unificacion_id_df, col_nombre_df = "jugadora", col_id_df = "id")
+    res$penales <- aplicar_unificacion_por_nombre(res$penales, mapa_unificacion_id_df, col_nombre_df = "jugadora", col_id_df = "id")
+    
     return(res)
   })
 }
@@ -2115,6 +2135,46 @@ message(paste("   >", length(referee_ids_to_skip), "referees from national team 
 message(paste("   >", length(stadium_ids_to_skip), "stadiums from national team matches will be excluded from individual profiles."))
 
 
+# ==============================================================================
+# ==      AÑADIR ESTE BLOQUE PARA CREAR LA INSTANTÁNEA DE DATOS PARA PRUEBAS      ==
+# ==============================================================================
+message(">>>>>> CREANDO INSTANTÁNEA DE DATOS PARA PRUEBAS (entorno_procesado.RData)...")
+
+# Lista de todos los objetos que necesitamos para generar las páginas
+objetos_a_guardar <- c(
+  # Dataframes principales de datos
+  "partidos_df", "apariciones_df", "goles_df_unificado", "tarjetas_df_unificado",
+  "arbitros_df", "estadios_df",
+  
+  # Dataframes de estadísticas agregadas
+  "jugadoras_stats_df", "stats_clasificacion_por_comp_df", 
+  "stats_goleadoras_por_comp_df", "stats_sanciones_por_comp_df",
+  "stats_porteras_por_comp_df", "stats_trios_defensivos_df",
+  "career_summary_jugadoras_df", "stats_equipos_por_temporada_df",
+  "stats_jugadoras_por_equipo_temporada_df", "stats_arbitros_por_temporada_df",
+  "national_team_career_summary_df", "national_team_career_by_category_df",
+  
+  # Dataframes de configuración y mapeo
+  "entidades_maestro_df", "competiciones_unicas_df", "mapeo_completo_df",
+  
+  # Variables y listas de configuración
+  "textos", "IDIOMAS_SOPORTADOS", "nombres_carpetas_relativos", 
+  "estilos_clasificacion_data", "nombres_archivos_traducidos",
+  
+  # Variables de exclusión
+  "player_ids_to_skip", "team_names_to_skip_mk", "referee_ids_to_skip", "stadium_ids_to_skip"
+)
+
+# Guardar solo los objetos existentes en el entorno
+save(
+  list = intersect(objetos_a_guardar, ls()), 
+  file = "entorno_procesado.RData"
+)
+
+message(">>>>>> Instantánea guardada. Puedes detener el script si solo querías esto.")
+# ==============================================================================
+
+
 #### 12. EXTERNALIZATION OF ASSETS (CSS AND JAVASCRIPT) ####
 
 ### 12.1. Save Stylesheet (style.css)
@@ -2328,9 +2388,10 @@ th { background-color: #f2f2f2; }
 .card-icon-header.yellow { background-color: #ffc107; border: 1px solid #c69500; }
 .card-icon-header.red { background-color: #dc3545; border: 1px solid #a71d2a; }
 .match-list-container { font-size: 0.9em; }
-.match-list-header { display: grid; grid-template-columns: 1.5fr 5fr 0.8fr 0.8fr 1fr; gap: 10px; font-weight: bold; color: #6c757d; padding: 10px; border-bottom: 2px solid #dee2e6; margin-bottom: 5px; }
-.match-list-header > div:nth-child(3), .match-list-header > div:nth-child(4), .match-list-header > div:nth-child(5) { text-align: center; }
-.match-list-row { display: grid; grid-template-columns: 1.5fr 5fr 0.8fr 0.8fr 1fr; gap: 10px; align-items: center; padding: 12px 10px; border-bottom: 1px solid #e9ecef; transition: background-color 0.2s; }
+.match-list-header { display: grid; grid-template-columns: 1.5fr 5fr 1.2fr 0.8fr 0.8fr 1fr; gap: 10px; font-weight: bold; color: #6c757d; padding: 10px; border-bottom: 2px solid #dee2e6; margin-bottom: 5px; }
+.match-list-header > div { text-align: center; } /* Regla general: Centra TODOS los títulos */
+.match-list-header > div:first-child { text-align: left; } /* Excepción: Alinea a la izquierda SÓLO el PRIMER título (Fecha) */
+.match-list-row { display: grid; grid-template-columns: 1.5fr 5fr 1.2fr 0.8fr 0.8fr 1fr; gap: 10px; align-items: center; padding: 12px 10px; border-bottom: 1px solid #e9ecef; transition: background-color 0.2s; }
 .match-list-row.clickable-row { cursor: pointer; }
 .match-list-row.clickable-row:hover { background-color: #f8f9fa; }
 .cell-match { display: flex; align-items: center; justify-content: space-between; }
@@ -2344,6 +2405,65 @@ th { background-color: #f2f2f2; }
 .card-icon-table { display: inline-block; width: 8px; height: 12px; border-radius: 1px; }
 .card-icon-table.yellow { background-color: #ffc107; }
 .card-icon-table.red { background-color: #dc3545; }
+/* --- INICIO: ESTILOS PARA PÁGINA DE EQUIPO (V8) --- */
+
+/* --- Cabecera con Logo --- */
+.team-header-container-v5 { display: flex; align-items: center; gap: 25px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px; }
+.team-logo-main img { width: 90px; height: 90px; object-fit: contain; }
+.team-header-info { flex-grow: 1; }
+.team-name-v3 { font-size: 2.8em; color: #1a1a1a; margin: 0 0 15px 0; font-weight: 700; line-height: 1.1; text-align: left; padding: 0; border: none; }
+.info-item { display: flex; align-items: center; gap: 10px; }
+.info-icon svg { fill: #6c757d; width:20px; height:20px; }
+.info-text { display: flex; flex-direction: column; }
+.info-label { font-size: 0.7em; color: #6c757d; text-transform: uppercase; font-weight: 500; }
+.info-value { font-size: 0.9em; font-weight: 600; color: #212529; }
+
+/* --- Pestañas Principales (Roster/Schedule) --- */
+.tab-nav-v4 { display: flex; gap: 10px; border-bottom: 1px solid #dee2e6; }
+.tab-button-v4 { background: none; border: 1px solid transparent; border-bottom: none; padding: 8px 12px; cursor: pointer; font-size: 0.9em; color: #6c757d; font-weight: 600; margin-bottom: -1px; border-radius: 5px 5px 0 0; }
+.tab-button-v4.active { color: #CC0000; border-color: #dee2e6; background-color: #fff; }
+
+/* --- Contenedor de Filtros y Píldoras --- */
+.filters-and-pills-container { background-color: #f7f7f7; margin-top: 25px; }
+.filter-bar-v2 { margin-top: 0 !important; }
+
+/* --- Píldoras de Competición --- */
+.competition-pills-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 15px 15px 15px; }
+.competition-pill { background-color: #e9ecef; color: #495057; border: 1px solid #dee2e6; border-radius: 15px; padding: 6px 14px; font-size: 0.85em; font-weight: 500; cursor: pointer; transition: all 0.2s ease-in-out; }
+.competition-pill:hover { background-color: #ced4da; }
+.competition-pill.active { background-color: #CC0000; color: #fff; border-color: #CC0000; }
+
+/* --- Tabla de Plantilla (Roster) --- */
+.player-roster-table { width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 20px; }
+.player-roster-table th { padding: 10px; border-bottom: 2px solid #dee2e6; text-align: left; color: #6c757d; font-size: 0.8em; text-transform: uppercase; }
+.player-roster-table th.sortable { cursor: pointer; }
+.player-roster-table th.sortable:hover { color: #212529; }
+.player-roster-table th.sort-asc::after, .player-roster-table th.sort-desc::after { content: ''; display: inline-block; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; margin-left: 5px; }
+.player-roster-table th.sort-asc::after { border-bottom: 4px solid #212529; }
+.player-roster-table th.sort-desc::after { border-top: 4px solid #212529; }
+.player-roster-table td { padding: 12px 10px; border-bottom: 1px solid #e9ecef; }
+.player-roster-table tbody tr { cursor: pointer; transition: background-color 0.2s ease-in-out; }
+.player-roster-table tbody tr:hover { background-color: #f8f9fa; }
+.player-roster-table tr:last-child td { border-bottom: none; }
+.player-info-cell .player-name { color: #CC0000; font-weight: bold; }
+.player-info-cell .player-position { font-size: 0.9em; color: #6c757d; }
+
+/* --- Tabla de Calendario (Schedule) --- */
+.schedule-match-table { width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 20px; }
+.schedule-match-table th { padding: 10px; border-bottom: 2px solid #dee2e6; color: #6c757d; font-size: 0.8em; text-transform: uppercase; text-align: left;}
+.schedule-match-table td { padding: 12px 10px; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+.schedule-match-table tbody tr { cursor: pointer; transition: background-color 0.2s ease-in-out; }
+.schedule-match-table tbody tr:hover { background-color: #f8f9fa; }
+.schedule-match-table tr:last-child td { border-bottom: none; }
+.schedule-match-table .th-match { text-align: center; }
+.schedule-match-table .td-home { text-align: right; }
+.schedule-match-table .td-away { text-align: left; }
+.schedule-match-table .td-score { text-align: center; width: 80px; }
+.schedule-team-in-table { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.td-home .schedule-team-in-table { justify-content: flex-end; }
+.td-away .schedule-team-in-table { justify-content: flex-start; }
+.schedule-score-in-table { display: inline-block; font-size: 1em; font-weight: 700; background-color: #f1f2f3; padding: 5px 10px; border-radius: 4px; white-space: nowrap; }
+
 )"
 
 
@@ -2358,6 +2478,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeSearch();
   initializeMobileMenu();
   initializePlayerProfileInteractions();
+  initializeTeamProfilePage(); 
 });
 
 function initializeMobileMenu() {
@@ -2612,6 +2733,208 @@ function showLetter(letter) {
   const selectedLink = document.querySelector(`.letter-nav a[data-letter="${letter}"]`);
   if (selectedLink) { selectedLink.classList.add('active'); }
 }
+
+// --- INICIO: FUNCIONES PARA LA PÁGINA DE PERFIL DE EQUIPO (V8) ---
+
+function initializeTeamProfilePage() {
+  // Solo se ejecuta si encuentra el contenedor de datos específico de esta página
+  const dataEl = document.getElementById('team-page-data');
+  if (!dataEl) return;
+  
+  const pageData = JSON.parse(dataEl.textContent);
+  const t = pageData.translations;
+
+  // State Variables
+  let rosterSortColumn = 'dorsal_principal';
+  let rosterSortDirection = 'asc';
+
+  // DOM Elements
+  const rosterSeason = document.getElementById('roster-season-filter');
+  const rosterCategory = document.getElementById('roster-category-filter');
+  const rosterPillsContainer = document.getElementById('roster-competition-pills');
+  const rosterTableContainer = document.getElementById('roster-table-container');
+  
+  const scheduleSeason = document.getElementById('schedule-season-filter');
+  const scheduleCategory = document.getElementById('schedule-category-filter');
+  const schedulePillsContainer = document.getElementById('schedule-competition-pills');
+  const scheduleTableContainer = document.getElementById('schedule-table-container');
+
+  // Tab Navigation
+  document.querySelectorAll('.tab-button-v4').forEach(button => {
+    button.addEventListener('click', (event) => {
+      const targetPanelId = event.currentTarget.dataset.tabTarget;
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(targetPanelId).classList.add('active');
+      document.querySelectorAll('.tab-button-v4').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    });
+  });
+
+  // ROSTER TAB LOGIC
+  function updateRosterCategoryFilter() {
+    const season = rosterSeason.value;
+    const categories = [...new Set(pageData.roster_data.filter(p => p.competicion_temporada === season).map(p => JSON.stringify({ key: p.category_key })))].map(s => JSON.parse(s));
+    const order = { "category_senior": 1, "category_youth": 2, "category_cadet": 3 };
+    categories.sort((a, b) => (order[a.key] || 99) - (order[b.key] || 99));
+    rosterCategory.innerHTML = '';
+    categories.forEach(c => { rosterCategory.innerHTML += `<option value="${c.key}">${t[c.key] || c.key}</option>`; });
+    updateRosterCompetitionFilter();
+  }
+
+  function updateRosterCompetitionFilter() {
+    rosterPillsContainer.innerHTML = '';
+    if(!rosterSeason.value || !rosterCategory.value) { updateRosterView(); return; }
+    const season = rosterSeason.value; 
+    const category = rosterCategory.value;
+    const competitions = [...new Set(pageData.roster_data.filter(p => p.competicion_temporada === season && p.category_key === category).map(p => JSON.stringify({id: p.competicion_id, name: p.CompeticionLang || p.competicion_nombre})))].map(s => JSON.parse(s));
+    competitions.forEach(c => { rosterPillsContainer.innerHTML += `<button class="competition-pill" data-competition-id="${c.id}">${c.name}</button>`; });
+    const firstPill = rosterPillsContainer.querySelector('.competition-pill');
+    if (firstPill) { firstPill.classList.add('active'); }
+    updateRosterView();
+  }
+
+  function updateRosterView() {
+    const activePill = rosterPillsContainer.querySelector('.competition-pill.active');
+    if (!activePill) { rosterTableContainer.innerHTML = `<p style="text-align:center; padding: 20px;">${t.no_players_found}</p>`; return; }
+    const season = rosterSeason.value;
+    const category = rosterCategory.value;
+    const competition = activePill.dataset.competitionId;
+    let filteredData = pageData.roster_data.filter(p => p.competicion_temporada === season && p.category_key === category && p.competicion_id == competition);
+    if (filteredData.length === 0) { rosterTableContainer.innerHTML = `<p style="text-align:center; padding: 20px;">${t.no_players_found}</p>`; return; }
+    const direction = rosterSortDirection === 'asc' ? 1 : -1;
+    filteredData.sort((a, b) => {
+      let valA, valB;
+      if (rosterSortColumn === 'dorsal_principal') {
+        valA = parseInt(a.dorsal_principal) || 999;
+        valB = parseInt(b.dorsal_principal) || 999;
+      } else if (rosterSortColumn === 'PlayerName') {
+        return a.PlayerName.localeCompare(b.PlayerName) * direction;
+      } else {
+        valA = parseInt(a[rosterSortColumn]) || 0;
+        valB = parseInt(b[rosterSortColumn]) || 0;
+      }
+      return (valA - valB) * direction;
+    });
+    let html = `<table class="player-roster-table"><thead><tr>
+        <th class="sortable" data-sort-key="dorsal_principal" style="width:5%;">${t.col_dorsal}</th>
+        <th class="sortable" data-sort-key="PlayerName">${t.col_player}</th>
+        <th class="sortable" data-sort-key="Played" style="width:8%;">${t.col_apps}</th>
+        <th class="sortable" data-sort-key="Minutes" style="width:8%;">${t.col_mins}</th>
+        <th class="sortable" data-sort-key="Goals" style="width:8%;">${t.col_goals}</th>
+        <th class="sortable" data-sort-key="Yellows" style="width:12%;">${t.col_cards}</th>
+      </tr></thead><tbody>`;
+    filteredData.forEach(player => {
+      const position = t[player.posicion_final_unificada] || '';
+      const playerURL = `../igraci/${player.id}.html`;
+      html += `<tr onclick="window.location.href='${playerURL}'">
+        <td>${player.dorsal_principal || '-'}</td>
+        <td><div class="player-info-cell"><div class="player-name">${player.PlayerName}</div><div class="player-position">${position}</div></div></td>
+        <td style="text-align:center;">${player.Played || 0}</td>
+        <td style="text-align:center;">${player.Minutes || 0}</td>
+        <td style="text-align:center;">${player.Goals || 0}</td>
+        <td style="text-align:center;"><span class="card-icon-table yellow"></span> ${player.Yellows || 0}&nbsp;/&nbsp;<span class="card-icon-table red"></span> ${player.Reds || 0}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    rosterTableContainer.innerHTML = html;
+    const currentHeader = rosterTableContainer.querySelector(`[data-sort-key="${rosterSortColumn}"]`);
+    if (currentHeader) { currentHeader.classList.add(rosterSortDirection === 'asc' ? 'sort-asc' : 'sort-desc'); }
+  }
+
+  // SCHEDULE TAB LOGIC
+  function updateScheduleCategoryFilter() {
+    const season = scheduleSeason.value;
+    const categories = [...new Set(pageData.matches_data.filter(m => m.competicion_temporada === season).map(m => JSON.stringify({key: m.category_key, name: m.category_name})))].map(s => JSON.parse(s));
+    const order = { "category_senior": 1, "category_youth": 2, "category_cadet": 3 };
+    categories.sort((a, b) => (order[a.key] || 99) - (order[b.key] || 99));
+    scheduleCategory.innerHTML = '';
+    categories.forEach(c => { scheduleCategory.innerHTML += `<option value="${c.key}">${c.name}</option>`; });
+    updateScheduleCompetitionFilter();
+  }
+  
+  function updateScheduleCompetitionFilter() {
+      schedulePillsContainer.innerHTML = '';
+      if(!scheduleSeason.value || !scheduleCategory.value) { updateScheduleView(); return; }
+      const season = scheduleSeason.value; 
+      const category = scheduleCategory.value;
+      const competitions = [...new Set(pageData.matches_data.filter(m => m.competicion_temporada === season && m.category_key === category).map(m => JSON.stringify({id: m.competicion_id, name: m.CompeticionLang})))].map(s => JSON.parse(s));
+      competitions.forEach(c => { schedulePillsContainer.innerHTML += `<button class="competition-pill" data-competition-id="${c.id}">${c.name}</button>`; });
+      const firstPill = schedulePillsContainer.querySelector('.competition-pill');
+      if (firstPill) { firstPill.classList.add('active'); }
+      updateScheduleView();
+  }
+
+  function updateScheduleView() {
+    const activePill = schedulePillsContainer.querySelector('.competition-pill.active');
+    if(!activePill) { scheduleTableContainer.innerHTML = `<p style="text-align:center; padding: 20px;">${t.no_matches_found}</p>`; return; }
+    const season = scheduleSeason.value; 
+    const category = scheduleCategory.value; 
+    const competition = activePill.dataset.competitionId;
+    let filteredMatches = pageData.matches_data.filter(m => m.competicion_temporada === season && m.category_key === category && m.competicion_id === competition);
+    if (filteredMatches.length === 0) { scheduleTableContainer.innerHTML = `<p style="text-align:center; padding: 20px;">${t.no_matches_found}</p>`; return; }
+    filteredMatches.sort((a, b) => new Date(b.fecha.split('.').reverse().join('-')) - new Date(a.fecha.split('.').reverse().join('-')));
+    let html = `<table class="schedule-match-table">
+        <thead><tr><th style="width:15%">${t.col_date}</th><th colspan="3" class="th-match">${t.col_match}</th></tr></thead><tbody>`;
+    filteredMatches.forEach(match => {
+        const matchURL = `../natprevari/${match.id_partido}.html`;
+        html += `<tr onclick="window.location.href='${matchURL}'">
+            <td>${match.fecha}</td>
+            <td class="td-home"><span class="schedule-team-in-table">${match.local_lang} <img src="${match.home_logo_url}" class="team-logo-small"></span></td>
+            <td class="td-score"><span class="schedule-score-in-table">${match.goles_local} : ${match.goles_visitante}</span></td>
+            <td class="td-away"><span class="schedule-team-in-table"><img src="${match.away_logo_url}" class="team-logo-small"> ${match.visitante_lang}</span></td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    scheduleTableContainer.innerHTML = html;
+  }
+
+  // Event Listeners
+  rosterSeason.addEventListener('change', updateRosterCategoryFilter);
+  rosterCategory.addEventListener('change', updateRosterCompetitionFilter);
+  rosterPillsContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('competition-pill')) {
+      rosterPillsContainer.querySelectorAll('.competition-pill').forEach(pill => pill.classList.remove('active'));
+      e.target.classList.add('active');
+      updateRosterView();
+    }
+  });
+  rosterTableContainer.addEventListener('click', function(e){
+    const header = e.target.closest('th.sortable');
+    if(!header) return;
+    const sortKey = header.dataset.sortKey;
+    if(rosterSortColumn === sortKey){
+      rosterSortDirection = rosterSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      rosterSortColumn = sortKey;
+      rosterSortDirection = 'asc';
+    }
+    updateRosterView();
+  });
+
+  scheduleSeason.addEventListener('change', updateScheduleCategoryFilter);
+  scheduleCategory.addEventListener('change', updateScheduleCompetitionFilter);
+  schedulePillsContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('competition-pill')) {
+      schedulePillsContainer.querySelectorAll('.competition-pill').forEach(pill => pill.classList.remove('active'));
+      e.target.classList.add('active');
+      updateScheduleView();
+    }
+  });
+
+  // Initial Load
+  if(rosterSeason && rosterSeason.options.length > 0) updateRosterCategoryFilter();
+  if(scheduleSeason && scheduleSeason.options.length > 0) updateScheduleCategoryFilter();
+}
+
+function generarIdSeguroJS(nombre) {
+  if (!nombre) return '';
+  const map = {'а':'a','б':'b','в':'v','г':'g','д':'d','ѓ':'g','е':'e','ж':'z','з':'z','ѕ':'dz','и':'i','ј':'j','к':'k','л':'l','љ':'lj','м':'m','н':'n','њ':'n','о':'o','п':'p','р':'r','с':'s','т':'t','ќ':'kj','у':'u','ф':'f','х':'h','ц':'c','ч':'c','џ':'dz','ш':'s'};
+  let id = nombre.toLowerCase();
+  Object.entries(map).forEach(([key, value]) => { id = id.replace(new RegExp(key, 'g'), value); });
+  return id.replace(/[\s\/]+/g, '_').replace(/[^a-z0-9_\-]+/g, '').replace(/_{2,}/g, '_').replace(/^_+|_+$/g, '');
+}
+
+// --- FIN: FUNCIONES PARA LA PÁGINA DE PERFIL DE EQUIPO ---
 )"
 
 
@@ -3405,15 +3728,61 @@ if (hubo_cambios) {
         info_items[[length(info_items) + 1]] <- tags$div(class="bio-item", tags$div(class="bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>')), tags$div(class="bio-text", tags$span(class="bio-label", t("player_birth_place")), tags$span(class="bio-value", ciudad_a_mostrar)))
       }
       
-      # --- 2. CONSTRUIR TARJETA DE ESTADÍSTICAS ---
+      # --- 2. CONSTRUIR TARJETA DE ESTADÍSTICAS (LÓGICA CORREGIDA) ---
       player_career_data <- career_summary_jugadoras_df %>% filter(id == id_j)
       stats_summary_card_html <- NULL
       if (nrow(player_career_data) > 0) {
-        latest_season_info <- player_career_data %>% filter(!str_detect(competicion_nombre, "Пријателски|Бараж")) %>% mutate(start_year = as.integer(substr(competicion_temporada, 1, 2))) %>% arrange(desc(start_year)) %>% slice(1)
+        latest_season_info <- player_career_data %>% 
+          filter(!str_detect(competicion_nombre, "Пријателски|Бараж")) %>% 
+          mutate(start_year = as.integer(substr(competicion_temporada, 1, 2))) %>% 
+          arrange(desc(start_year)) %>% 
+          slice(1)
+        
         if (nrow(latest_season_info) > 0) {
           latest_season <- latest_season_info$competicion_temporada[1]
-          latest_season_stats <- player_career_data %>% filter(competicion_temporada == latest_season, !str_detect(competicion_nombre, "Пријателски|Бараж")) %>% summarise(CalledUp=sum(CalledUp, na.rm=T), Starter=sum(Starter, na.rm=T), Goals=sum(Goals, na.rm=T), Yellows=sum(Yellows, na.rm=T), Reds=sum(Reds, na.rm=T)) %>% mutate(SubOn = CalledUp - Starter)
-          stats_summary_card_html <- tags$div(class="stats-summary-card", tags$div(class="season-tag", latest_season), tags$div(class="stats-grid", tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'), tags$span(class="stat-value", latest_season_stats$CalledUp), tags$span(class="stat-label", t("player_apps"))), tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'), tags$span(class="stat-value", latest_season_stats$Starter), tags$span(class="stat-label", t("player_starter"))), tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>'), tags$span(class="stat-value", latest_season_stats$SubOn), tags$span(class="stat-label", t("player_sub_on"))), tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76l-2.12 2.12M12 2v2M7.76 7.76l2.12 2.12M2 12h2M7.76 16.24l2.12-2.12M12 22v-2M16.24 16.24l-2.12-2.12M22 12h-2"></path></svg>'), tags$span(class="stat-value", latest_season_stats$Goals), tags$span(class="stat-label", t("player_goals"))), tags$div(class="stat-item", HTML('<div class="stat-icon card-icon yellow"></div>'), tags$span(class="stat-value", latest_season_stats$Yellows), tags$span(class="stat-label", t("player_yellow_cards_short"))), tags$div(class="stat-item", HTML('<div class="stat-icon card-icon red"></div>'), tags$span(class="stat-value", latest_season_stats$Reds), tags$span(class="stat-label", t("player_red_cards_short")))))
+          
+          # CORRECCIÓN 1: Se añade `Played` a la suma y se recalcula `SubOn`.
+          latest_season_stats <- player_career_data %>% 
+            filter(competicion_temporada == latest_season, !str_detect(competicion_nombre, "Пријателски|Бараж")) %>% 
+            summarise(
+              Played=sum(Played, na.rm=T), # <-- (A) AÑADIDO: Sumar los partidos jugados.
+              Starter=sum(Starter, na.rm=T), 
+              Goals=sum(Goals, na.rm=T), 
+              Yellows=sum(Yellows, na.rm=T), 
+              Reds=sum(Reds, na.rm=T)
+            ) %>% 
+            mutate(SubOn = Played - Starter) # <-- (B) CORREGIDO: SubOn ahora es Jugados - Titular.
+          
+          stats_summary_card_html <- tags$div(class="stats-summary-card", 
+                                              tags$div(class="season-tag", latest_season), 
+                                              tags$div(class="stats-grid", 
+                                                       # CORRECCIÓN 2: Se usa `Played` en lugar de `CalledUp` para "Apps".
+                                                       tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'), 
+                                                                tags$span(class="stat-value", latest_season_stats$Played), # <-- (C) CORREGIDO: Muestra `Played`.
+                                                                tags$span(class="stat-label", t("player_apps"))
+                                                       ), 
+                                                       tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>'), 
+                                                                tags$span(class="stat-value", latest_season_stats$Starter), 
+                                                                tags$span(class="stat-label", t("player_starter"))
+                                                       ), 
+                                                       tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>'), 
+                                                                tags$span(class="stat-value", latest_season_stats$SubOn), 
+                                                                tags$span(class="stat-label", t("player_sub_on"))
+                                                       ), 
+                                                       tags$div(class="stat-item", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stat-icon"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76l-2.12 2.12M12 2v2M7.76 7.76l2.12 2.12M2 12h2M7.76 16.24l2.12-2.12M12 22v-2M16.24 16.24l-2.12-2.12M22 12h-2"></path></svg>'), 
+                                                                tags$span(class="stat-value", latest_season_stats$Goals), 
+                                                                tags$span(class="stat-label", t("player_goals"))
+                                                       ), 
+                                                       tags$div(class="stat-item", HTML('<div class="stat-icon card-icon yellow"></div>'), 
+                                                                tags$span(class="stat-value", latest_season_stats$Yellows), 
+                                                                tags$span(class="stat-label", t("player_yellow_cards_short"))
+                                                       ), 
+                                                       tags$div(class="stat-item", HTML('<div class="stat-icon card-icon red"></div>'), 
+                                                                tags$span(class="stat-value", latest_season_stats$Reds), 
+                                                                tags$span(class="stat-label", t("player_red_cards_short"))
+                                                       )
+                                              )
+          )
         }
       }
       
@@ -3456,7 +3825,11 @@ if (hubo_cambios) {
                                                                                 stage <- national_team_data_player[k, ]; tags$tr(tags$td(stage$categoria), tags$td(stage$Played), tags$td(stage$Starter), tags$td(stage$Goals), tags$td(stage$Yellows), tags$td(stage$Reds), tags$td(stage$Minutes))
                                                                               }))
                                               )
-                                              matches_data_season <- partidos_jugadora_details %>% filter(es_partido_seleccion == TRUE, equipo == "Македонија")
+                                             
+                                              matches_data_season <- partidos_jugadora_details %>% 
+                                                filter(es_partido_seleccion == TRUE, equipo == "Македонија") %>%
+                                                mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+                                                arrange(desc(fecha_date))
                                               categories_in_season <- matches_data_season %>% pull(categoria) %>% unique() %>% sort()
                                               matches_tab_content <- tagList(
                                                 tags$div(class="sub-tab-nav", map(seq_along(categories_in_season), function(c_idx){ current_category <- categories_in_season[c_idx]; tags$button(class=if(c_idx==1)"sub-tab-button active" else "sub-tab-button", `data-season-id`=season_id_safe, `data-subtab-target`=current_category, current_category) })),
@@ -3498,8 +3871,13 @@ if (hubo_cambios) {
                                               matches_tab_content <- tagList(
                                                 tags$div(class="sub-tab-nav", map(1:nrow(competitions_in_season), function(c_idx){ comp <- competitions_in_season[c_idx,]; tags$button(class=if(c_idx==1)"sub-tab-button active" else "sub-tab-button", `data-season-id`=season_id_safe, `data-subtab-target`=comp$competicion_id, comp$competicion_nombre_lang) })),
                                                 map(1:nrow(competitions_in_season), function(c_idx){
-                                                  comp <- competitions_in_season[c_idx,]; matches_in_comp <- matches_data_season %>% filter(competicion_id == comp$competicion_id)
-                                                  tags$div(id=paste0("matches-", season_id_safe, "-", comp$competicion_id), class=if(c_idx==1)"sub-tab-panel active" else "sub-tab-panel",
+
+                                                  comp <- competitions_in_season[c_idx,]; 
+                                                  matches_in_comp <- matches_data_season %>% 
+                                                    filter(competicion_id == comp$competicion_id) %>%
+                                                    mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+                                                    arrange(desc(fecha_date))
+                                                           tags$div(id=paste0("matches-", season_id_safe, "-", comp$competicion_id), class=if(c_idx==1)"sub-tab-panel active" else "sub-tab-panel",
                                                            tags$div(class="match-list-container",
                                                                     tags$div(class="match-list-header", tags$div(t("team_header_date")), tags$div(t("match_header_match")), tags$div(t("player_goals")), tags$div(t("match_header_card")), tags$div(t("player_mins"))),
                                                                     map(1:nrow(matches_in_comp), function(p_idx){
@@ -3552,40 +3930,110 @@ if (hubo_cambios) {
     
     
     
+    # ==============================================================================
+    # == INICIO DEL NUEVO CÓDIGO PARA PERFIL DE EQUIPO (REEMPLAZAR)               ==
+    # ==============================================================================
     walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_mk) {
-      if (!is.na(get_national_team_iso(team_mk))) {
-        return() 
+      # Excluir equipos de selecciones nacionales (excepto Macedonia) de la generación de perfiles
+      if (team_mk %in% team_names_to_skip_mk) { return() }
+      
+      id_t <- generar_id_seguro(team_mk)
+      if (!full_rebuild_needed && !(id_t %in% affected_team_ids)) { return() }
+      
+      # --- 1. Preparación de Datos (tomado del script de pruebas) ---
+      current_team_name <- (entidades_df_lang %>% filter(original_name == team_mk))$current_lang_name[1]
+      
+      stadium_principal_mk <- find_main_stadium(team_mk, partidos_df)
+      stadium_principal_lang <- if (!is.na(stadium_principal_mk)) (entidades_df_lang %>% filter(original_name == stadium_principal_mk))$current_lang_name[1] else NA_character_
+      
+      logo_filename_principal <- paste0(generar_id_seguro(team_mk), ".png")
+      if (!file.exists(file.path(RUTA_LOGOS_DESTINO, logo_filename_principal))) {
+        logo_filename_principal <- "NOLOGO.png"
       }
+      # La ruta relativa se construye desde la carpeta /timovi/
+      ruta_logo_principal <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, logo_filename_principal)
       
-      id_t <- generar_id_seguro(team_mk); if (!full_rebuild_needed && !(id_t %in% affected_team_ids)) { return() }
+      # --- 2. Datos para JavaScript (JSON) ---
+      datos_para_js_equipo <- toJSON(list(
+        roster_data = stats_jugadoras_por_equipo_temporada_df %>% filter(equipo == team_mk),
+        matches_data = historial_partidos_con_categoria %>% filter(local == team_mk | visitante == team_mk),
+        translations = list(
+          position_goalkeeper = t("position_goalkeeper"), position_defender = t("position_defender"),
+          position_midfielder = t("position_midfielder"), position_forward = t("position_forward"), col_dorsal = "#",
+          col_player = t("team_roster_player"), col_apps = t("player_apps_short"), col_mins = t("player_mins_short"),
+          col_goals = t("player_goals_short"), col_cards = t("team_roster_cards"), no_players_found = t("team_roster_no_players"),
+          no_matches_found = t("team_schedule_no_matches"),
+          col_date = t("match_date"), col_match = t("match_match"),
+          category_senior = t("category_senior"), category_youth = t("category_youth"), category_cadet = t("category_cadet")
+        )
+      ), auto_unbox = TRUE)
+      script_datos_json <- tags$script(id = "team-page-data", type = "application/json", HTML(datos_para_js_equipo))
       
-      current_team_name <- entidades_df_lang %>% filter(original_name == team_mk) %>% pull(current_lang_name)
-      nombre_archivo_final <- paste0(id_t, ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final)
-      temporadas_summary <- stats_equipos_por_temporada_df %>% filter(equipo == team_mk) %>% left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada")) %>% select(competicion_temporada, competicion_nombre, !!sym(comp_name_col))
-      path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras); path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
-      tabla_resumen_temporadas <- tags$table(class="team-career-summary", tags$thead(tags$tr(tags$th(t("player_season")), tags$th(t("player_competition")))), tags$tbody(map(1:nrow(temporadas_summary), function(j) { stage <- temporadas_summary[j,]; details_id <- paste0("details-", id_t, "-", j); nombre_competicion_mostrado <- stage[[comp_name_col]]; historial_stage_mk <- partidos_df %>% filter(competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre, local == team_mk | visitante == team_mk) %>% mutate(fecha_date = as.Date(fecha, format="%d.%m.%Y")) %>% arrange(fecha_date); historial_stage <- historial_stage_mk %>% left_join(entidades_df_lang %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% left_join(entidades_df_lang %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name")); player_name_col_sym <- sym(if (player_name_col %in% names(jugadoras_stats_df)) player_name_col else "PlayerName_mk"); stats_jugadoras_stage_lang <- stats_jugadoras_por_equipo_temporada_df %>% filter(equipo == team_mk, competicion_temporada == stage$competicion_temporada, competicion_nombre == stage$competicion_nombre) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% select(id, PlayerName = !!player_name_col_sym, CalledUp, Played, Minutes, Goals, Yellows, Reds); headers_stats <- c(t("player_type"), t("player_called_up"), t("player_played"), t("player_mins"), t("player_goals"), t("player_yellow_cards"), t("player_red_cards")); tabla_stats_jugadoras <- tags$table(tags$thead(tags$tr(map(headers_stats, tags$th))), tags$tbody(if(nrow(stats_jugadoras_stage_lang) > 0) { map(1:nrow(stats_jugadoras_stage_lang), function(p_idx) { p <- stats_jugadoras_stage_lang[p_idx,]; tags$tr(tags$td(tags$a(href=file.path(path_rel_jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td(p$CalledUp), tags$td(p$Played), tags$td(p$Minutes), tags$td(p$Goals), tags$td(p$Yellows), tags$td(p$Reds)) }) } else { tags$tr(tags$td(colspan=length(headers_stats), t("match_no_data"))) })); tabla_historial_partidos <- tags$table(tags$thead(tags$tr(tags$th(t("round_prefix")), tags$th(t("team_header_date")), tags$th(t("team_header_home")), tags$th(t("team_header_away")), tags$th(t("match_header_result")))), tags$tbody(map(1:nrow(historial_stage), function(p_idx) { partido <- historial_stage[p_idx,]; tags$tr(tags$td(partido$jornada), tags$td(partido$fecha), tags$td(partido$home_name), tags$td(partido$away_name), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido$id_partido, ".html")), paste(partido$goles_local, "-", partido$goles_visitante)))) }))); tagList(tags$tr(class="summary-row", onclick=sprintf("toggleDetails('%s')", details_id), tags$td(stage$competicion_temporada), tags$td(nombre_competicion_mostrado)), tags$tr(id = details_id, class="details-row", tags$td(colspan="2", tags$div(class="details-content", tags$h4(t("team_player_stats")), tabla_stats_jugadoras, tags$h4(t("team_match_list")), tabla_historial_partidos)))) })))
-      # 13.1.42. Logic for the crest/flag image on the team profile.
-      iso_code_team <- get_national_team_iso(team_mk)
-      if (!is.na(iso_code_team)) {
-        team_logo_src <- paste0("https://hatscripts.github.io/circle-flags/flags/", iso_code_team, ".svg")
-        team_logo_class <- "team-page-crest national-team-flag"
-      } else {
-        nombre_archivo_final <- paste0(id_t, ".png")
-        if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }
-        team_logo_src <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final)
-        team_logo_class <- "team-page-crest"
-      }
-      
-      contenido_equipo <- tagList(
-        crear_botones_navegacion(path_to_lang_root = ".."), 
-        tags$h2(current_team_name), 
-        tags$img(class=team_logo_class, src=team_logo_src, alt=paste("Crest of", current_team_name)), 
-        tags$h3(t("team_history_by_competition")), 
-        tabla_resumen_temporadas
+      # --- 3. Construcción del HTML de la página ---
+      team_header_final <- tags$div(class="team-header-container-v5",
+                                    tags$div(class="team-logo-main", tags$img(src = ruta_logo_principal, alt = paste("Logo", current_team_name))),
+                                    tags$div(class="team-header-info",
+                                             tags$h2(class="team-name-v3", current_team_name),
+                                             if (!is.na(stadium_principal_lang)) {
+                                               tags$div(class="info-item",
+                                                        tags$div(class="info-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 400Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Z"/></svg>')),
+                                                        tags$div(class="info-text", tags$span(class="info-label", toupper(t("match_stadium"))), tags$span(class="info-value", stadium_principal_lang))
+                                               )
+                                             }
+                                    )
       )
-      pagina_equipo_final <- crear_pagina_html(contenido_equipo, current_team_name, path_to_root_dir = "../..", script_contraseña_lang)
+      
+      tab_navigation <- tags$div(class="tab-nav-v4",
+                                 tags$button(class="tab-button-v4 active", `data-tab-target`="roster-panel", t("team_tab_roster")),
+                                 tags$button(class="tab-button-v4", `data-tab-target`="schedule-panel", t("team_tab_schedule"))
+      )
+      
+      available_seasons_roster <- stats_jugadoras_por_equipo_temporada_df %>% filter(equipo == team_mk) %>% pull(competicion_temporada) %>% unique() %>% sort(decreasing = TRUE)
+      available_seasons_schedule <- historial_partidos_con_categoria %>% filter(local == team_mk | visitante == team_mk) %>% pull(competicion_temporada) %>% unique() %>% sort(decreasing = TRUE)
+      
+      roster_panel <- tags$div(id="roster-panel", class="tab-panel active",
+                               tags$div(class="filters-and-pills-container",
+                                        tags$div(class="filter-bar-v2", style = "margin-bottom: 0;",
+                                                 tags$div(class="filter-group", tags$label(`for`="roster-season-filter", t("player_season")), tags$select(id="roster-season-filter", map(available_seasons_roster, ~tags$option(value = .x, .x)))),
+                                                 tags$div(class="filter-group", tags$label(`for`="roster-category-filter", t("category_header")), tags$select(id="roster-category-filter"))
+                                        ),
+                                        tags$div(id="roster-competition-pills", class="competition-pills-container")
+                               ),
+                               tags$div(id="roster-table-container")
+      )
+      
+      schedule_panel <- tags$div(id="schedule-panel", class="tab-panel",
+                                 tags$div(class="filters-and-pills-container",
+                                          tags$div(class="filter-bar-v2", style = "margin-bottom: 0;",
+                                                   tags$div(class="filter-group", tags$label(`for`="schedule-season-filter", t("player_season")), tags$select(id="schedule-season-filter", map(available_seasons_schedule, ~tags$option(value = .x, .x)))),
+                                                   tags$div(class="filter-group", tags$label(`for`="schedule-category-filter", t("category_header")), tags$select(id="schedule-category-filter"))
+                                          ),
+                                          tags$div(id="schedule-competition-pills", class="competition-pills-container")
+                                 ),
+                                 tags$div(id="schedule-table-container")
+      )
+      
+      contenido_equipo_final <- tagList(team_header_final, tab_navigation, roster_panel, schedule_panel)
+      
+      # --- 4. Guardar la página HTML final ---
+      pagina_equipo_final <- crear_pagina_html(
+        contenido_principal = contenido_equipo_final, 
+        titulo_pagina = current_team_name, 
+        path_to_root_dir = "../..", 
+        script_contraseña = script_contraseña_lang
+      )
+      
+      # Añadimos el JSON de datos justo antes del script principal
+      pagina_equipo_final$children[[2]]$children <- tagAppendChildren(
+        pagina_equipo_final$children[[2]]$children,
+        script_datos_json
+      )
+      
       save_html(pagina_equipo_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$timovi, paste0(id_t, ".html")))
     })
+    # ==============================================================================
+    # == FIN DEL NUEVO CÓDIGO PARA PERFIL DE EQUIPO                               ==
+    # ==============================================================================
     
     walk(unique(arbitros_df$ime), function(arb_mk) {
       id_a <- generar_id_seguro(arb_mk)
