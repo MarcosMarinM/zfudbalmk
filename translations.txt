@@ -76,9 +76,9 @@ player_goal_list,Список на голови,Lista e golave,Lista de goles,Go
 player_card_list,Список на картони,Lista e kartonëve,Lista de tarjetas,Card list
 player_season,Сезона,Sezoni,Temporada,Season
 player_competition,Натпреварување,Gara,Competición,Competition
-player_apps,Наст.,Nd.,Part.,Apps
-player_goals,Гол.,G,Gol.,Goals
-player_mins,Мин.,Min.,Min.,Mins
+player_apps,Наст.,Nd.,PJ,Apps
+player_goals,Гола,G,Goles,Goals
+player_mins,мин,min,min,min
 player_called_up,Повикана,E ftuar,Convocada,Called up
 player_played,Одиграни,Luajtur,Jugados,Played
 player_starter,Почетен состав,Titullare,Titular,Starter
@@ -135,7 +135,7 @@ category_page_title,Натпревари по категорија,Ndeshjet sipa
 match_header_category,Категорија,Kategoria,Categoría,Category
 match_header_status,Наст.Nd.,Part.,Apps
 national_team_all_time_stats,Статистика на сите времиња за репрезентацијата,Statistikat e të gjitha kohërave për ekipin kombëtar,Estadísticas de la selección,National team statistics
-category_header,Категорија,Kategoria, Categoría,Category
+category_header,Категорија,Kategoria,Categoría,Category
 player_stats_for_category,Статистика на фудбалерки за оваа категорија,Statistikat e lojtarëve për këtë kategori,Estadísticas de jugadoras para esta categoría,Player statistics for this category
 match_list_for_category,Список на натпревари за оваа категорија,Lista e ndeshjeve për këtë kategori,Lista de partidos para esta categoría,Match list for this category
 latest_results_title,Последни резултати,Rezultatet e fundit,Últimos resultados,Latest results
@@ -161,3 +161,40 @@ about_page_title,За проектот,Rreth projektit,Acerca del proyecto,About
 about_page_content,"<p>@zfudbalmk е личен проект создаден од <b>Маркос Марин Мартин</b>, ентузијаст од Мадрид со пасија за две работи: женскиот фудбал и Македонија.</p><p>Главната цел е да му се даде на македонскиот женски фудбал видливоста што ја заслужува. Она што започна како едноставна Инстаграм страница (<b><a href=\"https://www.instagram.com/zfudbalmk/\" target=\"_blank\" rel=\"noopener noreferrer\">@zfudbalmk</a></b>) еволуираше во оваа веб-страница, дизајнирана да ги направи статистиките, резултатите и податоците за играчите подостапни за сите.</p><p>Ако имате предлози, корекции или едноставно сакате да разговараме за фудбал, <b>директните пораки на Инстаграм</b> се секогаш отворени!</p>","<p>@zfudbalmk është një projekt personal i krijuar nga <b>Marcos Marín Martín</b>, një entuziast nga Madridi me një pasion për dy gjëra: futbollin e femrave dhe Maqedoninë.</p><p>Qëllimi kryesor është t'i jepet futbollit të femrave maqedonase dukshmëria që meriton. Ajo që filloi si një faqe e thjeshtë në Instagram (<b><a href=\"https://www.instagram.com/zfudbalmk/\" target=\"_blank\" rel=\"noopener noreferrer\">@zfudbalmk</a></b>) ka evoluar në këtë uebfaqe, e dizajnuar për t'i bërë statistikat e lojtareve, rezultatet dhe të dhënat më të aksesueshme për të gjithë.</p><p>Nëse keni sugjerime, korrigjime, apo thjesht dëshironi të bisedoni për futboll, <b>mesazhet direkte në Instagram</b> janë gjithmonë të hapura!</p>","<p>@zfudbalmk es un proyecto personal creado por <b>Marcos Marín Martín</b>, un aficionado de Madrid apasionado por dos cosas: el fútbol femenino y Macedonia.</p><p>El objetivo principal es dar al fútbol femenino macedonio la visibilidad que merece. Lo que comenzó como una simple página de Instagram (<b><a href=\"https://www.instagram.com/zfudbalmk/\" target=\"_blank\" rel=\"noopener noreferrer\">@zfudbalmk</a></b>) ha evolucionado a este sitio web, diseñado para hacer que las estadísticas, resultados y datos de las jugadoras sean más accesibles para todo el mundo.</p><p>Si tienes alguna sugerencia, corrección o simplemente quieres charlar sobre fútbol, ¡los <b>mensajes directos en Instagram</b> están siempre abiertos!</p>","<p>zfudbalmk is a personal project created by <b>Marcos Marín Martín</b>, an enthusiast from Madrid with a passion for two things: women's football and Macedonia.</p><p>The main goal is to give Macedonian women's football the visibility it deserves. What started as a simple Instagram page (<b><a href=\"https://www.instagram.com/zfudbalmk/\" target=\"_blank\" rel=\"noopener noreferrer\">@zfudbalmk</a></b>) has evolved into this website, designed to make player stats, results, and data more accessible to everyone.</p><p>If you have any suggestions, corrections, or just want to chat about football, the <b>DMs on Instagram</b> are always open!</p>"
 season_all,Сите,Të gjitha,Todas,All
 competition_reprezentacija,Репрезентација,Kombëtarja,Selección nacional,National team
+player_nationality,Националност,Kombësia,Nacionalidad,Nationality
+player_position,Позиција,Pozicioni,Posición,Position
+player_birth_date,Дата на раѓање,Data e lindjes,Fecha de nacimiento,Date of birth
+player_birth_place,Место на раѓање,Vendi i lindjes,Lugar de nacimiento,Place of birth
+player_sub_on,Влезе од клупа,U fut nga stoli,Entró de suplente,Subbed on
+player_yellow_cards_short,Ж. картони,K. verdhë,Amarillas,Yellow c.
+player_red_cards_short,Ц. картони,K. kuq,Rojas,Red c.
+player_stats_by_season,Статистика по сезона,Statistikat për sezon,Estadísticas por temporada,Stats by season
+tab_stats,Статистика,Statistikat,Estadísticas,Statistics
+tab_matches,Натпревари,Ndeshjet,Partidos,Matches
+key,mk,sq,es,en
+club_info_title,Информации за клубот,Informacione rreth klubit,Información del club,Club info
+match_stadium,Стадион,Stadiumi,Estadio,Stadium
+team_tab_roster,Состав,Skuadra,Plantilla,Roster
+team_tab_schedule,Распоред,Orari,Calendario,Fixtures
+player_season,Сезона,Sezoni,Temporada,Season
+category_header,Категорија,Kategoria,Categoría,Category
+player_competition,Натпреварување,Gara,Competición,Competition
+position_goalkeeper,Голман,Portiere,Portera,Goalkeeper
+position_defender,Одбрана,Mbrojtëse,Defensa,Defender
+position_midfielder,Среден ред,Mesfushore,Centrocampista,Midfielder
+position_forward,Напад,Sulmuese,Delantera,Forward
+col_dorsal,#,#,#,#
+col_player,Играч,Lojtare,Jugadora,Player
+player_apps_short,Наст.,Nd.,PJ,Apps
+player_mins_short,мин,min,min,min
+player_goals_short,Гола,G,Goles,Goals
+team_roster_cards,Картони,Kartonë,Tarjetas,Cards
+team_roster_no_players,Не се пронајдени играчи за избраните филтри,Nuk u gjetën lojtare për filtrat e zgjedhur,No se encontraron jugadoras para los filtros seleccionados,No players found for the selected filters
+team_schedule_no_matches,Не се пронајдени натпревари за избраните филтри,Nuk u gjetën ndeshje për filtrat e zgjedhur,No se encontraron partidos para los filtros seleccionados,No matches found for the selected filters
+col_date,Датум,Data,Fecha,Date
+col_match,Натпревар,Ndeshja,Partido,Match
+category_senior,Сениорки,Seniore,Senior,Senior
+category_youth,Младинки,Të reja,Juvenil,Youth
+category_cadet,Кадетки,Kadete,Cadete,Cadet
+team_roster_player,Фудбалерка,Lojtare,Jugadora,Player
+match_match,Натпревар,Ndeshja,Partido,Match
