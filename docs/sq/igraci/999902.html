@@ -69,131 +69,92 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2 style="display: flex; align-items: center; gap: 15px;">Milijana Pavlovikj</h2>
-        <h3>Përmbledhje e karrierës</h3>
-        <table class="career-summary-table">
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Ekip</th>
-              <th>Gara</th>
-              <th>Nd.</th>
-              <th>G</th>
-              <th>Min.</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-999902-club-1&#39;)">
-              <td>25/26</td>
-              <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/masinac.png" alt="Mašinac"/>
-                <a href="../timovi/masinac.html" onclick="event.stopPropagation();">Mašinac</a>
-              </td>
-              <td>Turne miqësor në Reçicë 25/26</td>
-              <td>1</td>
-              <td>0</td>
-              <td>90</td>
-            </tr>
-            <tr id="details-999902-club-1" class="details-row">
-              <td colspan="6">
-                <div class="details-content">
-                  <h4>Statistika të detajuara</h4>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td>Ekip</td>
-                        <td>Mašinac</td>
-                      </tr>
-                      <tr>
-                        <td>E ftuar</td>
-                        <td>1</td>
-                      </tr>
-                      <tr>
-                        <td>Luajtur</td>
-                        <td>1</td>
-                      </tr>
-                      <tr>
-                        <td>Titullare</td>
-                        <td>1</td>
-                      </tr>
-                      <tr>
-                        <td>Min.</td>
-                        <td>90</td>
-                      </tr>
-                      <tr>
-                        <td>G</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>Kartonë të verdhë</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>Kartonë të kuq</td>
-                        <td>0</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <h4>Lista e ndeshjeve</h4>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Statusi</th>
-                        <th>Min.</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>1/2Ф</td>
-                        <td>
-                          <a href="../natprevari/9999901.html">Mašinac vs Ljuboten</a>
-                        </td>
-                        <td>0 - 2</td>
-                        <td>Titullare</td>
-                        <td>90</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <h4>Lista e golave</h4>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Minuta</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td colspan="3">Nuk ka shënuar gola.</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <h4>Lista e kartonëve</h4>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Kartoni</th>
-                        <th>Minuta</th>
-                        <th>Arsyeja</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td colspan="5">Nuk ka marrë kartonë.</td>
-                      </tr>
-                    </tbody>
-                  </table>
+        <div class="player-profile-header-new">
+          <div class="player-name-container">
+            <h2 class="player-name-new">Milijana Pavlovikj</h2>
+          </div>
+        </div>
+        <div class="season-accordion-container">
+          <h3>Statistikat për sezon</h3>
+          <div class="season-accordion">
+            <div class="season-header">
+              <span class="season-header-title">25/26</span>
+              <span class="season-arrow"></span>
+            </div>
+            <div class="season-content">
+              <div class="tab-nav">
+                <button class="tab-button active" data-season-id="25-26-1" data-tab-target="stats">Statistikat</button>
+                <button class="tab-button" data-season-id="25-26-1" data-tab-target="matches">Ndeshjet</button>
+              </div>
+              <div id="stats-25-26-1" class="tab-panel active">
+                <table class="stats-table-season">
+                  <thead>
+                    <tr>
+                      <th>Gara</th>
+                      <th>Ekip</th>
+                      <th>Nd.</th>
+                      <th>Titullare</th>
+                      <th>G</th>
+                      <th><span class="card-icon-header yellow"></span></th>
+                      <th><span class="card-icon-header red"></span></th>
+                      <th>min</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <a href="../natprevaruvanja/prijatelski_turnir_recica_25_26.html">Turne miqësor në Reçicë 25/26</a>
+                      </td>
+                      <td class="team-cell-with-logo">
+                        <img class="team-logo-small" src="../../assets/logos/masinac.png"/>
+                        <a href="../timovi/masinac.html">Mašinac</a>
+                      </td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>90</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="matches-25-26-1" class="tab-panel">
+                <div class="sub-tab-nav">
+                  <button class="sub-tab-button active" data-season-id="25-26-1" data-subtab-target="prijatelski_turnir_recica_25_26">Turne miqësor në Reçicë 25/26</button>
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <div id="matches-25-26-1-prijatelski_turnir_recica_25_26" class="sub-tab-panel active">
+                  <div class="match-list-container">
+                    <div class="match-list-header">
+                      <div>Data</div>
+                      <div>Ndeshja</div>
+                      <div>G</div>
+                      <div>Kartoni</div>
+                      <div>min</div>
+                    </div>
+                    <div class="match-list-row clickable-row" data-href="../natprevari/9999901.html">
+                      <div class="cell-date">09.08.2025</div>
+                      <div class="cell-match">
+                        <span class="team-home">
+                          Mašinac
+                          <img class="team-logo-small" src="../../assets/logos/masinac.png"/>
+                        </span>
+                        <span class="match-score">0 : 2</span>
+                        <span class="team-away">
+                          <img class="team-logo-small" src="../../assets/logos/ljuboten.png"/>
+                          Ljuboten
+                        </span>
+                      </div>
+                      <div class="cell-goals">0</div>
+                      <div class="cell-cards"></div>
+                      <div class="cell-minutes">90</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

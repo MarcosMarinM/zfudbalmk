@@ -24,7 +24,6 @@ id,force_role
 132537,goalkeeper
 132926,goalkeeper
 133474,goalkeeper
-134619,goalkeeper
 135125,goalkeeper
 135425,goalkeeper
 135520,goalkeeper
@@ -32,7 +31,6 @@ id,force_role
 137654,goalkeeper
 138711,goalkeeper
 140122,goalkeeper
-141003,goalkeeper
 141395,goalkeeper
 141897,goalkeeper
 141909,goalkeeper
