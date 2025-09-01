@@ -2628,9 +2628,103 @@ function initializeSearch() {
   });
 }
 
-function generateLink(target_id) { /* ... (código de búsqueda sin cambios) ... */ }
-function handleSearchInput(event) { /* ... (código de búsqueda sin cambios) ... */ }
-function showSearchResults() { /* ... (código de búsqueda sin cambios) ... */ }
+function generateLink(target_id) {
+    const basePath = "."; // Rutas relativas desde la página actual
+    const parts = target_id.split('-');
+    const type = parts[0];
+    const id = parts.slice(1).join('-');
+
+    // Las carpetas deben coincidir con tus `nombres_carpetas_relativos`
+    const paths = {
+        'jugadora': 'igraci',
+        'equipo': 'timovi',
+        'arbitro': 'sudii',
+        'стадион': 'stadioni', // Mantener el nombre interno consistente
+        'menu-competicion': 'natprevaruvanja'
+    };
+
+    if (paths[type]) {
+        return `${basePath}/${paths[type]}/${id}.html`;
+    }
+    return '#'; // Fallback
+}
+
+function handleSearchInput(event) {
+    const input = event.target.value.toLowerCase().trim();
+    const suggestionsContainer = document.getElementById('search-suggestions');
+    
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        showSearchResults();
+        return;
+    }
+
+    if (input.length < 2) {
+        suggestionsContainer.style.display = 'none';
+        return;
+    }
+
+    const matches = searchData.filter(item => 
+        item.search_terms.toLowerCase().includes(input)
+    ).slice(0, 10); // Limitar a 10 sugerencias
+
+    if (matches.length > 0) {
+        suggestionsContainer.innerHTML = '';
+        matches.forEach(item => {
+            const link = document.createElement('a');
+            link.href = generateLink(item.target_id);
+            
+            // Resaltar la coincidencia
+            const regex = new RegExp(`(${input.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+            const highlightedName = item.Име.replace(regex, '<strong>$1</strong>');
+            
+            link.innerHTML = `${highlightedName} <span class="search-result-type">(${item.Тип})</span>`;
+            suggestionsContainer.appendChild(link);
+        });
+        suggestionsContainer.style.display = 'block';
+    } else {
+        suggestionsContainer.style.display = 'none';
+    }
+}
+
+function showSearchResults() {
+    const input = document.getElementById('search-input').value.toLowerCase().trim();
+    const suggestionsContainer = document.getElementById('search-suggestions');
+    const mainContent = document.getElementById('main-content');
+    const body = document.body;
+
+    suggestionsContainer.style.display = 'none';
+
+    if (input.length < 2) {
+        mainContent.innerHTML = `<h2>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters'}</h2>`;
+        return;
+    }
+
+    const matches = searchData.filter(item => 
+        item.search_terms.toLowerCase().includes(input)
+    );
+
+    let resultsHtml = `<h2>${body.dataset.searchResultsTitle || 'Search results for'}: "${input}"</h2>`;
+
+    if (matches.length > 0) {
+        resultsHtml += '<div id="search-results-list"><ul>';
+        matches.forEach(item => {
+            resultsHtml += `
+                <li>
+                    <a href="${generateLink(item.target_id)}">
+                        ${item.Име}
+                    </a>
+                    <span class="search-result-type">(${item.Тип})</span>
+                </li>`;
+        });
+        resultsHtml += '</ul></div>';
+    } else {
+        resultsHtml += `<p>${body.dataset.noSearchResultsMsg || 'No results found.'}</p>`;
+    }
+
+    mainContent.innerHTML = resultsHtml;
+}
+
 function sortTable(tableId, columnIndex) { /* ... (código de búsqueda sin cambios) ... */ }
 
 function showLetter(letter) {
@@ -2858,46 +2952,78 @@ if (hubo_cambios) {
     entidades_df_lang <- entidades_maestro_df %>% 
       select(original_name, current_lang_name = !!sym(entity_name_col))
     
-    search_jugadoras_data <- jugadoras_stats_df %>%
-      select(id, DisplayName = !!sym(player_name_col), CyrillicName = PlayerName_mk)
+    # --- 1. Jugadoras ---
+    # Obtenemos tanto el nombre a mostrar en el idioma actual como el nombre latino "oficial" si existe.
+    search_jugadoras_data_lang <- jugadoras_stats_df %>% 
+      select(id, 
+             DisplayName = !!sym(player_name_col), 
+             LatinName = PlayerName_en, # Usamos 'en' como el nombre latino de referencia
+             CyrillicName = PlayerName_mk)
     
-    search_jugadoras <- search_jugadoras_data %>% 
-      mutate(Тип = t("player_type"), 
-             target_id = paste0("jugadora-", id), 
-             search_terms = sapply(CyrillicName, generar_terminos_busqueda, USE.NAMES = FALSE)) %>% 
+    search_jugadoras <- search_jugadoras_data_lang %>%
+      mutate(
+        Тип = t("player_type"),
+        target_id = paste0("jugadora-", id),
+        search_terms = paste(
+          tolower(DisplayName),
+          tolower(LatinName),
+          sapply(CyrillicName, generar_terminos_busqueda, USE.NAMES = FALSE)
+        )
+      ) %>%
       select(Име = DisplayName, Тип, target_id, search_terms)
     
-    search_equipos <- entidades_df_lang %>% 
-      filter(original_name %in% nombres_equipos) %>% 
-      mutate(Тип = t("team_type"), 
-             target_id = paste0("equipo-", generar_id_seguro(original_name)), 
-             search_terms = sapply(original_name, generar_terminos_busqueda, USE.NAMES=F)) %>% 
-      select(Име = current_lang_name, Тип, target_id, search_terms)
+    # --- 2. Entidades (Equipos, Árbitros, Estadios) ---
+    # Hacemos lo mismo para las entidades
+    entidades_maestro_lang_df <- entidades_maestro_df %>%
+      select(original_name,
+             current_lang_name = !!sym(entity_name_col),
+             latin_name = translated_name_en) # 'en' como referencia latina
     
-    search_arbitros <- entidades_df_lang %>% 
-      filter(original_name %in% nombres_arbitros) %>% 
-      mutate(Тип = t("referee_type"), 
-             target_id = paste0("arbitro-", generar_id_seguro(original_name)), 
-             search_terms = sapply(original_name, generar_terminos_busqueda, USE.NAMES=F)) %>% 
-      select(Име = current_lang_name, Тип, target_id, search_terms)
+    # Función auxiliar para evitar repetir código
+    generar_search_entidad <- function(df, nombres_filtro, tipo_entidad, id_prefix) {
+      df %>%
+        filter(original_name %in% nombres_filtro) %>%
+        mutate(
+          Тип = t(tipo_entidad),
+          target_id = paste0(id_prefix, generar_id_seguro(original_name)),
+          search_terms = paste(
+            tolower(current_lang_name),
+            tolower(latin_name),
+            sapply(original_name, generar_terminos_busqueda, USE.NAMES = FALSE)
+          )
+        ) %>%
+        select(Име = current_lang_name, Тип, target_id, search_terms)
+    }
     
-    search_estadios <- entidades_df_lang %>% 
-      filter(original_name %in% nombres_estadios) %>% 
-      mutate(Тип = t("stadium_type"), 
-             target_id = paste0("стадион-", generar_id_seguro(original_name)), 
-             search_terms = sapply(original_name, generar_terminos_busqueda, USE.NAMES=F)) %>% 
-      select(Име = current_lang_name, Тип, target_id, search_terms)
+    search_equipos <- generar_search_entidad(entidades_maestro_lang_df, nombres_equipos, "team_type", "equipo-")
+    search_arbitros <- generar_search_entidad(entidades_maestro_lang_df, nombres_arbitros, "referee_type", "arbitro-")
+    search_estadios <- generar_search_entidad(entidades_maestro_lang_df, nombres_estadios, "stadium_type", "стадион-")
     
+    # --- 3. Competiciones ---
+    # Las competiciones son un caso especial, pero aplicamos la misma lógica
     search_competiciones <- competiciones_unicas_df %>% 
-      mutate(Име = !!sym(comp_name_col), 
-             Тип = t("competition_type"), 
-             target_id = paste0("menu-competicion-", competicion_id), 
-             search_terms = sapply(nombre_completo_mk, generar_terminos_busqueda, USE.NAMES = FALSE)) %>% 
+      mutate(
+        Име = !!sym(comp_name_col),
+        LatinName = !!sym("nombre_completo_en"), # 'en' como referencia latina
+        Тип = t("competition_type"), 
+        target_id = paste0("menu-competicion-", competicion_id), 
+        search_terms = paste(
+          tolower(Име),
+          tolower(LatinName),
+          sapply(nombre_completo_mk, generar_terminos_busqueda, USE.NAMES = FALSE)
+        )
+      ) %>% 
       select(Име, Тип, target_id, search_terms)
     
-    search_index_df_lang <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones, search_estadios) %>% arrange(Име)
+    # --- 4. Unir todo ---
+    search_index_df_lang <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones, search_estadios) %>% 
+      # Limpieza final para eliminar duplicados y espacios extra
+      mutate(search_terms = sapply(str_split(search_terms, "\\s+"), function(x) paste(unique(x), collapse = " "))) %>%
+      arrange(Име)
     
     search_data_json_lang <- toJSON(search_index_df_lang, auto_unbox = TRUE)
+    
+  
     ruta_json_salida <- file.path(RUTA_ASSETS_COMPARTIDOS, paste0("search_data_", lang, ".json"))
     writeLines(search_data_json_lang, ruta_json_salida, useBytes = TRUE)
     message("     > Search index saved to: ", basename(ruta_json_salida))
@@ -3092,7 +3218,7 @@ if (hubo_cambios) {
     } else {
       jugadoras_para_listar <- jugadoras_para_listar %>% arrange(apellido)
       alfabeto <- sort(unique(jugadoras_para_listar$letra_inicial))
-            alfabeto <- alfabeto[grepl("^[A-Z]$", alfabeto)]
+      alfabeto <- alfabeto[grepl("^[\\p{L}]$", alfabeto, perl = TRUE)]
     }
     
     grupos_por_letra <- split(jugadoras_para_listar, jugadoras_para_listar$letra_inicial)

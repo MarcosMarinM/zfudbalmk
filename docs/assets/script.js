@@ -135,9 +135,103 @@ function initializeSearch() {
   });
 }
 
-function generateLink(target_id) { /* ... (código de búsqueda sin cambios) ... */ }
-function handleSearchInput(event) { /* ... (código de búsqueda sin cambios) ... */ }
-function showSearchResults() { /* ... (código de búsqueda sin cambios) ... */ }
+function generateLink(target_id) {
+    const basePath = "."; // Rutas relativas desde la página actual
+    const parts = target_id.split('-');
+    const type = parts[0];
+    const id = parts.slice(1).join('-');
+
+    // Las carpetas deben coincidir con tus `nombres_carpetas_relativos`
+    const paths = {
+        'jugadora': 'igraci',
+        'equipo': 'timovi',
+        'arbitro': 'sudii',
+        'стадион': 'stadioni', // Mantener el nombre interno consistente
+        'menu-competicion': 'natprevaruvanja'
+    };
+
+    if (paths[type]) {
+        return `${basePath}/${paths[type]}/${id}.html`;
+    }
+    return '#'; // Fallback
+}
+
+function handleSearchInput(event) {
+    const input = event.target.value.toLowerCase().trim();
+    const suggestionsContainer = document.getElementById('search-suggestions');
+    
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        showSearchResults();
+        return;
+    }
+
+    if (input.length < 2) {
+        suggestionsContainer.style.display = 'none';
+        return;
+    }
+
+    const matches = searchData.filter(item => 
+        item.search_terms.toLowerCase().includes(input)
+    ).slice(0, 10); // Limitar a 10 sugerencias
+
+    if (matches.length > 0) {
+        suggestionsContainer.innerHTML = '';
+        matches.forEach(item => {
+            const link = document.createElement('a');
+            link.href = generateLink(item.target_id);
+            
+            // Resaltar la coincidencia
+            const regex = new RegExp(`(${input.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+            const highlightedName = item.Име.replace(regex, '<strong>$1</strong>');
+            
+            link.innerHTML = `${highlightedName} <span class="search-result-type">(${item.Тип})</span>`;
+            suggestionsContainer.appendChild(link);
+        });
+        suggestionsContainer.style.display = 'block';
+    } else {
+        suggestionsContainer.style.display = 'none';
+    }
+}
+
+function showSearchResults() {
+    const input = document.getElementById('search-input').value.toLowerCase().trim();
+    const suggestionsContainer = document.getElementById('search-suggestions');
+    const mainContent = document.getElementById('main-content');
+    const body = document.body;
+
+    suggestionsContainer.style.display = 'none';
+
+    if (input.length < 2) {
+        mainContent.innerHTML = `<h2>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters'}</h2>`;
+        return;
+    }
+
+    const matches = searchData.filter(item => 
+        item.search_terms.toLowerCase().includes(input)
+    );
+
+    let resultsHtml = `<h2>${body.dataset.searchResultsTitle || 'Search results for'}: "${input}"</h2>`;
+
+    if (matches.length > 0) {
+        resultsHtml += '<div id="search-results-list"><ul>';
+        matches.forEach(item => {
+            resultsHtml += `
+                <li>
+                    <a href="${generateLink(item.target_id)}">
+                        ${item.Име}
+                    </a>
+                    <span class="search-result-type">(${item.Тип})</span>
+                </li>`;
+        });
+        resultsHtml += '</ul></div>';
+    } else {
+        resultsHtml += `<p>${body.dataset.noSearchResultsMsg || 'No results found.'}</p>`;
+    }
+
+    mainContent.innerHTML = resultsHtml;
+}
+
 function sortTable(tableId, columnIndex) { /* ... (código de búsqueda sin cambios) ... */ }
 
 function showLetter(letter) {
