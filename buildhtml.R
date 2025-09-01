@@ -2632,7 +2632,30 @@ function generateLink(target_id) { /* ... (código de búsqueda sin cambios) ...
 function handleSearchInput(event) { /* ... (código de búsqueda sin cambios) ... */ }
 function showSearchResults() { /* ... (código de búsqueda sin cambios) ... */ }
 function sortTable(tableId, columnIndex) { /* ... (código de búsqueda sin cambios) ... */ }
-function showLetter(letter) { /* ... (código de búsqueda sin cambios) ... */ }
+
+function showLetter(letter) {
+  // 1. Ocultar todos los grupos de letras
+  const letterGroups = document.querySelectorAll('.letter-group');
+  letterGroups.forEach(group => {
+    group.classList.remove('active');
+  });
+
+  // 2. Mostrar solo el grupo de la letra seleccionada
+  const activeGroup = document.getElementById('group-' + letter);
+  if (activeGroup) {
+    activeGroup.classList.add('active');
+  }
+
+  // 3. Actualizar el estado visual de los botones de las letras
+  const letterNavLinks = document.querySelectorAll('.letter-nav a');
+  letterNavLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('data-letter') === letter) {
+      link.classList.add('active');
+    }
+  });
+}
+
 function toggleDetails(elementId) { /* ... (código de búsqueda sin cambios) ... */ }
 
 
@@ -2797,12 +2820,12 @@ message("style.css and script.js files saved to the assets folder.")
 # Para una construcción completa, todos deben estar en TRUE.
 
 GENERAR_PAGINAS_ESTATICAS <- TRUE   # Incluye: Inicio, Archivo, Lista de Equipos/Jugadoras, Acerca de
-GENERAR_PAGINAS_COMPETICION <- TRUE   # Todas las páginas de competiciones (menús y tablas)
-GENERAR_PERFILES_PARTIDO <- TRUE      # Perfiles individuales para cada partido
-GENERAR_PERFILES_JUGADORA <- TRUE     # Perfiles individuales para cada jugadora
-GENERAR_PERFILES_EQUIPO <- TRUE       # Perfiles individuales para cada equipo
-GENERAR_PERFILES_ARBITRO <- TRUE      # Perfiles individuales para cada árbitro
-GENERAR_PERFILES_ESTADIO <- TRUE      # Perfiles individuales para cada estadio
+GENERAR_PAGINAS_COMPETICION <- F   # Todas las páginas de competiciones (menús y tablas)
+GENERAR_PERFILES_PARTIDO <- F      # Perfiles individuales para cada partido
+GENERAR_PERFILES_JUGADORA <- F     # Perfiles individuales para cada jugadora
+GENERAR_PERFILES_EQUIPO <- F       # Perfiles individuales para cada equipo
+GENERAR_PERFILES_ARBITRO <- F      # Perfiles individuales para cada árbitro
+GENERAR_PERFILES_ESTADIO <- F      # Perfiles individuales para cada estadio
 
 # ============================================================================ #
 
@@ -3069,6 +3092,7 @@ if (hubo_cambios) {
     } else {
       jugadoras_para_listar <- jugadoras_para_listar %>% arrange(apellido)
       alfabeto <- sort(unique(jugadoras_para_listar$letra_inicial))
+            alfabeto <- alfabeto[grepl("^[A-Z]$", alfabeto)]
     }
     
     grupos_por_letra <- split(jugadoras_para_listar, jugadoras_para_listar$letra_inicial)

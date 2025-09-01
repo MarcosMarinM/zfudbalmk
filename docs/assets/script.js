@@ -139,7 +139,30 @@ function generateLink(target_id) { /* ... (código de búsqueda sin cambios) ...
 function handleSearchInput(event) { /* ... (código de búsqueda sin cambios) ... */ }
 function showSearchResults() { /* ... (código de búsqueda sin cambios) ... */ }
 function sortTable(tableId, columnIndex) { /* ... (código de búsqueda sin cambios) ... */ }
-function showLetter(letter) { /* ... (código de búsqueda sin cambios) ... */ }
+
+function showLetter(letter) {
+  // 1. Ocultar todos los grupos de letras
+  const letterGroups = document.querySelectorAll('.letter-group');
+  letterGroups.forEach(group => {
+    group.classList.remove('active');
+  });
+
+  // 2. Mostrar solo el grupo de la letra seleccionada
+  const activeGroup = document.getElementById('group-' + letter);
+  if (activeGroup) {
+    activeGroup.classList.add('active');
+  }
+
+  // 3. Actualizar el estado visual de los botones de las letras
+  const letterNavLinks = document.querySelectorAll('.letter-nav a');
+  letterNavLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('data-letter') === letter) {
+      link.classList.add('active');
+    }
+  });
+}
+
 function toggleDetails(elementId) { /* ... (código de búsqueda sin cambios) ... */ }
 
 
