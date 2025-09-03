@@ -133,3 +133,4 @@ id,force_role
 271968,goalkeeper
 271971,goalkeeper
 272042,goalkeeper
+272587,goalkeeper
