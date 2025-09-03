@@ -2914,12 +2914,12 @@ message("style.css and script.js files saved to the assets folder.")
 # Para una construcción completa, todos deben estar en TRUE.
 
 GENERAR_PAGINAS_ESTATICAS <- TRUE   # Incluye: Inicio, Archivo, Lista de Equipos/Jugadoras, Acerca de
-GENERAR_PAGINAS_COMPETICION <- F   # Todas las páginas de competiciones (menús y tablas)
-GENERAR_PERFILES_PARTIDO <- F      # Perfiles individuales para cada partido
-GENERAR_PERFILES_JUGADORA <- F     # Perfiles individuales para cada jugadora
-GENERAR_PERFILES_EQUIPO <- F       # Perfiles individuales para cada equipo
-GENERAR_PERFILES_ARBITRO <- F      # Perfiles individuales para cada árbitro
-GENERAR_PERFILES_ESTADIO <- F      # Perfiles individuales para cada estadio
+GENERAR_PAGINAS_COMPETICION <- TRUE   # Todas las páginas de competiciones (menús y tablas)
+GENERAR_PERFILES_PARTIDO <- TRUE      # Perfiles individuales para cada partido
+GENERAR_PERFILES_JUGADORA <- TRUE     # Perfiles individuales para cada jugadora
+GENERAR_PERFILES_EQUIPO <- TRUE       # Perfiles individuales para cada equipo
+GENERAR_PERFILES_ARBITRO <- TRUE      # Perfiles individuales para cada árbitro
+GENERAR_PERFILES_ESTADIO <- TRUE      # Perfiles individuales para cada estadio
 
 # ============================================================================ #
 
