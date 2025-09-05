@@ -135,23 +135,50 @@ function initializeSearch() {
   });
 }
 
+/**
+ * Encuentra la ruta raíz del idioma actual de forma robusta.
+ * @returns {string} Una ruta absoluta desde la raíz del dominio, ej: "/docs/mk/"
+ */
+function getLanguageRootPath() {
+    const path = window.location.pathname;
+    // Busca el primer segmento de idioma en la URL (ej. /mk/, /sq/)
+    const match = path.match(/\/(mk|sq|es|en)\//);
+    
+    if (match && match.index !== -1) {
+        // Devuelve la parte de la URL hasta el final del directorio del idioma
+        // ej. de "/docs/mk/igraci/id.html" extrae "/docs/mk/"
+        return path.substring(0, match.index + match[0].length);
+    }
+    
+    // Fallback si la URL no tiene el formato esperado (muy improbable)
+    // Asume que el idioma está en la raíz.
+    const lang = document.documentElement.lang || 'mk';
+    return `/${lang}/`;
+}
+
+/**
+ * Genera un enlace de URL correcto y absoluto para un elemento del índice de búsqueda.
+ * @param {string} target_id - El ID del objetivo, ej: "jugadora-12345"
+ * @returns {string} La URL completa y funcional.
+ */
 function generateLink(target_id) {
-    const basePath = "."; // Rutas relativas desde la página actual
+    // ¡LA CORRECCIÓN CLAVE! Usamos la ruta absoluta en lugar de "."
+    const basePath = getLanguageRootPath(); 
     const parts = target_id.split('-');
     const type = parts[0];
     const id = parts.slice(1).join('-');
 
-    // Las carpetas deben coincidir con tus `nombres_carpetas_relativos`
     const paths = {
         'jugadora': 'igraci',
         'equipo': 'timovi',
         'arbitro': 'sudii',
-        'стадион': 'stadioni', // Mantener el nombre interno consistente
+        'стадион': 'stadioni',
         'menu-competicion': 'natprevaruvanja'
     };
 
     if (paths[type]) {
-        return `${basePath}/${paths[type]}/${id}.html`;
+        // basePath ya termina con "/", así que no añadimos una extra.
+        return `${basePath}${paths[type]}/${id}.html`;
     }
     return '#'; // Fallback
 }

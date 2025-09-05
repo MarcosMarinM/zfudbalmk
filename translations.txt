@@ -198,3 +198,7 @@ category_youth,Младинки,Të reja,Juvenil,Youth
 category_cadet,Кадетки,Kadete,Cadete,Cadet
 team_roster_player,Фудбалерка,Lojtare,Jugadora,Player
 match_match,Натпревар,Ndeshja,Partido,Match
+dashboard_matches_title,Распоред и резултати,Orari & rezultatet,Calendario y resultados,Schedule & results
+dashboard_standings_title,Табела,Tabela,Clasificación,Standings
+dashboard_form_title,Форма,Forma,Forma,Form
+view_all_link,Види ги сите ›,Shiko të gjitha ›,Ver todo ›,View all ›
