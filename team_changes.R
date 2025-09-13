@@ -34,7 +34,7 @@ NEW_SEASON_LEAGUES <- c(
 )
 # Which specific matchdays from the new season should be analyzed?
 # (e.g., 1 means only the first, 1:3 means the first three, c(1, 4) means first and fourth)
-NEW_SEASON_MATCHDAYS_TO_ANALYZE <- 1
+NEW_SEASON_MATCHDAYS_TO_ANALYZE <- 4
 
 
 #### 2. SCRIPT INITIALIZATION ####

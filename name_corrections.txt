@@ -1,5 +1,4 @@
 original_mk,latin_sq,latin_es,latin_en
-Адиса Кала,Adisa Kala,Adisa Kala,Adisa Kala
 Алеуна Улдиз,Aleyna Yıldız,Aleyna Yıldız,Aleyna Yıldız
 Алехандра Родригез,Alejandra Rodríguez,Alejandra Rodríguez,Alejandra Rodríguez
 Амра Џемаили,Amra Xhemaili,Amra Xhemaili,Amra Xhemaili 
@@ -14,6 +13,7 @@ original_mk,latin_sq,latin_es,latin_en
 Беатриз Тарантино,Beatriz Tarantino,Beatriz Tarantino,Beatriz Tarantino
 Бејза Арифи,Beyza Arifi,Beyza Arifi,Beyza Arifi
 Белма Ќазимоска,Bellma Qazimoska,Belma Kjazimoska,Belma Kjazimoska
+Бениса Сељмани,Benisa Selmani,Benisa Selmani,Benisa Selmani
 Бисера Јовановиќ,Bisera Jovanović,Bisera Jovanović,Bisera Jovanović
 Брикена Шаќири,Brikena Shaqiri,Brikena Shaqiri,Brikena Shaqiri
 Буна Ипчја,Buna Ipçja,Buna Ipçja,Buna Ipçja
@@ -25,11 +25,15 @@ original_mk,latin_sq,latin_es,latin_en
 Деспина Пауновиќ,Despina Paunović,Despina Paunović,Despina Paunović
 Диана Алуши,Diana Alushi,Diana Alushi,Diana Alushi
 Евелин Шварц,Evelyn Schwarz,Evelyn Schwarz,Evelyn Schwarz
+Еда Шерифи,Eda Sherifi,Eda Sherifi,Eda Sherifi
 Едона Шабани,Edona Shabani,Edona Shabani,Edona Shabani
+Еља Шабани,Ela Shabani,Ela Shabani,Ela Shabani
 Елеонора Груиќ,Eleonora Gruić,Eleonora Gruić,Eleonora Gruić
 Елиона Таири,Eliona Tairi,Eliona Tairi,Eliona Tairi
 Елма Шемсовиќ,Elma Šemsović,Elma Šemsović,Elma Šemsović
 Енџи Шерифи,Enxhi Sherifi,Enxhi Sherifi,Enxhi Sherifi
+Ерина Беќири,Erina Beqiri,Erina Beqiri,Erina Beqiri
+Герта Бектеши,Gerta Bekteshi,Gerta Bekteshi,Gerta Bekteshi
 Зељејха Рамадани,Zelejha Ramadani,Zelejha Ramadani,Zelejha Ramadani
 Зилхава Ќамили,Zilhava Qamili,Zilhava Qamili,Zilhava Qamili
 Ивана Спасиќ,Ivana Spasić,Ivana Spasić,Ivana Spasić
@@ -44,7 +48,9 @@ original_mk,latin_sq,latin_es,latin_en
 Кешлин Копли,Cashlin Copley,Cashlin Copley,Cashlin Copley
 Кристин Нафула,Christine Nafula,Christine Nafula,Christine Nafula
 Кристина Пеев,Kristina Peev,Kristina Peev,Kristina Peev
+Леандра Ќазими,Leandra Qazimi,Leandra Qazimi,Leandra Qazimi
 Летисија Силва,Leticia Silva,Leticia Silva,Leticia Silva
+Љорина Адеми,Lorina Ademi,Lorina Ademi,Lorina Ademi
 Мајса Делгадо Бенедито,Maysa Delgado Benedito,Maysa Delgado Benedito,Maysa Delgado Benedito
 Мариан Охадиве,Maryann Ohadiwe,Maryann Ohadiwe,Maryann Ohadiwe
 Марија Јованова Ана,Marija Jovanova Ana,Marija Jovanova Ana,Marija Jovanova Ana
@@ -54,12 +60,15 @@ original_mk,latin_sq,latin_es,latin_en
 Мартина Денчиќ,Martina Denčić,Martina Denčić,Martina Denčić
 Мелек Шаќири,Melek Shaqiri,Melek Shaqiri,Melek Shaqiri
 Мелиса Димитриоски,Melissa Dimitrioski,Melissa Dimitrioski,Melissa Dimitrioski
+Мераљ Зендели,Meral Zendeli,Meral Zendeli,Meral Zendeli
 Милка Голубовиќ,Milka Golubović,Milka Golubović,Milka Golubović
 Мирвет Веселова,Mirvet Veselova,Mirvet Veselova,Mirvet Veselova
 Михаела Гамарц,Mihaela Gamarț,Mihaela Gamarț,Mihaela Gamarț
 Најели Кироз,Nayeli Quiroz,Nayeli Quiroz,Nayeli Quiroz
 Нанока Иригучи,Nanoka Iriguchi,Nanoka Iriguchi,Nanoka Iriguchi
+Нарта Фазљија,Narta Fazlija,Narta Fazlija,Narta Fazlija
 Нина Миленковиќ,Nina Milenković,Nina Milenković,Nina Milenković
+Нита Ќамили,Nita Qamili,Nita Qamili,Nita Qamili
 Ноел Митревски,Noelle Mitrevski,Noelle Mitrevski,Noelle Mitrevski
 Оливеира Наталиа Луана,Oliveira Natália Luana,Oliveira Natália Luana,Oliveira Natália Luana
 Прина Хоџа,Prina Hoxha,Prina Hoxha,Prina Hoxha
@@ -67,6 +76,7 @@ original_mk,latin_sq,latin_es,latin_en
 Рајане Каликсто,Rayane Calixto,Rayane Calixto,Rayane Calixto
 Рафаела Кармо Мартинс,Rafaela Carmo Martins,Rafaela Carmo Martins,Rafaela Carmo Martins
 Рената Фереира да Силва,Renata Ferreira da Silva,Renata Ferreira da Silva,Renata Ferreira da Silva
+Рита Реџепи,Rita Rexhepi,Rita Rexhepi,Rita Rexhepi
 Сара Димитриоски,Sarah Dimitrioski,Sarah Dimitrioski,Sarah Dimitrioski
 Севим Илјаз,Sevim İlyaz,Sevim İlyaz,Sevim İlyaz
 Синдис Положани,Sindis Pollozhani,Sindis Pollozhani,Sindis Pollozhani
@@ -88,8 +98,3 @@ original_mk,latin_sq,latin_es,latin_en
 Ширета Брахими,Shireta Brahimi,Shireta Brahimi,Shireta Brahimi
 Шкурте Ода,Shkurte Oda,Shkurte Oda,Shkurte Oda
 Шќипе Бојку,Shqipe Bojku,Shqipe Bojku,Shqipe Bojku
-
-
-"Калито Да Силва Рајане",""
-"Најели Куирос Кархуатанта","Најели Кироз"
-"Гилхермино Тарантино",""

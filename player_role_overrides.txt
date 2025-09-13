@@ -48,7 +48,6 @@ id,force_role
 150920,goalkeeper
 151070,goalkeeper
 244690,goalkeeper
-248089,goalkeeper
 249444,goalkeeper
 249637,goalkeeper
 249977,goalkeeper
@@ -59,8 +58,6 @@ id,force_role
 250650,goalkeeper
 250776,goalkeeper
 250905,goalkeeper
-250964,goalkeeper
-250965,goalkeeper
 250985,goalkeeper
 250994,goalkeeper
 250999,goalkeeper
@@ -73,7 +70,6 @@ id,force_role
 256602,goalkeeper
 256693,goalkeeper
 256836,goalkeeper
-257466,goalkeeper
 258746,goalkeeper
 258860,goalkeeper
 258862,goalkeeper
@@ -84,7 +80,6 @@ id,force_role
 259943,goalkeeper
 260152,goalkeeper
 261124,goalkeeper
-261287,goalkeeper
 261800,goalkeeper
 262076,goalkeeper
 262319,goalkeeper
@@ -92,16 +87,11 @@ id,force_role
 262880,goalkeeper
 262951,goalkeeper
 263064,goalkeeper
-263272,goalkeeper
-263274,goalkeeper
 263661,goalkeeper
-263681,goalkeeper
 263795,goalkeeper
 263810,goalkeeper
 264459,goalkeeper
 264460,goalkeeper
-264796,goalkeeper
-264823,goalkeeper
 265604,goalkeeper
 265738,goalkeeper
 265740,goalkeeper

@@ -202,3 +202,5 @@ dashboard_matches_title,Распоред и резултати,Orari & rezultate
 dashboard_standings_title,Табела,Tabela,Clasificación,Standings
 dashboard_form_title,Форма,Forma,Forma,Form
 view_all_link,Види ги сите ›,Shiko të gjitha ›,Ver todo ›,View all ›
+scorers_no_data_message,"Нема регистрирани голгетерки во ова натпреварување.","Nuk ka golashënuese të regjistruara në këtë garë.","No hay goleadoras registradas en esta competición.","There are no registered goal scorers in this competition."
+disciplinary_no_cards_message,"Нема регистрирани картони во ова натпреварување.","Nuk ka kartonë të regjistruar në këtë garë.","No hay tarjetas registradas en esta competición.","There are no registered cards in this competition."
