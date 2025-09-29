@@ -38,7 +38,6 @@ id,force_role
 143403,goalkeeper
 144643,goalkeeper
 145303,goalkeeper
-145714,goalkeeper
 146001,goalkeeper
 146776,goalkeeper
 147735,goalkeeper
