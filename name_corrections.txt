@@ -21,6 +21,7 @@ original_mk,latin_sq,latin_es,latin_en
 Викториа Алваренга Диас,Victoria Alvarenga Dias,Victoria Alvarenga Dias,Victoria Alvarenga Dias
 Викторија Златковиќ,Viktorija Zlatković,Viktorija Zlatković,Viktorija Zlatković
 Гентјана Рочи,Gentjana Roçi,Gentjana Roçi,Gentjana Roçi
+Герта Бектеши,Gerta Bekteshi,Gerta Bekteshi,Gerta Bekteshi
 Гордана Милошевиќ,Gordana Milošević,Gordana Milošević,Gordana Milošević
 Деспина Пауновиќ,Despina Paunović,Despina Paunović,Despina Paunović
 Диана Алуши,Diana Alushi,Diana Alushi,Diana Alushi
@@ -33,7 +34,6 @@ original_mk,latin_sq,latin_es,latin_en
 Елма Шемсовиќ,Elma Šemsović,Elma Šemsović,Elma Šemsović
 Енџи Шерифи,Enxhi Sherifi,Enxhi Sherifi,Enxhi Sherifi
 Ерина Беќири,Erina Beqiri,Erina Beqiri,Erina Beqiri
-Герта Бектеши,Gerta Bekteshi,Gerta Bekteshi,Gerta Bekteshi
 Зељејха Рамадани,Zelejha Ramadani,Zelejha Ramadani,Zelejha Ramadani
 Зилхава Ќамили,Zilhava Qamili,Zilhava Qamili,Zilhava Qamili
 Ивана Спасиќ,Ivana Spasić,Ivana Spasić,Ivana Spasić

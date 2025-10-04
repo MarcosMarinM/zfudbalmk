@@ -2,6 +2,7 @@
 ##                                                                            ##
 ##           SCRIPT 1.5 - WEB MATCH REPORT SCRAPING & CACHING                 ##
 ##                      (VERSION CON UNIFICACIÓN DE ID)                       ##
+##                  ** VERSIÓN FINAL - LÓGICA MEJORADA **                      ##
 ##                                                                            ##
 ################################################################################
 
@@ -34,7 +35,7 @@ latin_to_cyrillic <- function(nombres) {
   }, USE.NAMES = FALSE)
 }
 formatear_minuto_partido <- function(minutos) { sapply(minutos, function(minuto) { if (is.na(minuto) || !is.numeric(minuto)) return(as.character(minuto)); if (minuto > 140 && nchar(as.character(minuto)) >= 3) { minuto_str <- as.character(minuto); base <- substr(minuto_str, 1, 2); added <- substr(minuto_str, 3, nchar(minuto_str)); return(paste0(base, "+", added)) } else { return(as.character(minuto)) } }) }
-parsear_minuto_web <- function(minuto_str) { sapply(minuto_str, function(m) { if (is.na(m)) return(NA_integer_); minuto_limpio <- str_remove(m, "'") %>% trimws(); if (str_detect(minuto_limpio, "\\+")) { partes <- str_split(minuto_limpio, "\\+")[[1]]; return(as.integer(paste0(partes[1], partes[2]))) } else { return(as.integer(minuto_limpio)) } }, USE.NAMES = FALSE) }
+parsear_minuto_web <- function(minuto_str) { sapply(minuto_str, function(m) { if (is.na(m) || m == "") return(NA_integer_); minuto_limpio <- str_remove(m, "'") %>% trimws(); if (str_detect(minuto_limpio, "\\+")) { partes <- str_split(minuto_limpio, "\\+")[[1]]; return(as.integer(paste0(partes[1], partes[2]))) } else { return(as.integer(minuto_limpio)) } }, USE.NAMES = FALSE) }
 
 
 #### 3. FUNCIONES DE PARSEO WEB ####
@@ -61,8 +62,7 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
   message(paste("   -> Scrapeando:", url))
   doc <- read_html(url)
   
-  nodo_advertencia <- doc %>% html_element(".col-md-6:contains('Натпреварот не е одигран')")
-  if (!is.na(nodo_advertencia)) {
+  if (!is.na(xml_find_first(doc, "//*[contains(text(), 'Натпреварот не е одигран')]"))) {
     message(paste("      --> Partido", id_partido, "ignorado (no jugado o sin datos)."))
     return(NULL)
   }
@@ -88,7 +88,7 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
   arbitro_principal_nombre_cyr <- latin_to_cyrillic(arbitro_principal_nombre)
   asistente_1_nombre_cyr <- latin_to_cyrillic(asistente_1_nombre)
   asistente_2_nombre_cyr <- latin_to_cyrillic(asistente_2_nombre)
-
+  
   partido_df <- tibble(
     id_partido = id_partido, 
     competicion_nombre = competicion_info$competition_name, 
@@ -131,12 +131,54 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
       ) %>%
       select(id, dorsal, nombre, nombre_latin, es_portera, es_capitana, tipo = tipo_jugadoras)
   }
+  
+  # --- Lógica de Cambios Mejorada ---
+  subs_in <- eventos_todos %>% filter(tipo_evento == "substitution")
+  subs_out <- eventos_todos %>% filter(tipo_evento == "substitution_out")
+  
+  procesar_cambios_equipo <- function(subs_in_team, subs_out_team) {
+    if (nrow(subs_in_team) == 0 || nrow(subs_out_team) == 0 || nrow(subs_in_team) != nrow(subs_out_team)) {
+      return(tibble())
+    }
+    in_sorted <- subs_in_team %>% arrange(minuto)
+    out_sorted <- subs_out_team %>% arrange(minuto)
+    bind_cols(
+      in_sorted %>% select(nombre_in = nombre, dorsal_in = dorsal, minuto_in = minuto, equipo),
+      out_sorted %>% select(nombre_out = nombre, dorsal_out = dorsal)
+    ) %>% select(minuto = minuto_in, equipo, nombre_in, dorsal_in, nombre_out, dorsal_out)
+  }
+  
+  cambios_unidos <- bind_rows(
+    procesar_cambios_equipo(filter(subs_in, equipo == equipo_local), filter(subs_out, equipo == equipo_local)),
+    procesar_cambios_equipo(filter(subs_in, equipo == equipo_visitante), filter(subs_out, equipo == equipo_visitante))
+  )
+  
+  # --- Crear Alineaciones Iniciales y luego Actualizar Estatus ---
   alineacion_local <- crear_alineacion(titulares_local_raw, suplentes_local_raw)
   alineacion_visitante <- crear_alineacion(titulares_visitante_raw, suplentes_visitante_raw)
   
+  if (nrow(cambios_unidos) > 0) {
+    jugadoras_que_entran <- cambios_unidos$nombre_in
+    jugadoras_que_salen <- cambios_unidos$nombre_out
+    
+    alineacion_local <- alineacion_local %>%
+      mutate(tipo = case_when(
+        nombre %in% jugadoras_que_salen  ~ "Sustituido",
+        nombre %in% jugadoras_que_entran ~ "Suplente (Entró)",
+        TRUE ~ tipo
+      ))
+    
+    alineacion_visitante <- alineacion_visitante %>%
+      mutate(tipo = case_when(
+        nombre %in% jugadoras_que_salen  ~ "Sustituido",
+        nombre %in% jugadoras_que_entran ~ "Suplente (Entró)",
+        TRUE ~ tipo
+      ))
+  }
+  
   goles_df <- if (nrow(eventos_todos) > 0) { eventos_todos %>% filter(tipo_evento %in% c("goal", "penalty", "own_goal")) %>% transmute(jugadora = nombre, equipo_jugadora = equipo, equipo_acreditado = if_else(tipo_evento == "own_goal", if_else(equipo == equipo_local, equipo_visitante, equipo_local), equipo), minuto = minuto, dorsal = dorsal, tipo = if_else(tipo_evento == "own_goal", "Autogol", "Normal")) %>% tibble::add_column(id_partido = id_partido, .before = 1) } else { tibble() }
   tarjetas_df <- if (nrow(eventos_todos) > 0) { eventos_todos %>% filter(tipo_evento %in% c("yellow", "red")) %>% transmute(jugadora = nombre, equipo = equipo, dorsal = dorsal, minuto = minuto, tipo = if_else(tipo_evento == "yellow", "Amarilla", "Roja"), motivo = "Falta (Web)") %>% tibble::add_column(id_partido = id_partido, .before = 1) } else { tibble() }
-  cambios_unidos <- if (nrow(eventos_todos) > 0) { subs_in <- eventos_todos %>% filter(tipo_evento == "substitution"); subs_out <- eventos_todos %>% filter(tipo_evento == "substitution_out"); if (nrow(subs_in) > 0 && nrow(subs_out) > 0) { inner_join(subs_in, subs_out, by = c("minuto", "equipo"), suffix = c("_in", "_out")) } else { tibble() } } else { tibble() }
+  
   crear_df_cambios <- function(cambios, equipo_filtro) { if(nrow(cambios) == 0) return(tibble(minuto = integer(), texto = character())); df <- filter(cambios, equipo == equipo_filtro); if (nrow(df) == 0) return(tibble(minuto = integer(), texto = character())); df %>% transmute(minuto = minuto, texto = paste0("  - Min ", minuto, ": Entra ", nombre_in, " (", dorsal_in, ") por ", nombre_out, " (", dorsal_out, ")")) %>% arrange(minuto) }
   cambios_local_df <- crear_df_cambios(cambios_unidos, equipo_local)
   cambios_visitante_df <- crear_df_cambios(cambios_unidos, equipo_visitante)
@@ -151,7 +193,6 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
     estadio = estadio_raw
   ))
 }
-
 
 #### 4. LECTURA DE CONFIGURACIÓN Y GESTIÓN DE CACHÉ ####
 
@@ -207,7 +248,11 @@ if (nrow(partidos_pendientes_df) > 0) {
     Sys.sleep(0.5) 
     
     resultado_scrape <- safe_parser(url_actual, id_partido_actual, competicion_info_actual)
-    resultados_procesados[[id_partido_actual]] <- resultado_scrape
+    
+    if (is.null(resultado_scrape$result)) {
+      resultados_procesados[[id_partido_actual]] <- resultado_scrape
+      next
+    }
     
     if (is.null(resultado_scrape$error)) {
       alineaciones_partido <- bind_rows(
@@ -250,6 +295,8 @@ if (nrow(partidos_pendientes_df) > 0) {
         
         resultados_procesados[[id_partido_actual]] <- resultado_scrape
       }
+    } else {
+      resultados_procesados[[id_partido_actual]] <- resultado_scrape
     }
   }
   
