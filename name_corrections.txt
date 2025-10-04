@@ -34,6 +34,7 @@ original_mk,latin_sq,latin_es,latin_en
 Елма Шемсовиќ,Elma Šemsović,Elma Šemsović,Elma Šemsović
 Енџи Шерифи,Enxhi Sherifi,Enxhi Sherifi,Enxhi Sherifi
 Ерина Беќири,Erina Beqiri,Erina Beqiri,Erina Beqiri
+Зелије Балажи,Zelije Ballazhi,Zelije Ballazhi,Zelije Ballazhi
 Зељејха Рамадани,Zelejha Ramadani,Zelejha Ramadani,Zelejha Ramadani
 Зилхава Ќамили,Zilhava Qamili,Zilhava Qamili,Zilhava Qamili
 Ивана Спасиќ,Ivana Spasić,Ivana Spasić,Ivana Spasić
