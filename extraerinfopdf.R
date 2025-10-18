@@ -869,7 +869,7 @@ procesar_acta <- function(acta_path) {
 ### 5.1. Define Paths and Load Cache
 
 # 5.1.1. Path to the folder containing the PDF reports.
-ruta_pdfs <- "Actas"
+ruta_pdfs <- "Dropbox"
 # 5.1.2. Path for the cache file where processed results will be saved.
 ruta_cache <- "actas_cache.rds"
 
