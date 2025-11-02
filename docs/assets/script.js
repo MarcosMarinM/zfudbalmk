@@ -6,11 +6,15 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeSearch();
   initializeMobileMenu();
   initializePlayerProfileInteractions();
-  
+ 
   // INICIALIZADOR ESPECÍFICO PARA LA PÁGINA DE EQUIPO
-  // Se ejecuta solo si encuentra el contenedor de datos de la página de equipo.
   if (document.getElementById('team-page-data')) {
     initializeTeamProfilePage();
+  }
+  
+  // ¡NUEVO! INICIALIZADOR PARA EL HUB DE COMPETICIÓN
+  if (document.getElementById('competition-hub-data')) {
+    initializeCompetitionHub();
   }
 });
 
@@ -433,4 +437,214 @@ scheduleTableContainer.innerHTML = html;
   if(rosterSeason && rosterSeason.options.length > 0) updateRosterCategoryFilter();
   if(scheduleSeason && scheduleSeason.options.length > 0) updateScheduleCategoryFilter();
 }
+
+// ==============================================================================
+// == INICIO: FUNCIONES PARA EL NUEVO "HUB" DE COMPETICIÓN (v1)
+// ==============================================================================
+
+function initializeCompetitionHub() {
+  const dataEl = document.getElementById('competition-hub-data');
+  if (!dataEl) return;
+
+  const hubData = JSON.parse(dataEl.textContent);
+  const t = hubData.translations;
+  let currentRoundIndex = 0;
+
+  // --- Elementos del DOM ---
+  const roundTitleEl = document.getElementById('comp-hub-round-title');
+  const matchesContainerEl = document.getElementById('comp-hub-schedule-matches');
+  const prevRoundBtn = document.getElementById('comp-hub-prev-round');
+  const nextRoundBtn = document.getElementById('comp-hub-next-round');
+  
+  const statsTabsContainer = document.querySelector('.comp-hub-stats-tabs');
+  const statsTabButtons = document.querySelectorAll('.comp-hub-tab-btn');
+  const statsPanels = {
+    goleadoras: document.getElementById('comp-hub-stats-content-goleadoras'),
+    tarjetas: document.getElementById('comp-hub-stats-content-tarjetas'),
+    porteras: document.getElementById('comp-hub-stats-content-porteras')
+  };
+
+  // --- 1. Función para renderizar una Jornada (Schedule) ---
+  function renderScheduleRound(roundIndex) {
+    const roundData = hubData.jornadas_data[roundIndex];
+    if (!roundData) return;
+
+    // Actualizar título y estado de flechas
+    roundTitleEl.textContent = roundData.jornada_nombre;
+    prevRoundBtn.disabled = (roundIndex === 0);
+    nextRoundBtn.disabled = (roundIndex === hubData.jornadas_data.length - 1);
+    
+    // Limpiar y llenar partidos
+    matchesContainerEl.innerHTML = '';
+    if (roundData.partidos.length === 0) {
+      matchesContainerEl.innerHTML = `<p class="comp-hub-no-matches">${t.no_matches_in_round || 'No matches for this round.'}</p>`;
+      return;
+    }
+
+    roundData.partidos.forEach(partido => {
+      const matchLink = partido.id_partido 
+        ? `../natprevari/${partido.id_partido}.html` 
+        : '#';
+      const isClickable = partido.id_partido ? 'clickable' : '';
+      const stadiumInfo = partido.lugar_lang ? `<div class="comp-hub-match-stadium">${t.stadium || 'Stadium'}: ${partido.lugar_lang}</div>` : '';
+      const dateInfo = partido.fecha ? `<div class="comp-hub-match-date">${partido.fecha}</div>` : '';
+
+      const matchHtml = `
+        <a class="comp-hub-match-row ${isClickable}" href="${matchLink}">
+          <div class="comp-hub-match-time">
+            ${dateInfo}
+            ${stadiumInfo}
+          </div>
+          <div class="comp-hub-match-teams">
+            <span class="comp-hub-team-home">
+              ${partido.local_lang} <img src="${partido.local_logo_path}" class="comp-hub-team-logo">
+            </span>
+            <span class="comp-hub-match-score">${partido.resultado}</span>
+            <span class="comp-hub-team-away">
+              <img src="${partido.visitante_logo_path}" class="comp-hub-team-logo"> ${partido.visitante_lang}
+            </span>
+          </div>
+        </a>
+      `;
+      matchesContainerEl.innerHTML += matchHtml;
+    });
+  }
+
+  // --- 2. Función para renderizar tablas de Estadísticas (Top 5) ---
+  function renderStatsTable(tabName) {
+    let data, container, html;
+    
+    switch (tabName) {
+      case 'goleadoras':
+        data = hubData.stats_goleadoras;
+        container = statsPanels.goleadoras;
+        html = `<div class="comp-hub-stats-list">`;
+        if (data.length > 0) {
+          data.forEach(item => {
+            html += `
+              <div class="comp-hub-stat-row">
+                <span class="stat-pos">${item.Pos}</span>
+                <div class="stat-player-team">
+                  <a class="stat-player" href="${item.link_jugadora}">${item.PlayerName}</a>
+                  <a class="stat-team" href="${item.link_equipo}">${item.TeamName}</a>
+                </div>
+                <span class="stat-value">${item.Goals}</span>
+              </div>`;
+          });
+          html += `</div><a class="comp-hub-see-all-link stats-see-all" href="${hubData.links.goleadoras}">${t.see_all} ></a>`;
+        } else {
+          html = `<p class="comp-hub-no-stats">${t.no_matches_in_round}</p>`; // Reutilizar traducción
+        }
+        container.innerHTML = html;
+        break;
+
+      case 'tarjetas':
+        data = hubData.stats_tarjetas;
+        container = statsPanels.tarjetas;
+        html = `<div class="comp-hub-stats-list">`;
+        if (data.length > 0) {
+          data.forEach(item => {
+            html += `
+              <div class="comp-hub-stat-row">
+                <span class="stat-pos">${item.Pos}</span>
+                <div class="stat-player-team">
+                  <a class="stat-player" href="${item.link_jugadora}">${item.PlayerName}</a>
+                  <a class="stat-team" href="${item.link_equipo}">${item.TeamName}</a>
+                </div>
+                <span class="stat-value cards">
+                  <span class="card-icon-table yellow"></span> ${item.YellowCards}
+                  <span class="card-icon-table red"></span> ${item.RedCards}
+                </span>
+              </div>`;
+          });
+          html += `</div><a class="comp-hub-see-all-link stats-see-all" href="${hubData.links.tarjetas}">${t.see_all} ></a>`;
+        } else {
+          html = `<p class="comp-hub-no-stats">${t.no_matches_in_round}</p>`;
+        }
+        container.innerHTML = html;
+        break;
+
+      case 'porteras':
+        data = hubData.stats_porteras;
+        container = statsPanels.porteras;
+        html = `<div class="comp-hub-stats-list">`;
+         if (data.length > 0) {
+          data.forEach(item => {
+            html += `
+              <div class="comp-hub-stat-row">
+                <span class="stat-pos">${item.Pos}</span>
+                <div class="stat-player-team">
+                  <a class="stat-player" href="${item.link_jugadora}">${item.PlayerName}</a>
+                  <a class="stat-team" href="${item.link_equipo}">${item.TeamName}</a>
+                </div>
+                <span class="stat-value">${parseFloat(item.GA90).toFixed(2)}</span>
+              </div>`;
+          });
+          html += `</div><a class="comp-hub-see-all-link stats-see-all" href="${hubData.links.porteras}">${t.see_all} ></a>`;
+        } else {
+          html = `<p class="comp-hub-no-stats">${t.no_matches_in_round}</p>`;
+        }
+        container.innerHTML = html;
+        break;
+    }
+  }
+
+  // --- 3. Event Listeners ---
+  
+  // Navegación de Jornadas
+  prevRoundBtn.addEventListener('click', () => {
+    if (currentRoundIndex > 0) {
+      currentRoundIndex--;
+      renderScheduleRound(currentRoundIndex);
+    }
+  });
+
+  nextRoundBtn.addEventListener('click', () => {
+    if (currentRoundIndex < hubData.jornadas_data.length - 1) {
+      currentRoundIndex++;
+      renderScheduleRound(currentRoundIndex);
+    }
+  });
+
+  // Pestañas de Estadísticas (SÓLO SI EXISTEN)
+if (statsTabsContainer) { // <--- AÑADE ESTA LÍNEA
+  statsTabsContainer.addEventListener('click', (e) => {
+    const targetButton = e.target.closest('.comp-hub-tab-btn');
+    if (!targetButton) return;
+
+    const tabName = targetButton.dataset.tab;
+
+    // Quitar 'active' a todos
+    statsTabButtons.forEach(btn => btn.classList.remove('active'));
+    Object.values(statsPanels).forEach(panel => panel.classList.remove('active'));
+
+    // Poner 'active' al clickado
+    targetButton.classList.add('active');
+    if (statsPanels[tabName]) {
+      statsPanels[tabName].classList.add('active');
+    }
+
+    // Renderizar (o re-renderizar) el contenido de la pestaña
+    renderStatsTable(tabName);
+  });
+} // <--- Y AÑADE ESTA LLAVE DE CIERRE
+
+
+  // --- 4. Inicialización ---
+  // Encontrar la jornada por defecto
+  const defaultRoundRaw = hubData.jornada_por_defecto_raw;
+  let initialIndex = 0;
+  if (defaultRoundRaw) {
+    const foundIndex = hubData.jornadas_data.findIndex(j => j.jornada_id_raw === defaultRoundRaw);
+    if (foundIndex !== -1) {
+      initialIndex = foundIndex;
+    }
+  }
+  currentRoundIndex = initialIndex;
+  
+  // Renderizar estado inicial
+  renderScheduleRound(currentRoundIndex);
+  renderStatsTable('goleadoras'); // Renderizar la primera pestaña por defecto
+}
+
 

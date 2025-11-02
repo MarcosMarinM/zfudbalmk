@@ -74,16 +74,191 @@
       </div>
       <div id="main-content">
         <h2>Втора ЖФЛ 23/24</h2>
-        <div class="menu-container">
-          <a href="vtora_zfl_23_24_raspored.html" class="menu-button">Распоред</a>
-          <a href="vtora_zfl_23_24_strelci.html" class="menu-button">Стрелци</a>
-          <a href="vtora_zfl_23_24_tabela.html" class="menu-button">Табела</a>
-          <a href="vtora_zfl_23_24_golmanki.html" class="menu-button">Статистика на голманки</a>
-          <a href="vtora_zfl_23_24_disciplinska.html" class="menu-button">Дисциплинска</a>
+        <div class="comp-hub-container">
+          <div class="comp-hub-left-col">
+            <div class="comp-hub-section-header">
+              <a href="vtora_zfl_23_24_raspored.html" class="comp-hub-title-link">
+                <h3 class="comp-hub-section-title">Распоред</h3>
+              </a>
+              <a href="vtora_zfl_23_24_raspored.html" class="comp-hub-see-all-link">Сите резултати &gt;</a>
+            </div>
+            <div class="comp-hub-schedule-nav">
+              <button id="comp-hub-prev-round" class="comp-hub-nav-arrow">‹</button>
+              <h4 id="comp-hub-round-title"></h4>
+              <button id="comp-hub-next-round" class="comp-hub-nav-arrow">›</button>
+            </div>
+            <div id="comp-hub-schedule-matches"></div>
+          </div>
+          <div class="comp-hub-right-col">
+            <nav class="comp-hub-stats-tabs">
+              <button class="comp-hub-tab-btn active" data-tab="goleadoras">Стрелци</button>
+              <button class="comp-hub-tab-btn" data-tab="tarjetas">Дисциплинска</button>
+              <button class="comp-hub-tab-btn" data-tab="porteras">Статистика на голманки</button>
+            </nav>
+            <div id="comp-hub-stats-content-goleadoras" class="comp-hub-tab-panel active"></div>
+            <div id="comp-hub-stats-content-tarjetas" class="comp-hub-tab-panel"></div>
+            <div id="comp-hub-stats-content-porteras" class="comp-hub-tab-panel"></div>
+          </div>
+        </div>
+        <div class="comp-hub-bottom-row">
+          <div class="comp-hub-section-header">
+            <a href="vtora_zfl_23_24_tabela.html" class="comp-hub-title-link">
+              <h3 class="comp-hub-section-title">Табела</h3>
+            </a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Поз.</th>
+                <th>Тим</th>
+                <th>Н</th>
+                <th>Поб</th>
+                <th>Нер</th>
+                <th>Пор</th>
+                <th>ДГ</th>
+                <th>ПГ</th>
+                <th>ГР</th>
+                <th>Бод.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border-left: 5px solid #008000; font-weight: bold;">1</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                  <a href="../timovi/atletiko.html">Атлетико</a>
+                </td>
+                <td>14</td>
+                <td>14</td>
+                <td>0</td>
+                <td>0</td>
+                <td>137</td>
+                <td>2</td>
+                <td>135</td>
+                <td>42</td>
+              </tr>
+              <tr>
+                <td style="border-left: 5px solid #D4AF37; font-weight: bold;">2</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                  <a href="../timovi/vardar.html">Вардар</a>
+                </td>
+                <td>14</td>
+                <td>12</td>
+                <td>0</td>
+                <td>2</td>
+                <td>81</td>
+                <td>7</td>
+                <td>74</td>
+                <td>36</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                  <a href="../timovi/kocani.html">Кочани</a>
+                </td>
+                <td>14</td>
+                <td>7</td>
+                <td>1</td>
+                <td>6</td>
+                <td>40</td>
+                <td>34</td>
+                <td>6</td>
+                <td>22</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                  <a href="../timovi/plackovica.html">Плачковица</a>
+                </td>
+                <td>14</td>
+                <td>6</td>
+                <td>2</td>
+                <td>6</td>
+                <td>30</td>
+                <td>44</td>
+                <td>-14</td>
+                <td>20</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                  <a href="../timovi/biljanini_izvori.html">Билјанини Извори</a>
+                </td>
+                <td>14</td>
+                <td>5</td>
+                <td>1</td>
+                <td>8</td>
+                <td>38</td>
+                <td>65</td>
+                <td>-27</td>
+                <td>16</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                  <a href="../timovi/porece.html">Порече</a>
+                </td>
+                <td>14</td>
+                <td>3</td>
+                <td>1</td>
+                <td>10</td>
+                <td>17</td>
+                <td>63</td>
+                <td>-46</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                  <a href="../timovi/borec.html">Борец</a>
+                </td>
+                <td>14</td>
+                <td>3</td>
+                <td>1</td>
+                <td>10</td>
+                <td>17</td>
+                <td>83</td>
+                <td>-66</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                  <a href="../timovi/pobeda_16.html">Победа 16</a>
+                </td>
+                <td>14</td>
+                <td>2</td>
+                <td>2</td>
+                <td>10</td>
+                <td>13</td>
+                <td>75</td>
+                <td>-62</td>
+                <td>8</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color-box" style="background-color: #008000;"></span>
+              <span>Директна промоција</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color-box" style="background-color: #D4AF37;"></span>
+              <span>Бараж за промоција</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>
+    <script id="competition-hub-data" type="application/json">{"jornadas_data":[{"jornada_nombre":"Коло 1","jornada_id_raw":"1","partidos":[{"id_partido":"7019713","local_lang":"Атлетико","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"11 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"16.09.2023"},{"id_partido":"7019710","local_lang":"Билјанини Извори","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"1 - 16","lugar_lang":"Терен со вештачка трева СРЦ Билјанини Извори","fecha":"16.09.2023"},{"id_partido":"7019711","local_lang":"Борец","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"2 - 2","lugar_lang":"Градски стадион Велес","fecha":"16.09.2023"},{"id_partido":"7019712","local_lang":"Кочани","visitante_lang":"Порече","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"5 - 1","lugar_lang":"Градски стадион „Филип","fecha":"16.09.2023"}]},{"jornada_nombre":"Коло 2","jornada_id_raw":"2","partidos":[{"id_partido":"7019717","local_lang":"Билјанини Извори","visitante_lang":"Борец","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"3 - 4","lugar_lang":"Терен со вештачка трева СРЦ Билјанини Извори","fecha":"23.09.2023"},{"id_partido":"7019714","local_lang":"Вардар","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"4 - 0","lugar_lang":"Стадион Цементарница","fecha":"23.09.2023"},{"id_partido":"7019716","local_lang":"Победа 16","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"0 - 8","lugar_lang":"АМС Валандово","fecha":"23.09.2023"},{"id_partido":"7019715","local_lang":"Порече","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 14","lugar_lang":"Градско игралиште Македонски Брод","fecha":"23.09.2023"}]},{"jornada_nombre":"Коло 3","jornada_id_raw":"3","partidos":[{"id_partido":"7019720","local_lang":"Атлетико","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"9 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"30.09.2023"},{"id_partido":"7019718","local_lang":"Борец","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"0 - 10","lugar_lang":"Градски стадион Велес","fecha":"30.09.2023"},{"id_partido":"7019719","local_lang":"Кочани","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"6 - 2","lugar_lang":"Градски стадион Кочани","fecha":"30.09.2023"},{"id_partido":"7019721","local_lang":"Плачковица","visitante_lang":"Порече","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"4 - 1","lugar_lang":"Градски стадион Радовиш","fecha":"01.10.2023"}]},{"jornada_nombre":"Коло 4","jornada_id_raw":"4","partidos":[{"id_partido":"7019724","local_lang":"Билјанини Извори","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 12","lugar_lang":"Терен со вештачка трева СРЦ Билјанини Извори","fecha":"07.10.2023"},{"id_partido":"7019725","local_lang":"Борец","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"0 - 6","lugar_lang":"Градски стадион Велес","fecha":"07.10.2023"},{"id_partido":"7019722","local_lang":"Вардар","visitante_lang":"Порече","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"3 - 0","lugar_lang":"Стадион Цементарница","fecha":"07.10.2023"},{"id_partido":"7019723","local_lang":"Победа 16","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"1 - 4","lugar_lang":"АМС Валандово","fecha":"07.10.2023"}]},{"jornada_nombre":"Коло 5","jornada_id_raw":"5","partidos":[{"id_partido":"7019727","local_lang":"Атлетико","visitante_lang":"Борец","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"15 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"14.10.2023"},{"id_partido":"7019726","local_lang":"Кочани","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"1 - 3","lugar_lang":"Градски стадион Кочани","fecha":"14.10.2023"},{"id_partido":"7019728","local_lang":"Плачковица","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"7 - 2","lugar_lang":"Градски стадион Радовиш","fecha":"14.10.2023"},{"id_partido":"7019729","local_lang":"Порече","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"1 - 2","lugar_lang":"Градско игралиште Македонски Брод","fecha":"14.10.2023"}]},{"jornada_nombre":"Коло 6","jornada_id_raw":"6","partidos":[{"id_partido":"7019731","local_lang":"Билјанини Извори","visitante_lang":"Порече","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"5 - 0","lugar_lang":"Терен со вештачка трева СРЦ Билјанини Извори","fecha":"21.10.2023"},{"id_partido":"7019732","local_lang":"Борец","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"0 - 6","lugar_lang":"Градски стадион Велес","fecha":"22.10.2023"},{"id_partido":"7019730","local_lang":"Вардар","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"8 - 0","lugar_lang":"Стадион Цементарница","fecha":"21.10.2023"},{"id_partido":"7019733","local_lang":"Кочани","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"1 - 10","lugar_lang":"Градски стадион Кочани","fecha":"21.10.2023"}]},{"jornada_nombre":"Коло 7","jornada_id_raw":"7","partidos":[{"id_partido":"7019734","local_lang":"Атлетико","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"2 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"28.10.2023"},{"id_partido":"7019735","local_lang":"Плачковица","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"1 - 1","lugar_lang":"Градски стадион Радовиш","fecha":"28.10.2023"},{"id_partido":"7019737","local_lang":"Победа 16","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"1 - 2","lugar_lang":"АМС Валандово","fecha":"28.10.2023"},{"id_partido":"7019736","local_lang":"Порече","visitante_lang":"Борец","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"4 - 0","lugar_lang":"Градско Игралиште (Македонски Брод)","fecha":"28.10.2023"}]},{"jornada_nombre":"Коло 8","jornada_id_raw":"8","partidos":[{"id_partido":"7019738","local_lang":"Вардар","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"5 - 0","lugar_lang":"Стадион Цементарница","fecha":"16.03.2024"},{"id_partido":"7019741","local_lang":"Плачковица","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 10","lugar_lang":"Градски стадион Радовиш","fecha":"16.03.2024"},{"id_partido":"7019739","local_lang":"Победа 16","visitante_lang":"Борец","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"4 - 6","lugar_lang":"АМС Валандово","fecha":"16.03.2024"},{"id_partido":"7019740","local_lang":"Порече","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"3 - 2","lugar_lang":"Градско игралиште Македонски Брод","fecha":"17.03.2024"}]},{"jornada_nombre":"Коло 9","jornada_id_raw":"9","partidos":[{"id_partido":"7019743","local_lang":"Атлетико","visitante_lang":"Порече","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"16 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"23.03.2024"},{"id_partido":"7019745","local_lang":"Борец","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"0 - 4","lugar_lang":"Градски стадион Велес","fecha":"23.03.2024"},{"id_partido":"7019744","local_lang":"Кочани","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"5 - 1","lugar_lang":"Градски стадион Кочани","fecha":"23.03.2024"},{"id_partido":"7019742","local_lang":"Плачковица","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"0 - 7","lugar_lang":"Градски стадион Радовиш","fecha":"23.03.2024"}]},{"jornada_nombre":"Коло 10","jornada_id_raw":"10","partidos":[{"id_partido":"7019747","local_lang":"Билјанини Извори","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"3 - 0","lugar_lang":"Игралиште во населба Воска (Охрид)","fecha":"30.03.2024"},{"id_partido":"7019746","local_lang":"Вардар","visitante_lang":"Борец","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"8 - 0","lugar_lang":"Стадион Цементарница","fecha":"30.03.2024"},{"id_partido":"7019748","local_lang":"Победа 16","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 6","lugar_lang":"АМС Валандово","fecha":"30.03.2024"},{"id_partido":"7019749","local_lang":"Порече","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"2 - 4","lugar_lang":"Градско игралиште Македонски Брод","fecha":"30.03.2024"}]},{"jornada_nombre":"Коло 11","jornada_id_raw":"11","partidos":[{"id_partido":"7019752","local_lang":"Атлетико","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"11 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"06.04.2024"},{"id_partido":"7019753","local_lang":"Кочани","visitante_lang":"Борец","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"3 - 1","lugar_lang":"Градски стадион Кочани","fecha":"06.04.2024"},{"id_partido":"7019751","local_lang":"Плачковица","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"1 - 1","lugar_lang":"Градски стадион Радовиш","fecha":"06.04.2024"},{"id_partido":"7019750","local_lang":"Порече","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"0 - 4","lugar_lang":"Игралиште во населба Воска (Охрид)","fecha":"30.03.2024"}]},{"jornada_nombre":"Коло 12","jornada_id_raw":"12","partidos":[{"id_partido":"7019756","local_lang":"Билјанини Извори","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"1 - 2","lugar_lang":"Терен со вештачка трева СРЦ Билјанини Извори","fecha":"13.04.2024"},{"id_partido":"7019755","local_lang":"Борец","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 13","lugar_lang":"Градски стадион Велес","fecha":"13.04.2024"},{"id_partido":"7019754","local_lang":"Вардар","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"3 - 1","lugar_lang":"Стадион Цементарница","fecha":"13.04.2024"},{"id_partido":"7019757","local_lang":"Победа 16","visitante_lang":"Порече","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"1 - 0","lugar_lang":"АМС Валандово","fecha":"13.04.2024"}]},{"jornada_nombre":"Коло 13","jornada_id_raw":"13","partidos":[{"id_partido":"7019761","local_lang":"Атлетико","visitante_lang":"Кочани","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"6 - 0","lugar_lang":"Игралиште Павел Шатев","fecha":"20.04.2024"},{"id_partido":"7019760","local_lang":"Плачковица","visitante_lang":"Борец","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"1 - 2","lugar_lang":"Градски стадион Радовиш","fecha":"21.04.2024"},{"id_partido":"7019758","local_lang":"Победа 16","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/pobeda_16.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"0 - 9","lugar_lang":"АМС Валандово","fecha":"20.04.2024"},{"id_partido":"7019759","local_lang":"Порече","visitante_lang":"Билјанини Извори","local_logo_path":"../../assets/logos/porece.png","visitante_logo_path":"../../assets/logos/biljanini_izvori.png","resultado":"1 - 1","lugar_lang":"Градско игралиште Македонски Брод","fecha":"20.04.2024"}]},{"jornada_nombre":"Коло 14","jornada_id_raw":"14","partidos":[{"id_partido":"7019765","local_lang":"Билјанини Извори","visitante_lang":"Победа 16","local_logo_path":"../../assets/logos/biljanini_izvori.png","visitante_logo_path":"../../assets/logos/pobeda_16.png","resultado":"14 - 0","lugar_lang":"Терен со вештачка трева СРЦ Билјанини Извори","fecha":"27.04.2024"},{"id_partido":"7019764","local_lang":"Борец","visitante_lang":"Порече","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/porece.png","resultado":"2 - 4","lugar_lang":"Градски стадион Велес","fecha":"27.04.2024"},{"id_partido":"7019762","local_lang":"Вардар","visitante_lang":"Атлетико","local_logo_path":"../../assets/logos/vardar.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"1 - 2","lugar_lang":"Стадион Цементарница","fecha":"27.04.2024"},{"id_partido":"7019763","local_lang":"Кочани","visitante_lang":"Плачковица","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"1 - 0","lugar_lang":"Градски стадион Кочани","fecha":"28.04.2024"}]}],"jornada_por_defecto_raw":"14","stats_goleadoras":[{"Pos":1,"PlayerName":"Мелиса Димитриоски","TeamName":"Атлетико","Goals":42,"id_jugadora":"139442","id_equipo_mk":"Атлетико","link_jugadora":"../igraci/139442.html","link_equipo":"../timovi/atletiko.html"},{"Pos":2,"PlayerName":"Теодора Јанковска","TeamName":"Вардар","Goals":22,"id_jugadora":"114556","id_equipo_mk":"Вардар","link_jugadora":"../igraci/114556.html","link_equipo":"../timovi/vardar.html"},{"Pos":3,"PlayerName":"Мила Наумовска","TeamName":"Вардар","Goals":20,"id_jugadora":"143387","id_equipo_mk":"Вардар","link_jugadora":"../igraci/143387.html","link_equipo":"../timovi/vardar.html"},{"Pos":4,"PlayerName":"Мила Талевска","TeamName":"Атлетико","Goals":17,"id_jugadora":"112313","id_equipo_mk":"Атлетико","link_jugadora":"../igraci/112313.html","link_equipo":"../timovi/atletiko.html"},{"Pos":5,"PlayerName":"Андреа Донева","TeamName":"Кочани","Goals":16,"id_jugadora":"132907","id_equipo_mk":"Кочани","link_jugadora":"../igraci/132907.html","link_equipo":"../timovi/kocani.html"}],"stats_tarjetas":[{"Pos":1,"PlayerName":"Маријана Ташкова","TeamName":"Плачковица","YellowCards":2,"RedCards":1,"id_jugadora":"251229","id_equipo_mk":"Плачковица","link_jugadora":"../igraci/251229.html","link_equipo":"../timovi/plackovica.html"},{"Pos":2,"PlayerName":"Гордана Кочева","TeamName":"Победа 16","YellowCards":0,"RedCards":1,"id_jugadora":"111909","id_equipo_mk":"Победа 16","link_jugadora":"../igraci/111909.html","link_equipo":"../timovi/pobeda_16.html"},{"Pos":3,"PlayerName":"Зорица Проданова","TeamName":"Победа 16","YellowCards":0,"RedCards":1,"id_jugadora":"132888","id_equipo_mk":"Победа 16","link_jugadora":"../igraci/132888.html","link_equipo":"../timovi/pobeda_16.html"},{"Pos":4,"PlayerName":"Емилија Петковска","TeamName":"Атлетико","YellowCards":0,"RedCards":1,"id_jugadora":"138863","id_equipo_mk":"Атлетико","link_jugadora":"../igraci/138863.html","link_equipo":"../timovi/atletiko.html"},{"Pos":5,"PlayerName":"Анастасија Јанческа","TeamName":"Билјанини Извори","YellowCards":0,"RedCards":1,"id_jugadora":"145714","id_equipo_mk":"Билјанини Извори","link_jugadora":"../igraci/145714.html","link_equipo":"../timovi/biljanini_izvori.html"}],"stats_porteras":[{"Pos":1,"PlayerName":"Мартина Сиљаноска","TeamName":"Атлетико","GA90":0.1667,"CS":10,"id_jugadora":"135425","id_equipo_mk":"Атлетико","link_jugadora":"../igraci/135425.html","link_equipo":"../timovi/atletiko.html"},{"Pos":2,"PlayerName":"Верица Колевска","TeamName":"Вардар","GA90":0.5,"CS":9,"id_jugadora":"133474","id_equipo_mk":"Вардар","link_jugadora":"../igraci/133474.html","link_equipo":"../timovi/vardar.html"},{"Pos":3,"PlayerName":"Христина Гоговска","TeamName":"Кочани","GA90":2.446,"CS":3,"id_jugadora":"147156","id_equipo_mk":"Кочани","link_jugadora":"../igraci/147156.html","link_equipo":"../timovi/kocani.html"},{"Pos":4,"PlayerName":"Ивана Латкоска","TeamName":"Билјанини Извори","GA90":2.7143,"CS":3,"id_jugadora":"130126","id_equipo_mk":"Билјанини Извори","link_jugadora":"../igraci/130126.html","link_equipo":"../timovi/biljanini_izvori.html"},{"Pos":5,"PlayerName":"Софија Атанасова","TeamName":"Плачковица","GA90":2.7273,"CS":1,"id_jugadora":"258862","id_equipo_mk":"Плачковица","link_jugadora":"../igraci/258862.html","link_equipo":"../timovi/plackovica.html"}],"links":{"goleadoras":"vtora_zfl_23_24_strelci.html","tarjetas":"vtora_zfl_23_24_disciplinska.html","porteras":"vtora_zfl_23_24_golmanki.html","clasificacion":"vtora_zfl_23_24_tabela.html"},"translations":{"scorers":"Стрелци","cards":"Дисциплинска","goalkeepers":"Статистика на голманки","see_all":"Целосна листа","stadium":"Стадион","no_matches_in_round":"Нема регистрирани настани."}}</script>
   </body>
 </html>
 </html>

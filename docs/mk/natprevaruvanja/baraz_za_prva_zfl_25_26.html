@@ -74,16 +74,97 @@
       </div>
       <div id="main-content">
         <h2>Бараж за Прва ЖФЛ 25/26</h2>
-        <div class="menu-container">
-          <a href="baraz_za_prva_zfl_25_26_raspored.html" class="menu-button">Распоред</a>
-          <a href="baraz_za_prva_zfl_25_26_strelci.html" class="menu-button">Стрелци</a>
-          <a href="baraz_za_prva_zfl_25_26_tabela.html" class="menu-button">Табела</a>
-          <a href="baraz_za_prva_zfl_25_26_golmanki.html" class="menu-button">Статистика на голманки</a>
-          <a href="baraz_za_prva_zfl_25_26_disciplinska.html" class="menu-button">Дисциплинска</a>
+        <div class="comp-hub-container">
+          <div class="comp-hub-left-col">
+            <div class="comp-hub-section-header">
+              <a href="baraz_za_prva_zfl_25_26_raspored.html" class="comp-hub-title-link">
+                <h3 class="comp-hub-section-title">Распоред</h3>
+              </a>
+              <a href="baraz_za_prva_zfl_25_26_raspored.html" class="comp-hub-see-all-link">Сите резултати &gt;</a>
+            </div>
+            <div class="comp-hub-schedule-nav">
+              <button id="comp-hub-prev-round" class="comp-hub-nav-arrow">‹</button>
+              <h4 id="comp-hub-round-title"></h4>
+              <button id="comp-hub-next-round" class="comp-hub-nav-arrow">›</button>
+            </div>
+            <div id="comp-hub-schedule-matches"></div>
+          </div>
+          <div class="comp-hub-right-col">
+            <nav class="comp-hub-stats-tabs">
+              <button class="comp-hub-tab-btn active" data-tab="goleadoras">Стрелци</button>
+              <button class="comp-hub-tab-btn" data-tab="tarjetas">Дисциплинска</button>
+              <button class="comp-hub-tab-btn" data-tab="porteras">Статистика на голманки</button>
+            </nav>
+            <div id="comp-hub-stats-content-goleadoras" class="comp-hub-tab-panel active"></div>
+            <div id="comp-hub-stats-content-tarjetas" class="comp-hub-tab-panel"></div>
+            <div id="comp-hub-stats-content-porteras" class="comp-hub-tab-panel"></div>
+          </div>
+        </div>
+        <div class="comp-hub-bottom-row">
+          <div class="comp-hub-section-header">
+            <a href="baraz_za_prva_zfl_25_26_tabela.html" class="comp-hub-title-link">
+              <h3 class="comp-hub-section-title">Табела</h3>
+            </a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Поз.</th>
+                <th>Тим</th>
+                <th>Н</th>
+                <th>Поб</th>
+                <th>Нер</th>
+                <th>Пор</th>
+                <th>ДГ</th>
+                <th>ПГ</th>
+                <th>ГР</th>
+                <th>Бод.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border-left: 5px solid #008000; font-weight: bold;">1</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                  <a href="../timovi/recica.html">Речица</a>
+                </td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>4</td>
+                <td>1</td>
+                <td>3</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                  <a href="../timovi/vardar.html">Вардар</a>
+                </td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>4</td>
+                <td>-3</td>
+                <td>0</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color-box" style="background-color: #008000;"></span>
+              <span>Промоција</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>
+    <script id="competition-hub-data" type="application/json">{"jornadas_data":[{"jornada_nombre":"Коло Ф","jornada_id_raw":"Ф","partidos":[{"id_partido":"9767450","local_lang":"Речица","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"4 - 1","lugar_lang":"Тренинг центар Петар Милошевски","fecha":"28.05.2025"}]}],"jornada_por_defecto_raw":"Ф","stats_goleadoras":[{"Pos":1,"PlayerName":"Емили Митковска","TeamName":"Речица","Goals":4,"id_jugadora":"136401","id_equipo_mk":"Речица","link_jugadora":"../igraci/136401.html","link_equipo":"../timovi/recica.html"},{"Pos":2,"PlayerName":"Теодора Јанковска","TeamName":"Вардар","Goals":1,"id_jugadora":"114556","id_equipo_mk":"Вардар","link_jugadora":"../igraci/114556.html","link_equipo":"../timovi/vardar.html"}],"stats_tarjetas":[],"stats_porteras":[{"Pos":1,"PlayerName":"Катерина Ацевска","TeamName":"Речица","GA90":1,"CS":0,"id_jugadora":"132537","id_equipo_mk":"Речица","link_jugadora":"../igraci/132537.html","link_equipo":"../timovi/recica.html"},{"Pos":2,"PlayerName":"Верица Колевска","TeamName":"Вардар","GA90":4,"CS":0,"id_jugadora":"133474","id_equipo_mk":"Вардар","link_jugadora":"../igraci/133474.html","link_equipo":"../timovi/vardar.html"}],"links":{"goleadoras":"baraz_za_prva_zfl_25_26_strelci.html","tarjetas":"baraz_za_prva_zfl_25_26_disciplinska.html","porteras":"baraz_za_prva_zfl_25_26_golmanki.html","clasificacion":"baraz_za_prva_zfl_25_26_tabela.html"},"translations":{"scorers":"Стрелци","cards":"Дисциплинска","goalkeepers":"Статистика на голманки","see_all":"Целосна листа","stadium":"Стадион","no_matches_in_round":"Нема регистрирани настани."}}</script>
   </body>
 </html>
 </html>

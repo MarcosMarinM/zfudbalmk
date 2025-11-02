@@ -74,16 +74,97 @@
       </div>
       <div id="main-content">
         <h2>Бараж за Прва ЖФЛ 24/25</h2>
-        <div class="menu-container">
-          <a href="baraz_za_prva_zfl_24_25_raspored.html" class="menu-button">Распоред</a>
-          <a href="baraz_za_prva_zfl_24_25_strelci.html" class="menu-button">Стрелци</a>
-          <a href="baraz_za_prva_zfl_24_25_tabela.html" class="menu-button">Табела</a>
-          <a href="baraz_za_prva_zfl_24_25_golmanki.html" class="menu-button">Статистика на голманки</a>
-          <a href="baraz_za_prva_zfl_24_25_disciplinska.html" class="menu-button">Дисциплинска</a>
+        <div class="comp-hub-container">
+          <div class="comp-hub-left-col">
+            <div class="comp-hub-section-header">
+              <a href="baraz_za_prva_zfl_24_25_raspored.html" class="comp-hub-title-link">
+                <h3 class="comp-hub-section-title">Распоред</h3>
+              </a>
+              <a href="baraz_za_prva_zfl_24_25_raspored.html" class="comp-hub-see-all-link">Сите резултати &gt;</a>
+            </div>
+            <div class="comp-hub-schedule-nav">
+              <button id="comp-hub-prev-round" class="comp-hub-nav-arrow">‹</button>
+              <h4 id="comp-hub-round-title"></h4>
+              <button id="comp-hub-next-round" class="comp-hub-nav-arrow">›</button>
+            </div>
+            <div id="comp-hub-schedule-matches"></div>
+          </div>
+          <div class="comp-hub-right-col">
+            <nav class="comp-hub-stats-tabs">
+              <button class="comp-hub-tab-btn active" data-tab="goleadoras">Стрелци</button>
+              <button class="comp-hub-tab-btn" data-tab="tarjetas">Дисциплинска</button>
+              <button class="comp-hub-tab-btn" data-tab="porteras">Статистика на голманки</button>
+            </nav>
+            <div id="comp-hub-stats-content-goleadoras" class="comp-hub-tab-panel active"></div>
+            <div id="comp-hub-stats-content-tarjetas" class="comp-hub-tab-panel"></div>
+            <div id="comp-hub-stats-content-porteras" class="comp-hub-tab-panel"></div>
+          </div>
+        </div>
+        <div class="comp-hub-bottom-row">
+          <div class="comp-hub-section-header">
+            <a href="baraz_za_prva_zfl_24_25_tabela.html" class="comp-hub-title-link">
+              <h3 class="comp-hub-section-title">Табела</h3>
+            </a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Поз.</th>
+                <th>Тим</th>
+                <th>Н</th>
+                <th>Поб</th>
+                <th>Нер</th>
+                <th>Пор</th>
+                <th>ДГ</th>
+                <th>ПГ</th>
+                <th>ГР</th>
+                <th>Бод.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border-left: 5px solid #008000; font-weight: bold;">1</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                  <a href="../timovi/top_gol.html">Топ Гол</a>
+                </td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+                <td>0</td>
+                <td>6</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                  <a href="../timovi/vardar.html">Вардар</a>
+                </td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>6</td>
+                <td>-6</td>
+                <td>0</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color-box" style="background-color: #008000;"></span>
+              <span>Промоција</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>
+    <script id="competition-hub-data" type="application/json">{"jornadas_data":[{"jornada_nombre":"Коло Ф","jornada_id_raw":"Ф","partidos":[{"id_partido":"8256612","local_lang":"Топ Гол","visitante_lang":"Вардар","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/vardar.png","resultado":"6 - 0","lugar_lang":"Градски стадион Велес","fecha":"28.05.2024"}]}],"jornada_por_defecto_raw":"Ф","stats_goleadoras":[{"Pos":1,"PlayerName":"Анастасиа Илиевска","TeamName":"Топ Гол","Goals":2,"id_jugadora":"126047","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/126047.html","link_equipo":"../timovi/top_gol.html"},{"Pos":1,"PlayerName":"Георгина Димитровска","TeamName":"Топ Гол","Goals":2,"id_jugadora":"161889","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/161889.html","link_equipo":"../timovi/top_gol.html"},{"Pos":3,"PlayerName":"Дарија Стојчевска","TeamName":"Топ Гол","Goals":1,"id_jugadora":"125224","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/125224.html","link_equipo":"../timovi/top_gol.html"},{"Pos":3,"PlayerName":"Ивана Милевска","TeamName":"Топ Гол","Goals":1,"id_jugadora":"249622","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/249622.html","link_equipo":"../timovi/top_gol.html"}],"stats_tarjetas":[{"Pos":1,"PlayerName":"Верица Колевска","TeamName":"Вардар","YellowCards":0,"RedCards":1,"id_jugadora":"133474","id_equipo_mk":"Вардар","link_jugadora":"../igraci/133474.html","link_equipo":"../timovi/vardar.html"},{"Pos":2,"PlayerName":"Маргарита Талевска","TeamName":"Топ Гол","YellowCards":1,"RedCards":0,"id_jugadora":"125228","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/125228.html","link_equipo":"../timovi/top_gol.html"},{"Pos":3,"PlayerName":"Ангела Зафироска","TeamName":"Вардар","YellowCards":1,"RedCards":0,"id_jugadora":"129097","id_equipo_mk":"Вардар","link_jugadora":"../igraci/129097.html","link_equipo":"../timovi/vardar.html"},{"Pos":4,"PlayerName":"Амире Азизи","TeamName":"Вардар","YellowCards":1,"RedCards":0,"id_jugadora":"173889","id_equipo_mk":"Вардар","link_jugadora":"../igraci/173889.html","link_equipo":"../timovi/vardar.html"}],"stats_porteras":[{"Pos":1,"PlayerName":"Натали Талевска","TeamName":"Топ Гол","GA90":0,"CS":1,"id_jugadora":"145303","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/145303.html","link_equipo":"../timovi/top_gol.html"},{"Pos":2,"PlayerName":"Верица Колевска","TeamName":"Вардар","GA90":6,"CS":0,"id_jugadora":"133474","id_equipo_mk":"Вардар","link_jugadora":"../igraci/133474.html","link_equipo":"../timovi/vardar.html"}],"links":{"goleadoras":"baraz_za_prva_zfl_24_25_strelci.html","tarjetas":"baraz_za_prva_zfl_24_25_disciplinska.html","porteras":"baraz_za_prva_zfl_24_25_golmanki.html","clasificacion":"baraz_za_prva_zfl_24_25_tabela.html"},"translations":{"scorers":"Стрелци","cards":"Дисциплинска","goalkeepers":"Статистика на голманки","see_all":"Целосна листа","stadium":"Стадион","no_matches_in_round":"Нема регистрирани настани."}}</script>
   </body>
 </html>
 </html>

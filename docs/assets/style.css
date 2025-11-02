@@ -284,3 +284,301 @@ th { background-color: #f2f2f2; }
 .schedule-score-in-table { display: inline-block; font-size: 1em; font-weight: 700; background-color: #f1f2f3; padding: 5px 10px; border-radius: 4px; white-space: nowrap; }
 
 
+
+/* --- 1. Contenedor Principal (Grid) --- */
+.comp-hub-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Columna izquierda más ancha */
+  gap: 30px;
+  margin-top: 25px;
+  margin-bottom: 40px;
+}
+
+.comp-hub-left-col, .comp-hub-right-col, .comp-hub-bottom-row {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* --- 2. Encabezados de Sección --- */
+.comp-hub-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.comp-hub-section-title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.comp-hub-see-all-link {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #6c757d;
+  text-decoration: none;
+}
+.comp-hub-see-all-link:hover {
+  color: #CC0000;
+}
+
+
+/* --- 3. Columna Izquierda (Jornadas/Schedule) --- */
+.comp-hub-schedule-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+#comp-hub-round-title {
+  margin: 0;
+  padding: 0;
+  font-size: 1.1em;
+  color: #CC0000;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.comp-hub-nav-arrow {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  color: #333;
+  font-size: 1.5em;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  padding: 0;
+}
+.comp-hub-nav-arrow:hover {
+  background-color: #ced4da;
+}
+.comp-hub-nav-arrow:disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.comp-hub-match-row {
+  display: block;
+  text-decoration: none;
+  color: #212529;
+  padding: 15px;
+  border-bottom: 1px solid #f1f1f1;
+  transition: background-color 0.2s;
+}
+.comp-hub-match-row.clickable:hover {
+  background-color: #f8f9fa;
+}
+.comp-hub-match-row:last-child {
+  border-bottom: none;
+}
+
+.comp-hub-match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.comp-hub-team-home, .comp-hub-team-away {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.comp-hub-team-home { justify-content: flex-end; text-align: right; }
+.comp-hub-team-away { justify-content: flex-start; text-align: left; }
+
+.comp-hub-team-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.comp-hub-match-score {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #CC0000;
+  background-color: #f1f2f3;
+  padding: 5px 12px;
+  border-radius: 4px;
+  margin: 0 15px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.comp-hub-match-time {
+  font-size: 0.85em;
+  color: #6c757d;
+  text-align: center;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.comp-hub-match-date { padding-right: 10px; }
+.comp-hub-match-stadium { flex-grow: 1; text-align: right; }
+
+.comp-hub-no-matches, .comp-hub-no-stats {
+  padding: 20px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* --- 4. Columna Derecha (Estadísticas) --- */
+.comp-hub-right-col {
+  padding: 0; /* El padding lo tendrán los contenedores internos */
+  overflow: hidden; /* Para que los bordes redondeados afecten a los hijos */
+}
+
+.comp-hub-stats-tabs {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.comp-hub-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 12px 5px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.comp-hub-tab-btn:hover {
+  color: #333;
+}
+.comp-hub-tab-btn.active {
+  color: #CC0000;
+  border-bottom-color: #CC0000;
+}
+
+.comp-hub-tab-panel {
+  display: none;
+  padding: 15px;
+}
+.comp-hub-tab-panel.active {
+  display: block;
+}
+
+.comp-hub-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comp-hub-stat-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.95em;
+}
+
+.stat-pos {
+  font-weight: bold;
+  color: #6c757d;
+  text-align: right;
+}
+
+.stat-player-team {
+  display: flex;
+  flex-direction: column;
+}
+.stat-player {
+  font-weight: bold;
+  color: #CC0000;
+  text-decoration: none;
+}
+.stat-player:hover { text-decoration: underline; }
+
+.stat-team {
+  font-size: 0.9em;
+  color: #6c757d;
+  text-decoration: none;
+}
+.stat-team:hover { text-decoration: underline; }
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1.1em;
+  text-align: right;
+}
+.stat-value.cards {
+  font-size: 0.9em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stats-see-all {
+  display: block;
+  text-align: right;
+  margin-top: 15px;
+  font-size: 0.9em;
+}
+
+
+/* --- 5. Fila Inferior (Clasificación) --- */
+.comp-hub-bottom-row {
+  grid-column: 1 / -1; /* Ocupa todo el ancho */
+  padding: 20px;
+}
+/* La tabla de clasificación ya tiene estilos globales, así que no necesita más */
+
+
+/* --- 6. Media Queries (Responsividad) --- */
+@media (max-width: 850px) {
+  .comp-hub-container {
+    grid-template-columns: 1fr; /* Apilar columnas en móvil */
+  }
+  
+  .comp-hub-match-teams {
+    font-size: 1em;
+  }
+  .comp-hub-match-score {
+    margin: 0 10px;
+    font-size: 1em;
+  }
+  
+  .comp-hub-tab-btn {
+    font-size: 0.8em;
+  }
+}
+/* --- 7. Estilos para Títulos Clicables (Añadido) --- */
+.comp-hub-title-link {
+  text-decoration: none;
+  color: inherit; /* Hereda el color normal del título */
+}
+.comp-hub-title-link:hover .comp-hub-section-title {
+  color: #CC0000; /* Hace que el título se vuelva rojo al pasar el ratón */
+  text-decoration: underline;
+}
+
+/* Ocultar el enlace "see all" en la sección de clasificación (ya que el título es el enlace) */
+.comp-hub-bottom-row .comp-hub-see-all-link {
+  display: none;
+}
+
+

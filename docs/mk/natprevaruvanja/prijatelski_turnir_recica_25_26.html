@@ -74,13 +74,37 @@
       </div>
       <div id="main-content">
         <h2>Пријателски Турнир Речица 25/26</h2>
-        <div class="menu-container">
-          <a href="prijatelski_turnir_recica_25_26_raspored.html" class="menu-button">Распоред</a>
-          <a href="prijatelski_turnir_recica_25_26_strelci.html" class="menu-button">Стрелци</a>
+        <div class="comp-hub-container">
+          <div class="comp-hub-left-col">
+            <div class="comp-hub-section-header">
+              <a href="prijatelski_turnir_recica_25_26_raspored.html" class="comp-hub-title-link">
+                <h3 class="comp-hub-section-title">Распоред</h3>
+              </a>
+              <a href="prijatelski_turnir_recica_25_26_raspored.html" class="comp-hub-see-all-link">Сите резултати &gt;</a>
+            </div>
+            <div class="comp-hub-schedule-nav">
+              <button id="comp-hub-prev-round" class="comp-hub-nav-arrow">‹</button>
+              <h4 id="comp-hub-round-title"></h4>
+              <button id="comp-hub-next-round" class="comp-hub-nav-arrow">›</button>
+            </div>
+            <div id="comp-hub-schedule-matches"></div>
+          </div>
+          <div class="comp-hub-right-col">
+            <nav class="comp-hub-stats-tabs">
+              <button class="comp-hub-tab-btn active" data-tab="goleadoras">Стрелци</button>
+              <button class="comp-hub-tab-btn" data-tab="tarjetas">Дисциплинска</button>
+              <button class="comp-hub-tab-btn" data-tab="porteras">Статистика на голманки</button>
+            </nav>
+            <div id="comp-hub-stats-content-goleadoras" class="comp-hub-tab-panel active"></div>
+            <div id="comp-hub-stats-content-tarjetas" class="comp-hub-tab-panel"></div>
+            <div id="comp-hub-stats-content-porteras" class="comp-hub-tab-panel"></div>
+          </div>
         </div>
+        <div class="comp-hub-bottom-row"></div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>
+    <script id="competition-hub-data" type="application/json">{"jornadas_data":[{"jornada_nombre":"1/2Ф","jornada_id_raw":"1/2Ф","partidos":[{"id_partido":"9999901","local_lang":"Машинац","visitante_lang":"Љуботен","local_logo_path":"../../assets/logos/masinac.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"0 - 2","lugar_lang":"Стадион Милутин Вељковиќ-Уча","fecha":"09.08.2025"},{"id_partido":"9999900","local_lang":"Речица","visitante_lang":"Каменица Саса","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"0 - 4","lugar_lang":"Стадион Милутин Вељковиќ-Уча","fecha":"09.08.2025"}]},{"jornada_nombre":"3/4","jornada_id_raw":"3/4","partidos":[{"id_partido":"9999902","local_lang":"Речица","visitante_lang":"Машинац","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/masinac.png","resultado":"1 - 7","lugar_lang":"Стадион Милутин Вељковиќ-Уча","fecha":"10.08.2025"}]},{"jornada_nombre":"Ф","jornada_id_raw":"Ф","partidos":[{"id_partido":"9999903","local_lang":"Љуботен","visitante_lang":"Каменица Саса","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"3 - 1","lugar_lang":"Стадион Милутин Вељковиќ-Уча","fecha":"10.08.2025"}]}],"jornada_por_defecto_raw":"Ф","stats_goleadoras":[{"Pos":1,"PlayerName":"Тчеури Гоја","TeamName":"Каменица Саса","Goals":2,"id_jugadora":"256647","id_equipo_mk":"Каменица Саса","link_jugadora":"../igraci/256647.html","link_equipo":"../timovi/kamenica_sasa.html"},{"Pos":2,"PlayerName":"Ана Димитровска","TeamName":"Каменица Саса","Goals":1,"id_jugadora":"112211","id_equipo_mk":"Каменица Саса","link_jugadora":"../igraci/112211.html","link_equipo":"../timovi/kamenica_sasa.html"},{"Pos":2,"PlayerName":"Хава Мустафа","TeamName":"Љуботен","Goals":1,"id_jugadora":"113575","id_equipo_mk":"Љуботен","link_jugadora":"../igraci/113575.html","link_equipo":"../timovi/ljuboten.html"},{"Pos":2,"PlayerName":"Туане Фрагосо","TeamName":"Каменица Саса","Goals":1,"id_jugadora":"262182","id_equipo_mk":"Каменица Саса","link_jugadora":"../igraci/262182.html","link_equipo":"../timovi/kamenica_sasa.html"},{"Pos":2,"PlayerName":"Мариан Охадиве","TeamName":"Љуботен","Goals":1,"id_jugadora":"270274","id_equipo_mk":"Љуботен","link_jugadora":"../igraci/270274.html","link_equipo":"../timovi/ljuboten.html"}],"stats_tarjetas":[],"stats_porteras":[{"Pos":1,"PlayerName":"Ведрана Комненова","TeamName":"Љуботен","GA90":0,"CS":1,"id_jugadora":"250905","id_equipo_mk":"Љуботен","link_jugadora":"../igraci/250905.html","link_equipo":"../timovi/ljuboten.html"},{"Pos":2,"PlayerName":"Роксана Владимирова","TeamName":"Каменица Саса","GA90":0,"CS":1,"id_jugadora":"272042","id_equipo_mk":"Каменица Саса","link_jugadora":"../igraci/272042.html","link_equipo":"../timovi/kamenica_sasa.html"},{"Pos":3,"PlayerName":"Кристина Павлоска","TeamName":"Машинац","GA90":0,"CS":0,"id_jugadora":"146001","id_equipo_mk":"Машинац","link_jugadora":"../igraci/146001.html","link_equipo":"../timovi/masinac.html"},{"Pos":4,"PlayerName":"Сара Петровска","TeamName":"Речица","GA90":0,"CS":0,"id_jugadora":"259072","id_equipo_mk":"Речица","link_jugadora":"../igraci/259072.html","link_equipo":"../timovi/recica.html"}],"links":{"goleadoras":"prijatelski_turnir_recica_25_26_strelci.html","tarjetas":"prijatelski_turnir_recica_25_26_disciplinska.html","porteras":"prijatelski_turnir_recica_25_26_golmanki.html","clasificacion":null},"translations":{"scorers":"Стрелци","cards":"Дисциплинска","goalkeepers":"Статистика на голманки","see_all":"Целосна листа","stadium":"Стадион","no_matches_in_round":"Нема регистрирани настани."}}</script>
   </body>
 </html>
 </html>
