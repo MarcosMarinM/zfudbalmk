@@ -497,36 +497,36 @@ th { background-color: #f2f2f2; }
   font-size: 0.95em;
 }
 
-.stat-pos {
+.comp-hub-stat-row .stat-pos {
   font-weight: bold;
   color: #6c757d;
   text-align: right;
 }
 
-.stat-player-team {
+.comp-hub-stat-row .stat-player-team {
   display: flex;
   flex-direction: column;
 }
-.stat-player {
+.comp-hub-stat-row .stat-player {
   font-weight: bold;
   color: #CC0000;
   text-decoration: none;
 }
-.stat-player:hover { text-decoration: underline; }
+.comp-hub-stat-row .stat-player:hover { text-decoration: underline; }
 
-.stat-team {
+.comp-hub-stat-row .stat-team {
   font-size: 0.9em;
   color: #6c757d;
   text-decoration: none;
 }
-.stat-team:hover { text-decoration: underline; }
+.comp-hub-stat-row .stat-team:hover { text-decoration: underline; }
 
-.stat-value {
+.comp-hub-stat-row .stat-value {
   font-weight: 700;
   font-size: 1.1em;
   text-align: right;
 }
-.stat-value.cards {
+.comp-hub-stat-row .stat-value.cards {
   font-size: 0.9em;
   font-weight: 500;
   white-space: nowrap;

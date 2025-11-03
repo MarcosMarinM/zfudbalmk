@@ -2510,6 +2510,304 @@ th { background-color: #f2f2f2; }
 .td-away .schedule-team-in-table { justify-content: flex-start; }
 .schedule-score-in-table { display: inline-block; font-size: 1em; font-weight: 700; background-color: #f1f2f3; padding: 5px 10px; border-radius: 4px; white-space: nowrap; }
 
+
+
+/* --- 1. Contenedor Principal (Grid) --- */
+.comp-hub-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Columna izquierda más ancha */
+  gap: 30px;
+  margin-top: 25px;
+  margin-bottom: 40px;
+}
+
+.comp-hub-left-col, .comp-hub-right-col, .comp-hub-bottom-row {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* --- 2. Encabezados de Sección --- */
+.comp-hub-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.comp-hub-section-title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.comp-hub-see-all-link {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #6c757d;
+  text-decoration: none;
+}
+.comp-hub-see-all-link:hover {
+  color: #CC0000;
+}
+
+
+/* --- 3. Columna Izquierda (Jornadas/Schedule) --- */
+.comp-hub-schedule-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+#comp-hub-round-title {
+  margin: 0;
+  padding: 0;
+  font-size: 1.1em;
+  color: #CC0000;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.comp-hub-nav-arrow {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  color: #333;
+  font-size: 1.5em;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  padding: 0;
+}
+.comp-hub-nav-arrow:hover {
+  background-color: #ced4da;
+}
+.comp-hub-nav-arrow:disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.comp-hub-match-row {
+  display: block;
+  text-decoration: none;
+  color: #212529;
+  padding: 15px;
+  border-bottom: 1px solid #f1f1f1;
+  transition: background-color 0.2s;
+}
+.comp-hub-match-row.clickable:hover {
+  background-color: #f8f9fa;
+}
+.comp-hub-match-row:last-child {
+  border-bottom: none;
+}
+
+.comp-hub-match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.comp-hub-team-home, .comp-hub-team-away {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.comp-hub-team-home { justify-content: flex-end; text-align: right; }
+.comp-hub-team-away { justify-content: flex-start; text-align: left; }
+
+.comp-hub-team-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.comp-hub-match-score {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #CC0000;
+  background-color: #f1f2f3;
+  padding: 5px 12px;
+  border-radius: 4px;
+  margin: 0 15px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.comp-hub-match-time {
+  font-size: 0.85em;
+  color: #6c757d;
+  text-align: center;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.comp-hub-match-date { padding-right: 10px; }
+.comp-hub-match-stadium { flex-grow: 1; text-align: right; }
+
+.comp-hub-no-matches, .comp-hub-no-stats {
+  padding: 20px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* --- 4. Columna Derecha (Estadísticas) --- */
+.comp-hub-right-col {
+  padding: 0; /* El padding lo tendrán los contenedores internos */
+  overflow: hidden; /* Para que los bordes redondeados afecten a los hijos */
+}
+
+.comp-hub-stats-tabs {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.comp-hub-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 12px 5px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.comp-hub-tab-btn:hover {
+  color: #333;
+}
+.comp-hub-tab-btn.active {
+  color: #CC0000;
+  border-bottom-color: #CC0000;
+}
+
+.comp-hub-tab-panel {
+  display: none;
+  padding: 15px;
+}
+.comp-hub-tab-panel.active {
+  display: block;
+}
+
+.comp-hub-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comp-hub-stat-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.95em;
+}
+
+.comp-hub-stat-row .stat-pos {
+  font-weight: bold;
+  color: #6c757d;
+  text-align: right;
+}
+
+.comp-hub-stat-row .stat-player-team {
+  display: flex;
+  flex-direction: column;
+}
+.comp-hub-stat-row .stat-player {
+  font-weight: bold;
+  color: #CC0000;
+  text-decoration: none;
+}
+.comp-hub-stat-row .stat-player:hover { text-decoration: underline; }
+
+.comp-hub-stat-row .stat-team {
+  font-size: 0.9em;
+  color: #6c757d;
+  text-decoration: none;
+}
+.comp-hub-stat-row .stat-team:hover { text-decoration: underline; }
+
+.comp-hub-stat-row .stat-value {
+  font-weight: 700;
+  font-size: 1.1em;
+  text-align: right;
+}
+.comp-hub-stat-row .stat-value.cards {
+  font-size: 0.9em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stats-see-all {
+  display: block;
+  text-align: right;
+  margin-top: 15px;
+  font-size: 0.9em;
+}
+
+
+/* --- 5. Fila Inferior (Clasificación) --- */
+.comp-hub-bottom-row {
+  grid-column: 1 / -1; /* Ocupa todo el ancho */
+  padding: 20px;
+}
+/* La tabla de clasificación ya tiene estilos globales, así que no necesita más */
+
+
+/* --- 6. Media Queries (Responsividad) --- */
+@media (max-width: 850px) {
+  .comp-hub-container {
+    grid-template-columns: 1fr; /* Apilar columnas en móvil */
+  }
+  
+  .comp-hub-match-teams {
+    font-size: 1em;
+  }
+  .comp-hub-match-score {
+    margin: 0 10px;
+    font-size: 1em;
+  }
+  
+  .comp-hub-tab-btn {
+    font-size: 0.8em;
+  }
+}
+/* --- 7. Estilos para Títulos Clicables (Añadido) --- */
+.comp-hub-title-link {
+  text-decoration: none;
+  color: inherit; /* Hereda el color normal del título */
+}
+.comp-hub-title-link:hover .comp-hub-section-title {
+  color: #CC0000; /* Hace que el título se vuelva rojo al pasar el ratón */
+  text-decoration: underline;
+}
+
+/* Ocultar el enlace "see all" en la sección de clasificación (ya que el título es el enlace) */
+.comp-hub-bottom-row .comp-hub-see-all-link {
+  display: none;
+}
+
 )"
 
 
@@ -2525,11 +2823,15 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeSearch();
   initializeMobileMenu();
   initializePlayerProfileInteractions();
-  
+ 
   // INICIALIZADOR ESPECÍFICO PARA LA PÁGINA DE EQUIPO
-  // Se ejecuta solo si encuentra el contenedor de datos de la página de equipo.
   if (document.getElementById('team-page-data')) {
     initializeTeamProfilePage();
+  }
+  
+  // ¡NUEVO! INICIALIZADOR PARA EL HUB DE COMPETICIÓN
+  if (document.getElementById('competition-hub-data')) {
+    initializeCompetitionHub();
   }
 });
 
@@ -2952,6 +3254,216 @@ scheduleTableContainer.innerHTML = html;
   if(rosterSeason && rosterSeason.options.length > 0) updateRosterCategoryFilter();
   if(scheduleSeason && scheduleSeason.options.length > 0) updateScheduleCategoryFilter();
 }
+
+// ==============================================================================
+// == INICIO: FUNCIONES PARA EL NUEVO "HUB" DE COMPETICIÓN (v1)
+// ==============================================================================
+
+function initializeCompetitionHub() {
+  const dataEl = document.getElementById('competition-hub-data');
+  if (!dataEl) return;
+
+  const hubData = JSON.parse(dataEl.textContent);
+  const t = hubData.translations;
+  let currentRoundIndex = 0;
+
+  // --- Elementos del DOM ---
+  const roundTitleEl = document.getElementById('comp-hub-round-title');
+  const matchesContainerEl = document.getElementById('comp-hub-schedule-matches');
+  const prevRoundBtn = document.getElementById('comp-hub-prev-round');
+  const nextRoundBtn = document.getElementById('comp-hub-next-round');
+  
+  const statsTabsContainer = document.querySelector('.comp-hub-stats-tabs');
+  const statsTabButtons = document.querySelectorAll('.comp-hub-tab-btn');
+  const statsPanels = {
+    goleadoras: document.getElementById('comp-hub-stats-content-goleadoras'),
+    tarjetas: document.getElementById('comp-hub-stats-content-tarjetas'),
+    porteras: document.getElementById('comp-hub-stats-content-porteras')
+  };
+
+  // --- 1. Función para renderizar una Jornada (Schedule) ---
+  function renderScheduleRound(roundIndex) {
+    const roundData = hubData.jornadas_data[roundIndex];
+    if (!roundData) return;
+
+    // Actualizar título y estado de flechas
+    roundTitleEl.textContent = roundData.jornada_nombre;
+    prevRoundBtn.disabled = (roundIndex === 0);
+    nextRoundBtn.disabled = (roundIndex === hubData.jornadas_data.length - 1);
+    
+    // Limpiar y llenar partidos
+    matchesContainerEl.innerHTML = '';
+    if (roundData.partidos.length === 0) {
+      matchesContainerEl.innerHTML = `<p class="comp-hub-no-matches">${t.no_matches_in_round || 'No matches for this round.'}</p>`;
+      return;
+    }
+
+    roundData.partidos.forEach(partido => {
+      const matchLink = partido.id_partido 
+        ? `../natprevari/${partido.id_partido}.html` 
+        : '#';
+      const isClickable = partido.id_partido ? 'clickable' : '';
+      const stadiumInfo = partido.lugar_lang ? `<div class="comp-hub-match-stadium">${t.stadium || 'Stadium'}: ${partido.lugar_lang}</div>` : '';
+      const dateInfo = partido.fecha ? `<div class="comp-hub-match-date">${partido.fecha}</div>` : '';
+
+      const matchHtml = `
+        <a class="comp-hub-match-row ${isClickable}" href="${matchLink}">
+          <div class="comp-hub-match-time">
+            ${dateInfo}
+            ${stadiumInfo}
+          </div>
+          <div class="comp-hub-match-teams">
+            <span class="comp-hub-team-home">
+              ${partido.local_lang} <img src="${partido.local_logo_path}" class="comp-hub-team-logo">
+            </span>
+            <span class="comp-hub-match-score">${partido.resultado}</span>
+            <span class="comp-hub-team-away">
+              <img src="${partido.visitante_logo_path}" class="comp-hub-team-logo"> ${partido.visitante_lang}
+            </span>
+          </div>
+        </a>
+      `;
+      matchesContainerEl.innerHTML += matchHtml;
+    });
+  }
+
+  // --- 2. Función para renderizar tablas de Estadísticas (Top 5) ---
+  function renderStatsTable(tabName) {
+    let data, container, html;
+    
+    switch (tabName) {
+      case 'goleadoras':
+        data = hubData.stats_goleadoras;
+        container = statsPanels.goleadoras;
+        html = `<div class="comp-hub-stats-list">`;
+        if (data.length > 0) {
+          data.forEach(item => {
+            html += `
+              <div class="comp-hub-stat-row">
+                <span class="stat-pos">${item.Pos}</span>
+                <div class="stat-player-team">
+                  <a class="stat-player" href="${item.link_jugadora}">${item.PlayerName}</a>
+                  <a class="stat-team" href="${item.link_equipo}">${item.TeamName}</a>
+                </div>
+                <span class="stat-value">${item.Goals}</span>
+              </div>`;
+          });
+          html += `</div><a class="comp-hub-see-all-link stats-see-all" href="${hubData.links.goleadoras}">${t.see_all} ></a>`;
+        } else {
+          html = `<p class="comp-hub-no-stats">${t.no_matches_in_round}</p>`; // Reutilizar traducción
+        }
+        container.innerHTML = html;
+        break;
+
+      case 'tarjetas':
+        data = hubData.stats_tarjetas;
+        container = statsPanels.tarjetas;
+        html = `<div class="comp-hub-stats-list">`;
+        if (data.length > 0) {
+          data.forEach(item => {
+            html += `
+              <div class="comp-hub-stat-row">
+                <span class="stat-pos">${item.Pos}</span>
+                <div class="stat-player-team">
+                  <a class="stat-player" href="${item.link_jugadora}">${item.PlayerName}</a>
+                  <a class="stat-team" href="${item.link_equipo}">${item.TeamName}</a>
+                </div>
+                <span class="stat-value cards">
+                  <span class="card-icon-table yellow"></span> ${item.YellowCards}
+                  <span class="card-icon-table red"></span> ${item.RedCards}
+                </span>
+              </div>`;
+          });
+          html += `</div><a class="comp-hub-see-all-link stats-see-all" href="${hubData.links.tarjetas}">${t.see_all} ></a>`;
+        } else {
+          html = `<p class="comp-hub-no-stats">${t.no_matches_in_round}</p>`;
+        }
+        container.innerHTML = html;
+        break;
+
+      case 'porteras':
+        data = hubData.stats_porteras;
+        container = statsPanels.porteras;
+        html = `<div class="comp-hub-stats-list">`;
+         if (data.length > 0) {
+          data.forEach(item => {
+            html += `
+              <div class="comp-hub-stat-row">
+                <span class="stat-pos">${item.Pos}</span>
+                <div class="stat-player-team">
+                  <a class="stat-player" href="${item.link_jugadora}">${item.PlayerName}</a>
+                  <a class="stat-team" href="${item.link_equipo}">${item.TeamName}</a>
+                </div>
+                <span class="stat-value">${parseFloat(item.GA90).toFixed(2)}</span>
+              </div>`;
+          });
+          html += `</div><a class="comp-hub-see-all-link stats-see-all" href="${hubData.links.porteras}">${t.see_all} ></a>`;
+        } else {
+          html = `<p class="comp-hub-no-stats">${t.no_matches_in_round}</p>`;
+        }
+        container.innerHTML = html;
+        break;
+    }
+  }
+
+  // --- 3. Event Listeners ---
+  
+  // Navegación de Jornadas
+  prevRoundBtn.addEventListener('click', () => {
+    if (currentRoundIndex > 0) {
+      currentRoundIndex--;
+      renderScheduleRound(currentRoundIndex);
+    }
+  });
+
+  nextRoundBtn.addEventListener('click', () => {
+    if (currentRoundIndex < hubData.jornadas_data.length - 1) {
+      currentRoundIndex++;
+      renderScheduleRound(currentRoundIndex);
+    }
+  });
+
+  // Pestañas de Estadísticas (SÓLO SI EXISTEN)
+if (statsTabsContainer) { // <--- AÑADE ESTA LÍNEA
+  statsTabsContainer.addEventListener('click', (e) => {
+    const targetButton = e.target.closest('.comp-hub-tab-btn');
+    if (!targetButton) return;
+
+    const tabName = targetButton.dataset.tab;
+
+    // Quitar 'active' a todos
+    statsTabButtons.forEach(btn => btn.classList.remove('active'));
+    Object.values(statsPanels).forEach(panel => panel.classList.remove('active'));
+
+    // Poner 'active' al clickado
+    targetButton.classList.add('active');
+    if (statsPanels[tabName]) {
+      statsPanels[tabName].classList.add('active');
+    }
+
+    // Renderizar (o re-renderizar) el contenido de la pestaña
+    renderStatsTable(tabName);
+  });
+} // <--- Y AÑADE ESTA LLAVE DE CIERRE
+
+
+  // --- 4. Inicialización ---
+  // Encontrar la jornada por defecto
+  const defaultRoundRaw = hubData.jornada_por_defecto_raw;
+  let initialIndex = 0;
+  if (defaultRoundRaw) {
+    const foundIndex = hubData.jornadas_data.findIndex(j => j.jornada_id_raw === defaultRoundRaw);
+    if (foundIndex !== -1) {
+      initialIndex = foundIndex;
+    }
+  }
+  currentRoundIndex = initialIndex;
+  
+  // Renderizar estado inicial
+  renderScheduleRound(currentRoundIndex);
+  renderStatsTable('goleadoras'); // Renderizar la primera pestaña por defecto
+}
+
 )"
 
 
@@ -2966,13 +3478,13 @@ message("style.css and script.js files saved to the assets folder.")
 # regeneran. Esto es útil para hacer pruebas rápidas en una sección.
 # Para una construcción completa, todos deben estar en TRUE.
 
-GENERAR_PAGINAS_ESTATICAS <- TRUE   # Incluye: Inicio, Archivo, Lista de Equipos/Jugadoras, Acerca de
+GENERAR_PAGINAS_ESTATICAS <- FALSE   # Incluye: Inicio, Archivo, Lista de Equipos/Jugadoras, Acerca de
 GENERAR_PAGINAS_COMPETICION <- TRUE   # Todas las páginas de competiciones (menús y tablas)
-GENERAR_PERFILES_PARTIDO <- TRUE      # Perfiles individuales para cada partido
-GENERAR_PERFILES_JUGADORA <- TRUE     # Perfiles individuales para cada jugadora
-GENERAR_PERFILES_EQUIPO <- TRUE       # Perfiles individuales para cada equipo
-GENERAR_PERFILES_ARBITRO <- TRUE      # Perfiles individuales para cada árbitro
-GENERAR_PERFILES_ESTADIO <- TRUE      # Perfiles individuales para cada estadio
+GENERAR_PERFILES_PARTIDO <- F      # Perfiles individuales para cada partido
+GENERAR_PERFILES_JUGADORA <- F     # Perfiles individuales para cada jugadora
+GENERAR_PERFILES_EQUIPO <- F       # Perfiles individuales para cada equipo
+GENERAR_PERFILES_ARBITRO <- F      # Perfiles individuales para cada árbitro
+GENERAR_PERFILES_ESTADIO <- F      # Perfiles individuales para cada estadio
 
 # ============================================================================ #
 
@@ -3559,8 +4071,423 @@ if (hubo_cambios) {
             tabla_sanciones_comp <- stats_sanciones_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(!is.na(!!player_name_col_sym)) %>% select(Pos, id, PlayerName = !!player_name_col_sym, TeamNames_mk, YellowCards, RedCards); contenido_sanciones <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("disciplinary_title"), "-", comp_nombre_current_lang)), tags$table(tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(HTML("<span class='card-yellow'></span>")), tags$th(HTML("<span class='card-red'></span>")))), tags$tbody(if(nrow(tabla_sanciones_comp) > 0) { map(1:nrow(tabla_sanciones_comp), function(j) { s <- tabla_sanciones_comp[j,]; tags$tr(tags$td(s$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(s$id, ".html")), s$PlayerName)), tags$td({ teams_mk <- str_split(s$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df_lang %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); nombre_archivo_final <- paste0(generar_id_seguro(team_name_mk), ".png"); if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) { nombre_archivo_final <- "NOLOGO.png" }; ruta_relativa_logo_html <- file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final); team_element <- tags$span(class="team-cell", tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = team_name), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) }}; tagList(team_tags) }), tags$td(s$YellowCards), tags$td(s$RedCards)) })} else { tags$tr(tags$td(colspan="5", t("disciplinary_no_cards_message"))) })))
             nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_traducidos$sanciones, ".html"); save_html(crear_pagina_html(contenido_sanciones, paste(t("disciplinary_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_sanciones)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_sanciones, class="menu-button", t("disciplinary_title"))
           }
-          contenido_menu_final <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(comp_nombre_current_lang), tags$div(class="menu-container", lista_botones_menu))
-          save_html(crear_pagina_html(contenido_menu_final, comp_nombre_current_lang, "../..", script_contraseña_lang, current_page_id = "competitions"), file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html")))
+          
+          # ========================================================================
+          # == INICIO: NUEVO CÓDIGO PARA GENERAR EL "HUB" DE LA COMPETICIÓN (v2 - Corregido)
+          # ========================================================================
+          message(paste0("        > Generating new Competition Hub for: ", comp_id))
+          
+          # --- 0. Definir nombres de archivo por adelantado para evitar errores ---
+          # Esto garantiza que las variables existan, incluso si la lógica anterior las omitió (p.ej., en una Copa)
+          nombre_archivo_goleadoras <- paste0(comp_id, "_", nombres_archivos_traducidos$goleadoras, ".html")
+          nombre_archivo_sanciones <- paste0(comp_id, "_", nombres_archivos_traducidos$sanciones, ".html")
+          nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html") # Nombre hardcodeado del script original
+          nombre_archivo_clasif <- paste0(comp_id, "_", nombres_archivos_traducidos$clasificacion, ".html")
+          
+          # --- 1. Definir helper de logo ---
+          # Esta función helper obtiene la ruta relativa al logo DESDE la página del hub.
+          get_logo_path_relativo <- function(nombre_equipo_mk) {
+            nombre_archivo_final <- paste0(generar_id_seguro(nombre_equipo_mk), ".png")
+            if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_final))) {
+              nombre_archivo_final <- "NOLOGO.png"
+            }
+            # La ruta debe ser relativa desde '.../natprevaruvanja/comp.html' -> '../../assets/logos/...'
+            file.path("..", "..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo_final)
+          }
+          
+          # --- 2. Preparar datos de JORNADAS (Schedule) ---
+          partidos_jugados <- partidos_comp %>% filter(!is.na(id_partido))
+          jornada_por_defecto_raw <- NA_character_ # La jornada 'raw' (ej: "1", "1/2")
+          
+          if (nrow(partidos_jugados) > 0) {
+            # Usar la misma lógica de ordenación que la página de calendario
+            jornadas_jugadas_ordenadas <- data.frame(jornada = unique(partidos_jugados$jornada)) %>%
+              filter(!is.na(jornada)) %>%
+              mutate(order_key = case_when(
+                str_detect(jornada, "1/64") ~ 1,
+                str_detect(jornada, "1/32") ~ 2,
+                str_detect(jornada, "1/16") ~ 3,
+                str_detect(jornada, "1/8") ~ 4,
+                str_detect(jornada, "1/4") ~ 5,
+                str_detect(jornada, "1/2") ~ 6,
+                str_detect(jornada, "3/4") ~ 6.5,
+                str_detect(jornada, "Ф$|ф$|финале") ~ 7,
+                str_detect(jornada, "^\\d+$") ~ as.numeric(jornada),
+                TRUE ~ 99
+              )) %>%
+              arrange(desc(order_key)) # Ordenamos de la más reciente a la más antigua
+            
+            if (nrow(jornadas_jugadas_ordenadas) > 0) {
+              jornada_por_defecto_raw <- jornadas_jugadas_ordenadas$jornada[1]
+            }
+          }
+          
+          # Si AÚN no hay jornada por defecto (ej. no se ha jugado ningún partido),
+          # simplemente coger la primera jornada del calendario (ej. "1")
+          if (is.na(jornada_por_defecto_raw) && length(jornadas_comp) > 0) {
+            jornada_por_defecto_raw <- jornadas_comp[1]
+          }
+          
+          # Formatear TODAS las jornadas para el JSON
+          datos_jornadas_json <- map(jornadas_comp, function(j) {
+            partidos_jornada <- partidos_comp %>% filter(jornada == j) %>% arrange(local)
+            
+            partidos_data <- map(1:nrow(partidos_jornada), function(k) {
+              partido <- partidos_jornada[k,]
+              is_placeholder_match <- is.na(partido$id_partido)
+              
+              local_name <- entidades_df_lang$current_lang_name[match(partido$local, entidades_df_lang$original_name)]
+              visitante_name <- entidades_df_lang$current_lang_name[match(partido$visitante, entidades_df_lang$original_name)]
+              
+              resultado_texto <- if (is_placeholder_match) {
+                partido$hora %||% " - "
+              } else {
+                res_base <- paste(partido$goles_local, "-", partido$goles_visitante)
+                if (!is.na(partido$penales_local)) res_base <- sprintf("%s (%s - %s)", res_base, partido$penales_local, partido$penales_visitante)
+                if (isTRUE(partido$es_resultado_oficial)) res_base <- paste(res_base, "*")
+                res_base
+              }
+              
+              # Obtener estadio (lugar)
+              lugar_partido_mk <- estadio_info_mk <- estadios_df %>% filter(id_partido == partido$id_partido) %>% pull(estadio)
+              lugar_partido_lang <- if(length(lugar_partido_mk) > 0) {
+                (entidades_df_lang %>% filter(original_name == lugar_partido_mk[1]))$current_lang_name[1]
+              } else {
+                NA_character_
+              }
+              
+              list(
+                id_partido = partido$id_partido,
+                local_lang = local_name,
+                visitante_lang = visitante_name,
+                local_logo_path = get_logo_path_relativo(partido$local),
+                visitante_logo_path = get_logo_path_relativo(partido$visitante),
+                resultado = resultado_texto,
+                lugar_lang = lugar_partido_lang %||% NA_character_,
+                fecha = partido$fecha %||% NA_character_
+              )
+            })
+            
+            list(
+              jornada_nombre = if(is_cup || is_friendly_comp) as.character(j) else paste(t("round_prefix"), j),
+              jornada_id_raw = j,
+              partidos = partidos_data
+            )
+          })
+          
+          # --- 3. Preparar datos de ESTADÍSTICAS (Top 5) ---
+          
+          # Goleadoras
+          datos_top_goleadoras <- stats_goleadoras_por_comp_df %>%
+            filter(competicion_id == comp_id) %>%
+            left_join(jugadoras_lang_df, by = "id") %>%
+            # Corrección para obtener el nombre del equipo en el idioma correcto
+            left_join(entidades_df_lang, by = c("TeamNames_mk" = "original_name")) %>%
+            filter(!is.na(PlayerName)) %>%
+            select(Pos, PlayerName, TeamName = current_lang_name, Goals, id_jugadora = id, id_equipo_mk = TeamNames_mk) %>%
+            head(5) %>%
+            # Añadir rutas de enlace para el JS
+            mutate(
+              link_jugadora = file.path("..", nombres_carpetas_relativos$jugadoras, paste0(id_jugadora, ".html")),
+              link_equipo = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(id_equipo_mk), ".html"))
+            )
+          
+          # Tarjetas
+          datos_top_tarjetas <- stats_sanciones_por_comp_df %>%
+            filter(competicion_id == comp_id) %>%
+            left_join(jugadoras_lang_df, by = "id") %>%
+            left_join(entidades_df_lang, by = c("TeamNames_mk" = "original_name")) %>%
+            filter(!is.na(PlayerName)) %>%
+            select(Pos, PlayerName, TeamName = current_lang_name, YellowCards, RedCards, id_jugadora = id, id_equipo_mk = TeamNames_mk) %>%
+            head(5) %>%
+            mutate(
+              link_jugadora = file.path("..", nombres_carpetas_relativos$jugadoras, paste0(id_jugadora, ".html")),
+              link_equipo = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(id_equipo_mk), ".html"))
+            )
+          
+          # Calcular los minutos totales posibles por equipo en esta competición
+          minutos_totales_equipo_comp <- partidos_df %>%
+            filter(
+              competicion_nombre == comp_info$competicion_nombre,
+              competicion_temporada == comp_info$competicion_temporada,
+              !is.na(id_partido) # Solo partidos con acta
+            ) %>%
+            select(local, visitante, duracion_partido) %>%
+            pivot_longer(cols = c(local, visitante), names_to = "tipo_equipo", values_to = "equipo") %>%
+            group_by(equipo) %>%
+            summarise(minutos_totales_posibles = sum(duracion_partido, na.rm = TRUE), .groups = 'drop')
+          
+          # Porteras (La nueva pestaña que pediste)
+          datos_top_porteras <- stats_porteras_por_comp_df %>%
+            filter(competicion_id == comp_id) %>% # 1. Filtrar por competición
+            
+            # 2. Unir con los minutos totales para calcular el %
+            left_join(minutos_totales_equipo_comp, by = c("TeamName_mk" = "equipo")) %>%
+            
+            # 3. Calcular el porcentaje de minutos jugados
+            mutate(pct_minutos = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Minutes / minutos_totales_posibles) * 100, 0)) %>%
+            
+            # 4. *** ¡EL FILTRO CLAVE PEDIDO POR EL USUARIO! ***
+            #    Usamos >= 50 para replicar la lógica original de la página completa.
+            filter(pct_minutos >= 50) %>% 
+            
+            # 5. Continuar con el resto de la lógica...
+            left_join(jugadoras_lang_df, by = "id") %>%
+            left_join(entidades_df_lang, by = c("TeamName_mk" = "original_name")) %>%
+            filter(!is.na(PlayerName)) %>%
+            # Ordenar por GA90 (asc), luego CS (desc), luego Minutos (desc)
+            arrange(GA90, desc(CS), desc(Minutes)) %>%
+            mutate(Pos = row_number()) %>%
+            select(Pos, PlayerName, TeamName = current_lang_name, GA90, CS, id_jugadora = id, id_equipo_mk = TeamName_mk) %>%
+            head(5) %>%
+            mutate(
+              link_jugadora = file.path("..", nombres_carpetas_relativos$jugadoras, paste0(id_jugadora, ".html")),
+              link_equipo = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(id_equipo_mk), ".html"))
+            )
+          
+          # --- 4. Preparar datos de CLASIFICACIÓN (HTML completo) ---
+          # Reutilizamos la lógica exacta que ya tenías para la página de 'Tabela'
+          # para mantener la coherencia (incluyendo los estilos de colores).
+          bloque_html_clasificacion <- if (!is_cup && !is_friendly_comp && !is_placeholder_only_comp) {
+            
+            clasificacion_df_comp_raw <- stats_clasificacion_por_comp_df %>% filter(competicion_id == comp_id)
+            clave_estilo_comp <- paste(comp_info$competicion_nombre, comp_info$competicion_temporada)
+            
+            contenido_tabla <- if (nrow(clasificacion_df_comp_raw) == 0) {
+              tags$p(t("standings_no_data_message"))
+            } else {
+              clasificacion_df_comp_raw_lang <- clasificacion_df_comp_raw %>%
+                left_join(entidades_df_lang, by = c("team" = "original_name")) %>%
+                select(Pos, team_lang = current_lang_name, P, W, D, L, GF, GA, GD, Pts)
+              
+              nombres_neutros <- c("Pos", "team_lang", "P", "W", "D", "L", "GF", "GA", "GD", "Pts")
+              claves_traduccion <- c("standings_pos", "standings_team", "standings_p", "standings_w", "standings_d", "standings_l", "standings_gf", "standings_ga", "standings_gd", "standings_pts")
+              nombres_traducidos <- sapply(claves_traduccion, t, USE.NAMES = FALSE)
+              mapa_nombres_col <- setNames(as.list(nombres_neutros), nombres_traducidos)
+              
+              clasificacion_df_comp <- clasificacion_df_comp_raw_lang %>% rename(!!!mapa_nombres_col)
+              
+              estilos_comp <- estilos_clasificacion_data[[clave_estilo_comp]]
+              
+              tagList(
+                tags$table(
+                  tags$thead(tags$tr(map(names(clasificacion_df_comp), tags$th))),
+                  tags$tbody(map(1:nrow(clasificacion_df_comp), function(j) {
+                    fila <- clasificacion_df_comp[j,]
+                    nombre_equipo <- fila[[t("standings_team")]]
+                    posicion_equipo <- fila[[t("standings_pos")]]
+                    nombre_equipo_original <- clasificacion_df_comp_raw$team[j]
+                    
+                    # Usamos la nueva función helper para la ruta del logo
+                    ruta_relativa_logo_html <- get_logo_path_relativo(nombre_equipo_original)
+                    
+                    regla_actual <- NULL
+                    if (!is.null(estilos_comp)) {
+                      regla_match <- estilos_comp$reglas %>% filter(puesto == posicion_equipo)
+                      if (nrow(regla_match) > 0) {
+                        regla_actual <- regla_match[1,]
+                      }
+                    }
+                    
+                    tags$tr(map(seq_along(fila), function(k) {
+                      cell_value <- fila[[k]]
+                      col_name <- names(fila)[k]
+                      if (col_name == t("standings_pos") && !is.null(regla_actual)) {
+                        tags$td(style = paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;"), cell_value)
+                      } else if (col_name == t("standings_team")) {
+                        tags$td(
+                          class = "team-cell",
+                          tags$img(class="team-logo", src = ruta_relativa_logo_html, alt = nombre_equipo),
+                          tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), cell_value)
+                        )
+                      } else {
+                        tags$td(cell_value)
+                      }
+                    }))
+                  }))
+                ),
+                if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) {
+                  tags$div(
+                    class = "legend",
+                    map(estilos_comp$leyenda, function(item_leyenda) {
+                      tags$div(
+                        class = "legend-item",
+                        tags$span(class = "legend-color-box", style = paste0("background-color: ", item_leyenda$color, ";")),
+                        tags$span(t(item_leyenda$texto_key))
+                      )
+                    })
+                  )
+                }
+              )
+            }
+            
+            # Devolver el bloque completo con su título
+            tagList(
+              tags$div(class = "comp-hub-section-header",
+                       # El título H3 ahora está DENTRO del enlace
+                       tags$a(href = nombre_archivo_clasif, class="comp-hub-title-link",
+                              tags$h3(class="comp-hub-section-title", t("standings_title"))
+                       )
+                       # No hay enlace "see all" a la derecha
+              ),
+              contenido_tabla
+            )
+            
+          } else {
+            NULL # No mostrar bloque de clasificación para Copas o Amistosos
+          }
+          
+          # --- 5. Incrustar todo en un paquete JSON ---
+          datos_completos_hub_json <- toJSON(list(
+            jornadas_data = datos_jornadas_json,
+            jornada_por_defecto_raw = jornada_por_defecto_raw,
+            stats_goleadoras = datos_top_goleadoras,
+            stats_tarjetas = datos_top_tarjetas,
+            stats_porteras = datos_top_porteras,
+            links = list(
+              goleadoras = nombre_archivo_goleadoras,
+              tarjetas = nombre_archivo_sanciones,
+              porteras = nombre_archivo_porteras,
+              clasificacion = if(!is.null(bloque_html_clasificacion)) nombre_archivo_clasif else NA_character_
+            ),
+            translations = list(
+              scorers = t("scorers_title"),
+              cards = t("disciplinary_title"),
+              goalkeepers = t("goalkeepers_title"),
+              # *** CORRECCIÓN DE TRADUCCIÓN AQUÍ ***
+              see_all = t("see_full_list"),
+              stadium = t("match_stadium"),
+              no_matches_in_round = t("match_timeline_no_events") # Reutilizamos esta traducción
+            )
+          ), auto_unbox = TRUE, na = "null") # Asegurarse que los NA se conviertan en null
+          
+          script_datos_hub_json <- tags$script(
+            id = "competition-hub-data",
+            type = "application/json",
+            HTML(datos_completos_hub_json)
+          )
+          
+          # --- 6. Construir el esqueleto HTML del Hub ---
+          # ¡NUEVA LÓGICA! Usar un diseño diferente para Ligas vs Copas
+          if (is_cup) {
+            # --- 6a. Esqueleto SIMPLIFICADO para Copas ---
+            # (Solo Jornadas y Goleadoras, como pediste)
+            
+            # Preparar el panel de Goleadoras (ya calculado en Sección 3)
+            panel_goleadoras_copa <- tagList(
+              tags$div(class = "comp-hub-section-header",
+                       tags$h3(class="comp-hub-section-title", t("scorers_title")),
+                       # *** CORRECCIÓN DE TRADUCCIÓN AQUÍ ***
+                       tags$a(href = nombre_archivo_goleadoras, class="comp-hub-see-all-link", paste0(t("all_results_link"), " >"))
+              ),
+              # El JS llenará esta lista
+              tags$div(id = "comp-hub-stats-content-goleadoras", class = "comp-hub-tab-panel active")
+            )
+            
+            contenido_hub_final <- tagList(
+              crear_botones_navegacion(path_to_lang_root = ".."),
+              tags$h2(comp_nombre_current_lang),
+              
+              # Contenedor principal (Grid) - 2 columnas
+              tags$div(class = "comp-hub-left-col",
+                       tags$div(class = "comp-hub-section-header",
+                                # El título H3 ahora está DENTRO del enlace
+                                tags$a(href = nombre_archivo_partidos, class="comp-hub-title-link",
+                                       tags$h3(class="comp-hub-section-title", t("schedule_title"))
+                                ),
+                                # El enlace "see all" se mantiene
+                                tags$a(href = nombre_archivo_partidos, class="comp-hub-see-all-link", paste0(t("all_results_link"), " >"))
+                       ),
+                                tags$div(class = "comp-hub-schedule-nav",
+                                         tags$button(id = "comp-hub-prev-round", class = "comp-hub-nav-arrow", "‹"),
+                                         tags$h4(id = "comp-hub-round-title", ""),
+                                         tags$button(id = "comp-hub-next-round", class = "comp-hub-nav-arrow", "›")
+                                ),
+                                tags$div(id = "comp-hub-schedule-matches") # JS llenará esto
+                       ),
+                       
+                       # Columna Derecha (Solo Goleadoras)
+                       tags$div(class = "comp-hub-right-col",
+                                panel_goleadoras_copa
+                       )
+              )
+              # No hay .comp-hub-bottom-row para Copas
+      
+            
+          } else {
+            # --- 6b. Esqueleto COMPLETO para Ligas (el que ya teníamos) ---
+            
+            contenido_hub_final <- tagList(
+              crear_botones_navegacion(path_to_lang_root = ".."),
+              tags$h2(comp_nombre_current_lang),
+              
+              # Contenedor principal (Grid)
+              tags$div(class = "comp-hub-container",
+                       # Columna Izquierda (Jornadas)
+                       tags$div(class = "comp-hub-left-col",
+                                tags$div(class = "comp-hub-section-header",
+                                         # El título H3 ahora está DENTRO del enlace
+                                         tags$a(href = nombre_archivo_partidos, class="comp-hub-title-link",
+                                                tags$h3(class="comp-hub-section-title", t("schedule_title"))
+                                         ),
+                                         # El enlace "see all" se mantiene
+                                         tags$a(href = nombre_archivo_partidos, class="comp-hub-see-all-link", paste0(t("all_results_link"), " >"))
+                                ),
+                                tags$div(class = "comp-hub-schedule-nav",
+                                         tags$button(id = "comp-hub-prev-round", class = "comp-hub-nav-arrow", "‹"),
+                                         tags$h4(id = "comp-hub-round-title", ""),
+                                         tags$button(id = "comp-hub-next-round", class = "comp-hub-nav-arrow", "›")
+                                ),
+                                tags$div(id = "comp-hub-schedule-matches") # JS llenará esto
+                       ),
+                       
+                       # Columna Derecha (Estadísticas con Pestañas)
+                       tags$div(class = "comp-hub-right-col",
+                                tags$nav(class = "comp-hub-stats-tabs",
+                                         tags$button(class = "comp-hub-tab-btn active", "data-tab" = "goleadoras", t("scorers_title")),
+                                         # *** CORRECCIÓN DEL TYPO AQUÍ ***
+                                         tags$button(class = "comp-hub-tab-btn", "data-tab" = "tarjetas", t("disciplinary_title")),
+                                         tags$button(class = "comp-hub-tab-btn", "data-tab" = "porteras", t("goalkeepers_title"))
+                                ),
+                                # Contenedores para cada pestaña
+                                tags$div(id = "comp-hub-stats-content-goleadoras", class = "comp-hub-tab-panel active"),
+                                tags$div(id = "comp-hub-stats-content-tarjetas", class = "comp-hub-tab-panel"),
+                                tags$div(id = "comp-hub-stats-content-porteras", class = "comp-hub-tab-panel")
+                       )
+              ),
+              
+              # Fila Inferior (Clasificación)
+              tags$div(class = "comp-hub-bottom-row",
+                       bloque_html_clasificacion # El HTML de la clasificación se inserta directamente
+              )
+            )
+          } # Fin del if/else (is_cup)
+          
+          
+          # --- 7. Guardar la página ---
+          pagina_hub_final <- crear_pagina_html(
+            contenido_hub_final,
+            comp_nombre_current_lang,
+            "../..",
+            script_contraseña_lang,
+            current_page_id = "competitions"
+          )
+          
+          # Añadir el JSON al body
+          pagina_hub_final$children[[2]]$children <- tagAppendChildren(
+            pagina_hub_final$children[[2]]$children,
+            script_datos_hub_json
+          )
+          
+          save_html(
+            pagina_hub_final,
+            file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, paste0(comp_id, ".html"))
+          )
+          
+          # ========================================================================
+          # == FIN: NUEVO CÓDIGO PARA GENERAR EL "HUB" DE LA COMPETICIÓN (v2 - Corregido)
+          # ========================================================================
+          
         }
       })
     }
