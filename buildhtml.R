@@ -1849,16 +1849,7 @@ stats_sanciones_por_comp_df <- apariciones_df %>%
 ### 11.3. Calculate Goalkeeper Statistics by Competition
 porteras_apariciones_df <- apariciones_df %>%
   filter(es_portera == TRUE, !is.na(id), minutos_jugados > 0) %>%
-  select(id, id_partido, equipo, competicion_nombre, competicion_temporada, min_entra, min_sale, minutos_jugados) %>%
-  # 11.3.a. AÑADIDO: Unir con partidos_df para obtener la duración nominal del partido.
-  left_join(partidos_df %>% select(id_partido, duracion_partido), by = "id_partido") %>%
-  # 11.3.b. AÑADIDO: Crear un 'min_sale_efectivo' para la imputación de goles.
-  mutate(
-    # Si min_sale == duracion_partido (ej. 90), significa que la portera jugó hasta el final.
-    # Extendemos su tiempo a "200" para capturar goles en tiempo añadido (ej. 93).
-    # Si min_sale < duracion_partido (ej. 75), fue sustituida, por lo que usamos el minuto real.
-    min_sale_efectivo = if_else(min_sale == duracion_partido, 200, min_sale) 
-  )
+  select(id, id_partido, equipo, competicion_nombre, competicion_temporada, min_entra, min_sale, minutos_jugados)
 
 goles_recibidos_df <- goles_df_unificado %>%
   left_join(partidos_df %>% select(id_partido, local, visitante), by = "id_partido") %>%
@@ -1868,8 +1859,7 @@ goles_recibidos_df <- goles_df_unificado %>%
 # 11.3.1. Step 1: Calculate Goals Against (GA) explicitly and robustly.
 stats_ga <- porteras_apariciones_df %>%
   left_join(goles_recibidos_df, by = c("id_partido", "equipo" = "equipo_conceded"), relationship = "many-to-many") %>%
-  # 11.3.c. CORRECCIÓN: Usar 'min_sale_efectivo' (200 si jugó hasta el final) en lugar de 'min_sale' (90).
-  filter(!is.na(minuto_gol) & minuto_gol >= min_entra & minuto_gol <= min_sale_efectivo) %>%
+  filter(!is.na(minuto_gol) & minuto_gol >= min_entra & minuto_gol <= min_sale) %>%
   group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
   summarise(GA = n(), .groups = 'drop')
 
@@ -4408,21 +4398,21 @@ if (hubo_cambios) {
                                 # El enlace "see all" se mantiene
                                 tags$a(href = nombre_archivo_partidos, class="comp-hub-see-all-link", paste0(t("all_results_link"), " >"))
                        ),
-                                tags$div(class = "comp-hub-schedule-nav",
-                                         tags$button(id = "comp-hub-prev-round", class = "comp-hub-nav-arrow", "‹"),
-                                         tags$h4(id = "comp-hub-round-title", ""),
-                                         tags$button(id = "comp-hub-next-round", class = "comp-hub-nav-arrow", "›")
-                                ),
-                                tags$div(id = "comp-hub-schedule-matches") # JS llenará esto
+                       tags$div(class = "comp-hub-schedule-nav",
+                                tags$button(id = "comp-hub-prev-round", class = "comp-hub-nav-arrow", "‹"),
+                                tags$h4(id = "comp-hub-round-title", ""),
+                                tags$button(id = "comp-hub-next-round", class = "comp-hub-nav-arrow", "›")
                        ),
-                       
-                       # Columna Derecha (Solo Goleadoras)
-                       tags$div(class = "comp-hub-right-col",
-                                panel_goleadoras_copa
-                       )
+                       tags$div(id = "comp-hub-schedule-matches") # JS llenará esto
+              ),
+              
+              # Columna Derecha (Solo Goleadoras)
+              tags$div(class = "comp-hub-right-col",
+                       panel_goleadoras_copa
               )
-              # No hay .comp-hub-bottom-row para Copas
-      
+            )
+            # No hay .comp-hub-bottom-row para Copas
+            
             
           } else {
             # --- 6b. Esqueleto COMPLETO para Ligas (el que ya teníamos) ---
