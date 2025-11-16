@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Liga e Parë e Femrave 18/19</title>
+  <link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<html lang="sq">
+  <body data-search-results-title="Rezultatet e kërkimit për" data-no-search-results-msg="Nuk u gjetën rezultate për" data-search-prompt-msg="Ju lutemi, shkruani të paktën 2 karaktere për të kërkuar.">
+    <div class="container">
+      <div class="language-selector" style="text-align: right; margin-bottom: 15px; font-size: 0.9em;">
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/sq/&#39;, &#39;/mk/&#39;); return false;">[ Македонски ]</a>
+         
+        <span style="font-weight: bold; color: #333;">[ Shqip ]</span>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/sq/&#39;, &#39;/es/&#39;); return false;">[ Castellano ]</a>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/sq/&#39;, &#39;/en/&#39;); return false;">[ English ]</a>
+      </div>
+      <div class="header-main">
+        <h1>
+          <a href="../index.html" style="color: inherit; text-decoration: none;">@zfudbalmk</a>
+        </h1>
+        <nav class="navbar">
+          <a href="javascript:void(0);" class="hamburger-icon" id="hamburger-icon">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </a>
+          <ul class="nav-links">
+            <li class="close-btn-li">
+              <a href="javascript:void(0);" id="close-nav-btn">×</a>
+            </li>
+            <li>
+              <a class="" href="../index.html">Ballina</a>
+            </li>
+            <li class="dropdown">
+              <a href="javascript:void(0)" class="dropbtn active">Garat  &#9662;</a>
+              <div class="dropdown-content">
+                <a href="../natprevaruvanja/kup_na_rm_za_zeni_25_26.html">Kupa e RM për Femra 25/26</a>
+                <a href="../natprevaruvanja/prva_zfl_25_26.html">Liga e Parë e Femrave 25/26</a>
+                <a href="../natprevaruvanja/vtora_zfl_25_26.html">Liga e Dytë e Femrave 25/26</a>
+                <a href="../natprevaruvanja/mladinska_zenska_fudbalska_liga_25_26.html">Liga e të Rejave 25/26</a>
+                <a href="../natprevaruvanja/kadetska_zenska_fudbalska_liga_25_26.html">Liga e Kadeteve 25/26</a>
+                <hr/>
+                <a href="../arhiva.html">Arkiva</a>
+              </div>
+            </li>
+            <li>
+              <a class="" href="../natprevaruvanja/reprezentacija.html">Kombëtarja</a>
+            </li>
+            <li>
+              <a class="" href="../fudbalerki.html">Futbolliste</a>
+            </li>
+            <li>
+              <a class="" href="../klubovi.html">Klubet</a>
+            </li>
+            <li>
+              <a class="" href="../za-zfudbalmk.html">Rreth</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="search-container">
+        <form action="#" onsubmit="showSearchResults(); return false;">
+          <input type="text" id="search-input" class="search-input" placeholder="Kërko lojtare, ekip, gjyqtar, stadium..." onkeyup="handleSearchInput(event)"/>
+          <button type="submit" class="search-button">Kërko</button>
+        </form>
+        <div id="search-suggestions"></div>
+      </div>
+      <div id="main-content">
+        <h2>Liga e Parë e Femrave 18/19</h2>
+        <div class="comp-hub-container">
+          <div class="comp-hub-left-col">
+            <div class="comp-hub-section-header">
+              <a href="prva_zfl_18_19_raspored.html" class="comp-hub-title-link">
+                <h3 class="comp-hub-section-title">Orari</h3>
+              </a>
+              <a href="prva_zfl_18_19_raspored.html" class="comp-hub-see-all-link">Të gjitha rezultatet &gt;</a>
+            </div>
+            <div class="comp-hub-schedule-nav">
+              <button id="comp-hub-prev-round" class="comp-hub-nav-arrow">‹</button>
+              <h4 id="comp-hub-round-title"></h4>
+              <button id="comp-hub-next-round" class="comp-hub-nav-arrow">›</button>
+            </div>
+            <div id="comp-hub-schedule-matches"></div>
+          </div>
+          <div class="comp-hub-right-col">
+            <nav class="comp-hub-stats-tabs">
+              <button class="comp-hub-tab-btn active" data-tab="goleadoras">Golashënuesit</button>
+              <button class="comp-hub-tab-btn" data-tab="tarjetas">Evidenca disiplinore</button>
+              <button class="comp-hub-tab-btn" data-tab="porteras">Statistikat e portiereve</button>
+            </nav>
+            <div id="comp-hub-stats-content-goleadoras" class="comp-hub-tab-panel active"></div>
+            <div id="comp-hub-stats-content-tarjetas" class="comp-hub-tab-panel"></div>
+            <div id="comp-hub-stats-content-porteras" class="comp-hub-tab-panel"></div>
+          </div>
+        </div>
+        <div class="comp-hub-bottom-row">
+          <div class="comp-hub-section-header">
+            <a href="prva_zfl_18_19_tabela.html" class="comp-hub-title-link">
+              <h3 class="comp-hub-section-title">Tabela</h3>
+            </a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Poz.</th>
+                <th>Ekipi</th>
+                <th>N</th>
+                <th>F</th>
+                <th>B</th>
+                <th>H</th>
+                <th>GSh</th>
+                <th>GP</th>
+                <th>GD</th>
+                <th>P.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/skopje_2014.png" alt="Skopje 2014"/>
+                  <a href="../timovi/skopje_2014.html">Skopje 2014</a>
+                </td>
+                <td>23</td>
+                <td>23</td>
+                <td>0</td>
+                <td>0</td>
+                <td>159</td>
+                <td>7</td>
+                <td>152</td>
+                <td>69</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/istatov.png" alt="Istatov"/>
+                  <a href="../timovi/istatov.html">Istatov</a>
+                </td>
+                <td>21</td>
+                <td>19</td>
+                <td>1</td>
+                <td>1</td>
+                <td>184</td>
+                <td>7</td>
+                <td>177</td>
+                <td>58</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/as_junajted.png" alt="AS United"/>
+                  <a href="../timovi/as_junajted.html">AS United</a>
+                </td>
+                <td>22</td>
+                <td>16</td>
+                <td>2</td>
+                <td>4</td>
+                <td>88</td>
+                <td>20</td>
+                <td>68</td>
+                <td>50</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/brera_tiverija.png" alt="Brera Tiverija"/>
+                  <a href="../timovi/brera_tiverija.html">Brera Tiverija</a>
+                </td>
+                <td>21</td>
+                <td>14</td>
+                <td>2</td>
+                <td>5</td>
+                <td>103</td>
+                <td>25</td>
+                <td>78</td>
+                <td>44</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/kamenica_sasa.png" alt="Kamenica Sasa"/>
+                  <a href="../timovi/kamenica_sasa.html">Kamenica Sasa</a>
+                </td>
+                <td>22</td>
+                <td>13</td>
+                <td>1</td>
+                <td>8</td>
+                <td>74</td>
+                <td>47</td>
+                <td>27</td>
+                <td>40</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/top_gol.png" alt="Top Gol"/>
+                  <a href="../timovi/top_gol.html">Top Gol</a>
+                </td>
+                <td>26</td>
+                <td>12</td>
+                <td>3</td>
+                <td>11</td>
+                <td>112</td>
+                <td>82</td>
+                <td>30</td>
+                <td>39</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/recica.png" alt="Rečica"/>
+                  <a href="../timovi/recica.html">Rečica</a>
+                </td>
+                <td>25</td>
+                <td>12</td>
+                <td>3</td>
+                <td>10</td>
+                <td>66</td>
+                <td>56</td>
+                <td>10</td>
+                <td>39</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/cevitana.png" alt="Cevitana"/>
+                  <a href="../timovi/cevitana.html">Cevitana</a>
+                </td>
+                <td>25</td>
+                <td>12</td>
+                <td>2</td>
+                <td>11</td>
+                <td>86</td>
+                <td>61</td>
+                <td>25</td>
+                <td>38</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/tetova_2017.png" alt="Tetova 2017"/>
+                  <a href="../timovi/tetova_2017.html">Tetova 2017</a>
+                </td>
+                <td>19</td>
+                <td>10</td>
+                <td>1</td>
+                <td>8</td>
+                <td>77</td>
+                <td>54</td>
+                <td>23</td>
+                <td>31</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/kocani.png" alt="Kočani"/>
+                  <a href="../timovi/kocani.html">Kočani</a>
+                </td>
+                <td>22</td>
+                <td>5</td>
+                <td>3</td>
+                <td>14</td>
+                <td>45</td>
+                <td>106</td>
+                <td>-61</td>
+                <td>18</td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/atletiko.png" alt="Atletiko"/>
+                  <a href="../timovi/atletiko.html">Atletiko</a>
+                </td>
+                <td>24</td>
+                <td>5</td>
+                <td>3</td>
+                <td>16</td>
+                <td>37</td>
+                <td>113</td>
+                <td>-76</td>
+                <td>18</td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/ljuboten.png" alt="Ljuboten"/>
+                  <a href="../timovi/ljuboten.html">Ljuboten</a>
+                </td>
+                <td>25</td>
+                <td>2</td>
+                <td>3</td>
+                <td>20</td>
+                <td>16</td>
+                <td>160</td>
+                <td>-144</td>
+                <td>9</td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/borec.png" alt="Borec"/>
+                  <a href="../timovi/borec.html">Borec</a>
+                </td>
+                <td>23</td>
+                <td>2</td>
+                <td>2</td>
+                <td>19</td>
+                <td>9</td>
+                <td>149</td>
+                <td>-140</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/plackovica.png" alt="Plačkovica"/>
+                  <a href="../timovi/plackovica.html">Plačkovica</a>
+                </td>
+                <td>18</td>
+                <td>0</td>
+                <td>0</td>
+                <td>18</td>
+                <td>4</td>
+                <td>173</td>
+                <td>-169</td>
+                <td>0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script defer src="../../assets/script.js"></script>
+    <script id="competition-hub-data" type="application/json">{"jornadas_data":[{"jornada_nombre":"Raundi 1","jornada_id_raw":"1","partidos":[{"id_partido":"1472003","local_lang":"AS United","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"7 - 2","lugar_lang":"Gradski Stadion Struga","fecha":"25.08.2018"},{"id_partido":"1472007","local_lang":"Atletiko","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"1 - 20","lugar_lang":"Igralište Pavel Šatev","fecha":"25.08.2018"},{"id_partido":"1472004","local_lang":"Borec","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 15","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"25.08.2018"},{"id_partido":"1472008","local_lang":"Kočani","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"0 - 5","lugar_lang":"Gradski Stadion Kočani","fecha":"25.08.2018"},{"id_partido":"1472006","local_lang":"Plačkovica","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"0 - 15","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"26.08.2018"},{"id_partido":"1472005","local_lang":"Tetova 2017","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"12 - 0","lugar_lang":"Igralište Vo Bogovinje, S. Bogovinje","fecha":"25.08.2018"},{"id_partido":"1472002","local_lang":"Cevitana","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"0 - 6","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"25.08.2018"}]},{"jornada_nombre":"Raundi 2","jornada_id_raw":"2","partidos":[{"id_partido":"1472012","local_lang":"Ljuboten","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"5 - 0","lugar_lang":"Ams Tetovo","fecha":"05.09.2018"},{"id_partido":"1472009","local_lang":"Brera Tiverija","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"10 - 1","lugar_lang":"Stadion Filip Lazarevski","fecha":"05.09.2018"},{"id_partido":"1472010","local_lang":"Istatov","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"14 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"05.09.2018"},{"id_partido":"1472011","local_lang":"Kamenica Sasa","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"1 - 0","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"05.09.2018"},{"id_partido":"1472013","local_lang":"Skopje 2014","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"9 - 1","lugar_lang":"Igralište Jovan Mandarovski","fecha":"05.09.2018"},{"id_partido":"1472014","local_lang":"Top Gol","visitante_lang":"Borec","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"9 - 0","lugar_lang":"Igralište Pavel Šatev","fecha":"06.09.2018"},{"id_partido":"1472015","local_lang":"Cevitana","visitante_lang":"AS United","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"1 - 3","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"05.09.2018"}]},{"jornada_nombre":"Raundi 3","jornada_id_raw":"3","partidos":[{"id_partido":"1472016","local_lang":"AS United","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"0 - 0","lugar_lang":"Gradski Stadion Struga","fecha":"08.09.2018"},{"id_partido":"1472020","local_lang":"Atletiko","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"5 - 1","lugar_lang":"Igralište Pavel Šatev","fecha":"09.09.2018"},{"id_partido":"1472017","local_lang":"Borec","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"0 - 6","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"09.09.2018"},{"id_partido":"1472019","local_lang":"Plačkovica","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 8","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"09.09.2018"},{"id_partido":"1472022","local_lang":"Rečica","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 5","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"08.09.2018"},{"id_partido":"1472018","local_lang":"Tetova 2017","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"4 - 5","lugar_lang":"Ams Tetovo","fecha":"08.09.2018"}]},{"jornada_nombre":"Raundi 4","jornada_id_raw":"4","partidos":[{"id_partido":"1472025","local_lang":"Ljuboten","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"1 - 9","lugar_lang":"Stadion \"Leska\" S.forino-Gostivar, S.forino","fecha":"15.09.2018"},{"id_partido":"1472029","local_lang":"AS United","visitante_lang":"Borec","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"8 - 0","lugar_lang":"Gradski Stadion Struga","fecha":"15.09.2018"},{"id_partido":"1472023","local_lang":"Brera Tiverija","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 1","lugar_lang":"Stadion Filip Lazarevski","fecha":"15.09.2018"},{"id_partido":"1472024","local_lang":"Kamenica Sasa","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"2 - 1","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"16.09.2018"},{"id_partido":"1472026","local_lang":"Skopje 2014","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"7 - 1","lugar_lang":"Igralište Jovan Mandarovski","fecha":"15.09.2018"},{"id_partido":"1472027","local_lang":"Top Gol","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"12 - 0","lugar_lang":"Igralište Pavel Šatev","fecha":"15.09.2018"},{"id_partido":"1472028","local_lang":"Cevitana","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"5 - 2","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"16.09.2018"}]},{"jornada_nombre":"Raundi 5","jornada_id_raw":"5","partidos":[{"id_partido":"1472033","local_lang":"Atletiko","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"2 - 8","lugar_lang":"Igralište Pavel Šatev","fecha":"29.09.2018"},{"id_partido":"1472030","local_lang":"Borec","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"0 - 10","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"29.09.2018"},{"id_partido":"1472036","local_lang":"Istatov","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"8 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"10.10.2018"},{"id_partido":"1472034","local_lang":"Kočani","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 7","lugar_lang":"Gradski Stadion Kočani","fecha":"29.09.2018"},{"id_partido":"1472032","local_lang":"Plačkovica","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"0 - 9","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"29.09.2018"},{"id_partido":"1472035","local_lang":"Rečica","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"6 - 0","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"29.09.2018"},{"id_partido":"1472031","local_lang":"Tetova 2017","visitante_lang":"AS United","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"2 - 1","lugar_lang":"Ams Tetovo","fecha":"29.09.2018"}]},{"jornada_nombre":"Raundi 6","jornada_id_raw":"6","partidos":[{"id_partido":"1472038","local_lang":"Ljuboten","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 16","lugar_lang":"Ams Tetovo","fecha":"13.10.2018"},{"id_partido":"1472043","local_lang":"Borec","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"0 - 10","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"14.10.2018"},{"id_partido":"1472039","local_lang":"Skopje 2014","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"3 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"14.10.2018"},{"id_partido":"1472040","local_lang":"Top Gol","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"6 - 1","lugar_lang":"Igralište Pavel Šatev","fecha":"13.10.2018"},{"id_partido":"1472041","local_lang":"Cevitana","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"5 - 1","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"14.10.2018"}]},{"jornada_nombre":"Raundi 7","jornada_id_raw":"7","partidos":[{"id_partido":"1472046","local_lang":"Atletiko","visitante_lang":"AS United","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"0 - 6","lugar_lang":"Igralište Pavel Šatev","fecha":"20.10.2018"},{"id_partido":"1472049","local_lang":"Istatov","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"1 - 2","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"20.10.2018"},{"id_partido":"1472050","local_lang":"Kamenica Sasa","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"10 - 0","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"20.10.2018"},{"id_partido":"1472047","local_lang":"Kočani","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"3 - 3","lugar_lang":"Gradski Stadion Kočani","fecha":"20.10.2018"},{"id_partido":"1472045","local_lang":"Plačkovica","visitante_lang":"Borec","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"1 - 3","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"20.10.2018"},{"id_partido":"1472048","local_lang":"Rečica","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"1 - 1","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"20.10.2018"},{"id_partido":"1472044","local_lang":"Tetova 2017","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"3 - 2","lugar_lang":"Ams Tetovo","fecha":"20.10.2018"}]},{"jornada_nombre":"Raundi 8","jornada_id_raw":"8","partidos":[{"id_partido":"1472055","local_lang":"AS United","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"6 - 0","lugar_lang":"Gradski Stadion Struga","fecha":"27.10.2018"},{"id_partido":"1472056","local_lang":"Borec","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 6","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"27.10.2018"},{"id_partido":"1472051","local_lang":"Brera Tiverija","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"10 - 0","lugar_lang":"Stadion Filip Lazarevski","fecha":"27.10.2018"},{"id_partido":"1472052","local_lang":"Skopje 2014","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"6 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"28.10.2018"},{"id_partido":"1472053","local_lang":"Top Gol","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 11","lugar_lang":"Igralište Pavel Šatev","fecha":"27.10.2018"},{"id_partido":"1472054","local_lang":"Cevitana","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"4 - 1","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"28.10.2018"}]},{"jornada_nombre":"Raundi 9","jornada_id_raw":"9","partidos":[{"id_partido":"1472064","local_lang":"Ljuboten","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 10","lugar_lang":"Stadion S.negotino-Pološko, S.negotino-Pološko/Gostivar","fecha":"03.11.2018"},{"id_partido":"1472059","local_lang":"Atletiko","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"1 - 6","lugar_lang":"Crno Buki, Crno Buki","fecha":"03.11.2018"},{"id_partido":"1472062","local_lang":"Istatov","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"1 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"03.11.2018"},{"id_partido":"1472063","local_lang":"Kamenica Sasa","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"3 - 2","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"04.11.2018"},{"id_partido":"1472060","local_lang":"Kočani","visitante_lang":"Borec","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"5 - 1","lugar_lang":"Gradski Stadion Kočani","fecha":"03.11.2018"},{"id_partido":"1472058","local_lang":"Plačkovica","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"0 - 15","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"03.11.2018"},{"id_partido":"1472061","local_lang":"Rečica","visitante_lang":"AS United","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"0 - 0","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"03.11.2018"}]},{"jornada_nombre":"Raundi 10","jornada_id_raw":"10","partidos":[{"id_partido":"1472068","local_lang":"AS United","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 3","lugar_lang":"Gradski Stadion Struga","fecha":"11.11.2018"},{"id_partido":"1472069","local_lang":"Borec","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"0 - 7","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"10.11.2018"},{"id_partido":"1472065","local_lang":"Brera Tiverija","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 3","lugar_lang":"Stadion Filip Lazarevski","fecha":"10.11.2018"},{"id_partido":"1472071","local_lang":"Plačkovica","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"2 - 4","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"10.11.2018"},{"id_partido":"1472070","local_lang":"Tetova 2017","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"3 - 2","lugar_lang":"Igralište  Vo  S. Kamenjane, S. Kamenjane , Bogovinje","fecha":"10.11.2018"},{"id_partido":"1472066","local_lang":"Top Gol","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"12 - 1","lugar_lang":"Igralište Pavel Šatev","fecha":"11.11.2018"},{"id_partido":"1472067","local_lang":"Cevitana","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"3 - 2","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"10.11.2018"}]},{"jornada_nombre":"Raundi 11","jornada_id_raw":"11","partidos":[{"id_partido":"1472077","local_lang":"Ljuboten","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"2 - 8","lugar_lang":"Igralište Brvenica, S. Brvenica - Brvenica","fecha":"18.11.2018"},{"id_partido":"1472072","local_lang":"Atletiko","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"0 - 4","lugar_lang":"Igralište Pavel Šatev","fecha":"17.11.2018"},{"id_partido":"1472076","local_lang":"Kamenica Sasa","visitante_lang":"AS United","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"1 - 4","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"18.11.2018"},{"id_partido":"1472073","local_lang":"Kočani","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"11 - 0","lugar_lang":"Gradski Stadion Kočani","fecha":"17.11.2018"},{"id_partido":"1472074","local_lang":"Rečica","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"1 - 0","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"18.11.2018"},{"id_partido":"1472078","local_lang":"Skopje 2014","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"9 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"18.11.2018"}]},{"jornada_nombre":"Raundi 12","jornada_id_raw":"12","partidos":[{"id_partido":"1472081","local_lang":"AS United","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"4 - 0","lugar_lang":"Stadion As Junajted","fecha":"24.11.2018"},{"id_partido":"1472085","local_lang":"Atletiko","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"2 - 2","lugar_lang":"Igralište Pavel Šatev","fecha":"24.11.2018"},{"id_partido":"1472082","local_lang":"Borec","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"0 - 5","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"25.11.2018"},{"id_partido":"1472079","local_lang":"Brera Tiverija","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"6 - 3","lugar_lang":"Stadion Filip Lazarevski","fecha":"24.11.2018"},{"id_partido":"1472084","local_lang":"Plačkovica","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"0 - 8","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"25.11.2018"},{"id_partido":"1472080","local_lang":"Cevitana","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 4","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"24.11.2018"}]},{"jornada_nombre":"Raundi 13","jornada_id_raw":"13","partidos":[{"id_partido":"1472090","local_lang":"Ljuboten","visitante_lang":"Borec","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"1 - 1","lugar_lang":"Ams Tetovo","fecha":"01.12.2018"},{"id_partido":"1472088","local_lang":"Istatov","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"30 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"01.12.2018"},{"id_partido":"1472089","local_lang":"Kamenica Sasa","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"3 - 2","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"01.12.2018"},{"id_partido":"1472086","local_lang":"Kočani","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"1 - 4","lugar_lang":"Gradski Stadion Kočani","fecha":"01.12.2018"},{"id_partido":"1472087","local_lang":"Rečica","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"5 - 0","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"01.12.2018"},{"id_partido":"1472091","local_lang":"Skopje 2014","visitante_lang":"AS United","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"3 - 2","lugar_lang":"Igralište Jovan Mandarovski","fecha":"02.12.2018"},{"id_partido":"1472092","local_lang":"Top Gol","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"2 - 2","lugar_lang":"Igralište Pavel Šatev","fecha":"01.12.2018"}]},{"jornada_nombre":"Raundi 14","jornada_id_raw":"14","partidos":[{"id_partido":"1472096","local_lang":"Ljuboten","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"1 - 1","lugar_lang":"Igralište Brvenica, S. Brvenica - Brvenica","fecha":"10.03.2019"},{"id_partido":"1472093","local_lang":"Brera Tiverija","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"3 - 1","lugar_lang":"Stadion Filip Lazarevski","fecha":"09.03.2019"},{"id_partido":"1472098","local_lang":"Istatov","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"8 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"09.03.2019"},{"id_partido":"1472097","local_lang":"Kamenica Sasa","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"8 - 0","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"10.03.2019"},{"id_partido":"1472099","local_lang":"Rečica","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"2 - 0","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"09.03.2019"},{"id_partido":"1472095","local_lang":"Skopje 2014","visitante_lang":"Borec","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"7 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"09.03.2019"},{"id_partido":"1472094","local_lang":"Top Gol","visitante_lang":"AS United","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"3 - 5","lugar_lang":"Igralište Pavel Šatev","fecha":"09.03.2019"}]},{"jornada_nombre":"Raundi 15","jornada_id_raw":"15","partidos":[{"id_partido":"1472106","local_lang":"AS United","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"5 - 1","lugar_lang":"Stadion As Junajted","fecha":"17.03.2019"},{"id_partido":"1472102","local_lang":"Atletiko","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"1 - 1","lugar_lang":"Igralište Pavel Šatev","fecha":"16.03.2019"},{"id_partido":"1472105","local_lang":"Borec","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"0 - 7","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"17.03.2019"},{"id_partido":"1472101","local_lang":"Kočani","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 12","lugar_lang":"Gradski Stadion Kočani","fecha":"16.03.2019"},{"id_partido":"1472103","local_lang":"Plačkovica","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"0 - 2","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"16.03.2019"},{"id_partido":"1472100","local_lang":"Rečica","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"1 - 4","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"17.03.2019"}]},{"jornada_nombre":"Raundi 16","jornada_id_raw":"16","partidos":[{"id_partido":"1472111","local_lang":"Ljuboten","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"0 - 1","lugar_lang":"Igralište Brvenica, S. Brvenica - Brvenica","fecha":"23.03.2019"},{"id_partido":"1472107","local_lang":"Brera Tiverija","visitante_lang":"AS United","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"1 - 2","lugar_lang":"Stadion Filip Lazarevski","fecha":"23.03.2019"},{"id_partido":"1472113","local_lang":"Istatov","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"7 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"23.03.2019"},{"id_partido":"1472112","local_lang":"Kamenica Sasa","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"5 - 2","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"24.03.2019"},{"id_partido":"1472110","local_lang":"Skopje 2014","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"13 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"24.03.2019"},{"id_partido":"1472109","local_lang":"Top Gol","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"4 - 3","lugar_lang":"Igralište Pavel Šatev","fecha":"23.03.2019"},{"id_partido":"1472108","local_lang":"Cevitana","visitante_lang":"Borec","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"8 - 0","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"23.03.2019"}]},{"jornada_nombre":"Raundi 17","jornada_id_raw":"17","partidos":[{"id_partido":"1472117","local_lang":"Atletiko","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 9","lugar_lang":"Igralište Pavel Šatev","fecha":"30.03.2019"},{"id_partido":"1472114","local_lang":"Istatov","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"2 - 2","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"10.04.2019"},{"id_partido":"1472118","local_lang":"Plačkovica","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"0 - 8","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"31.03.2019"},{"id_partido":"1472115","local_lang":"Rečica","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"4 - 1","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"31.03.2019"},{"id_partido":"1472119","local_lang":"Tetova 2017","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"2 - 8","lugar_lang":"Ams Tetovo","fecha":"31.03.2019"}]},{"jornada_nombre":"Raundi 18","jornada_id_raw":"18","partidos":[{"id_partido":"1472126","local_lang":"Ljuboten","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"1 - 3","lugar_lang":"Stadion S.čegrane, Čegrane","fecha":"13.04.2019"},{"id_partido":"1472121","local_lang":"Brera Tiverija","visitante_lang":"Borec","local_logo_path":"../../assets/logos/brera_tiverija.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"10 - 0","lugar_lang":"Stadion Filip Lazarevski","fecha":"13.04.2019"},{"id_partido":"1472125","local_lang":"Skopje 2014","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"8 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"13.04.2019"},{"id_partido":"1472124","local_lang":"Top Gol","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"7 - 0","lugar_lang":"Igralište Pavel Šatev","fecha":"13.04.2019"}]},{"jornada_nombre":"Raundi 19","jornada_id_raw":"19","partidos":[{"id_partido":"1472132","local_lang":"Atletiko","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"1 - 5","lugar_lang":"Igralište Pavel Šatev","fecha":"20.04.2019"},{"id_partido":"1472129","local_lang":"Istatov","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"11 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"20.04.2019"},{"id_partido":"1472128","local_lang":"Kamenica Sasa","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"2 - 5","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"20.04.2019"},{"id_partido":"1472131","local_lang":"Kočani","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"2 - 1","lugar_lang":"Gradski Stadion Kočani","fecha":"20.04.2019"},{"id_partido":"1472133","local_lang":"Plačkovica","visitante_lang":"AS United","local_logo_path":"../../assets/logos/plackovica.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"0 - 11","lugar_lang":"Gradski Stadion Radoviš, Radoviš","fecha":"20.04.2019"},{"id_partido":"1472130","local_lang":"Rečica","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 4","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"20.04.2019"},{"id_partido":"1472134","local_lang":"Tetova 2017","visitante_lang":"Borec","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"8 - 1","lugar_lang":"Global Arena S.dobridol, S.dobridol, Vrapčište - Gostivar","fecha":"20.04.2019"}]},{"jornada_nombre":"Raundi 20","jornada_id_raw":"20","partidos":[{"id_partido":"1472141","local_lang":"Ljuboten","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"0 - 3","lugar_lang":"Igralište Brvenica, S. Brvenica - Brvenica","fecha":"08.05.2019"},{"id_partido":"1472137","local_lang":"AS United","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"6 - 0","lugar_lang":"Gradski Stadion Struga","fecha":"02.05.2019"},{"id_partido":"1472136","local_lang":"Borec","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"3 - 0","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"02.05.2019"},{"id_partido":"1472139","local_lang":"Top Gol","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"1 - 1","lugar_lang":"Igralište Pavel Šatev","fecha":"08.05.2019"},{"id_partido":"1472138","local_lang":"Cevitana","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"10 - 2","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"02.05.2019"}]},{"jornada_nombre":"Raundi 21","jornada_id_raw":"21","partidos":[{"id_partido":"1472142","local_lang":"Ljuboten","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"0 - 7","lugar_lang":"Ams Tetovo","fecha":"05.06.2019"},{"id_partido":"1472147","local_lang":"Atletiko","visitante_lang":"Borec","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"7 - 0","lugar_lang":"Igralište Pavel Šatev","fecha":"04.05.2019"},{"id_partido":"1472144","local_lang":"Istatov","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"11 - 2","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"22.05.2019"},{"id_partido":"1472143","local_lang":"Kamenica Sasa","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"0 - 4","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"04.05.2019"},{"id_partido":"1472146","local_lang":"Kočani","visitante_lang":"AS United","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"1 - 7","lugar_lang":"Gradski Stadion Kočani","fecha":"16.05.2019"},{"id_partido":"1472145","local_lang":"Rečica","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"4 - 1","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"04.05.2019"}]},{"jornada_nombre":"Raundi 22","jornada_id_raw":"22","partidos":[{"id_partido":"1472152","local_lang":"AS United","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"2 - 0","lugar_lang":"Gradski Stadion Struga","fecha":"22.05.2019"},{"id_partido":"1472151","local_lang":"Borec","visitante_lang":"Kočani","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/kocani.png","resultado":"0 - 1","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"22.05.2019"},{"id_partido":"1472155","local_lang":"Skopje 2014","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"11 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"11.05.2019"},{"id_partido":"1472150","local_lang":"Tetova 2017","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"3 - 1","lugar_lang":"Ams Tetovo","fecha":"12.05.2019"},{"id_partido":"1472154","local_lang":"Top Gol","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"0 - 1","lugar_lang":"Igralište Pavel Šatev","fecha":"11.05.2019"},{"id_partido":"1472153","local_lang":"Cevitana","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 3","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"11.05.2019"}]},{"jornada_nombre":"Raundi 23","jornada_id_raw":"23","partidos":[{"id_partido":"1472157","local_lang":"Ljuboten","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"0 - 11","lugar_lang":"Igralište Brvenica, S. Brvenica - Brvenica","fecha":"18.05.2019"},{"id_partido":"1472159","local_lang":"Istatov","visitante_lang":"AS United","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"2 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"19.05.2019"},{"id_partido":"1472158","local_lang":"Kamenica Sasa","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"4 - 1","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"18.05.2019"},{"id_partido":"1472161","local_lang":"Kočani","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"1 - 7","lugar_lang":"Gradski Stadion Kočani","fecha":"18.05.2019"},{"id_partido":"1472156","local_lang":"Skopje 2014","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"4 - 0","lugar_lang":"Igralište Jovan Mandarovski","fecha":"18.05.2019"}]},{"jornada_nombre":"Raundi 24","jornada_id_raw":"24","partidos":[{"id_partido":"1472167","local_lang":"AS United","visitante_lang":"Kamenica Sasa","local_logo_path":"../../assets/logos/as_junajted.png","visitante_logo_path":"../../assets/logos/kamenica_sasa.png","resultado":"4 - 0","lugar_lang":"Gradski Stadion Struga","fecha":"26.05.2019"},{"id_partido":"1472166","local_lang":"Borec","visitante_lang":"Istatov","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/istatov.png","resultado":"0 - 11","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"26.05.2019"},{"id_partido":"1472165","local_lang":"Tetova 2017","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/tetova_2017.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"8 - 2","lugar_lang":"Ams Tetovo","fecha":"26.05.2019"},{"id_partido":"1472169","local_lang":"Top Gol","visitante_lang":"Skopje 2014","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/skopje_2014.png","resultado":"1 - 8","lugar_lang":"Igralište Pavel Šatev","fecha":"25.05.2019"},{"id_partido":"1472168","local_lang":"Cevitana","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"4 - 1","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"26.05.2019"}]},{"jornada_nombre":"Raundi 25","jornada_id_raw":"25","partidos":[{"id_partido":"1472172","local_lang":"Ljuboten","visitante_lang":"AS United","local_logo_path":"../../assets/logos/ljuboten.png","visitante_logo_path":"../../assets/logos/as_junajted.png","resultado":"0 - 5","lugar_lang":"Ams Tetovo","fecha":"29.05.2019"},{"id_partido":"1472174","local_lang":"Istatov","visitante_lang":"Tetova 2017","local_logo_path":"../../assets/logos/istatov.png","visitante_logo_path":"../../assets/logos/tetova_2017.png","resultado":"7 - 0","lugar_lang":"Stadion Dojransko Ezero, Nov Dojran","fecha":"30.05.2019"},{"id_partido":"1472173","local_lang":"Kamenica Sasa","visitante_lang":"Borec","local_logo_path":"../../assets/logos/kamenica_sasa.png","visitante_logo_path":"../../assets/logos/borec.png","resultado":"7 - 0","lugar_lang":"Gradski Stadion  Makedonska Kamenica, Makedonska Kamenica","fecha":"29.05.2019"},{"id_partido":"1472176","local_lang":"Kočani","visitante_lang":"Atletiko","local_logo_path":"../../assets/logos/kocani.png","visitante_logo_path":"../../assets/logos/atletiko.png","resultado":"2 - 2","lugar_lang":"Gradski Stadion Kočani","fecha":"29.05.2019"},{"id_partido":"1472175","local_lang":"Rečica","visitante_lang":"Plačkovica","local_logo_path":"../../assets/logos/recica.png","visitante_logo_path":"../../assets/logos/plackovica.png","resultado":"8 - 1","lugar_lang":"Stadion Milutin Veljkovikj-Uča","fecha":"29.05.2019"},{"id_partido":"1472171","local_lang":"Skopje 2014","visitante_lang":"Cevitana","local_logo_path":"../../assets/logos/skopje_2014.png","visitante_logo_path":"../../assets/logos/cevitana.png","resultado":"5 - 1","lugar_lang":"Igralište Jovan Mandarovski","fecha":"28.05.2019"},{"id_partido":"1472170","local_lang":"Top Gol","visitante_lang":"Brera Tiverija","local_logo_path":"../../assets/logos/top_gol.png","visitante_logo_path":"../../assets/logos/brera_tiverija.png","resultado":"1 - 4","lugar_lang":"Igralište Pavel Šatev","fecha":"30.05.2019"}]},{"jornada_nombre":"Raundi 26","jornada_id_raw":"26","partidos":[{"id_partido":"1472178","local_lang":"Atletiko","visitante_lang":"Rečica","local_logo_path":"../../assets/logos/atletiko.png","visitante_logo_path":"../../assets/logos/recica.png","resultado":"1 - 5","lugar_lang":"Igralište Pavel Šatev","fecha":"02.06.2019"},{"id_partido":"1472181","local_lang":"Borec","visitante_lang":"Ljuboten","local_logo_path":"../../assets/logos/borec.png","visitante_logo_path":"../../assets/logos/ljuboten.png","resultado":"0 - 0","lugar_lang":"Gradski Stadion   Veles, Veles","fecha":"02.06.2019"},{"id_partido":"1472183","local_lang":"Cevitana","visitante_lang":"Top Gol","local_logo_path":"../../assets/logos/cevitana.png","visitante_logo_path":"../../assets/logos/top_gol.png","resultado":"0 - 4","lugar_lang":"Igralište So Veštačka Treva (Prilep)","fecha":"02.06.2019"}]}],"jornada_por_defecto_raw":"26","stats_goleadoras":[{"Pos":1,"PlayerName":"Eli Jakovska","TeamName":"Istatov","Goals":60,"id_jugadora":"112028","id_equipo_mk":"Истатов","link_jugadora":"../igraci/112028.html","link_equipo":"../timovi/istatov.html"},{"Pos":2,"PlayerName":"Yllza Maksuti","TeamName":"AS United","Goals":43,"id_jugadora":"112015","id_equipo_mk":"АС Јунајтед","link_jugadora":"../igraci/112015.html","link_equipo":"../timovi/as_junajted.html"},{"Pos":3,"PlayerName":"Hava Mustafa","TeamName":"Tetova 2017","Goals":38,"id_jugadora":"113575","id_equipo_mk":"Тетова 2017","link_jugadora":"../igraci/113575.html","link_equipo":"../timovi/tetova_2017.html"},{"Pos":4,"PlayerName":"Teodora Šopov","TeamName":"Brera Tiverija","Goals":36,"id_jugadora":"123855","id_equipo_mk":"Брера Тиверија","link_jugadora":"../igraci/123855.html","link_equipo":"../timovi/brera_tiverija.html"},{"Pos":5,"PlayerName":"Afrodita Salihi","TeamName":"Skopje 2014","Goals":27,"id_jugadora":"112085","id_equipo_mk":"Скопје 2014","link_jugadora":"../igraci/112085.html","link_equipo":"../timovi/skopje_2014.html"}],"stats_tarjetas":[{"Pos":1,"PlayerName":"Olgica Arsova","TeamName":"Skopje 2014","YellowCards":0,"RedCards":1,"id_jugadora":"112027","id_equipo_mk":"Скопје 2014","link_jugadora":"../igraci/112027.html","link_equipo":"../timovi/skopje_2014.html"},{"Pos":2,"PlayerName":"Froska Kostova","TeamName":"Kočani","YellowCards":0,"RedCards":1,"id_jugadora":"112209","id_equipo_mk":"Кочани","link_jugadora":"../igraci/112209.html","link_equipo":"../timovi/kocani.html"},{"Pos":3,"PlayerName":"Valentina Dalčeska","TeamName":"AS United","YellowCards":6,"RedCards":0,"id_jugadora":"129587","id_equipo_mk":"АС Јунајтед","link_jugadora":"../igraci/129587.html","link_equipo":"../timovi/as_junajted.html"},{"Pos":4,"PlayerName":"Ane Bošeska","TeamName":null,"YellowCards":5,"RedCards":0,"id_jugadora":"112144","id_equipo_mk":"Цевитана / Брера Тиверија","link_jugadora":"../igraci/112144.html","link_equipo":"../timovi/cevitana_brera_tiverija.html"},{"Pos":5,"PlayerName":"Margarita Talevska","TeamName":"Top Gol","YellowCards":5,"RedCards":0,"id_jugadora":"125228","id_equipo_mk":"Топ Гол","link_jugadora":"../igraci/125228.html","link_equipo":"../timovi/top_gol.html"}],"stats_porteras":[{"Pos":1,"PlayerName":"Jovana Jovanovska","TeamName":"Rečica","GA90":1.8667,"CS":3,"id_jugadora":"990044","id_equipo_mk":"Речица","link_jugadora":"../igraci/990044.html","link_equipo":"../timovi/recica.html"},{"Pos":2,"PlayerName":"Sara Petkovska","TeamName":"Rečica","GA90":2.0398,"CS":3,"id_jugadora":"130781","id_equipo_mk":"Речица","link_jugadora":"../igraci/130781.html","link_equipo":"../timovi/recica.html"},{"Pos":3,"PlayerName":"Syarta Dervishi","TeamName":"AS United","GA90":2.241,"CS":7,"id_jugadora":"114987","id_equipo_mk":"АС Јунајтед","link_jugadora":"../igraci/114987.html","link_equipo":"../timovi/as_junajted.html"},{"Pos":4,"PlayerName":"Viktorija Pančurova","TeamName":"Brera Tiverija","GA90":2.4865,"CS":7,"id_jugadora":"111907","id_equipo_mk":"Брера Тиверија","link_jugadora":"../igraci/111907.html","link_equipo":"../timovi/brera_tiverija.html"},{"Pos":5,"PlayerName":"Froska Kostova","TeamName":"Kočani","GA90":2.6294,"CS":0,"id_jugadora":"112209","id_equipo_mk":"Кочани","link_jugadora":"../igraci/112209.html","link_equipo":"../timovi/kocani.html"}],"links":{"goleadoras":"prva_zfl_18_19_strelci.html","tarjetas":"prva_zfl_18_19_disciplinska.html","porteras":"prva_zfl_18_19_golmanki.html","clasificacion":"prva_zfl_18_19_tabela.html"},"translations":{"scorers":"Golashënuesit","cards":"Evidenca disiplinore","goalkeepers":"Statistikat e portiereve","see_all":"Listë e plotë","stadium":"Stadiumi","no_matches_in_round":"Nuk ka ngjarje të regjistruara."}}</script>
+  </body>
+</html>
+</html>

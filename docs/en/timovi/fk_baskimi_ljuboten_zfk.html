@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fk Baškimi Ljuboten/Žfk</title>
+  <link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<html lang="en">
+  <body data-search-results-title="Search results for" data-no-search-results-msg="No results found for" data-search-prompt-msg="Please enter at least 2 characters to search.">
+    <div class="container">
+      <div class="language-selector" style="text-align: right; margin-bottom: 15px; font-size: 0.9em;">
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/en/&#39;, &#39;/mk/&#39;); return false;">[ Македонски ]</a>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/en/&#39;, &#39;/sq/&#39;); return false;">[ Shqip ]</a>
+         
+        <a href="#" onclick="window.location.href = window.location.href.replace(&#39;/en/&#39;, &#39;/es/&#39;); return false;">[ Castellano ]</a>
+         
+        <span style="font-weight: bold; color: #333;">[ English ]</span>
+      </div>
+      <div class="header-main">
+        <h1>
+          <a href="../index.html" style="color: inherit; text-decoration: none;">@zfudbalmk</a>
+        </h1>
+        <nav class="navbar">
+          <a href="javascript:void(0);" class="hamburger-icon" id="hamburger-icon">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </a>
+          <ul class="nav-links">
+            <li class="close-btn-li">
+              <a href="javascript:void(0);" id="close-nav-btn">×</a>
+            </li>
+            <li>
+              <a class="" href="../index.html">Home</a>
+            </li>
+            <li class="dropdown">
+              <a href="javascript:void(0)" class="dropbtn">Competitions  &#9662;</a>
+              <div class="dropdown-content">
+                <a href="../natprevaruvanja/kup_na_rm_za_zeni_25_26.html">Macedonian Women's Cup 25/26</a>
+                <a href="../natprevaruvanja/prva_zfl_25_26.html">Women's First League 25/26</a>
+                <a href="../natprevaruvanja/vtora_zfl_25_26.html">Women's Second League 25/26</a>
+                <a href="../natprevaruvanja/mladinska_zenska_fudbalska_liga_25_26.html">Women's Youth League 25/26</a>
+                <a href="../natprevaruvanja/kadetska_zenska_fudbalska_liga_25_26.html">Women's Cadet League 25/26</a>
+                <hr/>
+                <a href="../arhiva.html">Archive</a>
+              </div>
+            </li>
+            <li>
+              <a class="" href="../natprevaruvanja/reprezentacija.html">National team</a>
+            </li>
+            <li>
+              <a class="" href="../fudbalerki.html">Players</a>
+            </li>
+            <li>
+              <a class="active" href="../klubovi.html">Clubs</a>
+            </li>
+            <li>
+              <a class="" href="../za-zfudbalmk.html">About</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="search-container">
+        <form action="#" onsubmit="showSearchResults(); return false;">
+          <input type="text" id="search-input" class="search-input" placeholder="Search for player, team, referee, stadium..." onkeyup="handleSearchInput(event)"/>
+          <button type="submit" class="search-button">Search</button>
+        </form>
+        <div id="search-suggestions"></div>
+      </div>
+      <div id="main-content">
+        <div class="team-header-container-v5">
+          <div class="team-logo-main">
+            <img src="../../assets/logos/NOLOGO.png" alt="Logo Fk Baškimi Ljuboten/Žfk"/>
+          </div>
+          <div class="team-header-info">
+            <h2 class="team-name-v3">Fk Baškimi Ljuboten/Žfk</h2>
+            <div class="info-item">
+              <div class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 400Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Z"/></svg></div>
+              <div class="info-text">
+                <span class="info-label">STADIUM</span>
+                <span class="info-value">Igralište Jovan Mandarovski</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-nav-v4">
+          <button class="tab-button-v4 active" data-tab-target="roster-panel">Roster</button>
+          <button class="tab-button-v4" data-tab-target="schedule-panel">Fixtures</button>
+        </div>
+        <div id="roster-panel" class="tab-panel active">
+          <div class="filters-and-pills-container">
+            <div class="filter-bar-v2" style="margin-bottom: 0;">
+              <div class="filter-group">
+                <label for="roster-season-filter">Season</label>
+                <select id="roster-season-filter">
+                  <option value="17/18">17/18</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="roster-category-filter">Category</label>
+                <select id="roster-category-filter"></select>
+              </div>
+            </div>
+            <div id="roster-competition-pills" class="competition-pills-container"></div>
+          </div>
+          <div id="roster-table-container"></div>
+        </div>
+        <div id="schedule-panel" class="tab-panel">
+          <div class="filters-and-pills-container">
+            <div class="filter-bar-v2" style="margin-bottom: 0;">
+              <div class="filter-group">
+                <label for="schedule-season-filter">Season</label>
+                <select id="schedule-season-filter">
+                  <option value="17/18">17/18</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="schedule-category-filter">Category</label>
+                <select id="schedule-category-filter"></select>
+              </div>
+            </div>
+            <div id="schedule-competition-pills" class="competition-pills-container"></div>
+          </div>
+          <div id="schedule-table-container"></div>
+        </div>
+      </div>
+    </div>
+    <script defer src="../../assets/script.js"></script>
+    <script id="team-page-data" type="application/json">{"roster_data":[{"id":"990062","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":13,"Played":13,"Minutes":1170,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":9,"PlayerName":"Kjendresa Abdulov","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990348","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":13,"Played":13,"Minutes":1089,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":14,"PlayerName":"Isra Ahmeti","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990343","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":12,"Played":12,"Minutes":1080,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":15,"PlayerName":"Fatime Saiti","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990349","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":13,"Played":13,"Minutes":1034,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":17,"PlayerName":"Aida Demiri","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990112","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":12,"Played":12,"Minutes":990,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":8,"PlayerName":"Sumeja Ismani","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990118","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":12,"Played":11,"Minutes":885,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":1,"PlayerName":"Fatuš Sadiki","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990345","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":13,"Played":11,"Minutes":871,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":5,"PlayerName":"Merita Hajdari","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990124","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":12,"Played":11,"Minutes":792,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":3,"PlayerName":"Zibuše Kurtiš","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990362","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":9,"Played":9,"Minutes":766,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":18,"PlayerName":"Rina Šerifi","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990358","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":9,"Played":9,"Minutes":702,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":26,"PlayerName":"Enise Sali","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990117","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":12,"Played":11,"Minutes":607,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":7,"PlayerName":"Zejnep Eljezi","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990347","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":7,"Played":7,"Minutes":602,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":10,"PlayerName":"Suera Isufi","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990350","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":8,"Played":8,"Minutes":537,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":16,"PlayerName":"Ebru Zeneli","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990344","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":9,"Played":9,"Minutes":445,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":2,"PlayerName":"Melek Avdula","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990346","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":6,"Played":6,"Minutes":415,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":6,"PlayerName":"Besa Suleman","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990113","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":5,"Played":5,"Minutes":390,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":10,"PlayerName":"Nedžmije Vljahen","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"124444","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":2,"Played":2,"Minutes":180,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":13,"PlayerName":"Ikmete Limani","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990369","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":3,"Played":3,"Minutes":135,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":45,"PlayerName":"Alejna Rustemi","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990356","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":4,"Played":1,"Minutes":90,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":1,"PlayerName":"Habibe Fasli","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"},{"id":"990368","equipo":"Фк Башкими Љуботен/жфк","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","CalledUp":1,"Played":0,"Minutes":0,"Goals":0,"Yellows":0,"Reds":0,"category_key":"category_senior","dorsal_principal":20,"PlayerName":"Anesa Džemaili","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18"}],"matches_data":[{"id_partido":"1002369","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"1","fecha":"03.09.2017","hora":"17:00","local":"Речица","visitante":"Фк Башкими Љуботен/жфк","goles_local":4,"goles_visitante":0,"es_resultado_oficial":false,"estadio":"Фудбалски Терен Речица, С.речица Куманово","arbitro_principal_nombre":"Тефику Ндерим","arbitro_asist_1_nombre":"Ефремовска Матеја","arbitro_asist_2_nombre":"Петковска Бети","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Rečica","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/recica.png","away_logo_url":"../../assets/logos/NOLOGO.png"},{"id_partido":"1002370","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"2","fecha":"10.09.2017","hora":"13:30","local":"Топ Гол","visitante":"Фк Башкими Љуботен/жфк","goles_local":10,"goles_visitante":1,"es_resultado_oficial":false,"estadio":"Игралиште Павел Шатев, Битола","arbitro_principal_nombre":"Велевачкоска Ирена","arbitro_asist_1_nombre":"Конеска Марија","arbitro_asist_2_nombre":"Маркоска Мартина","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Top Gol","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/top_gol.png","away_logo_url":"../../assets/logos/NOLOGO.png"},{"id_partido":"1002381","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"3","fecha":"17.09.2017","hora":"16:00","local":"Фк Башкими Љуботен/жфк","visitante":"Скопје 2014","goles_local":0,"goles_visitante":16,"es_resultado_oficial":false,"estadio":"Стадион „борис Трајковски“-маџари, Скопје, Скопје","arbitro_principal_nombre":"Зулбеари Фитим","arbitro_asist_1_nombre":"Љиворека Хабиљ","arbitro_asist_2_nombre":"Исмаили Музафер","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Fk Baškimi Ljuboten/Žfk","visitante_lang":"Skopje 2014","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/NOLOGO.png","away_logo_url":"../../assets/logos/skopje_2014.png"},{"id_partido":"1002383","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"4","fecha":"07.10.2017","hora":"11:00","local":"Тетова 2017","visitante":"Фк Башкими Љуботен/жфк","goles_local":8,"goles_visitante":1,"es_resultado_oficial":false,"estadio":"Игралиште На Амс Сц Тетово, Тетово","arbitro_principal_nombre":"Ивановски Филип","arbitro_asist_1_nombre":"Петковска Бети","arbitro_asist_2_nombre":"Стошиќ Славица","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Tetova 2017","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/tetova_2017.png","away_logo_url":"../../assets/logos/NOLOGO.png"},{"id_partido":"1002392","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"5","fecha":"28.10.2017","hora":"11:00","local":"Фк Башкими Љуботен/жфк","visitante":"Борец","goles_local":0,"goles_visitante":14,"es_resultado_oficial":false,"estadio":"Градски Стадион   Велес, Велес","arbitro_principal_nombre":"Абдули Бесар","arbitro_asist_1_nombre":"Крајчевска Бранка","arbitro_asist_2_nombre":"Вукадинова Ивана","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Fk Baškimi Ljuboten/Žfk","visitante_lang":"Borec","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/NOLOGO.png","away_logo_url":"../../assets/logos/borec.png"},{"id_partido":"1002396","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"6","fecha":"05.11.2017","hora":"12:00","local":"Кочани","visitante":"Фк Башкими Љуботен/жфк","goles_local":12,"goles_visitante":0,"es_resultado_oficial":false,"estadio":"Градски Стадион Кочани, Кочани","arbitro_principal_nombre":"Иванов Игор","arbitro_asist_1_nombre":"Ефремовска Матеја","arbitro_asist_2_nombre":"Стошиќ Славица","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Kočani","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/kocani.png","away_logo_url":"../../assets/logos/NOLOGO.png"},{"id_partido":"1002409","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"8","fecha":"19.11.2017","hora":"13:00","local":"Брера Тиверија","visitante":"Фк Башкими Љуботен/жфк","goles_local":10,"goles_visitante":0,"es_resultado_oficial":false,"estadio":"Општинско Фудбалско Игралиште Струмица, Струмица","arbitro_principal_nombre":"Пецов Мики","arbitro_asist_1_nombre":"Илиевска Снежана","arbitro_asist_2_nombre":"Димитровска Кристина","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Brera Tiverija","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/brera_tiverija.png","away_logo_url":"../../assets/logos/NOLOGO.png"},{"id_partido":"1002425","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"11","fecha":"10.12.2017","hora":"13:00","local":"Фк Башкими Љуботен/жфк","visitante":"Каменица Саса","goles_local":2,"goles_visitante":4,"es_resultado_oficial":false,"estadio":"Игралиште Јован Мандаровски, Пржино - Скопје","arbitro_principal_nombre":"Зулбеари Фитим","arbitro_asist_1_nombre":"Крајчевска Бранка","arbitro_asist_2_nombre":"Рајчевска Ангела","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Fk Baškimi Ljuboten/Žfk","visitante_lang":"Kamenica Sasa","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/NOLOGO.png","away_logo_url":"../../assets/logos/kamenica_sasa.png"},{"id_partido":"1002436","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"13","fecha":"31.03.2018","hora":"12:00","local":"Фк Башкими Љуботен/жфк","visitante":"Топ Гол","goles_local":0,"goles_visitante":3,"es_resultado_oficial":false,"estadio":"Игралиште Јован Мандаровски, Пржино - Скопје","arbitro_principal_nombre":"Леши Беса","arbitro_asist_1_nombre":"Адеми Бетиме","arbitro_asist_2_nombre":"Хамид Дениса","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Fk Baškimi Ljuboten/Žfk","visitante_lang":"Top Gol","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/NOLOGO.png","away_logo_url":"../../assets/logos/top_gol.png"},{"id_partido":"1002449","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"15","fecha":"14.04.2018","hora":"12:00","local":"Фк Башкими Љуботен/жфк","visitante":"Тетова 2017","goles_local":2,"goles_visitante":3,"es_resultado_oficial":false,"estadio":"Игралиште Јован Мандаровски, Пржино - Скопје","arbitro_principal_nombre":"Зулбеари Фитим","arbitro_asist_1_nombre":"Хамид Дениса","arbitro_asist_2_nombre":"Ќаили Линдијана","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Fk Baškimi Ljuboten/Žfk","visitante_lang":"Tetova 2017","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/NOLOGO.png","away_logo_url":"../../assets/logos/tetova_2017.png"},{"id_partido":"1002458","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"16","fecha":"29.04.2018","hora":"17:00","local":"Борец","visitante":"Фк Башкими Љуботен/жфк","goles_local":5,"goles_visitante":0,"es_resultado_oficial":false,"estadio":"Градски Стадион   Велес, Велес","arbitro_principal_nombre":"Исмаили Музафер","arbitro_asist_1_nombre":"Цветановиќ Тамара","arbitro_asist_2_nombre":"Вукадинова Ивана","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Borec","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/borec.png","away_logo_url":"../../assets/logos/NOLOGO.png"},{"id_partido":"1002462","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"17","fecha":"02.05.2018","hora":"12:00","local":"Фк Башкими Љуботен/жфк","visitante":"Кочани","goles_local":1,"goles_visitante":6,"es_resultado_oficial":false,"estadio":"Игралиште Јован Мандаровски, Пржино - Скопје","arbitro_principal_nombre":"Ивановски Филип","arbitro_asist_1_nombre":"Петковска Бети","arbitro_asist_2_nombre":"Цветановиќ Тамара","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"Fk Baškimi Ljuboten/Žfk","visitante_lang":"Kočani","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/NOLOGO.png","away_logo_url":"../../assets/logos/kocani.png"},{"id_partido":"1002469","competicion_nombre":"Прва ЖФЛ","competicion_temporada":"17/18","jornada":"18","fecha":"05.05.2018","hora":"12:00","local":"АС Јунајтед","visitante":"Фк Башкими Љуботен/жфк","goles_local":6,"goles_visitante":0,"es_resultado_oficial":false,"estadio":"Градски Стадион Струга, Струга","arbitro_principal_nombre":"Леши Беса","arbitro_asist_1_nombre":"Асани Љумтурие","arbitro_asist_2_nombre":"Адеми Бетиме","duracion_partido":90,"es_partido_seleccion":false,"category_key":"category_senior","category_name":"Senior","local_lang":"AS United","visitante_lang":"Fk Baškimi Ljuboten/Žfk","competicion_id":"prva_zfl_17_18","CompeticionLang":"Women's First League 17/18","home_logo_url":"../../assets/logos/as_junajted.png","away_logo_url":"../../assets/logos/NOLOGO.png"}],"translations":{"position_goalkeeper":"Goalkeeper","position_defender":"Defender","position_midfielder":"Midfielder","position_forward":"Forward","col_dorsal":"#","col_player":"Player","col_apps":"Apps","col_mins":"min","col_goals":"Goals","col_cards":"Cards","no_players_found":"No players found for the selected filters","no_matches_found":"No matches found for the selected filters","col_date":"Date","col_match":"Match","col_competition":"Competition","category_senior":"Senior","category_youth":"Youth","category_cadet":"Cadet"}}</script>
+  </body>
+</html>
+</html>
