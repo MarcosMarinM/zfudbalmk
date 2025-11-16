@@ -1859,7 +1859,20 @@ goles_recibidos_df <- goles_df_unificado %>%
 # 11.3.1. Step 1: Calculate Goals Against (GA) explicitly and robustly.
 stats_ga <- porteras_apariciones_df %>%
   left_join(goles_recibidos_df, by = c("id_partido", "equipo" = "equipo_conceded"), relationship = "many-to-many") %>%
-  filter(!is.na(minuto_gol) & minuto_gol >= min_entra & minuto_gol <= min_sale) %>%
+  
+  # PASO ADICIONAL: Normalizar el minuto del gol para la comparación.
+  # Esto convierte 903 -> 90, 452 -> 45, etc., solo para este cálculo.
+  mutate(
+    minuto_gol_normalizado = case_when(
+      minuto_gol > 900 ~ 90,
+      minuto_gol > 450 & minuto_gol < 900 ~ 45, # Para el añadido de la primera parte
+      TRUE ~ minuto_gol
+    )
+  ) %>%
+  
+  # FILTRO CORREGIDO: Usamos la nueva columna normalizada para la comparación.
+  filter(!is.na(minuto_gol) & minuto_gol_normalizado >= min_entra & minuto_gol_normalizado <= min_sale) %>%
+  
   group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
   summarise(GA = n(), .groups = 'drop')
 
@@ -3481,7 +3494,7 @@ message("style.css and script.js files saved to the assets folder.")
 GENERAR_PAGINAS_ESTATICAS <- TRUE   # Incluye: Inicio, Archivo, Lista de Equipos/Jugadoras, Acerca de
 GENERAR_PAGINAS_COMPETICION <- TRUE   # Todas las páginas de competiciones (menús y tablas)
 GENERAR_PERFILES_PARTIDO <- TRUE      # Perfiles individuales para cada partido
-GENERAR_PERFILES_JUGADORA <- TRUE     # Perfiles individuales para cada jugadora
+GENERAR_PERFILES_JUGADORA <- TRUE    # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE       # Perfiles individuales para cada equipo
 GENERAR_PERFILES_ARBITRO <- TRUE      # Perfiles individuales para cada árbitro
 GENERAR_PERFILES_ESTADIO <- TRUE      # Perfiles individuales para cada estadio
