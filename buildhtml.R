@@ -3509,6 +3509,7 @@ if (hubo_cambios) {
   # ============================================================================ #
   # ==      MAIN GENERATION LOOP: Iterates over each language and builds the site      ==
   # ============================================================================ #
+  nombres_archivos_mk <- nombres_archivos_traducidos 
   
   for (lang in IDIOMAS_SOPORTADOS) {
     
