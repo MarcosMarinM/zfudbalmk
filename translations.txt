@@ -38,8 +38,8 @@ standings_gf,ДГ,GSh,GF,GF
 standings_ga,ПГ,GP,GC,GA
 standings_gd,ГР,GD,DG,GD
 standings_pts,Бод.,P.,Pts,Pts
-gk_stats_header_over_50,"Фудбалерки со 50% или повеќе одиграни минути","Lojtaret me 50% ose më shumë minuta të luajtura","Jugadoras con al menos el 50 % de minutos jugados","Players with 50% or more of minutes played"
-gk_stats_header_under_50,"Фудбалерки со помалку од 50% одиграни минути","Lojtaret me më pak se 50% minuta të luajtura","Jugadoras con menos del 50 % de minutos jugados","Players with less than 50% of minutes played"
+gk_stats_header_over_50,"Фудбалерки со 75% или повеќе одиграни минути","Lojtaret me 75% ose më shumë minuta të luajtura","Jugadoras con al menos el 75 % de minutos jugados","Players with 75% or more of minutes played"
+gk_stats_header_under_50,"Фудбалерки со помалку од 75% одиграни минути","Lojtaret me më pak se 75% minuta të luajtura","Jugadoras con menos del 75 % de minutos jugados","Players with less than 75% of minutes played"
 no_data_in_category,Нема податоци во оваа категорија.,Nuk ka të dhëna në këtë kategori.,No hay datos en esta categoría.,No data in this category.
 stats_minutes,Минути,Minuta,Minutos,Minutes
 gk_ga,ПГ,GP,GC,GA
