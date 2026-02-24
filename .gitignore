@@ -12,3 +12,10 @@
 # Directorios de caché y temporales
 .Rapp.history
 .Rproj.user/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
