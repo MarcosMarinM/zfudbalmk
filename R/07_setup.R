@@ -11,7 +11,8 @@
 # 7.1.1. Load necessary packages for HTML report generation.
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
-  dplyr, tidyr, purrr, htmltools, stringr, jsonlite, readxl
+  dplyr, tidyr, purrr, htmltools, stringr, jsonlite, readxl,
+  future, future.apply, progressr, cli
 )
 
 

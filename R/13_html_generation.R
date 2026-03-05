@@ -2,6 +2,15 @@
 
 if (hubo_cambios) {
   
+  # --- Parallelization and progress bar setup ---
+  n_workers <- max(1, parallel::detectCores() - 1)
+  plan(multisession, workers = n_workers)
+  handlers(handler_cli(
+    format = "{cli::pb_spin} [{cli::pb_current}/{cli::pb_total}] {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
+  ))
+  pkgs_paralelos <- c("htmltools", "dplyr", "purrr", "stringr", "rlang", "jsonlite", "tidyr")
+  message(sprintf("   > Parallelization enabled with %d workers.", n_workers))
+  
   # ============================================================================ #
   # ==      MAIN GENERATION LOOP: Iterates over each language and builds the site      ==
   # ============================================================================ #
@@ -1004,10 +1013,16 @@ if (hubo_cambios) {
     
     # 13.1.23. Generate Individual Profile Pages.
     if (GENERAR_PERFILES_PARTIDO) {
-      message("   > Generating individual profiles (matches, players, etc.)...")
-      walk(1:nrow(partidos_df), function(i) {
+      indices_partidos <- which(
+        !is.na(partidos_df$id_partido) &
+        (full_rebuild_needed | partidos_df$id_partido %in% affected_match_ids)
+      )
+      n_partidos <- length(indices_partidos)
+      message(sprintf("   > Generating %d match profiles in parallel...", n_partidos))
+      if (n_partidos > 0) with_progress({
+      p_partidos <- progressor(steps = n_partidos)
+      future_lapply(indices_partidos, function(i) {
         partido_info <- partidos_df[i,]; id_p <- partido_info$id_partido
-        if (is.na(id_p) || (!full_rebuild_needed && !(id_p %in% affected_match_ids))) { return() }
         
         local_name <- (entidades_df_lang %>% filter(original_name == partido_info$local))$current_lang_name[1]
         visitante_name <- (entidades_df_lang %>% filter(original_name == partido_info$visitante))$current_lang_name[1]
@@ -1204,6 +1219,8 @@ if (hubo_cambios) {
         )
         pagina_partido_final <- crear_pagina_html(contenido_partido, paste(local_name, "vs", visitante_name), path_to_root_dir = "../..", script_contraseña_lang)
         save_html(pagina_partido_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$partidos, paste0(id_p, ".html")))
+        p_partidos()
+      }, future.seed = TRUE, future.packages = pkgs_paralelos)
       })
     }
     
@@ -1212,11 +1229,16 @@ if (hubo_cambios) {
     # == INICIO DEL BLOQUE FINAL v5 DE PERFIL DE JUGADORA (REEMPLAZAR)             ==
     # ==============================================================================
     if (GENERAR_PERFILES_JUGADORA) {
-      walk(1:nrow(jugadoras_stats_df), function(i) {
+      indices_jugadoras <- which(
+        !(jugadoras_stats_df$id %in% player_ids_to_skip) &
+        (full_rebuild_needed | jugadoras_stats_df$id %in% affected_player_ids)
+      )
+      n_jugadoras <- length(indices_jugadoras)
+      message(sprintf("   > Generating %d player profiles in parallel...", n_jugadoras))
+      if (n_jugadoras > 0) with_progress({
+      p_jugadoras <- progressor(steps = n_jugadoras)
+      future_lapply(indices_jugadoras, function(i) {
         jugadora <- jugadoras_stats_df[i,]; id_j <- jugadora$id;
-        if (id_j %in% player_ids_to_skip) { return() }
-        
-        if (!full_rebuild_needed && !(id_j %in% affected_player_ids)) { return() }
         
         current_player_name <- jugadora[[player_name_col]]
         
@@ -1439,6 +1461,8 @@ if (hubo_cambios) {
           script_contraseña_lang
         )
         save_html(pagina_jugadora_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$jugadoras, paste0(id_j, ".html")))
+        p_jugadoras()
+      }, future.seed = TRUE, future.packages = pkgs_paralelos)
       })
     }
     # ============================================================================
@@ -1465,10 +1489,17 @@ if (hubo_cambios) {
       }
       
       # --- Inicia el bucle para cada equipo ---
-      walk(unique(c(partidos_df$local, partidos_df$visitante)), function(team_mk) {
-        if (team_mk %in% team_names_to_skip_mk) { return() }
+      todos_equipos <- unique(c(partidos_df$local, partidos_df$visitante))
+      equipos_a_generar <- todos_equipos[
+        !(todos_equipos %in% team_names_to_skip_mk) &
+        (full_rebuild_needed | generar_id_seguro(todos_equipos) %in% affected_team_ids)
+      ]
+      n_equipos <- length(equipos_a_generar)
+      message(sprintf("   > Generating %d team profiles in parallel...", n_equipos))
+      if (n_equipos > 0) with_progress({
+      p_equipos <- progressor(steps = n_equipos)
+      future_lapply(equipos_a_generar, function(team_mk) {
         id_t <- generar_id_seguro(team_mk)
-        if (!full_rebuild_needed && !(id_t %in% affected_team_ids)) { return() }
         
         # ============================================================================
         # == INICIO DE LA LÓGICA LITERAL DEL SCRIPT DE PRUEBAS                       ==
@@ -1599,20 +1630,28 @@ if (hubo_cambios) {
         pagina_equipo_final <- crear_pagina_html(contenido_equipo, current_team_name, path_to_root_dir = "../..", script_contraseña_lang, current_page_id = "teams")
         pagina_equipo_final$children[[2]]$children <- tagAppendChildren(pagina_equipo_final$children[[2]]$children, script_datos_json)
         save_html(pagina_equipo_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$timovi, paste0(id_t, ".html")))
+        p_equipos()
         
         # ============================================================================
         # == FIN DE LA LÓGICA LITERAL                                                ==
         # ============================================================================
+      }, future.seed = TRUE, future.packages = pkgs_paralelos)
       })
     }
     
     
     if (GENERAR_PERFILES_ARBITRO) {
-      walk(unique(arbitros_df$ime), function(arb_mk) {
+      todos_arbitros <- unique(arbitros_df$ime)
+      arbitros_a_generar <- todos_arbitros[
+        !(generar_id_seguro(todos_arbitros) %in% referee_ids_to_skip) &
+        (full_rebuild_needed | generar_id_seguro(todos_arbitros) %in% affected_referee_ids)
+      ]
+      n_arbitros <- length(arbitros_a_generar)
+      message(sprintf("   > Generating %d referee profiles in parallel...", n_arbitros))
+      if (n_arbitros > 0) with_progress({
+      p_arbitros <- progressor(steps = n_arbitros)
+      future_lapply(arbitros_a_generar, function(arb_mk) {
         id_a <- generar_id_seguro(arb_mk)
-        if (id_a %in% referee_ids_to_skip) { return() }
-        
-        if (!full_rebuild_needed && !(id_a %in% affected_referee_ids)) { return() }
         
         current_arb_name <- (entidades_df_lang %>% filter(original_name == arb_mk))$current_lang_name[1]
         temporadas_summary <- stats_arbitros_por_temporada_df %>% 
@@ -1703,17 +1742,23 @@ if (hubo_cambios) {
           script_contraseña = script_contraseña_lang
         )
         save_html(pagina_arbitro_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$arbitros, paste0(id_a, ".html")))
+        p_arbitros()
+      }, future.seed = TRUE, future.packages = pkgs_paralelos)
       })
     }
     
     if (GENERAR_PERFILES_ESTADIO) {
-      walk(unique(na.omit(estadios_df$estadio)), function(est_mk) {
-        id_e <- generar_id_seguro(est_mk); 
-        
-        # 13.1.43. NEW EXCLUSION LOGIC: If the stadium is in the exclusion list, skip.
-        if (id_e %in% stadium_ids_to_skip) { return() }
-        
-        if (!full_rebuild_needed && !(id_e %in% affected_stadium_ids)) { return() }
+      todos_estadios <- unique(na.omit(estadios_df$estadio))
+      estadios_a_generar <- todos_estadios[
+        !(generar_id_seguro(todos_estadios) %in% stadium_ids_to_skip) &
+        (full_rebuild_needed | generar_id_seguro(todos_estadios) %in% affected_stadium_ids)
+      ]
+      n_estadios <- length(estadios_a_generar)
+      message(sprintf("   > Generating %d stadium profiles in parallel...", n_estadios))
+      if (n_estadios > 0) with_progress({
+      p_estadios <- progressor(steps = n_estadios)
+      future_lapply(estadios_a_generar, function(est_mk) {
+        id_e <- generar_id_seguro(est_mk);
         current_est_name <- entidades_df_lang %>% filter(original_name == est_mk) %>% pull(current_lang_name)
         historial_mk <- estadios_df %>% filter(estadio == est_mk) %>% mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>% arrange(desc(fecha_date))
         historial <- historial_mk %>% left_join(entidades_df_lang %>% select(original_name, home_name = current_lang_name), by = c("local" = "original_name")) %>% left_join(entidades_df_lang %>% select(original_name, away_name = current_lang_name), by = c("visitante" = "original_name")) %>% left_join(competiciones_unicas_df %>% select(competicion_nombre, competicion_temporada, !!sym(comp_name_col)), by = c("competicion_nombre", "competicion_temporada"))
@@ -1721,6 +1766,8 @@ if (hubo_cambios) {
         contenido_estadio <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(current_est_name), tags$h3(t("stadium_match_history")), tags$table(tags$thead(tags$tr(tags$th(t("team_header_date")), tags$th(t("player_season")), tags$th(t("player_competition")), tags$th(t("round_prefix")), tags$th(t("match_header_match")), tags$th(t("match_header_result")))), tags$tbody(if (nrow(historial) > 0) { map(1:nrow(historial), function(p_idx) { partido <- historial[p_idx, ]; nombre_competicion_mostrado <- partido[[comp_name_col]]; tags$tr(tags$td(partido$fecha), tags$td(partido$competicion_temporada), tags$td(nombre_competicion_mostrado), tags$td(partido$jornada), tags$td(tags$a(href=file.path(path_rel_partidos, paste0(partido$id_partido, ".html")), paste(partido$home_name, "vs", partido$away_name))), tags$td(paste(partido$goles_local, "-", partido$goles_visitante))) }) } else { tags$tr(tags$td(colspan = "6", t("player_no_matches"))) })))
         pagina_estadio_final <- crear_pagina_html(contenido_estadio, current_est_name, path_to_root_dir = "../..", script_contraseña_lang)
         save_html(pagina_estadio_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$estadios, paste0(id_e, ".html")))
+        p_estadios()
+      }, future.seed = TRUE, future.packages = pkgs_paralelos)
       })
     }
     
@@ -1730,6 +1777,9 @@ if (hubo_cambios) {
   message("\nCreating redirect file at the site root...")
   redirect_html_content <- c('<!DOCTYPE html>', '<html>', '<head>', '<title>Redirecting...</title>', '<meta charset="utf-8">', paste0('<meta http-equiv="refresh" content="0; url=', IDIOMAS_SOPORTADOS[1], '/index.html">'), '</head>', '<body>', '<p>If you are not redirected automatically, follow this <a href="', IDIOMAS_SOPORTADOS[1], '/index.html">link</a>.</p>', '</body>', '</html>')
   writeLines(redirect_html_content, file.path(RUTA_SALIDA_RAIZ, "index.html"))
+  
+  # --- Restore sequential execution ---
+  plan(sequential)
   
 }
 
