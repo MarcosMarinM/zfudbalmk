@@ -141,9 +141,17 @@ stats_clasificacion_por_comp_df <- competiciones_unicas_df %>%
     }
   })
 
-stats_goleadoras_por_comp_df <- apariciones_df %>%
+# Helper: for each player+competition, get all teams ("A / B") and the last team by match date
+equipos_por_jugadora_comp <- apariciones_df %>%
+  left_join(partidos_df %>% select(id_partido, fecha), by = "id_partido") %>%
   group_by(id, competicion_nombre, competicion_temporada) %>%
-  summarise(TeamNames_mk = paste(unique(equipo), collapse = " / "), .groups = 'drop') %>%
+  summarise(
+    TeamNames_mk = paste(unique(equipo), collapse = " / "),
+    LastTeam_mk = { idx <- which.max(fecha); if (length(idx) == 0) NA_character_ else equipo[idx] },
+    .groups = 'drop'
+  )
+
+stats_goleadoras_por_comp_df <- equipos_por_jugadora_comp %>%
   right_join(
     goles_df_unificado %>% filter(tipo == "Normal", !is.na(id)) %>%
       left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
@@ -158,9 +166,7 @@ stats_goleadoras_por_comp_df <- apariciones_df %>%
   mutate(Pos = min_rank(desc(Goals))) %>%
   ungroup()
 
-stats_sanciones_por_comp_df <- apariciones_df %>%
-  group_by(id, competicion_nombre, competicion_temporada) %>%
-  summarise(TeamNames_mk = paste(unique(equipo), collapse = " / "), .groups = 'drop') %>%
+stats_sanciones_por_comp_df <- equipos_por_jugadora_comp %>%
   right_join(
     tarjetas_df_unificado %>% filter(!is.na(id)) %>%
       left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%

@@ -7,7 +7,13 @@ message("Step 10.0: Loading, unifying, and cleansing all raw data sources...")
 ruta_cache_pdf <- "actas_cache.rds"
 pdf_results <- if (file.exists(ruta_cache_pdf)) readRDS(ruta_cache_pdf) else list()
 ruta_cache_web <- "web_cache.rds"
-web_results <- if (file.exists(ruta_cache_web)) readRDS(ruta_cache_web) else list()
+web_results_raw <- if (file.exists(ruta_cache_web)) readRDS(ruta_cache_web) else list()
+# Filter out sentinel entries for ignored/unplayed matches
+ignorados <- keep(web_results_raw, ~isTRUE(.x$ignorado))
+if (length(ignorados) > 0) {
+  message(paste("   > Skipping", length(ignorados), "ignored/unplayed web matches."))
+}
+web_results <- discard(web_results_raw, ~isTRUE(.x$ignorado))
 resultados_exitosos <- c(pdf_results, web_results)
 message(paste("   > Total unified reports to process:", length(resultados_exitosos)))
 

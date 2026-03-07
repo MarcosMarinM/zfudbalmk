@@ -57,7 +57,7 @@ extraer_eventos <- function(columna_nodo) {
   jugadoras_nodos <- columna_nodo %>% html_elements(".ffm-rez__start")
   if (length(jugadoras_nodos) == 0) return(tibble())
   
-  map_dfr(jugadoras_nodos, function(jugadora_nodo) {
+  result <- map_dfr(jugadoras_nodos, function(jugadora_nodo) {
     nombre_latin <- jugadora_nodo %>% html_element(".ffm-rez__name span:first-child") %>% html_text(trim = TRUE)
     dorsal <- jugadora_nodo %>% html_element(".ffm-rez__name span:last-child") %>% html_text(trim = TRUE) %>% as.integer()
     eventos_nodos <- jugadora_nodo %>% html_elements(".ffm-rez__evts > div")
@@ -72,6 +72,7 @@ extraer_eventos <- function(columna_nodo) {
           tipo_evento_raw == "own_goal" ~ "own_goal",
           tipo_evento_raw == "yellow" ~ "yellow",
           tipo_evento_raw == "red" ~ "red",
+          tipo_evento_raw == "second_yellow" ~ "second_yellow",
           tipo_evento_raw == "substitution" ~ "substitution_in",
           tipo_evento_raw == "substitution_out" ~ "substitution_out",
           TRUE ~ NA_character_
@@ -82,7 +83,9 @@ extraer_eventos <- function(columna_nodo) {
     } else {
       tibble()
     }
-  }) %>% filter(!is.na(tipo_evento))
+  })
+  if (nrow(result) == 0 || !"tipo_evento" %in% names(result)) return(tibble())
+  result %>% filter(!is.na(tipo_evento))
 }
 
 parsear_informe_web <- function(url, id_partido, competicion_info) {
@@ -94,20 +97,21 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
     return(NULL)
   }
   
-  equipos_nodos <- doc %>% html_elements("h1.ffm-rez__title span")
+  equipos_nodos <- doc %>% html_elements(".ffm-match-header__name")
   equipo_local <- html_text(equipos_nodos[[1]], trim = TRUE)
   equipo_visitante <- html_text(equipos_nodos[[2]], trim = TRUE)
-  goles_nodos <- doc %>% html_elements(".ffm-rez__rez .col-6 span")
+  goles_nodos <- doc %>% html_elements(".ffm-match-header__goal")
   goles_local <- as.integer(html_text(goles_nodos[[1]], trim = TRUE))
   goles_visitante <- as.integer(html_text(goles_nodos[[2]], trim = TRUE))
-  info_text <- doc %>% html_elements(".ffm-rez__info div") %>% html_text(trim = TRUE)
+  info_text <- doc %>% html_elements(".ffm-match-meta__details span") %>% html_text(trim = TRUE)
   jornada <- str_extract(str_subset(info_text, "коло"), "\\d+")
   fecha <- str_extract(str_subset(info_text, "\\d{2}\\.\\d{2}\\.\\d{4}"), "\\d{2}\\.\\d{2}\\.\\d{4}")
   hora <- str_extract(str_subset(info_text, "\\d{2}:\\d{2}"), "\\d{2}:\\d{2}")
-  estadio_raw <- str_remove(str_subset(info_text, "Стадион:"), "Стадион: ")
+  estadio_raw <- str_remove(str_subset(info_text, "Стадион:"), "Стадион:\\s*")
   
-  arbitros_raw <- doc %>% html_element(".row.pt-5.pb-4 .col-12:last-child div") %>% html_text(trim = TRUE)
-  arbitro_principal_nombre <- str_match(arbitros_raw, "Судија:\\s*([^,]+)")[, 2] %>% trimws()
+  arbitros_raw <- doc %>% html_element(".ffm-match-meta__refs") %>% html_text(trim = TRUE)
+  # Handle both old format ("Судија:") and new format ("Главен судија:")
+  arbitro_principal_nombre <- str_match(arbitros_raw, "(?:Главен\\s+)?[Сс]удија:\\s*([^,]+)")[, 2] %>% trimws()
   asistente_1_nombre <- str_match(arbitros_raw, "1\\.\\s*помошен судија:\\s*([^,]+)")[, 2] %>% trimws()
   asistente_2_nombre <- str_match(arbitros_raw, "2\\.\\s*помошен судија:\\s*([^,]+)")[, 2] %>% trimws()
   arbitro_principal_nombre_cyr <- latin_to_cyrillic(arbitro_principal_nombre)
@@ -182,7 +186,22 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
   # --- FIN DE LA CORRECCIÓN FINAL ---
   
   goles_df <- if (nrow(eventos_todos) > 0) { eventos_todos %>% filter(tipo_evento %in% c("goal", "penalty", "own_goal")) %>% transmute(id_partido, jugadora = nombre, equipo_jugadora = equipo, equipo_acreditado = if_else(tipo_evento == "own_goal", if_else(equipo == equipo_local, equipo_visitante, equipo_local), equipo), minuto, dorsal, tipo = if_else(tipo_evento == "own_goal", "Autogol", "Normal")) } else { tibble() }
-  tarjetas_df <- if (nrow(eventos_todos) > 0) { eventos_todos %>% filter(tipo_evento %in% c("yellow", "red")) %>% transmute(id_partido, jugadora = nombre, equipo, dorsal, minuto, tipo = if_else(tipo_evento == "yellow", "Amarilla", "Roja"), motivo = "Falta (Web)") } else { tibble() }
+  tarjetas_df <- if (nrow(eventos_todos) > 0) {
+    # Standard yellow and red cards
+    tarjetas_normales <- eventos_todos %>%
+      filter(tipo_evento %in% c("yellow", "red")) %>%
+      transmute(id_partido, jugadora = nombre, id_jugadora = NA_character_, equipo, dorsal, minuto,
+                tipo = if_else(tipo_evento == "yellow", "Amarilla", "Roja"), motivo = "Falta (Web)")
+    # second_yellow generates both a yellow card AND a red card (double yellow)
+    tarjetas_2a_amarilla <- eventos_todos %>% filter(tipo_evento == "second_yellow")
+    tarjetas_doble <- if (nrow(tarjetas_2a_amarilla) > 0) {
+      bind_rows(
+        tarjetas_2a_amarilla %>% transmute(id_partido, jugadora = nombre, id_jugadora = NA_character_, equipo, dorsal, minuto, tipo = "Amarilla", motivo = "Falta (Web)"),
+        tarjetas_2a_amarilla %>% transmute(id_partido, jugadora = nombre, id_jugadora = NA_character_, equipo, dorsal, minuto, tipo = "Roja", motivo = "Doble amarilla")
+      )
+    } else { tibble() }
+    bind_rows(tarjetas_normales, tarjetas_doble)
+  } else { tibble() }
   
   crear_df_cambios_pdf_format <- function(cambios, equipo_filtro) {
     if(nrow(cambios) == 0) return(tibble(minuto = integer(), texto = character()))
@@ -206,12 +225,31 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
 
 #### 4. LECTURA DE CONFIGURACIÓN Y GESTIÓN DE CACHÉ ####
 
-if (!file.exists(ruta_config_web)) stop(paste("El archivo de configuración no se encuentra en:", ruta_config_web))
-config_df <- read_csv(ruta_config_web, show_col_types = FALSE)
-partidos_a_procesar_df <- config_df %>%
-  rowwise() %>%
-  reframe(id_partido = as.character(seq(start_id, end_id)), competition_name, season) %>%
-  distinct()
+#### 4.1. Load competition ranges (web_competitions.txt) ####
+partidos_a_procesar_df <- tibble(id_partido = character(), competition_name = character(), season = character())
+if (file.exists(ruta_config_web)) {
+  config_df <- read_csv(ruta_config_web, show_col_types = FALSE)
+  partidos_competiciones <- config_df %>%
+    rowwise() %>%
+    reframe(id_partido = as.character(seq(start_id, end_id)), competition_name, season) %>%
+    distinct()
+  partidos_a_procesar_df <- bind_rows(partidos_a_procesar_df, partidos_competiciones)
+  message(paste("   > web_competitions.txt:", nrow(partidos_competiciones), "partidos de", nrow(config_df), "competiciones."))
+}
+
+#### 4.2. Load individual matches (web_single_matches.txt) ####
+ruta_config_single <- "web_single_matches.txt"
+if (file.exists(ruta_config_single)) {
+  single_df <- read_csv(ruta_config_single, show_col_types = FALSE) %>%
+    mutate(id_partido = as.character(match_id)) %>%
+    select(id_partido, competition_name, season)
+  partidos_a_procesar_df <- bind_rows(partidos_a_procesar_df, single_df) %>% distinct()
+  message(paste("   > web_single_matches.txt:", nrow(single_df), "partidos individuales añadidos."))
+}
+
+if (nrow(partidos_a_procesar_df) == 0) {
+  stop("No se encontraron partidos para procesar. Revisa web_competitions.txt y/o web_single_matches.txt.")
+}
 
 resultados_cacheados <- list()
 if (file.exists(ruta_cache_web)) {
@@ -260,7 +298,16 @@ if (nrow(partidos_pendientes_df) > 0) {
     resultado_scrape <- safe_parser(url_actual, id_partido_actual, competicion_info_actual)
     
     if (is.null(resultado_scrape$result)) {
-      resultados_procesados[[id_partido_actual]] <- resultado_scrape
+      # Match not played or no data: store a sentinel so it's not retried
+      if (is.null(resultado_scrape$error)) {
+        resultados_procesados[[id_partido_actual]] <- list(
+          result = list(ignorado = TRUE, id_partido = id_partido_actual),
+          error = NULL
+        )
+        message(paste("      --> Guardado como ignorado en caché:", id_partido_actual))
+      } else {
+        resultados_procesados[[id_partido_actual]] <- resultado_scrape
+      }
       next
     }
     
@@ -327,10 +374,12 @@ if (nrow(partidos_pendientes_df) > 0) {
 #### 6. ACTUALIZAR Y GUARDAR CACHÉ ####
 
 if (length(nuevos_resultados) > 0) {
+  n_ignorados <- sum(sapply(nuevos_resultados, function(x) isTRUE(x$ignorado)))
+  n_reales <- length(nuevos_resultados) - n_ignorados
   resultados_finales <- c(resultados_cacheados, nuevos_resultados)
   saveRDS(resultados_finales, file = ruta_cache_web)
-  message(paste("\nCaché web actualizada con", length(nuevos_resultados), "nuevos informes."))
-  message(paste("Total de informes en web_cache.rds:", length(resultados_finales)))
+  message(paste0("\nCaché web actualizada: ", n_reales, " informes nuevos, ", n_ignorados, " ignorados (no jugados/sin datos)."))
+  message(paste("Total de entradas en web_cache.rds:", length(resultados_finales)))
 }
 
 message("\nProceso de scraping y cacheo web completado.")

@@ -91,7 +91,7 @@ id,force_role
 266971,goalkeeper
 267022,goalkeeper
 267633,goalkeeper
-268343,goalkeeper
+
 269268,goalkeeper
 269457,goalkeeper
 269464,goalkeeper

@@ -700,10 +700,10 @@ if (hubo_cambios) {
           datos_top_goleadoras <- stats_goleadoras_por_comp_df %>%
             filter(competicion_id == comp_id) %>%
             left_join(jugadoras_lang_df, by = "id") %>%
-            # Corrección para obtener el nombre del equipo en el idioma correcto
-            left_join(entidades_df_lang, by = c("TeamNames_mk" = "original_name")) %>%
+            # Use LastTeam_mk (single team) for the hub top 5 so translation always resolves
+            left_join(entidades_df_lang, by = c("LastTeam_mk" = "original_name")) %>%
             filter(!is.na(PlayerName)) %>%
-            select(Pos, PlayerName, TeamName = current_lang_name, Goals, id_jugadora = id, id_equipo_mk = TeamNames_mk) %>%
+            select(Pos, PlayerName, TeamName = current_lang_name, Goals, id_jugadora = id, id_equipo_mk = LastTeam_mk) %>%
             head(5) %>%
             # Añadir rutas de enlace para el JS
             mutate(
@@ -715,9 +715,9 @@ if (hubo_cambios) {
           datos_top_tarjetas <- stats_sanciones_por_comp_df %>%
             filter(competicion_id == comp_id) %>%
             left_join(jugadoras_lang_df, by = "id") %>%
-            left_join(entidades_df_lang, by = c("TeamNames_mk" = "original_name")) %>%
+            left_join(entidades_df_lang, by = c("LastTeam_mk" = "original_name")) %>%
             filter(!is.na(PlayerName)) %>%
-            select(Pos, PlayerName, TeamName = current_lang_name, YellowCards, RedCards, id_jugadora = id, id_equipo_mk = TeamNames_mk) %>%
+            select(Pos, PlayerName, TeamName = current_lang_name, YellowCards, RedCards, id_jugadora = id, id_equipo_mk = LastTeam_mk) %>%
             head(5) %>%
             mutate(
               link_jugadora = file.path("..", nombres_carpetas_relativos$jugadoras, paste0(id_jugadora, ".html")),
