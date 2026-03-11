@@ -379,7 +379,109 @@ extraer_apellido <- function(nombre) {
   return(palabras[length(palabras)])
 }
 
-### 8.4. Function to Generate Match Timeline
+### 8.4. Shared Utility Functions (Consolidated from multiple files)
+
+#' @title Format match minutes to handle added time (e.g., 451 → "45+1").
+#' @param minutos A numeric vector of minutes.
+#' @return A character vector with the formatted minutes.
+formatear_minuto_partido <- function(minutos) {
+  sapply(minutos, function(minuto) {
+    if (is.na(minuto) || !is.numeric(minuto)) return(as.character(minuto))
+    if (minuto > 140 && nchar(as.character(minuto)) >= 3) {
+      minuto_str <- as.character(minuto)
+      base <- substr(minuto_str, 1, 2)
+      added <- substr(minuto_str, 3, nchar(minuto_str))
+      return(paste0(base, "+", added))
+    } else {
+      return(as.character(minuto))
+    }
+  })
+}
+
+#' @title Get the relative file path to a club team's logo.
+#' @description Always returns a local path (no national team flag logic).
+#'   Falls back to "NOLOGO.png" if not found.
+#' @param nombre_equipo_mk Team name in Macedonian (original_name).
+#' @param path_to_root Relative path from the calling page to the docs/ root.
+#' @return A string with the relative path to the logo file.
+get_club_logo_path <- function(nombre_equipo_mk, path_to_root = "../..") {
+  nombre_archivo <- paste0(generar_id_seguro(nombre_equipo_mk), ".png")
+  if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo))) {
+    nombre_archivo <- "NOLOGO.png"
+  }
+  file.path(path_to_root, nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo)
+}
+
+#' @title Get an HTML img tag for a team logo.
+#' @description For national teams, uses flag SVG from hatscripts.github.io.
+#'   For clubs, uses local logo file. Falls back to "NOLOGO.png".
+#' @param nombre_equipo_mk Team name in Macedonian (original_name).
+#' @param path_to_root Relative path from the calling page to the docs/ root.
+#' @param css_class CSS class(es) for the img tag. "national-team-flag" is
+#'   appended automatically for national teams.
+#' @return An htmltools img tag.
+get_logo_tag <- function(nombre_equipo_mk, path_to_root = "../..", css_class = "team-logo") {
+  iso_code <- get_national_team_iso(nombre_equipo_mk)
+  if (!is.na(iso_code)) {
+    flag_url <- paste0("https://hatscripts.github.io/circle-flags/flags/", iso_code, ".svg")
+    tags$img(class = paste(css_class, "national-team-flag"), src = flag_url, alt = nombre_equipo_mk)
+  } else {
+    tags$img(class = css_class, src = get_club_logo_path(nombre_equipo_mk, path_to_root), alt = nombre_equipo_mk)
+  }
+}
+
+#' @title Order round/matchday names for cup and league competitions.
+#' @param jornadas_vector Character vector of round names.
+#' @param descendente If TRUE, order from most recent to earliest.
+#' @return A character vector of ordered round names (NAs removed).
+ordenar_jornadas <- function(jornadas_vector, descendente = FALSE) {
+  df <- data.frame(jornada = jornadas_vector, stringsAsFactors = FALSE) |>
+    filter(!is.na(jornada)) |>
+    mutate(order_key = case_when(
+      str_detect(jornada, "1/64") ~ 1,
+      str_detect(jornada, "1/32") ~ 2,
+      str_detect(jornada, "1/16") ~ 3,
+      str_detect(jornada, "1/8") ~ 4,
+      str_detect(jornada, "1/4") ~ 5,
+      str_detect(jornada, "1/2") ~ 6,
+      str_detect(jornada, "3/4") ~ 6.5,
+      str_detect(jornada, "Ф$|ф$|финале") ~ 7,
+      str_detect(jornada, "^\\d+$") ~ as.numeric(jornada),
+      TRUE ~ 99
+    ))
+  
+  if (descendente) {
+    df <- df |> arrange(desc(order_key))
+  } else {
+    df <- df |> arrange(order_key)
+  }
+  
+  df |> pull(jornada)
+}
+
+#' @title Generate search index entries for a given entity type.
+#' @param df Dataframe with columns: original_name, current_lang_name, latin_name.
+#' @param nombres_filtro Character vector of names to include.
+#' @param tipo_entidad Translation key for the entity type (e.g., "team_type").
+#' @param id_prefix Prefix for the target_id (e.g., "equipo-").
+#' @return A tibble with columns: Име, Тип, target_id, search_terms.
+generar_search_entidad <- function(df, nombres_filtro, tipo_entidad, id_prefix) {
+  df |>
+    filter(original_name %in% nombres_filtro) |>
+    mutate(
+      Тип = t(tipo_entidad),
+      target_id = paste0(id_prefix, generar_id_seguro(original_name)),
+      search_terms = paste(
+        tolower(current_lang_name),
+        tolower(latin_name),
+        sapply(original_name, generar_terminos_busqueda, USE.NAMES = FALSE)
+      )
+    ) |>
+    select(Име = current_lang_name, Тип, target_id, search_terms)
+}
+
+
+### 8.5. Function to Generate Match Timeline
 
 #' @title Generate a dataframe with the timeline of match events (goals, cards, changes).
 #' @description Generates a dataframe sorted by minute with the match events. This version is robust
@@ -542,20 +644,17 @@ crear_bloque_resultados_competicion <- function(comp_info, partidos_jornada_df, 
     local_name <- entidades_df_lang$current_lang_name[match(partido$local, entidades_df_lang$original_name)]
     visitante_name <- entidades_df_lang$current_lang_name[match(partido$visitante, entidades_df_lang$original_name)]
     
-    logo_local_path <- paste0(generar_id_seguro(partido$local), ".png")
-    if (!file.exists(file.path(RUTA_LOGOS_DESTINO, logo_local_path))) { logo_local_path <- "NOLOGO.png" }
-    
-    logo_visitante_path <- paste0(generar_id_seguro(partido$visitante), ".png")
-    if (!file.exists(file.path(RUTA_LOGOS_DESTINO, logo_visitante_path))) { logo_visitante_path <- "NOLOGO.png" }
+    logo_local_src <- get_club_logo_path(partido$local, path_to_root = "..")
+    logo_visitante_src <- get_club_logo_path(partido$visitante, path_to_root = "..")
     
     ruta_partido_html <- if(!is.na(partido$id_partido)) file.path(nombres_carpetas_relativos$partidos, paste0(partido$id_partido, ".html")) else "#"
     
     fila_local <- tags$div(class="match-row",
-                           tags$div(class="team-info", tags$img(src = file.path("..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, logo_local_path), class="logo"), tags$span(class="name", local_name)),
+                           tags$div(class="team-info", tags$img(src = logo_local_src, class="logo"), tags$span(class="name", local_name)),
                            if(!is.na(partido$id_partido)) tags$span(class="score", partido$goles_local) else NULL
     )
     fila_visitante <- tags$div(class="match-row",
-                               tags$div(class="team-info", tags$img(src = file.path("..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, logo_visitante_path), class="logo"), tags$span(class="name", visitante_name)),
+                               tags$div(class="team-info", tags$img(src = logo_visitante_src, class="logo"), tags$span(class="name", visitante_name)),
                                if(!is.na(partido$id_partido)) tags$span(class="score", partido$goles_visitante) else NULL
     )
     
@@ -642,8 +741,7 @@ crear_tabla_clasificacion_portada <- function(comp_info, stats_clasificacion_por
                       tags$tbody(
                         map(1:nrow(clasificacion_final_df), function(i) {
                           fila <- clasificacion_final_df[i, ]
-                          logo_path <- paste0(generar_id_seguro(fila$team), ".png")
-                          if (!file.exists(file.path(RUTA_LOGOS_DESTINO, logo_path))) { logo_path <- "NOLOGO.png" }
+                          logo_src <- get_club_logo_path(fila$team, path_to_root = "..")
                           
                           estilo_borde <- ""
                           if (!is.null(estilos_comp)) {
@@ -655,7 +753,7 @@ crear_tabla_clasificacion_portada <- function(comp_info, stats_clasificacion_por
                           
                           tags$tr(
                             tags$td(style = estilo_borde, class="pos-cell", fila$Pos),
-                            tags$td(class="logo-cell", tags$img(class="mini-logo", src = file.path("..", nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, logo_path))),
+                            tags$td(class="logo-cell", tags$img(class="mini-logo", src = logo_src)),
                             tags$td(class="abbr-cell", fila$final_abbr),
                             tags$td(class="pj-cell", fila$P),
                             tags$td(class="pts-cell", fila$Pts)
