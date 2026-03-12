@@ -147,7 +147,7 @@ equipos_por_jugadora_comp <- apariciones_df %>%
   group_by(id, competicion_nombre, competicion_temporada) %>%
   summarise(
     TeamNames_mk = paste(unique(equipo), collapse = " / "),
-    LastTeam_mk = { idx <- which.max(fecha); if (length(idx) == 0) NA_character_ else equipo[idx] },
+    LastTeam_mk = { idx <- which.max(as.Date(fecha, "%d.%m.%Y")); if (length(idx) == 0) NA_character_ else equipo[idx] },
     .groups = 'drop'
   )
 
