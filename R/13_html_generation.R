@@ -486,26 +486,11 @@ if (hubo_cambios) {
               group_by(equipo) %>%
               summarise(minutos_totales_posibles = sum(duracion_partido, na.rm = TRUE), .groups = 'drop')
             
-            # 2. El resto de la lógica permanece igual, pero ahora usará el total correcto.
-            tabla_porteras_comp_raw <- stats_porteras_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% left_join(entidades_df_lang, by = c("TeamName_mk" = "original_name")) %>% left_join(minutos_totales_equipo_comp, by = c("TeamName_mk" = "equipo")) %>% mutate(pct_minutos = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Minutes / minutos_totales_posibles) * 100, 0), group = if_else(pct_minutos >= 75, "mas_50", "menos_50")) %>% select(id, PlayerName = !!player_name_col_sym, TeamName = current_lang_name, TeamName_mk, GA90, GA, Minutes, CS, group)
-            if (nrow(tabla_porteras_comp_raw) > 0) { porteras_mas_50 <- tabla_porteras_comp_raw %>% 
-              filter(group == "mas_50") %>% 
-              arrange(
-                GA90,       # Criterio 1: Menor coeficiente de goles en contra (ascendente)
-                desc(CS),     # Criterio 2: Mayor número de porterías a cero (descendente)
-                desc(Minutes) # Criterio 3: Mayor número de minutos jugados (descendente)
-              ) %>% 
-              mutate(Pos = row_number()); 
-            
-            porteras_menos_50 <- tabla_porteras_comp_raw %>% 
-              filter(group == "menos_50", Minutes > 0) %>% 
-              arrange(
-                GA90,       # Criterio 1: Menor coeficiente de goles en contra (ascendente)
-                desc(CS),     # Criterio 2: Mayor número de porterías a cero (descendente)
-                desc(Minutes) # Criterio 3: Mayor número de minutos jugados (descendente)
-              ) %>% 
-              mutate(Pos = row_number());
-            generar_tabla_html_porteras <- function(df, table_id) { if (is.null(df) || nrow(df) == 0) { return(tags$p(t("no_data_in_category")))}; tags$table(id = table_id, `data-sort-col` = "3", `data-sort-dir` = "asc", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(class="sortable-header asc", onclick=sprintf("sortTable('%s', 3)", table_id), t("gk_ga_90")), tags$th(t("gk_ga")), tags$th(t("stats_minutes")), tags$th(class="sortable-header", onclick=sprintf("sortTable('%s', 6)", table_id), t("gk_cs")))), tags$tbody(map(1:nrow(df), function(j){ p <- df[j,]; nombre_equipo <- p$TeamName; nombre_equipo_mk <- p$TeamName_mk; tags$tr(tags$td(p$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td(class = "team-cell", get_logo_tag(nombre_equipo_mk), tags$a(href=file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_mk), ".html")), nombre_equipo)), tags$td(format(round(p$GA90, 2), nsmall = 2)), tags$td(p$GA), tags$td(p$Minutes), tags$td(p$CS)) })))}; contenido_porteras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("goalkeepers_title"), "-", comp_nombre_current_lang)), tags$h3(t("gk_stats_header_over_50")), generar_tabla_html_porteras(porteras_mas_50, "tabla-porteras-mas-50"), tags$h3(t("gk_stats_header_under_50")), generar_tabla_html_porteras(porteras_menos_50, "tabla-porteras-menos-50")); nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html"); save_html(crear_pagina_html(contenido_porteras, paste(t("goalkeepers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_porteras)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_porteras, class="menu-button", t("goalkeepers_title")) }
+            # 2. Tabla unificada de porteras (sin split por % de minutos).
+            # Una fila por jugadora+competición (como goleadoras), con TeamNames_mk "A / B".
+            tabla_porteras_comp <- stats_porteras_por_comp_df %>% filter(competicion_id == comp_id) %>% left_join(jugadoras_stats_df %>% select(id, !!player_name_col_sym), by = "id") %>% filter(Minutes > 0, !is.na(!!player_name_col_sym)) %>% arrange(desc(CS), GA90, desc(Minutes)) %>% mutate(Pos = row_number()) %>% select(id, Pos, PlayerName = !!player_name_col_sym, TeamNames_mk, GA90, GA, Minutes, CS)
+            if (nrow(tabla_porteras_comp) > 0) {
+            generar_tabla_html_porteras <- function(df, table_id) { if (is.null(df) || nrow(df) == 0) { return(tags$p(t("no_data_in_category")))}; tags$table(id = table_id, `data-sort-col` = "6", `data-sort-dir` = "desc", tags$thead(tags$tr(tags$th(t("standings_pos")), tags$th(t("player_type")), tags$th(t("team_type")), tags$th(class="sortable-header", onclick=sprintf("sortTable('%s', 3)", table_id), t("gk_ga_90")), tags$th(t("gk_ga")), tags$th(t("stats_minutes")), tags$th(class="sortable-header desc", onclick=sprintf("sortTable('%s', 6)", table_id), t("gk_cs")))), tags$tbody(map(1:nrow(df), function(j){ p <- df[j,]; tags$tr(tags$td(p$Pos), tags$td(tags$a(href=file.path("..", nombres_carpetas_relativos$jugadoras, paste0(p$id, ".html")), p$PlayerName)), tags$td({ teams_mk <- str_split(p$TeamNames_mk, " / ")[[1]]; team_tags <- list(); for (i in seq_along(teams_mk)) { team_name_mk <- teams_mk[i]; team_name <- entidades_df_lang %>% filter(original_name == team_name_mk) %>% pull(current_lang_name); team_element <- tags$span(class="team-cell", get_logo_tag(team_name_mk), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(team_name_mk), ".html")), team_name)); team_tags <- append(team_tags, list(team_element)); if (i < length(teams_mk)) { team_tags <- append(team_tags, list(tags$span(style="margin: 0 5px;", "/"))) } }; tagList(team_tags) }), tags$td(format(round(p$GA90, 2), nsmall = 2)), tags$td(p$GA), tags$td(p$Minutes), tags$td(p$CS)) })))}; contenido_porteras <- tagList(crear_botones_navegacion(path_to_lang_root = ".."), tags$h2(paste(t("goalkeepers_title"), "-", comp_nombre_current_lang)), generar_tabla_html_porteras(tabla_porteras_comp, "tabla-porteras")); nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html"); save_html(crear_pagina_html(contenido_porteras, paste(t("goalkeepers_title"), "-", comp_nombre_current_lang), "../..", script_contraseña_lang), file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$competiciones, nombre_archivo_porteras)); lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href=nombre_archivo_porteras, class="menu-button", t("goalkeepers_title")) }
             
             # --- BLOQUE DE TRÍOS DEFENSIVOS DESACTIVADO TEMPORALMENTE ---
             # if (str_detect(comp_info$competicion_nombre, "Прва|Втора")) {
@@ -668,28 +653,15 @@ if (hubo_cambios) {
             group_by(equipo) %>%
             summarise(minutos_totales_posibles = sum(duracion_partido, na.rm = TRUE), .groups = 'drop')
           
-          # Porteras (La nueva pestaña que pediste)
+          # Porteras (top-5 en hub) — usa LastTeam_mk como goleadoras
           datos_top_porteras <- stats_porteras_por_comp_df %>%
-            filter(competicion_id == comp_id) %>% # 1. Filtrar por competición
-            
-            # 2. Unir con los minutos totales para calcular el %
-            left_join(minutos_totales_equipo_comp, by = c("TeamName_mk" = "equipo")) %>%
-            
-            # 3. Calcular el porcentaje de minutos jugados
-            mutate(pct_minutos = if_else(!is.na(minutos_totales_posibles) & minutos_totales_posibles > 0, (Minutes / minutos_totales_posibles) * 100, 0)) %>%
-            
-            # 4. *** ¡EL FILTRO CLAVE PEDIDO POR EL USUARIO! ***
-            #    Usamos >= 50 para replicar la lógica original de la página completa.
-            filter(pct_minutos >= 75) %>% 
-            
-            # 5. Continuar con el resto de la lógica...
+            filter(competicion_id == comp_id, Minutes > 0) %>%
             left_join(jugadoras_lang_df, by = "id") %>%
-            left_join(entidades_df_lang, by = c("TeamName_mk" = "original_name")) %>%
+            left_join(entidades_df_lang, by = c("LastTeam_mk" = "original_name")) %>%
             filter(!is.na(PlayerName)) %>%
-            # Ordenar por GA90 (asc), luego CS (desc), luego Minutos (desc)
-            arrange(GA90, desc(CS), desc(Minutes)) %>%
+            arrange(desc(CS), GA90, desc(Minutes)) %>%
             mutate(Pos = row_number()) %>%
-            select(Pos, PlayerName, TeamName = current_lang_name, GA90, CS, id_jugadora = id, id_equipo_mk = TeamName_mk) %>%
+            select(Pos, PlayerName, TeamName = current_lang_name, GA90, CS, id_jugadora = id, id_equipo_mk = LastTeam_mk) %>%
             head(5) %>%
             mutate(
               link_jugadora = file.path("..", nombres_carpetas_relativos$jugadoras, paste0(id_jugadora, ".html")),

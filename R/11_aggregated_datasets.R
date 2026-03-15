@@ -209,7 +209,7 @@ stats_ga <- porteras_apariciones_df %>%
   # FILTRO CORREGIDO: Usamos la nueva columna normalizada para la comparación.
   filter(!is.na(minuto_gol) & minuto_gol_normalizado >= min_entra & minuto_gol_normalizado <= min_sale) %>%
   
-  group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  group_by(id, competicion_nombre, competicion_temporada) %>%
   summarise(GA = n(), .groups = 'drop')
 
 # 11.3.2. Step 2: Calculate Clean Sheets (CS) explicitly and robustly.
@@ -220,20 +220,22 @@ stats_cs <- porteras_apariciones_df %>%
   filter(minutos_jugados >= duracion_partido) %>%
   mutate(goles_recibidos_partido = if_else(local == equipo, goles_visitante, goles_local)) %>%
   filter(goles_recibidos_partido == 0) %>%
-  group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  group_by(id, competicion_nombre, competicion_temporada) %>%
   summarise(CS = n(), .groups = 'drop')
 
 # 11.3.5. Step 3: Calculate total minutes.
 stats_minutos <- porteras_apariciones_df %>%
-  group_by(id, competicion_nombre, competicion_temporada, TeamName_mk = equipo) %>%
+  group_by(id, competicion_nombre, competicion_temporada) %>%
   summarise(Minutes = sum(minutos_jugados, na.rm = TRUE), .groups = 'drop')
 
 # 11.3.6. Step 4: Join all statistics into a final dataframe.
+# Una entrada por jugadora+competición (como goleadoras), con TeamNames_mk "A / B".
 stats_porteras_por_comp_df <- stats_minutos %>%
-  full_join(stats_ga, by = c("id", "competicion_nombre", "competicion_temporada", "TeamName_mk")) %>%
-  full_join(stats_cs, by = c("id", "competicion_nombre", "competicion_temporada", "TeamName_mk")) %>%
+  full_join(stats_ga, by = c("id", "competicion_nombre", "competicion_temporada")) %>%
+  full_join(stats_cs, by = c("id", "competicion_nombre", "competicion_temporada")) %>%
   mutate(across(c(GA, CS), ~replace_na(., 0))) %>%
   mutate(GA90 = if_else(Minutes > 0, (GA / Minutes) * 90, 0)) %>%
+  left_join(equipos_por_jugadora_comp, by = c("id", "competicion_nombre", "competicion_temporada")) %>%
   left_join(competiciones_unicas_df %>% filter(competicion_id != "reprezentacija") %>% select(competicion_id, competicion_nombre, competicion_temporada), by = c("competicion_nombre", "competicion_temporada"))
 
 ### 11.4. Calculate Defensive Trio Statistics by Competition

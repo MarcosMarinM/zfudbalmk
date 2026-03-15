@@ -381,6 +381,54 @@ if (!is.null(mapa_roles_forzados_df) && nrow(mapa_roles_forzados_df) > 0) {
     left_join(mapa_roles_forzados_df, by = "id") %>%
     mutate(es_portera = if_else(!is.na(force_role) & force_role == "goalkeeper", TRUE, es_portera)) %>%
     select(-force_role)
+  
+  # Deduplicar: máximo una portera titular por equipo/partido.
+  # La primera titular de la lista siempre es la portera real;
+  # cualquier otra marcada como portera (por override) se desmarca.
+  apariciones_df <- apariciones_df %>%
+    group_by(id_partido, equipo) %>%
+    mutate(
+      es_portera = if_else(
+        tipo == "Titular" & es_portera & cumsum(tipo == "Titular" & es_portera) > 1,
+        FALSE,
+        es_portera
+      )
+    ) %>%
+    ungroup()
+  
+  # Suplentes del override: solo son porteras si:
+  # (a) entraron en el mismo minuto que salió la portera titular (sustitución directa), O
+  # (b) la portera titular fue expulsada y la suplente entró en los 10 min siguientes
+  #     (entra por una de campo, pero para ocupar la portería).
+  # En cualquier otro caso, la suplente entró como jugadora de campo.
+  porteras_titulares_info <- apariciones_df %>%
+    filter(tipo == "Titular", es_portera == TRUE) %>%
+    select(id_partido, equipo, id_gk = id, gk_min_sale = min_sale)
+  
+  # Minuto de la roja a la portera titular (si la hubo)
+  rojas_a_porteras_titulares <- porteras_titulares_info %>%
+    inner_join(
+      tarjetas_df_unificado %>% filter(tipo == "Roja") %>% select(id_partido, id, minuto_roja = minuto),
+      by = c("id_partido", "id_gk" = "id")
+    ) %>%
+    select(id_partido, equipo, minuto_roja)
+  
+  apariciones_df <- apariciones_df %>%
+    left_join(porteras_titulares_info %>% select(id_partido, equipo, gk_min_sale),
+              by = c("id_partido", "equipo")) %>%
+    left_join(rojas_a_porteras_titulares, by = c("id_partido", "equipo")) %>%
+    mutate(
+      .reemplaza_portera = !is.na(min_entra) & !is.na(gk_min_sale) & min_entra == gk_min_sale,
+      # Roja a la titular Y la suplente entró dentro de los 10 min siguientes
+      .entra_tras_roja = !is.na(min_entra) & !is.na(minuto_roja) & min_entra >= minuto_roja & min_entra <= minuto_roja + 10,
+      es_portera = if_else(
+        tipo == "Suplente" & es_portera & id %in% ids_forzadas &
+          !is.na(gk_min_sale) & !.reemplaza_portera & !.entra_tras_roja,
+        FALSE,
+        es_portera
+      )
+    ) %>%
+    select(-gk_min_sale, -minuto_roja, -.reemplaza_portera, -.entra_tras_roja)
 }
 message("   > Player appearances consolidated and IDs unified.")
 
