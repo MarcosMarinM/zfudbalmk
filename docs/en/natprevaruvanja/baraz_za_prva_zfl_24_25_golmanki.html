@@ -74,17 +74,16 @@
       </div>
       <div id="main-content">
         <h2>Goalkeeper stats - Play-off for the First Women's League 24/25</h2>
-        <h3>Players with 75% or more of minutes played</h3>
-        <table id="tabla-porteras-mas-50" data-sort-col="3" data-sort-dir="asc">
+        <table id="tabla-porteras" data-sort-col="6" data-sort-dir="desc">
           <thead>
             <tr>
               <th>Pos</th>
               <th>Player</th>
               <th>Team</th>
-              <th class="sortable-header asc" onclick="sortTable(&#39;tabla-porteras-mas-50&#39;, 3)">GA/90</th>
+              <th class="sortable-header" onclick="sortTable(&#39;tabla-porteras&#39;, 3)">GA/90</th>
               <th>GA</th>
               <th>Minutes</th>
-              <th class="sortable-header" onclick="sortTable(&#39;tabla-porteras-mas-50&#39;, 6)">CS</th>
+              <th class="sortable-header desc" onclick="sortTable(&#39;tabla-porteras&#39;, 6)">CS</th>
             </tr>
           </thead>
           <tbody>
@@ -93,9 +92,11 @@
               <td>
                 <a href="../igraci/145303.html">Natali Talevska</a>
               </td>
-              <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
-                <a href="../timovi/top_gol.html">Top Gol</a>
+              <td>
+                <span class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                  <a href="../timovi/top_gol.html">Top Gol</a>
+                </span>
               </td>
               <td>0.00</td>
               <td>0</td>
@@ -107,9 +108,11 @@
               <td>
                 <a href="../igraci/133474.html">Verica Kolevska</a>
               </td>
-              <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
-                <a href="../timovi/vardar.html">Vardar</a>
+              <td>
+                <span class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                  <a href="../timovi/vardar.html">Vardar</a>
+                </span>
               </td>
               <td>6.00</td>
               <td>6</td>
@@ -118,8 +121,6 @@
             </tr>
           </tbody>
         </table>
-        <h3>Players with less than 75% of minutes played</h3>
-        <p>No data in this category.</p>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

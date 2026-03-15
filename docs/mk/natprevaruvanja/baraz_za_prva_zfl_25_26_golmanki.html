@@ -74,17 +74,16 @@
       </div>
       <div id="main-content">
         <h2>Статистика на голманки - Бараж за Прва ЖФЛ 25/26</h2>
-        <h3>Фудбалерки со 75% или повеќе одиграни минути</h3>
-        <table id="tabla-porteras-mas-50" data-sort-col="3" data-sort-dir="asc">
+        <table id="tabla-porteras" data-sort-col="6" data-sort-dir="desc">
           <thead>
             <tr>
               <th>Поз.</th>
               <th>Фудбалерка</th>
               <th>Тим</th>
-              <th class="sortable-header asc" onclick="sortTable(&#39;tabla-porteras-mas-50&#39;, 3)">ПГ/90</th>
+              <th class="sortable-header" onclick="sortTable(&#39;tabla-porteras&#39;, 3)">ПГ/90</th>
               <th>ПГ</th>
               <th>Минути</th>
-              <th class="sortable-header" onclick="sortTable(&#39;tabla-porteras-mas-50&#39;, 6)">ЧМ</th>
+              <th class="sortable-header desc" onclick="sortTable(&#39;tabla-porteras&#39;, 6)">ЧМ</th>
             </tr>
           </thead>
           <tbody>
@@ -93,9 +92,11 @@
               <td>
                 <a href="../igraci/132537.html">Катерина Ацевска</a>
               </td>
-              <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/recica.png" alt="Речица"/>
-                <a href="../timovi/recica.html">Речица</a>
+              <td>
+                <span class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                  <a href="../timovi/recica.html">Речица</a>
+                </span>
               </td>
               <td>1.00</td>
               <td>1</td>
@@ -107,9 +108,11 @@
               <td>
                 <a href="../igraci/133474.html">Верица Колевска</a>
               </td>
-              <td class="team-cell">
-                <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
-                <a href="../timovi/vardar.html">Вардар</a>
+              <td>
+                <span class="team-cell">
+                  <img class="team-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                  <a href="../timovi/vardar.html">Вардар</a>
+                </span>
               </td>
               <td>4.00</td>
               <td>4</td>
@@ -118,8 +121,6 @@
             </tr>
           </tbody>
         </table>
-        <h3>Фудбалерки со помалку од 75% одиграни минути</h3>
-        <p>Нема податоци во оваа категорија.</p>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>
