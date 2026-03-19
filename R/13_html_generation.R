@@ -1035,8 +1035,8 @@ if (hubo_cambios) {
               minuto_fmt <- paste0(formatear_minuto_partido(e$minuto), "'")
               
               # Content for the event
-              player_display <- toupper(e$jugadora_nombre %||% "")
-              sub_display <- if (!is.na(e$jugadora_sub_nombre)) toupper(e$jugadora_sub_nombre) else NULL
+              player_display <- e$jugadora_nombre %||% ""
+              sub_display <- if (!is.na(e$jugadora_sub_nombre)) e$jugadora_sub_nombre else NULL
               
               event_content <- tagList(
                 tags$span(class = "icon", e$icono),
@@ -1148,7 +1148,7 @@ if (hubo_cambios) {
                   tags$span("🏟️ ", estadio_element)
                 ),
                 tags$div(class = "mp-detail-row",
-                  tags$span("⚖️ ", referees_html)
+                  tags$span(referees_html)
                 ),
                 if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) {
                   tags$p(class = "mp-notes", nota_arbitro)
