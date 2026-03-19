@@ -613,3 +613,15 @@ if (hubo_cambios) {
   }
   message(paste("   > Identified", length(affected_competition_ids), "competitions,", length(affected_match_ids), "matches, and", length(affected_player_ids), "players for update."))
 }
+
+### 10.X. Load club sanctions (point deductions)
+ruta_sanciones_clubes <- "sanciones_clubes.txt"
+if (file.exists(ruta_sanciones_clubes)) {
+  sanciones_clubes_df <- read.csv(ruta_sanciones_clubes, stringsAsFactors = FALSE, encoding = "UTF-8")
+  message(paste("   > Loaded", nrow(sanciones_clubes_df), "club sanctions from", ruta_sanciones_clubes))
+} else {
+  sanciones_clubes_df <- tibble(
+    competicion_nombre = character(), competicion_temporada = character(),
+    equipo = character(), puntos_deducidos = integer(), motivo = character()
+  )
+}

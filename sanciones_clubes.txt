@@ -1,0 +1,3 @@
+competicion_nombre,competicion_temporada,equipo,puntos_deducidos,motivo
+Прва ЖФЛ,25/26,Љуботен,9,Sanción disciplinaria
+Втора ЖФЛ,24/25,Борец,3,Sanción disciplinaria

@@ -136,6 +136,18 @@ stats_clasificacion_por_comp_df <- competiciones_unicas_df %>%
           .groups = 'drop'
         ) %>%
         mutate(GD = GF - GA) %>%
+        # Apply club sanctions (point deductions)
+        left_join(
+          sanciones_clubes_df %>%
+            filter(competicion_nombre == grupo_actual$competicion_nombre,
+                   competicion_temporada == grupo_actual$competicion_temporada) %>%
+            select(team = equipo, puntos_deducidos),
+          by = "team"
+        ) %>%
+        mutate(
+          puntos_deducidos = replace_na(puntos_deducidos, 0L),
+          Pts = Pts - puntos_deducidos
+        ) %>%
         arrange(desc(Pts), desc(GD), desc(GF)) %>%
         mutate(Pos = row_number())
     }

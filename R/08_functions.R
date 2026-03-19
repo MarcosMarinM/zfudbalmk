@@ -282,6 +282,7 @@ crear_pagina_html <- function(contenido_principal, titulo_pagina, path_to_root_d
               tags$meta(charset="UTF-8"),
               tags$meta(name="viewport", content="width=device-width, initial-scale=1.0"),
               tags$title(titulo_pagina),
+              tags$link(rel = "icon", type = "image/png", href = file.path(path_to_root_dir, "favicon.png")),
               tags$link(rel = "stylesheet", href = file.path(path_to_root_dir, nombres_carpetas_relativos$assets, "style.css")),
               script_contraseña
             ),

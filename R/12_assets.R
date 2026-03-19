@@ -681,7 +681,7 @@ th { background-color: #f2f2f2; }
 .mp-penales-grid li a { color: inherit; text-decoration: none; }
 .mp-penales-grid li a:hover { text-decoration: underline; }
 
-/* Responsive */
+/* Responsive - Match pages */
 @media (max-width: 768px) {
   .mp-scoreboard { flex-direction: column; gap: 15px; }
   .mp-team { justify-content: center !important; }
@@ -689,6 +689,50 @@ th { background-color: #f2f2f2; }
   .mp-lineups-grid, .mp-penales-grid { grid-template-columns: 1fr; }
   .mp-timeline-container { justify-content: flex-start; gap: 10px; padding: 40px 10px; }
   .mp-timeline-event { min-width: 80px; }
+}
+
+/* ============================== */
+/* --- STADIUM PAGE REDESIGN ---  */
+/* ============================== */
+.sp-container { max-width: 1000px; margin: 0 auto; }
+
+/* Header */
+.sp-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eaeaea; }
+.sp-header h2 { font-size: 1.8em; color: #8B0000; border-bottom: none; padding-bottom: 0; margin: 0 0 5px 0; }
+.sp-header .sp-subtitle { font-size: 14px; color: #666; }
+
+/* Match history table */
+.sp-history-section { border-top: 2px solid #eaeaea; padding-top: 25px; }
+.sp-section-title { text-align: center; font-size: 20px; margin-bottom: 20px; border-bottom: none; padding-bottom: 0; color: #111; }
+.sp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.sp-table th { background-color: #8B0000; color: white; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px; border: none; }
+.sp-table td { padding: 10px 12px; border-bottom: 1px solid #eaeaea; vertical-align: middle; }
+.sp-table tr:hover { background-color: #f8f9fa; }
+.sp-table a { color: inherit; text-decoration: none; }
+.sp-table a:hover { text-decoration: underline; color: #8B0000; }
+.sp-clickable-row { cursor: pointer; }
+.sp-clickable-row:hover { background-color: #f0e8e8; }
+.sp-match-cell { display: inline-flex; align-items: center; gap: 8px; }
+.sp-table-logo { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+.sp-team-name { font-weight: 600; white-space: nowrap; }
+.sp-result { font-weight: 700; text-align: center; margin: 0 4px; }
+
+/* Accordion rows (referee detail toggle) */
+.sp-table .summary-row { cursor: pointer; }
+.sp-table .summary-row:hover { background-color: #f0e8e8; }
+.sp-table .summary-row td:first-child::before { content: '▶ '; font-size: 0.8em; color: #8B0000; }
+.sp-table .summary-row.active td:first-child::before { content: '▼ '; }
+.sp-table .details-row { display: none; }
+.sp-table .details-row > td { padding: 0; border-bottom: 2px solid #8B0000; }
+.sp-table .details-row .details-content { padding: 15px 20px; background-color: #fafafa; }
+.sp-table .details-row .sp-table { margin: 0; }
+.sp-table .details-row .sp-table th { background-color: #555; }
+
+/* Responsive - Stadium pages */
+@media (max-width: 768px) {
+  .sp-table { font-size: 13px; }
+  .sp-table th, .sp-table td { padding: 8px 6px; }
+  .sp-team-name { font-size: 12px; }
 }
 
 )"
@@ -988,7 +1032,14 @@ function showLetter(letter) {
   });
 }
 
-function toggleDetails(elementId) { /* ... (código de búsqueda sin cambios) ... */ }
+function toggleDetails(elementId) {
+  var row = document.getElementById(elementId);
+  if (!row) return;
+  var isVisible = row.style.display === 'table-row';
+  row.style.display = isVisible ? 'none' : 'table-row';
+  var summaryRow = row.previousElementSibling;
+  if (summaryRow) summaryRow.classList.toggle('active', !isVisible);
+}
 
 
 // ==============================================================================

@@ -288,7 +288,14 @@ function showLetter(letter) {
   });
 }
 
-function toggleDetails(elementId) { /* ... (código de búsqueda sin cambios) ... */ }
+function toggleDetails(elementId) {
+  var row = document.getElementById(elementId);
+  if (!row) return;
+  var isVisible = row.style.display === 'table-row';
+  row.style.display = isVisible ? 'none' : 'table-row';
+  var summaryRow = row.previousElementSibling;
+  if (summaryRow) summaryRow.classList.toggle('active', !isVisible);
+}
 
 
 // ==============================================================================
