@@ -513,12 +513,18 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
     }
   }
   
+  # Columnas extra para el timeline visual
+  cols_extra_vacias <- tibble(
+    equipo_canonico_mk = character(), tipo_evento = character(),
+    jugadora_id = character(), jugadora_nombre = character(),
+    jugadora_sub_id = character(), jugadora_sub_nombre = character()
+  )
+  
   # Step 1: Goals
   goles_data_raw <- goles_df_unificado %>% filter(id_partido == id_p)
   
   if (!is.null(goles_data_raw) && nrow(goles_data_raw) > 0) {
     goles_data <- goles_data_raw %>%
-      # CORRECCIÓN: Añadido 'relationship' para silenciar el aviso.
       left_join(mapa_jugadora_a_equipo, by = "id", relationship = "many-to-many") %>%
       mutate(
         equipo_acreditado_canonico = if_else(
@@ -540,8 +546,18 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
           link_equipo_jugadora <- crear_link_condicional(ej_lang, path_timovi, generar_id_seguro(ej_mk), ej_mk)
           link_equipo_acreditado <- crear_link_condicional(ea_lang, path_timovi, generar_id_seguro(ea_mk), ea_mk)
           if (t == "Autogol") sprintf(t("match_timeline_own_goal"), link_jugadora, link_equipo_jugadora, link_equipo_acreditado) else sprintf(t("match_timeline_goal"), link_jugadora, link_equipo_acreditado)
-        })
-      ) %>% select(minuto, icono = tipo, texto_evento) %>% mutate(icono = recode(icono, "Normal" = "⚽", "Autogol" = "⚽"))
+        }),
+        tipo_evento = if_else(tipo == "Autogol", "autogol", "gol")
+      ) %>% 
+      select(
+        minuto, icono = tipo, texto_evento,
+        equipo_canonico_mk = equipo_acreditado_canonico,
+        tipo_evento, jugadora_id = id, jugadora_nombre = PlayerName
+      ) %>% 
+      mutate(
+        icono = recode(icono, "Normal" = "⚽", "Autogol" = "⚽"),
+        jugadora_sub_id = NA_character_, jugadora_sub_nombre = NA_character_
+      )
     lista_eventos[[length(lista_eventos) + 1]] <- goles_eventos
   }
   
@@ -550,7 +566,6 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
   
   if (!is.null(tarjetas_data_raw) && nrow(tarjetas_data_raw) > 0) {
     tarjetas_data <- tarjetas_data_raw %>%
-      # CORRECCIÓN: Añadido 'relationship' para silenciar el aviso.
       left_join(mapa_jugadora_a_equipo, by = "id", relationship = "many-to-many") %>%
       left_join(jugadoras_lang_df, by = "id") %>%
       left_join(entidades_lang_df, by = c("equipo_canonico" = "original_name"))
@@ -562,12 +577,19 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
           link_equipo <- crear_link_condicional(e_lang, path_timovi, generar_id_seguro(e_mk), e_mk)
           sprintf(t("match_timeline_card"), link_jugadora, link_equipo)
         }),
-        icono = if_else(tipo == "Amarilla", "🟨", "🟥")
-      ) %>% select(minuto, icono, texto_evento)
+        icono = if_else(tipo == "Amarilla", "🟨", "🟥"),
+        tipo_evento = if_else(tipo == "Amarilla", "tarjeta_amarilla", "tarjeta_roja")
+      ) %>% 
+      select(
+        minuto, icono, texto_evento,
+        equipo_canonico_mk = equipo_canonico, tipo_evento,
+        jugadora_id = id, jugadora_nombre = PlayerName
+      ) %>%
+      mutate(jugadora_sub_id = NA_character_, jugadora_sub_nombre = NA_character_)
     lista_eventos[[length(lista_eventos) + 1]] <- tarjetas_eventos
   }
   
-  # Step 3: Substitutions (sin cambios)
+  # Step 3: Substitutions
   procesar_cambios <- function(cambios_df, nombre_equipo_mk, alineacion_equipo) {
     if (is.null(cambios_df) || nrow(cambios_df) == 0 || is.null(alineacion_equipo) || nrow(alineacion_equipo) == 0) return(NULL)
     map_dfr(1:nrow(cambios_df), function(i) {
@@ -584,7 +606,12 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
       link_sale <- crear_link_condicional(nombre_sale_lang, path_jugadoras, id_sale, nombre_equipo_mk)
       link_equipo <- crear_link_condicional(nombre_equipo_lang, path_timovi, generar_id_seguro(nombre_equipo_mk), nombre_equipo_mk)
       texto_final <- sprintf(t("match_timeline_substitution"), link_equipo, link_entra, dorsal_entra, link_sale, dorsal_sale)
-      tibble(minuto = cambio$minuto, icono = "🔄", texto_evento = texto_final)
+      tibble(
+        minuto = cambio$minuto, icono = "🔄", texto_evento = texto_final,
+        equipo_canonico_mk = nombre_equipo_mk, tipo_evento = "cambio",
+        jugadora_id = id_entra %||% NA_character_, jugadora_nombre = nombre_entra_lang,
+        jugadora_sub_id = id_sale %||% NA_character_, jugadora_sub_nombre = nombre_sale_lang
+      )
     })
   }
   alineacion_partido <- apariciones_df %>% filter(id_partido == id_p)
@@ -593,7 +620,14 @@ generar_cronologia_df <- function(id_p, resumen_partido, entidades_lang_df, juga
   
   lista_eventos <- c(lista_eventos, list(cambios_local_eventos), list(cambios_visitante_eventos))
   lista_eventos_compacta <- purrr::compact(lista_eventos)
-  if (length(lista_eventos_compacta) == 0) { return(tibble(minuto = integer(), icono = character(), texto_evento = character())) }
+  if (length(lista_eventos_compacta) == 0) {
+    return(tibble(
+      minuto = integer(), icono = character(), texto_evento = character(),
+      equipo_canonico_mk = character(), tipo_evento = character(),
+      jugadora_id = character(), jugadora_nombre = character(),
+      jugadora_sub_id = character(), jugadora_sub_nombre = character()
+    ))
+  }
   bind_rows(lista_eventos_compacta) %>% filter(!is.na(minuto)) %>% arrange(minuto)
 }
 

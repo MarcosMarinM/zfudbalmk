@@ -952,14 +952,10 @@ if (hubo_cambios) {
         nota_arbitro <- resumen_partido$nota_arbitro %||% NA_character_
         if (!is.na(nota_arbitro)) { nota_arbitro <- str_remove(nota_arbitro, "^[\\s:]*") }
         path_rel_competiciones <- file.path("..", nombres_carpetas_relativos$competiciones); path_rel_timovi <- file.path("..", nombres_carpetas_relativos$timovi); path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras); path_rel_arbitros <- file.path("..", nombres_carpetas_relativos$arbitros); path_rel_estadios <- file.path("..", nombres_carpetas_relativos$estadios)
-        crear_cabecera_alineacion <- function(nombre_equipo_mk, nombre_equipo_lang) {
-          tags$div(class = "alineacion-header", 
-                   get_logo_tag(nombre_equipo_mk, css_class = "match-page-crest"), 
-                   tags$h3(crear_enlace_equipo_condicional(nombre_equipo_mk, nombre_equipo_lang))
-          )
-        }
         alineacion_partido_lang <- apariciones_df %>% filter(id_partido == id_p) %>% left_join(jugadoras_lang_df, by="id")
-        render_equipo_html <- function(df_equipo, goles_del_partido, tarjetas_del_partido, is_national_team_match, team_original_mk_name, duracion_partido) { # <-- CAMBIO 1: Añadir duracion_partido
+        
+        # --- Helper: render lineup for one team (new design) ---
+        render_equipo_html_new <- function(df_equipo, goles_del_partido, tarjetas_del_partido, is_national_team_match, team_original_mk_name, duracion_partido) {
           if (is.null(df_equipo) || nrow(df_equipo) == 0) { return(tags$p(t("match_no_data"))) }
           starters <- df_equipo %>% filter(tipo == "Titular")
           subs <- df_equipo %>% filter(tipo == "Suplente")
@@ -973,139 +969,250 @@ if (hubo_cambios) {
               tarjetas_jugadora <- tarjetas_del_partido %>% filter(id == !!id)
               if (nrow(tarjetas_jugadora) > 0) { walk(1:nrow(tarjetas_jugadora), function(c) { tarjeta <- tarjetas_jugadora[c,]; card_span <- tags$span(class = if (tarjeta$tipo == "Amarilla") "card-yellow" else "card-red"); eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event", card_span, HTML(paste0("︎ ", formatear_minuto_partido(tarjeta$minuto), "'")))) }) }
               if (!is.na(min_entra) && tipo == "Suplente") { eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-in", paste0("↑", min_entra, "'"))) }
-              
-              if (!is.na(min_sale) && min_sale < duracion_partido && !is.na(minutos_jugados) && minutos_jugados > 0) { # <-- CAMBIO 3: Usar duracion_partido en lugar de 90
+              if (!is.na(min_sale) && min_sale < duracion_partido && !is.na(minutos_jugados) && minutos_jugados > 0) {
                 eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-out", paste0("↓", min_sale, "'")))
               }
-              # -------------------------------------------
-              
               icono_p <- if (isTRUE(es_portera)) "🧤" else ""
               icono_c <- if (isTRUE(es_capitana)) "(C)" else ""
-              
               should_be_clickable <- !is_national_team_match || (is_national_team_match && team_original_mk_name == "Македонија")
-              
-              if (should_be_clickable) {
-                player_element <- tags$a(href = file.path(path_rel_jugadoras, paste0(id, ".html")), PlayerName)
-              } else {
-                player_element <- PlayerName
-              }
-              
+              player_element <- if (should_be_clickable) { tags$a(href = file.path(path_rel_jugadoras, paste0(id, ".html")), PlayerName) } else { PlayerName }
               tags$li(paste0(dorsal, ". "), player_element, icono_p, icono_c, eventos_html)
             }))
           }
-          tagList(tags$h4(t("match_starting_lineup")), crear_lista_jugadoras(starters, duracion_partido), tags$h4(t("match_substitutes")), crear_lista_jugadoras(subs, duracion_partido)) # <-- CAMBIO 4: Pasar duracion_partido a las llamadas
+          tagList(
+            tags$div(class = "mp-lineup-sub-header", t("match_starting_lineup")),
+            crear_lista_jugadoras(starters, duracion_partido),
+            tags$div(class = "mp-lineup-sub-header", t("match_substitutes")),
+            crear_lista_jugadoras(subs, duracion_partido)
+          )
         }
-        render_penales_html <- function(df_equipo) { if(is.null(df_equipo) || nrow(df_equipo) == 0) { return(NULL) }; tags$ul(pmap(df_equipo, function(PlayerName, id, dorsal, resultado_penal, ...) { tags$li(if(resultado_penal=="Gol") "✅" else "❌", " ", if(is.na(PlayerName)) "NA" else tags$a(href=file.path(path_rel_jugadoras, paste0(id, ".html")), PlayerName), paste0(" (", dorsal, ")")) })) }
         
-        contenido_partido <- tagList(
-          crear_botones_navegacion(path_to_lang_root = ".."),
-          tags$h2(paste(local_name, "vs", visitante_name)),
-          tags$p(style = "text-align:center; font-size: 1.1em; color: #555; margin-top: -15px; margin-bottom: 20px;", tags$a(href = file.path(path_rel_competiciones, paste0(partido_comp_info$competicion_id, ".html")), comp_nombre_current_lang), " - ", jornada_texto),
-          tags$h3({
-            resultado_texto <- paste(t("final_score"), ":", partido_info$goles_local, "-", partido_info$goles_visitante)
-            if(!is.na(partido_info$penales_local)) { resultado_texto <- paste0(resultado_texto, " (", t("penalties_short"), " ", partido_info$penales_local, "-", partido_info$penales_visitante, ")") }
-            if (isTRUE(partido_info$es_resultado_oficial)) { resultado_texto <- paste(resultado_texto, "*") }
-            resultado_texto
-          }),
-          if(isTRUE(partido_info$es_resultado_oficial)) { tags$p(style="text-align:center; font-weight:bold; color: #8B0000;", t("match_official_result")) },
-          tags$p(
-            paste0(t("match_date"), ": ", partido_info$fecha, " | ", t("match_time"), ": ", partido_info$hora, " | ", t("match_stadium"), ": "), 
-            if (nrow(estadio_info_mk) > 0) {
-              is_stadium_excluded_for_national_match <- partido_info$es_partido_seleccion && (generar_id_seguro(estadio_info_mk$estadio) %in% stadium_ids_to_skip)
-              
-              if (!is_stadium_excluded_for_national_match) {
-                estadio_element <- tags$a(href = file.path(path_rel_estadios, paste0(generar_id_seguro(estadio_info_mk$estadio), ".html")), estadio_name_lang)
-              } else {
-                estadio_element <- estadio_name_lang
-              }
-              estadio_element
+        # --- Helper: render penalties for one team ---
+        render_penales_html <- function(df_equipo) {
+          if(is.null(df_equipo) || nrow(df_equipo) == 0) { return(NULL) }
+          tags$ul(pmap(df_equipo, function(PlayerName, id, dorsal, resultado_penal, ...) {
+            tags$li(
+              if(resultado_penal=="Gol") "✅" else "❌", " ",
+              if(is.na(PlayerName)) "NA" else tags$a(href=file.path(path_rel_jugadoras, paste0(id, ".html")), PlayerName),
+              paste0(" (", dorsal, ")")
+            )
+          }))
+        }
+        
+        # --- Helper: render goals summary for one side ---
+        render_goals_summary <- function(goles_df_side, align) {
+          if (nrow(goles_df_side) == 0) return(NULL)
+          goles_agrupados <- goles_df_side %>%
+            group_by(id, PlayerName, tipo) %>%
+            summarise(minutos = paste0(sapply(minuto, formatear_minuto_partido), "'", collapse = ", "), .groups = "drop")
+          tagList(map(1:nrow(goles_agrupados), function(g) {
+            gol <- goles_agrupados[g,]
+            og_label <- if (gol$tipo == "Autogol") tags$span(class = "mp-og-label", "(AG)") else NULL
+            should_link <- !partido_info$es_partido_seleccion || partido_info$local == "Македонија" || partido_info$visitante == "Македонија"
+            player_el <- if (should_link && !is.na(gol$id)) {
+              tags$a(href = file.path(path_rel_jugadoras, paste0(gol$id, ".html")), tags$span(class = "mp-goal-player", gol$PlayerName))
             } else {
-              t("match_unknown")
+              tags$span(class = "mp-goal-player", gol$PlayerName)
             }
-          ),
-          tags$h3(t("referees_title")),
-          
-          #### MODIFICACIÓN ROBUSTA PARA EL ERROR FATAL Y EL AVISO ####
-          tags$ul(class = "sudii-lista", map(1:nrow(arbitros_partido_lang), function(a) {
+            if (align == "home") {
+              tags$div(class = "mp-goal-row", player_el, og_label, tags$span(class = "mp-goal-minute", gol$minutos))
+            } else {
+              tags$div(class = "mp-goal-row", tags$span(class = "mp-goal-minute", gol$minutos), player_el, og_label)
+            }
+          }))
+        }
+        
+        # --- Helper: build visual timeline ---
+        render_timeline_visual <- function(cronologia, equipo_local_mk) {
+          if (!exists("cronologia") || is.null(cronologia) || nrow(cronologia) == 0) {
+            return(tags$p(class = "mp-timeline-no-events", t("match_timeline_no_events")))
+          }
+          tags$section(class = "mp-timeline-container",
+            tags$div(class = "mp-timeline-line"),
+            tagList(map(1:nrow(cronologia), function(c) {
+              e <- cronologia[c,]
+              es_local <- !is.na(e$equipo_canonico_mk) && e$equipo_canonico_mk == equipo_local_mk
+              minuto_fmt <- paste0(formatear_minuto_partido(e$minuto), "'")
+              
+              # Content for the event
+              player_display <- toupper(e$jugadora_nombre %||% "")
+              sub_display <- if (!is.na(e$jugadora_sub_nombre)) toupper(e$jugadora_sub_nombre) else NULL
+              
+              event_content <- tagList(
+                tags$span(class = "icon", e$icono),
+                tags$span(class = "player", player_display),
+                if (!is.null(sub_display)) tags$span(class = "mp-player-sub", sub_display)
+              )
+              
+              if (es_local) {
+                tags$div(class = "mp-timeline-event",
+                  tags$div(class = "mp-event-top", event_content),
+                  tags$div(class = "mp-minute", minuto_fmt),
+                  tags$div(class = "mp-event-bottom")
+                )
+              } else {
+                tags$div(class = "mp-timeline-event",
+                  tags$div(class = "mp-event-top"),
+                  tags$div(class = "mp-minute", minuto_fmt),
+                  tags$div(class = "mp-event-bottom", event_content)
+                )
+              }
+            }))
+          )
+        }
+        
+        # --- Build stadium element ---
+        estadio_element <- if (nrow(estadio_info_mk) > 0) {
+          is_stadium_excluded <- partido_info$es_partido_seleccion && (generar_id_seguro(estadio_info_mk$estadio) %in% stadium_ids_to_skip)
+          if (!is_stadium_excluded) {
+            tags$a(href = file.path(path_rel_estadios, paste0(generar_id_seguro(estadio_info_mk$estadio), ".html")), estadio_name_lang)
+          } else {
+            estadio_name_lang
+          }
+        } else {
+          t("match_unknown")
+        }
+        
+        # --- Build referees list ---
+        referees_html <- if (nrow(arbitros_partido_lang) > 0) {
+          tags$ul(class = "mp-referees-list", map(1:nrow(arbitros_partido_lang), function(a) {
             arb <- arbitros_partido_lang[a,]
-            
-            # 1. Comprobación ultra-segura para el rol del árbitro.
-            rol_traducido <- "" # Valor por defecto.
-            # Esta condición verifica que 'uloga' existe, es un vector de longitud 1,
-            # no es NA y no es una cadena vacía, antes de intentar traducirlo.
+            rol_traducido <- ""
             if (!is.null(arb$uloga) && length(arb$uloga) == 1 && !is.na(arb$uloga) && nchar(arb$uloga) > 0) {
               rol_traducido <- t(arb$uloga)
             }
-            
-            # 2. Comprobación ultra-segura para la ciudad.
-            nombre_mostrado <- arb$current_lang_name # Valor por defecto.
-            # Esta condición verifica que 'ciudad' existe, es de longitud 1,
-            # no es NA y no es una cadena vacía, antes de usarla.
+            nombre_mostrado <- arb$current_lang_name
             if (!is.null(arb$ciudad) && length(arb$ciudad) == 1 && !is.na(arb$ciudad) && nchar(arb$ciudad) > 0) {
               nombre_mostrado <- paste0(arb$current_lang_name, " (", arb$ciudad, ")")
             }
-            
-            is_arb_excluded_for_national_match <- partido_info$es_partido_seleccion && (generar_id_seguro(arb$ime) %in% referee_ids_to_skip)
-            
-            ref_element <- if (!is_arb_excluded_for_national_match) {
+            is_arb_excluded <- partido_info$es_partido_seleccion && (generar_id_seguro(arb$ime) %in% referee_ids_to_skip)
+            ref_element <- if (!is_arb_excluded) {
               tags$a(href = file.path(path_rel_arbitros, paste0(generar_id_seguro(arb$ime), ".html")), nombre_mostrado)
             } else {
               nombre_mostrado
             }
-            
             tags$li(paste0(rol_traducido, ": "), ref_element)
-          })),
-          #### FIN DE LA MODIFICACIÓN ####
+          }))
+        } else { NULL }
+        
+        # --- Goals summary data ---
+        goles_resumen_local_name <- resumen_partido$partido_info$local
+        goles_local_df <- goles_partido %>% filter(equipo_acreditado == goles_resumen_local_name)
+        goles_visitante_df <- goles_partido %>% filter(equipo_acreditado != goles_resumen_local_name)
+        
+        # --- MAIN CONTENT ---
+        contenido_partido <- tagList(
+          crear_botones_navegacion(path_to_lang_root = ".."),
           
-          if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) { tagList(tags$h3(t("officials_notes")), tags$p(style = "white-space: pre-wrap; background-color: #f9f9f9; border-left: 3px solid #ccc; padding: 10px;", nota_arbitro)) },
-          
-          tags$h3(t("lineups_title")),
-          tags$div(class = "alineaciones-container", 
-                   tags$div(class = "columna-alineacion", 
-                            crear_cabecera_alineacion(partido_info$local, local_name), 
-                            render_equipo_html(
-                              filter(alineacion_partido_lang, equipo == partido_info$local), 
-                              goles_partido, 
-                              tarjetas_partido,
-                              partido_info$es_partido_seleccion,
-                              partido_info$local,
-                              partido_info$duracion_partido
-                            )
-                   ), 
-                   tags$div(class = "columna-alineacion", 
-                            crear_cabecera_alineacion(partido_info$visitante, visitante_name), 
-                            render_equipo_html(
-                              filter(alineacion_partido_lang, equipo == partido_info$visitante), 
-                              goles_partido, 
-                              tarjetas_partido,
-                              partido_info$es_partido_seleccion,
-                              partido_info$visitante,
-                              partido_info$duracion_partido
-                            )
-                   )
-          ),
-          
-          tags$h3(t("timeline_title")),
-          tags$ul(class = "timeline", if (exists("cronologia") && nrow(cronologia) > 0) { map(1:nrow(cronologia), function(c) { e <- cronologia[c,]; tags$li(HTML(paste0("<span class='icon'>", e$icono, "</span>")), paste0(formatear_minuto_partido(e$minuto), "' - "), HTML(e$texto_evento)) }) } else { tags$li(t("match_timeline_no_events")) }),
-          
-          if (!is.na(partido_info$penales_local) && nrow(penales_partido) > 0) {
-            tagList(
-              tags$h3(t("penalties_title")),
-              tags$div(
-                class = "penales-container",
-                tags$div(
-                  class = "columna-penales", 
-                  tags$h4(local_name), 
-                  render_penales_html(filter(penales_partido, equipo == partido_info$local))
+          tags$div(class = "mp-container",
+            
+            # === SCOREBOARD ===
+            tags$header(class = "mp-scoreboard",
+              tags$div(class = "mp-team mp-team-home",
+                tags$div(class = "mp-team-name", crear_enlace_equipo_condicional(partido_info$local, local_name)),
+                tags$div(class = "mp-team-logo", get_logo_tag(partido_info$local, css_class = ""))
+              ),
+              tags$div(class = "mp-score-container",
+                tags$div(class = "mp-score", paste(partido_info$goles_local, "-", partido_info$goles_visitante)),
+                tags$div(class = "mp-status", t("final_score")),
+                if (!is.na(partido_info$penales_local)) {
+                  tags$div(class = "mp-penalties-note", paste0("(", t("penalties_short"), " ", partido_info$penales_local, "-", partido_info$penales_visitante, ")"))
+                },
+                if (isTRUE(partido_info$es_resultado_oficial)) {
+                  tags$div(class = "mp-official-result", t("match_official_result"))
+                }
+              ),
+              tags$div(class = "mp-team mp-team-away",
+                tags$div(class = "mp-team-logo", get_logo_tag(partido_info$visitante, css_class = "")),
+                tags$div(class = "mp-team-name", crear_enlace_equipo_condicional(partido_info$visitante, visitante_name))
+              )
+            ),
+            
+            # === MATCH INFO (Goals Summary + Details) ===
+            tags$section(class = "mp-match-info",
+              # Goals summary box
+              tags$div(class = "mp-info-box mp-goals-summary",
+                tags$div(class = "mp-goals-title", t("stats_goals")),
+                tags$div(class = "mp-goals-grid",
+                  tags$div(class = "mp-goals-home", render_goals_summary(goles_local_df, "home")),
+                  tags$div(class = "mp-goals-away", render_goals_summary(goles_visitante_df, "away"))
+                )
+              ),
+              # Details box
+              tags$div(class = "mp-info-box",
+                tags$div(class = "mp-detail-row",
+                  tags$span(paste0("⏱️ ", partido_info$fecha)),
+                  tags$span(partido_info$hora)
                 ),
-                tags$div(
-                  class = "columna-penales", 
-                  tags$h4(visitante_name), 
-                  render_penales_html(filter(penales_partido, equipo == partido_info$visitante))
+                tags$div(class = "mp-detail-row",
+                  tags$span("🏟️ ", estadio_element)
+                ),
+                tags$div(class = "mp-detail-row",
+                  tags$span("⚖️ ", referees_html)
+                ),
+                if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) {
+                  tags$p(class = "mp-notes", nota_arbitro)
+                }
+              )
+            ),
+            
+            # === COMPETITION HEADER ===
+            tags$section(class = "mp-competition-header",
+              tags$h2(tags$a(href = file.path(path_rel_competiciones, paste0(partido_comp_info$competicion_id, ".html")), comp_nombre_current_lang)),
+              tags$p(paste0(jornada_texto, " · ", partido_info$fecha))
+            ),
+            
+            # === VISUAL TIMELINE ===
+            render_timeline_visual(cronologia, partido_info$local),
+            
+            # === LINEUPS ===
+            tags$section(class = "mp-lineups-section",
+              tags$h3(class = "mp-section-title", t("lineups_title")),
+              tags$div(class = "mp-lineups-grid",
+                tags$div(class = "mp-lineup",
+                  tags$div(class = "mp-lineup-header",
+                    get_logo_tag(partido_info$local, css_class = ""),
+                    tags$h4(crear_enlace_equipo_condicional(partido_info$local, local_name))
+                  ),
+                  render_equipo_html_new(
+                    filter(alineacion_partido_lang, equipo == partido_info$local),
+                    goles_partido, tarjetas_partido,
+                    partido_info$es_partido_seleccion, partido_info$local,
+                    partido_info$duracion_partido
+                  )
+                ),
+                tags$div(class = "mp-lineup",
+                  tags$div(class = "mp-lineup-header",
+                    get_logo_tag(partido_info$visitante, css_class = ""),
+                    tags$h4(crear_enlace_equipo_condicional(partido_info$visitante, visitante_name))
+                  ),
+                  render_equipo_html_new(
+                    filter(alineacion_partido_lang, equipo == partido_info$visitante),
+                    goles_partido, tarjetas_partido,
+                    partido_info$es_partido_seleccion, partido_info$visitante,
+                    partido_info$duracion_partido
+                  )
                 )
               )
-            )
-          },
+            ),
+            
+            # === PENALTIES (if applicable) ===
+            if (!is.na(partido_info$penales_local) && nrow(penales_partido) > 0) {
+              tags$section(class = "mp-penales-section",
+                tags$h3(class = "mp-section-title", t("penalties_title")),
+                tags$div(class = "mp-penales-grid",
+                  tags$div(
+                    tags$h4(local_name),
+                    render_penales_html(filter(penales_partido, equipo == partido_info$local))
+                  ),
+                  tags$div(
+                    tags$h4(visitante_name),
+                    render_penales_html(filter(penales_partido, equipo == partido_info$visitante))
+                  )
+                )
+              )
+            }
+          ),
           
           crear_botones_navegacion(path_to_lang_root = "..")
         )
