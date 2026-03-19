@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište Vo S. Jegunovce, S. Jegunovce</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,62 +74,82 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište Vo S. Jegunovce, S. Jegunovce</h2>
-        <h3>Match history</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Round</th>
-              <th>Match</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>03.11.2019</td>
-              <td>19/20</td>
-              <td>Women's First League 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956610.html">Ljuboten vs Rečica</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>19.10.2019</td>
-              <td>19/20</td>
-              <td>Women's First League 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956597.html">Ljuboten vs Borec</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>17.09.2019</td>
-              <td>19/20</td>
-              <td>Women's First League 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956584.html">Ljuboten vs Brera Tiverija</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>07.09.2019</td>
-              <td>19/20</td>
-              <td>Women's First League 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956571.html">Ljuboten vs Atletiko</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište Vo S. Jegunovce, S. Jegunovce</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Match history</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Competition</th>
+                  <th>Round</th>
+                  <th>Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956610.html&#39;">
+                  <td>03.11.2019</td>
+                  <td>Women's First League 19/20</td>
+                  <td>8</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <span class="sp-result">0 - 5</span>
+                      <span class="sp-team-name">Rečica</span>
+                      <img class="sp-table-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956597.html&#39;">
+                  <td>19.10.2019</td>
+                  <td>Women's First League 19/20</td>
+                  <td>6</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <span class="sp-result">2 - 3</span>
+                      <span class="sp-team-name">Borec</span>
+                      <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956584.html&#39;">
+                  <td>17.09.2019</td>
+                  <td>Women's First League 19/20</td>
+                  <td>4</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <span class="sp-result">0 - 8</span>
+                      <span class="sp-team-name">Brera Tiverija</span>
+                      <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956571.html&#39;">
+                  <td>07.09.2019</td>
+                  <td>Women's First League 19/20</td>
+                  <td>2</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <span class="sp-result">0 - 3</span>
+                      <span class="sp-team-name">Atletiko</span>
+                      <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

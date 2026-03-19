@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište  Vo  S. Kamenjane, S. Kamenjane , Bogovinje</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište  Vo  S. Kamenjane, S. Kamenjane , Bogovinje</h2>
-        <h3>Historial de partidos</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Jornada</th>
-              <th>Partido</th>
-              <th>Resultado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>10.11.2018</td>
-              <td>18/19</td>
-              <td>Primera Liga Femenina 18/19</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1472070.html">Tetova 2017 vs Kočani</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište  Vo  S. Kamenjane, S. Kamenjane , Bogovinje</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial de partidos</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Competición</th>
+                  <th>Jornada</th>
+                  <th>Partido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1472070.html&#39;">
+                  <td>10.11.2018</td>
+                  <td>Primera Liga Femenina 18/19</td>
+                  <td>10</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/tetova_2017.png" alt="Тетова 2017"/>
+                      <span class="sp-team-name">Tetova 2017</span>
+                      <span class="sp-result">3 - 2</span>
+                      <span class="sp-team-name">Kočani</span>
+                      <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

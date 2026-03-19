@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište Sc.istatov-Crničani, S.crničani-Dojran</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,62 +74,82 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište Sc.istatov-Crničani, S.crničani-Dojran</h2>
-        <h3>Match history</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Round</th>
-              <th>Match</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>02.12.2017</td>
-              <td>17/18</td>
-              <td>Women's First League 17/18</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1002421.html">Istatov vs Skopje 2014</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>18.11.2017</td>
-              <td>17/18</td>
-              <td>Women's First League 17/18</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1002410.html">Istatov vs Rečica</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>04.11.2017</td>
-              <td>17/18</td>
-              <td>Women's First League 17/18</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1002399.html">Istatov vs Atletiko</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>28.10.2017</td>
-              <td>17/18</td>
-              <td>Women's First League 17/18</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1002388.html">Istatov vs Top Gol</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište Sc.istatov-Crničani, S.crničani-Dojran</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Match history</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Competition</th>
+                  <th>Round</th>
+                  <th>Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002421.html&#39;">
+                  <td>02.12.2017</td>
+                  <td>Women's First League 17/18</td>
+                  <td>10</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                      <span class="sp-team-name">Istatov</span>
+                      <span class="sp-result">1 - 3</span>
+                      <span class="sp-team-name">Skopje 2014</span>
+                      <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002410.html&#39;">
+                  <td>18.11.2017</td>
+                  <td>Women's First League 17/18</td>
+                  <td>8</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                      <span class="sp-team-name">Istatov</span>
+                      <span class="sp-result">8 - 2</span>
+                      <span class="sp-team-name">Rečica</span>
+                      <img class="sp-table-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002399.html&#39;">
+                  <td>04.11.2017</td>
+                  <td>Women's First League 17/18</td>
+                  <td>6</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                      <span class="sp-team-name">Istatov</span>
+                      <span class="sp-result">0 - 4</span>
+                      <span class="sp-team-name">Atletiko</span>
+                      <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002388.html&#39;">
+                  <td>28.10.2017</td>
+                  <td>Women's First League 17/18</td>
+                  <td>5</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                      <span class="sp-team-name">Istatov</span>
+                      <span class="sp-result">3 - 2</span>
+                      <span class="sp-team-name">Top Gol</span>
+                      <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

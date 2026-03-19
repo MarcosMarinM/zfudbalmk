@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Stadion S.čegrane, Čegrane</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,42 +74,54 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Stadion S.čegrane, Čegrane</h2>
-        <h3>Historial de partidos</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Jornada</th>
-              <th>Partido</th>
-              <th>Resultado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>16.11.2019</td>
-              <td>19/20</td>
-              <td>Primera Liga Femenina 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956623.html">Ljuboten vs Kamenica Sasa</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>13.04.2019</td>
-              <td>18/19</td>
-              <td>Primera Liga Femenina 18/19</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1472126.html">Ljuboten vs Rečica</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Stadion S.čegrane, Čegrane</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial de partidos</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Competición</th>
+                  <th>Jornada</th>
+                  <th>Partido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956623.html&#39;">
+                  <td>16.11.2019</td>
+                  <td>Primera Liga Femenina 19/20</td>
+                  <td>10</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <span class="sp-result">0 - 3</span>
+                      <span class="sp-team-name">Kamenica Sasa</span>
+                      <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1472126.html&#39;">
+                  <td>13.04.2019</td>
+                  <td>Primera Liga Femenina 18/19</td>
+                  <td>18</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <span class="sp-result">1 - 3</span>
+                      <span class="sp-team-name">Rečica</span>
+                      <img class="sp-table-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Марјан Стојановски</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,118 +74,136 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Марјан Стојановски</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marjan_stojanovski-1&#39;)">
-              <td>24/25</td>
-              <td>Прва ЖФЛ 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-marjan_stojanovski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>02.03.2025</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/8327792.html">Топ Гол vs Љуботен</a>
-                        </td>
-                        <td>0 - 8</td>
-                        <td>Главен судија</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marjan_stojanovski-2&#39;)">
-              <td>23/24</td>
-              <td>Прва ЖФЛ 23/24</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-marjan_stojanovski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>02.12.2023</td>
-                        <td>14</td>
-                        <td>
-                          <a href="../natprevari/6961911.html">АС Јунајтед vs Цевитана</a>
-                        </td>
-                        <td>2 - 0</td>
-                        <td>Главен судија</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marjan_stojanovski-3&#39;)">
-              <td>17/18</td>
-              <td>Прва ЖФЛ 17/18</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-marjan_stojanovski-3" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>16.05.2018</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/1002481.html">Брера Тиверија vs Скопје 2014</a>
-                        </td>
-                        <td>2 - 1</td>
-                        <td>Главен судија</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Марјан Стојановски</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marjan_stojanovski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Прва ЖФЛ 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-marjan_stojanovski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8327792.html&#39;">
+                            <td>02.03.2025</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                                <span class="sp-team-name">Топ Гол</span>
+                                <span class="sp-result">0 - 8</span>
+                                <span class="sp-team-name">Љуботен</span>
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marjan_stojanovski-2&#39;)">
+                  <td>23/24</td>
+                  <td>Прва ЖФЛ 23/24</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-marjan_stojanovski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/6961911.html&#39;">
+                            <td>02.12.2023</td>
+                            <td>14</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">АС Јунајтед</span>
+                                <span class="sp-result">2 - 0</span>
+                                <span class="sp-team-name">Цевитана</span>
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marjan_stojanovski-3&#39;)">
+                  <td>17/18</td>
+                  <td>Прва ЖФЛ 17/18</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-marjan_stojanovski-3" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002481.html&#39;">
+                            <td>16.05.2018</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                                <span class="sp-team-name">Брера Тиверија</span>
+                                <span class="sp-result">2 - 1</span>
+                                <span class="sp-team-name">Скопје 2014</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Коце Милчев</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,94 +74,113 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Коце Милчев</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-koce_milcev-1&#39;)">
-              <td>21/22</td>
-              <td>Прва ЖФЛ 21/22</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-koce_milcev-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>04.12.2021</td>
-                        <td>9</td>
-                        <td>
-                          <a href="../natprevari/4426248.html">Цевитана vs Топ Гол</a>
-                        </td>
-                        <td>6 - 1</td>
-                        <td>2-ри помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-koce_milcev-2&#39;)">
-              <td>20/21</td>
-              <td>Прва ЖФЛ 20/21</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-koce_milcev-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>03.04.2021</td>
-                        <td>21</td>
-                        <td>
-                          <a href="../natprevari/3268050.html">Плачковица vs Топ Гол</a>
-                        </td>
-                        <td>0 - 3</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                      <tr>
-                        <td>20.03.2021</td>
-                        <td>18</td>
-                        <td>
-                          <a href="../natprevari/3268026.html">Каменица Саса vs Шкупи</a>
-                        </td>
-                        <td>9 - 0</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Коце Милчев</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-koce_milcev-1&#39;)">
+                  <td>21/22</td>
+                  <td>Прва ЖФЛ 21/22</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-koce_milcev-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/4426248.html&#39;">
+                            <td>04.12.2021</td>
+                            <td>9</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                                <span class="sp-team-name">Цевитана</span>
+                                <span class="sp-result">6 - 1</span>
+                                <span class="sp-team-name">Топ Гол</span>
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                              </span>
+                            </td>
+                            <td>2-ри помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-koce_milcev-2&#39;)">
+                  <td>20/21</td>
+                  <td>Прва ЖФЛ 20/21</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-koce_milcev-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3268050.html&#39;">
+                            <td>03.04.2021</td>
+                            <td>21</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                                <span class="sp-team-name">Плачковица</span>
+                                <span class="sp-result">0 - 3</span>
+                                <span class="sp-team-name">Топ Гол</span>
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3268026.html&#39;">
+                            <td>20.03.2021</td>
+                            <td>18</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Каменица Саса</span>
+                                <span class="sp-result">9 - 0</span>
+                                <span class="sp-team-name">Шкупи</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skupi.png" alt="Шкупи"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

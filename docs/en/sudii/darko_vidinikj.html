@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Darko Vidinikj</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,52 +74,62 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Darko Vidinikj</h2>
-        <h3>History by competition</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Matches</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-darko_vidinikj-1&#39;)">
-              <td>25/26</td>
-              <td>Women's First League 25/26</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-darko_vidinikj-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>15.03.2026</td>
-                        <td>18</td>
-                        <td>
-                          <a href="../natprevari/9950292.html">Skopje 2014 vs Kamenica Sasa</a>
-                        </td>
-                        <td>2 - 0</td>
-                        <td>2nd assistant</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Darko Vidinikj</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">History by competition</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Season</th>
+                  <th>Competition</th>
+                  <th>Matches</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-darko_vidinikj-1&#39;)">
+                  <td>25/26</td>
+                  <td>Women's First League 25/26</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-darko_vidinikj-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/9950292.html&#39;">
+                            <td>15.03.2026</td>
+                            <td>18</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">2 - 0</span>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                              </span>
+                            </td>
+                            <td>2nd assistant</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište Vo Gorno Lisiče</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,52 +74,68 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište Vo Gorno Lisiče</h2>
-        <h3>Match history</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Round</th>
-              <th>Match</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>08.11.2025</td>
-              <td>25/26</td>
-              <td>Women's Second League 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057573.html">Sloboden vs Borec</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>26.10.2025</td>
-              <td>25/26</td>
-              <td>Women's Second League 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057572.html">Sloboden vs Poreče</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>11.10.2025</td>
-              <td>25/26</td>
-              <td>Women's Second League 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057568.html">Sloboden vs Konzuli</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište Vo Gorno Lisiče</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Match history</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Competition</th>
+                  <th>Round</th>
+                  <th>Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057573.html&#39;">
+                  <td>08.11.2025</td>
+                  <td>Women's Second League 25/26</td>
+                  <td>7</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/sloboden.png" alt="Слободен"/>
+                      <span class="sp-team-name">Sloboden</span>
+                      <span class="sp-result">0 - 8</span>
+                      <span class="sp-team-name">Borec</span>
+                      <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057572.html&#39;">
+                  <td>26.10.2025</td>
+                  <td>Women's Second League 25/26</td>
+                  <td>6</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/sloboden.png" alt="Слободен"/>
+                      <span class="sp-team-name">Sloboden</span>
+                      <span class="sp-result">1 - 8</span>
+                      <span class="sp-team-name">Poreče</span>
+                      <img class="sp-table-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057568.html&#39;">
+                  <td>11.10.2025</td>
+                  <td>Women's Second League 25/26</td>
+                  <td>5</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/sloboden.png" alt="Слободен"/>
+                      <span class="sp-team-name">Sloboden</span>
+                      <span class="sp-result">0 - 12</span>
+                      <span class="sp-team-name">Konzuli</span>
+                      <img class="sp-table-logo" src="../../assets/logos/konzuli.png" alt="Конзули"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

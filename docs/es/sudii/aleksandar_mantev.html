@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aleksandar Mantev</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,85 +74,99 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Aleksandar Mantev</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-aleksandar_mantev-1&#39;)">
-              <td>24/25</td>
-              <td>Liga Femenina Cadete 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-aleksandar_mantev-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>19.10.2024</td>
-                        <td>2</td>
-                        <td>
-                          <a href="../natprevari/8613465.html">Plačkovica vs Biljanini Izvori</a>
-                        </td>
-                        <td>0 - 1</td>
-                        <td>2.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-aleksandar_mantev-2&#39;)">
-              <td>24/25</td>
-              <td>Segunda Liga Femenina 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-aleksandar_mantev-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>29.09.2024</td>
-                        <td>3</td>
-                        <td>
-                          <a href="../natprevari/8372761.html">Pobeda 16 vs Poreče</a>
-                        </td>
-                        <td>1 - 1</td>
-                        <td>2.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Aleksandar Mantev</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-aleksandar_mantev-1&#39;)">
+                  <td>24/25</td>
+                  <td>Liga Femenina Cadete 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-aleksandar_mantev-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613465.html&#39;">
+                            <td>19.10.2024</td>
+                            <td>2</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                                <span class="sp-team-name">Plačkovica</span>
+                                <span class="sp-result">0 - 1</span>
+                                <span class="sp-team-name">Biljanini Izvori</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>2.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-aleksandar_mantev-2&#39;)">
+                  <td>24/25</td>
+                  <td>Segunda Liga Femenina 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-aleksandar_mantev-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8372761.html&#39;">
+                            <td>29.09.2024</td>
+                            <td>3</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                                <span class="sp-team-name">Pobeda 16</span>
+                                <span class="sp-result">1 - 1</span>
+                                <span class="sp-team-name">Poreče</span>
+                                <img class="sp-table-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                              </span>
+                            </td>
+                            <td>2.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište Vo S.podareš Radoviš, S.podareš</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,42 +74,54 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište Vo S.podareš Radoviš, S.podareš</h2>
-        <h3>Match history</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Round</th>
-              <th>Match</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>27.03.2021</td>
-              <td>20/21</td>
-              <td>Women's First League 20/21</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/3268033.html">Plačkovica vs Ljuboten</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>29.02.2020</td>
-              <td>19/20</td>
-              <td>Women's First League 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956652.html">Plačkovica vs Atletiko</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište Vo S.podareš Radoviš, S.podareš</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Match history</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Competition</th>
+                  <th>Round</th>
+                  <th>Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3268033.html&#39;">
+                  <td>27.03.2021</td>
+                  <td>Women's First League 20/21</td>
+                  <td>19</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                      <span class="sp-team-name">Plačkovica</span>
+                      <span class="sp-result">0 - 6</span>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956652.html&#39;">
+                  <td>29.02.2020</td>
+                  <td>Women's First League 19/20</td>
+                  <td>14</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                      <span class="sp-team-name">Plačkovica</span>
+                      <span class="sp-result">3 - 2</span>
+                      <span class="sp-team-name">Atletiko</span>
+                      <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

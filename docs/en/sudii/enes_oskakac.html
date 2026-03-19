@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Enes Oskakač</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,112 +74,141 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Enes Oskakač</h2>
-        <h3>History by competition</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Matches</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-enes_oskakac-1&#39;)">
-              <td>24/25</td>
-              <td>Women's Cadet League 24/25</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-enes_oskakac-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>10.05.2025</td>
-                        <td>22</td>
-                        <td>
-                          <a href="../natprevari/8613608.html">Dži-Dži vs Plačkovica</a>
-                        </td>
-                        <td>10 - 0</td>
-                        <td>2nd assistant</td>
-                      </tr>
-                      <tr>
-                        <td>26.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8613590.html">Skopje 2014 vs Kamenica Sasa</a>
-                        </td>
-                        <td>3 - 1</td>
-                        <td>2nd assistant</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-enes_oskakac-2&#39;)">
-              <td>24/25</td>
-              <td>Women's Youth League 24/25</td>
-              <td>3</td>
-            </tr>
-            <tr id="details-arbitro-enes_oskakac-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>03.05.2025</td>
-                        <td>21</td>
-                        <td>
-                          <a href="../natprevari/8612622.html">AS United vs Istatov</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>1st assistant</td>
-                      </tr>
-                      <tr>
-                        <td>26.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8612614.html">Skopje 2014 vs Kamenica Sasa</a>
-                        </td>
-                        <td>4 - 0</td>
-                        <td>2nd assistant</td>
-                      </tr>
-                      <tr>
-                        <td>26.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8612617.html">Istatov vs Atletiko</a>
-                        </td>
-                        <td>2 - 3</td>
-                        <td>Referee</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Enes Oskakač</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">History by competition</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Season</th>
+                  <th>Competition</th>
+                  <th>Matches</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-enes_oskakac-1&#39;)">
+                  <td>24/25</td>
+                  <td>Women's Cadet League 24/25</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-enes_oskakac-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613608.html&#39;">
+                            <td>10.05.2025</td>
+                            <td>22</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/dzi-dzi.png" alt="Џи-Џи"/>
+                                <span class="sp-team-name">Dži-Dži</span>
+                                <span class="sp-result">10 - 0</span>
+                                <span class="sp-team-name">Plačkovica</span>
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                              </span>
+                            </td>
+                            <td>2nd assistant</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613590.html&#39;">
+                            <td>26.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">3 - 1</span>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                              </span>
+                            </td>
+                            <td>2nd assistant</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-enes_oskakac-2&#39;)">
+                  <td>24/25</td>
+                  <td>Women's Youth League 24/25</td>
+                  <td>3</td>
+                </tr>
+                <tr id="details-arbitro-enes_oskakac-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612622.html&#39;">
+                            <td>03.05.2025</td>
+                            <td>21</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Istatov</span>
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                              </span>
+                            </td>
+                            <td>1st assistant</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612614.html&#39;">
+                            <td>26.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">4 - 0</span>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                              </span>
+                            </td>
+                            <td>2nd assistant</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612617.html&#39;">
+                            <td>26.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                                <span class="sp-team-name">Istatov</span>
+                                <span class="sp-result">2 - 3</span>
+                                <span class="sp-team-name">Atletiko</span>
+                                <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                              </span>
+                            </td>
+                            <td>Referee</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Марко Спироски</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,130 +74,169 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Марко Спироски</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-1&#39;)">
-              <td>24/25</td>
-              <td>Кадетска Женска Фудбалска Лига 24/25</td>
-              <td>4</td>
-            </tr>
-            <tr id="details-arbitro-marko_spiroski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>29.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8613591.html">Љуботен vs Билјанини Извори</a>
-                        </td>
-                        <td>2 - 0</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                      <tr>
-                        <td>31.03.2025</td>
-                        <td>16</td>
-                        <td>
-                          <a href="../natprevari/8613567.html">Шкендија vs Ускана</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>2-ри помошник</td>
-                      </tr>
-                      <tr>
-                        <td>29.03.2025</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/8613560.html">Љуботен vs Брера Тиверија</a>
-                        </td>
-                        <td>2 - 0</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                      <tr>
-                        <td>01.03.2025</td>
-                        <td>12</td>
-                        <td>
-                          <a href="../natprevari/8613535.html">Љуботен vs Тиквешанки</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>Главен судија</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-2&#39;)">
-              <td>24/25</td>
-              <td>Младинска Женска Фудбалска Лига 24/25</td>
-              <td>3</td>
-            </tr>
-            <tr id="details-arbitro-marko_spiroski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>29.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8612615.html">Љуботен vs Билјанини Извори</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Главен судија</td>
-                      </tr>
-                      <tr>
-                        <td>29.03.2025</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/8612584.html">Љуботен vs Брера Тиверија</a>
-                        </td>
-                        <td>3 - 1</td>
-                        <td>Главен судија</td>
-                      </tr>
-                      <tr>
-                        <td>01.03.2025</td>
-                        <td>12</td>
-                        <td>
-                          <a href="../natprevari/8612559.html">Љуботен vs Победа 16</a>
-                        </td>
-                        <td>12 - 1</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Марко Спироски</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Кадетска Женска Фудбалска Лига 24/25</td>
+                  <td>4</td>
+                </tr>
+                <tr id="details-arbitro-marko_spiroski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613591.html&#39;">
+                            <td>29.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Љуботен</span>
+                                <span class="sp-result">2 - 0</span>
+                                <span class="sp-team-name">Билјанини Извори</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613567.html&#39;">
+                            <td>31.03.2025</td>
+                            <td>16</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                                <span class="sp-team-name">Шкендија</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Ускана</span>
+                                <img class="sp-table-logo" src="../../assets/logos/uskana.png" alt="Ускана"/>
+                              </span>
+                            </td>
+                            <td>2-ри помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613560.html&#39;">
+                            <td>29.03.2025</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Љуботен</span>
+                                <span class="sp-result">2 - 0</span>
+                                <span class="sp-team-name">Брера Тиверија</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613535.html&#39;">
+                            <td>01.03.2025</td>
+                            <td>12</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Љуботен</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Тиквешанки</span>
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-2&#39;)">
+                  <td>24/25</td>
+                  <td>Младинска Женска Фудбалска Лига 24/25</td>
+                  <td>3</td>
+                </tr>
+                <tr id="details-arbitro-marko_spiroski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612615.html&#39;">
+                            <td>29.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Љуботен</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Билјанини Извори</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612584.html&#39;">
+                            <td>29.03.2025</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Љуботен</span>
+                                <span class="sp-result">3 - 1</span>
+                                <span class="sp-team-name">Брера Тиверија</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612559.html&#39;">
+                            <td>01.03.2025</td>
+                            <td>12</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Љуботен</span>
+                                <span class="sp-result">12 - 1</span>
+                                <span class="sp-team-name">Победа 16</span>
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

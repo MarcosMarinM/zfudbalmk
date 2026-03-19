@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nikola Nikolov</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,112 +74,141 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Nikola Nikolov</h2>
-        <h3>Historia sipas garave</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Ndeshje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-nikola_nikolov-1&#39;)">
-              <td>25/26</td>
-              <td>Liga e Kadeteve 25/26</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-nikola_nikolov-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>22.11.2025</td>
-                        <td>11</td>
-                        <td>
-                          <a href="../natprevari/10058948.html">Skopje 2014 vs Uskana</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                      <tr>
-                        <td>13.09.2025</td>
-                        <td>1</td>
-                        <td>
-                          <a href="../natprevari/10058893.html">Skopje 2014 vs Top Gol</a>
-                        </td>
-                        <td>7 - 0</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-nikola_nikolov-2&#39;)">
-              <td>25/26</td>
-              <td>Liga e të Rejave 25/26</td>
-              <td>3</td>
-            </tr>
-            <tr id="details-arbitro-nikola_nikolov-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>22.11.2025</td>
-                        <td>11</td>
-                        <td>
-                          <a href="../natprevari/10058074.html">Skopje 2014 vs Poreče</a>
-                        </td>
-                        <td>12 - 0</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>23.10.2025</td>
-                        <td>6</td>
-                        <td>
-                          <a href="../natprevari/10058046.html">Vardar vs Biljanini Izvori</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>13.09.2025</td>
-                        <td>1</td>
-                        <td>
-                          <a href="../natprevari/10058019.html">Skopje 2014 vs Biljanini Izvori</a>
-                        </td>
-                        <td>15 - 0</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Nikola Nikolov</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia sipas garave</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Sezoni</th>
+                  <th>Gara</th>
+                  <th>Ndeshje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-nikola_nikolov-1&#39;)">
+                  <td>25/26</td>
+                  <td>Liga e Kadeteve 25/26</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-nikola_nikolov-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058948.html&#39;">
+                            <td>22.11.2025</td>
+                            <td>11</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Uskana</span>
+                                <img class="sp-table-logo" src="../../assets/logos/uskana.png" alt="Ускана"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058893.html&#39;">
+                            <td>13.09.2025</td>
+                            <td>1</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">7 - 0</span>
+                                <span class="sp-team-name">Top Gol</span>
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-nikola_nikolov-2&#39;)">
+                  <td>25/26</td>
+                  <td>Liga e të Rejave 25/26</td>
+                  <td>3</td>
+                </tr>
+                <tr id="details-arbitro-nikola_nikolov-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058074.html&#39;">
+                            <td>22.11.2025</td>
+                            <td>11</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">12 - 0</span>
+                                <span class="sp-team-name">Poreče</span>
+                                <img class="sp-table-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058046.html&#39;">
+                            <td>23.10.2025</td>
+                            <td>6</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                                <span class="sp-team-name">Vardar</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Biljanini Izvori</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058019.html&#39;">
+                            <td>13.09.2025</td>
+                            <td>1</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">15 - 0</span>
+                                <span class="sp-team-name">Biljanini Izvori</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

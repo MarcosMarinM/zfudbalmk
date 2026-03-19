@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fk„Fortuna„, Skopje</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Fk„Fortuna„, Skopje</h2>
-        <h3>Historia e ndeshjeve</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Raundi</th>
-              <th>Ndeshja</th>
-              <th>Rezultati</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>16.08.2020</td>
-              <td>20/21</td>
-              <td>Liga e Parë e Femrave 20/21</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/3267891.html">Shkupi vs Borec</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Fk„Fortuna„, Skopje</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia e ndeshjeve</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gara</th>
+                  <th>Raundi</th>
+                  <th>Ndeshja</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267891.html&#39;">
+                  <td>16.08.2020</td>
+                  <td>Liga e Parë e Femrave 20/21</td>
+                  <td>1</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/skupi.png" alt="Шкупи"/>
+                      <span class="sp-team-name">Shkupi</span>
+                      <span class="sp-result">3 - 3</span>
+                      <span class="sp-team-name">Borec</span>
+                      <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

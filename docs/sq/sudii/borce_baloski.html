@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Borče Baloski</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,79 +74,104 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Borče Baloski</h2>
-        <h3>Historia sipas garave</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Ndeshje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-borce_baloski-1&#39;)">
-              <td>24/25</td>
-              <td>Liga e të Rejave 24/25</td>
-              <td>4</td>
-            </tr>
-            <tr id="details-arbitro-borce_baloski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>19.04.2025</td>
-                        <td>19</td>
-                        <td>
-                          <a href="../natprevari/8612607.html">AS United vs Pobeda 16</a>
-                        </td>
-                        <td>6 - 0</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>05.04.2025</td>
-                        <td>17</td>
-                        <td>
-                          <a href="../natprevari/8612592.html">AS United vs Cevitana</a>
-                        </td>
-                        <td>3 - 1</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>31.03.2025</td>
-                        <td>16</td>
-                        <td>
-                          <a href="../natprevari/8612591.html">AS United vs Atletiko</a>
-                        </td>
-                        <td>0 - 1</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>08.03.2025</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/8612566.html">AS United vs Kamenica Sasa</a>
-                        </td>
-                        <td>1 - 2</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Borče Baloski</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia sipas garave</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Sezoni</th>
+                  <th>Gara</th>
+                  <th>Ndeshje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-borce_baloski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Liga e të Rejave 24/25</td>
+                  <td>4</td>
+                </tr>
+                <tr id="details-arbitro-borce_baloski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612607.html&#39;">
+                            <td>19.04.2025</td>
+                            <td>19</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">6 - 0</span>
+                                <span class="sp-team-name">Pobeda 16</span>
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612592.html&#39;">
+                            <td>05.04.2025</td>
+                            <td>17</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">3 - 1</span>
+                                <span class="sp-team-name">Cevitana</span>
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612591.html&#39;">
+                            <td>31.03.2025</td>
+                            <td>16</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">0 - 1</span>
+                                <span class="sp-team-name">Atletiko</span>
+                                <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612566.html&#39;">
+                            <td>08.03.2025</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">1 - 2</span>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

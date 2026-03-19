@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Фудбалско игралиште АМС (Валандово)</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Фудбалско игралиште АМС (Валандово)</h2>
-        <h3>Историја на натпревари</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Датум</th>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Коло</th>
-              <th>Натпревар</th>
-              <th>Резултат</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>05.11.2023</td>
-              <td>23/24</td>
-              <td>КУП на РМ за Жени 23/24</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/7385646.html">Победа 16 vs Плачковица</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Фудбалско игралиште АМС (Валандово)</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја на натпревари</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Датум</th>
+                  <th>Натпреварување</th>
+                  <th>Коло</th>
+                  <th>Натпревар</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7385646.html&#39;">
+                  <td>05.11.2023</td>
+                  <td>КУП на РМ за Жени 23/24</td>
+                  <td>1/16Ф</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                      <span class="sp-team-name">Победа 16</span>
+                      <span class="sp-result">3 - 0</span>
+                      <span class="sp-team-name">Плачковица</span>
+                      <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

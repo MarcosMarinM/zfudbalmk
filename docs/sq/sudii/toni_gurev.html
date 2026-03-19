@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Toni Gurev</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,112 +74,141 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Toni Gurev</h2>
-        <h3>Historia sipas garave</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Ndeshje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-toni_gurev-1&#39;)">
-              <td>25/26</td>
-              <td>Liga e Kadeteve 25/26</td>
-              <td>3</td>
-            </tr>
-            <tr id="details-arbitro-toni_gurev-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>25.10.2025</td>
-                        <td>7</td>
-                        <td>
-                          <a href="../natprevari/10058929.html">Tikvešanki vs Brera Tiverija</a>
-                        </td>
-                        <td>3 - 1</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>04.10.2025</td>
-                        <td>4</td>
-                        <td>
-                          <a href="../natprevari/10058907.html">Tikvešanki vs Top Gol</a>
-                        </td>
-                        <td>0 - 0</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>20.09.2025</td>
-                        <td>2</td>
-                        <td>
-                          <a href="../natprevari/10058896.html">Tikvešanki vs Rečica</a>
-                        </td>
-                        <td>1 - 6</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-toni_gurev-2&#39;)">
-              <td>24/25</td>
-              <td>Liga e Kadeteve 24/25</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-toni_gurev-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>14.12.2024</td>
-                        <td>9</td>
-                        <td>
-                          <a href="../natprevari/8613518.html">Tikvešanki vs Bashkimi</a>
-                        </td>
-                        <td>2 - 3</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>19.10.2024</td>
-                        <td>2</td>
-                        <td>
-                          <a href="../natprevari/8613466.html">Tikvešanki vs Kamenica Sasa</a>
-                        </td>
-                        <td>0 - 8</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Toni Gurev</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia sipas garave</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Sezoni</th>
+                  <th>Gara</th>
+                  <th>Ndeshje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-toni_gurev-1&#39;)">
+                  <td>25/26</td>
+                  <td>Liga e Kadeteve 25/26</td>
+                  <td>3</td>
+                </tr>
+                <tr id="details-arbitro-toni_gurev-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058929.html&#39;">
+                            <td>25.10.2025</td>
+                            <td>7</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                                <span class="sp-team-name">Tikvešanki</span>
+                                <span class="sp-result">3 - 1</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058907.html&#39;">
+                            <td>04.10.2025</td>
+                            <td>4</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                                <span class="sp-team-name">Tikvešanki</span>
+                                <span class="sp-result">0 - 0</span>
+                                <span class="sp-team-name">Top Gol</span>
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058896.html&#39;">
+                            <td>20.09.2025</td>
+                            <td>2</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                                <span class="sp-team-name">Tikvešanki</span>
+                                <span class="sp-result">1 - 6</span>
+                                <span class="sp-team-name">Rečica</span>
+                                <img class="sp-table-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-toni_gurev-2&#39;)">
+                  <td>24/25</td>
+                  <td>Liga e Kadeteve 24/25</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-toni_gurev-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613518.html&#39;">
+                            <td>14.12.2024</td>
+                            <td>9</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                                <span class="sp-team-name">Tikvešanki</span>
+                                <span class="sp-result">2 - 3</span>
+                                <span class="sp-team-name">Bashkimi</span>
+                                <img class="sp-table-logo" src="../../assets/logos/baskimi.png" alt="Башкими"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613466.html&#39;">
+                            <td>19.10.2024</td>
+                            <td>2</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                                <span class="sp-team-name">Tikvešanki</span>
+                                <span class="sp-result">0 - 8</span>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

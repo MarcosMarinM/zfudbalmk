@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Krumislav Gjorgiev</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,127 +74,150 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Krumislav Gjorgiev</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-krumislav_gorgiev-1&#39;)">
-              <td>25/26</td>
-              <td>Primera Liga Femenina 25/26</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-krumislav_gorgiev-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>16.11.2025</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/9950264.html">Istatov vs Brera Tiverija</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Árbitra</td>
-                      </tr>
-                      <tr>
-                        <td>17.09.2025</td>
-                        <td>5</td>
-                        <td>
-                          <a href="../natprevari/9950225.html">Ljuboten vs Skopje 2014</a>
-                        </td>
-                        <td>4 - 1</td>
-                        <td>Árbitra</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-krumislav_gorgiev-2&#39;)">
-              <td>22/23</td>
-              <td>Primera Liga Femenina 22/23</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-krumislav_gorgiev-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>03.12.2022</td>
-                        <td>11</td>
-                        <td>
-                          <a href="../natprevari/5442084.html">Kamenica Sasa vs Ljuboten</a>
-                        </td>
-                        <td>1 - 1</td>
-                        <td>Árbitra</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-krumislav_gorgiev-3&#39;)">
-              <td>20/21</td>
-              <td>Primera Liga Femenina 20/21</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-krumislav_gorgiev-3" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>03.04.2021</td>
-                        <td>21</td>
-                        <td>
-                          <a href="../natprevari/3268044.html">Kamenica Sasa vs Brera Tiverija</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Árbitra</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Krumislav Gjorgiev</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-krumislav_gorgiev-1&#39;)">
+                  <td>25/26</td>
+                  <td>Primera Liga Femenina 25/26</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-krumislav_gorgiev-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/9950264.html&#39;">
+                            <td>16.11.2025</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                                <span class="sp-team-name">Istatov</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/9950225.html&#39;">
+                            <td>17.09.2025</td>
+                            <td>5</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">4 - 1</span>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-krumislav_gorgiev-2&#39;)">
+                  <td>22/23</td>
+                  <td>Primera Liga Femenina 22/23</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-krumislav_gorgiev-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/5442084.html&#39;">
+                            <td>03.12.2022</td>
+                            <td>11</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <span class="sp-result">1 - 1</span>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-krumislav_gorgiev-3&#39;)">
+                  <td>20/21</td>
+                  <td>Primera Liga Femenina 20/21</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-krumislav_gorgiev-3" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3268044.html&#39;">
+                            <td>03.04.2021</td>
+                            <td>21</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

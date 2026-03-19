@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Фатон Мустафи</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,61 +74,76 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Фатон Мустафи</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-faton_mustafi-1&#39;)">
-              <td>20/21</td>
-              <td>Прва ЖФЛ 20/21</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-faton_mustafi-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>21.11.2020</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/3267997.html">Борец vs Истатов</a>
-                        </td>
-                        <td>1 - 2</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                      <tr>
-                        <td>15.11.2020</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/3267981.html">Шкупи vs Кочани</a>
-                        </td>
-                        <td>3 - 2</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Фатон Мустафи</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-faton_mustafi-1&#39;)">
+                  <td>20/21</td>
+                  <td>Прва ЖФЛ 20/21</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-faton_mustafi-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267997.html&#39;">
+                            <td>21.11.2020</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                                <span class="sp-team-name">Борец</span>
+                                <span class="sp-result">1 - 2</span>
+                                <span class="sp-team-name">Истатов</span>
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267981.html&#39;">
+                            <td>15.11.2020</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skupi.png" alt="Шкупи"/>
+                                <span class="sp-team-name">Шкупи</span>
+                                <span class="sp-result">3 - 2</span>
+                                <span class="sp-team-name">Кочани</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

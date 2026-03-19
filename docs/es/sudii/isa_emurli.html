@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Isa Emurli</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,97 +74,132 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Isa Emurli</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-isa_emurli-1&#39;)">
-              <td>20/21</td>
-              <td>Primera Liga Femenina 20/21</td>
-              <td>6</td>
-            </tr>
-            <tr id="details-arbitro-isa_emurli-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>18.11.2020</td>
-                        <td>14</td>
-                        <td>
-                          <a href="../natprevari/3267991.html">AS United vs Cevitana</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                      <tr>
-                        <td>11.11.2020</td>
-                        <td>12</td>
-                        <td>
-                          <a href="../natprevari/3267974.html">Skopje 2014 vs Cevitana</a>
-                        </td>
-                        <td>0 - 0</td>
-                        <td>2.ª asistente</td>
-                      </tr>
-                      <tr>
-                        <td>08.11.2020</td>
-                        <td>11</td>
-                        <td>
-                          <a href="../natprevari/3267969.html">Kamenica Sasa vs Skopje 2014</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                      <tr>
-                        <td>18.10.2020</td>
-                        <td>10</td>
-                        <td>
-                          <a href="../natprevari/3267960.html">Top Gol vs Borec</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                      <tr>
-                        <td>04.10.2020</td>
-                        <td>8</td>
-                        <td>
-                          <a href="../natprevari/3267940.html">Brera Tiverija vs Cevitana</a>
-                        </td>
-                        <td>1 - 2</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                      <tr>
-                        <td>09.09.2020</td>
-                        <td>5</td>
-                        <td>
-                          <a href="../natprevari/3267916.html">AS United vs Brera Tiverija</a>
-                        </td>
-                        <td>1 - 1</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Isa Emurli</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-isa_emurli-1&#39;)">
+                  <td>20/21</td>
+                  <td>Primera Liga Femenina 20/21</td>
+                  <td>6</td>
+                </tr>
+                <tr id="details-arbitro-isa_emurli-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267991.html&#39;">
+                            <td>18.11.2020</td>
+                            <td>14</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Cevitana</span>
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267974.html&#39;">
+                            <td>11.11.2020</td>
+                            <td>12</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <span class="sp-result">0 - 0</span>
+                                <span class="sp-team-name">Cevitana</span>
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                              </span>
+                            </td>
+                            <td>2.ª asistente</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267969.html&#39;">
+                            <td>08.11.2020</td>
+                            <td>11</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267960.html&#39;">
+                            <td>18.10.2020</td>
+                            <td>10</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                                <span class="sp-team-name">Top Gol</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Borec</span>
+                                <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267940.html&#39;">
+                            <td>04.10.2020</td>
+                            <td>8</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <span class="sp-result">1 - 2</span>
+                                <span class="sp-team-name">Cevitana</span>
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3267916.html&#39;">
+                            <td>09.09.2020</td>
+                            <td>5</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">1 - 1</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

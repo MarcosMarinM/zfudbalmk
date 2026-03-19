@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Marko Spiroski</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,130 +74,169 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Marko Spiroski</h2>
-        <h3>Historia sipas garave</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Ndeshje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-1&#39;)">
-              <td>24/25</td>
-              <td>Liga e Kadeteve 24/25</td>
-              <td>4</td>
-            </tr>
-            <tr id="details-arbitro-marko_spiroski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>29.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8613591.html">Ljuboten vs Biljanini Izvori</a>
-                        </td>
-                        <td>2 - 0</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                      <tr>
-                        <td>31.03.2025</td>
-                        <td>16</td>
-                        <td>
-                          <a href="../natprevari/8613567.html">Shkëndija vs Uskana</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>29.03.2025</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/8613560.html">Ljuboten vs Brera Tiverija</a>
-                        </td>
-                        <td>2 - 0</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                      <tr>
-                        <td>01.03.2025</td>
-                        <td>12</td>
-                        <td>
-                          <a href="../natprevari/8613535.html">Ljuboten vs Tikvešanki</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-2&#39;)">
-              <td>24/25</td>
-              <td>Liga e të Rejave 24/25</td>
-              <td>3</td>
-            </tr>
-            <tr id="details-arbitro-marko_spiroski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>29.04.2025</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/8612615.html">Ljuboten vs Biljanini Izvori</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>29.03.2025</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/8612584.html">Ljuboten vs Brera Tiverija</a>
-                        </td>
-                        <td>3 - 1</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                      <tr>
-                        <td>01.03.2025</td>
-                        <td>12</td>
-                        <td>
-                          <a href="../natprevari/8612559.html">Ljuboten vs Pobeda 16</a>
-                        </td>
-                        <td>12 - 1</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Marko Spiroski</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia sipas garave</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Sezoni</th>
+                  <th>Gara</th>
+                  <th>Ndeshje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Liga e Kadeteve 24/25</td>
+                  <td>4</td>
+                </tr>
+                <tr id="details-arbitro-marko_spiroski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613591.html&#39;">
+                            <td>29.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">2 - 0</span>
+                                <span class="sp-team-name">Biljanini Izvori</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613567.html&#39;">
+                            <td>31.03.2025</td>
+                            <td>16</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                                <span class="sp-team-name">Shkëndija</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Uskana</span>
+                                <img class="sp-table-logo" src="../../assets/logos/uskana.png" alt="Ускана"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613560.html&#39;">
+                            <td>29.03.2025</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">2 - 0</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613535.html&#39;">
+                            <td>01.03.2025</td>
+                            <td>12</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Tikvešanki</span>
+                                <img class="sp-table-logo" src="../../assets/logos/tikvesanki.png" alt="Тиквешанки"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-marko_spiroski-2&#39;)">
+                  <td>24/25</td>
+                  <td>Liga e të Rejave 24/25</td>
+                  <td>3</td>
+                </tr>
+                <tr id="details-arbitro-marko_spiroski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612615.html&#39;">
+                            <td>29.04.2025</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Biljanini Izvori</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612584.html&#39;">
+                            <td>29.03.2025</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">3 - 1</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612559.html&#39;">
+                            <td>01.03.2025</td>
+                            <td>12</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                                <span class="sp-team-name">Ljuboten</span>
+                                <span class="sp-result">12 - 1</span>
+                                <span class="sp-team-name">Pobeda 16</span>
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Antonio Jordanoski</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,121 +74,155 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Antonio Jordanoski</h2>
-        <h3>History by competition</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Matches</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-antonio_jordanoski-1&#39;)">
-              <td>24/25</td>
-              <td>Women's Youth League 24/25</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-antonio_jordanoski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>07.12.2024</td>
-                        <td>10</td>
-                        <td>
-                          <a href="../natprevari/8612543.html">Cevitana vs Rečica</a>
-                        </td>
-                        <td>0 - 3</td>
-                        <td>2nd assistant</td>
-                      </tr>
-                      <tr>
-                        <td>10.11.2024</td>
-                        <td>6</td>
-                        <td>
-                          <a href="../natprevari/8612515.html">Cevitana vs Fudbal Stars</a>
-                        </td>
-                        <td>1 - 0</td>
-                        <td>Referee</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-antonio_jordanoski-2&#39;)">
-              <td>23/24</td>
-              <td>Women's Second League 23/24</td>
-              <td>4</td>
-            </tr>
-            <tr id="details-arbitro-antonio_jordanoski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>20.04.2024</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/7019761.html">Atletiko vs Kočani</a>
-                        </td>
-                        <td>6 - 0</td>
-                        <td>Referee</td>
-                      </tr>
-                      <tr>
-                        <td>06.04.2024</td>
-                        <td>11</td>
-                        <td>
-                          <a href="../natprevari/7019752.html">Atletiko vs Biljanini Izvori</a>
-                        </td>
-                        <td>11 - 0</td>
-                        <td>Referee</td>
-                      </tr>
-                      <tr>
-                        <td>30.03.2024</td>
-                        <td>10</td>
-                        <td>
-                          <a href="../natprevari/7019749.html">Poreče vs Plačkovica</a>
-                        </td>
-                        <td>2 - 4</td>
-                        <td>2nd assistant</td>
-                      </tr>
-                      <tr>
-                        <td>16.09.2023</td>
-                        <td>1</td>
-                        <td>
-                          <a href="../natprevari/7019713.html">Atletiko vs Plačkovica</a>
-                        </td>
-                        <td>11 - 0</td>
-                        <td>1st assistant</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Antonio Jordanoski</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">History by competition</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Season</th>
+                  <th>Competition</th>
+                  <th>Matches</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-antonio_jordanoski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Women's Youth League 24/25</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-antonio_jordanoski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612543.html&#39;">
+                            <td>07.12.2024</td>
+                            <td>10</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                                <span class="sp-team-name">Cevitana</span>
+                                <span class="sp-result">0 - 3</span>
+                                <span class="sp-team-name">Rečica</span>
+                                <img class="sp-table-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                              </span>
+                            </td>
+                            <td>2nd assistant</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612515.html&#39;">
+                            <td>10.11.2024</td>
+                            <td>6</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                                <span class="sp-team-name">Cevitana</span>
+                                <span class="sp-result">1 - 0</span>
+                                <span class="sp-team-name">Fudbal Stars</span>
+                                <img class="sp-table-logo" src="../../assets/logos/fudbal_stars.png" alt="Фудбал Старс"/>
+                              </span>
+                            </td>
+                            <td>Referee</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-antonio_jordanoski-2&#39;)">
+                  <td>23/24</td>
+                  <td>Women's Second League 23/24</td>
+                  <td>4</td>
+                </tr>
+                <tr id="details-arbitro-antonio_jordanoski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019761.html&#39;">
+                            <td>20.04.2024</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                                <span class="sp-team-name">Atletiko</span>
+                                <span class="sp-result">6 - 0</span>
+                                <span class="sp-team-name">Kočani</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                              </span>
+                            </td>
+                            <td>Referee</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019752.html&#39;">
+                            <td>06.04.2024</td>
+                            <td>11</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                                <span class="sp-team-name">Atletiko</span>
+                                <span class="sp-result">11 - 0</span>
+                                <span class="sp-team-name">Biljanini Izvori</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>Referee</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019749.html&#39;">
+                            <td>30.03.2024</td>
+                            <td>10</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                                <span class="sp-team-name">Poreče</span>
+                                <span class="sp-result">2 - 4</span>
+                                <span class="sp-team-name">Plačkovica</span>
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                              </span>
+                            </td>
+                            <td>2nd assistant</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019713.html&#39;">
+                            <td>16.09.2023</td>
+                            <td>1</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                                <span class="sp-team-name">Atletiko</span>
+                                <span class="sp-result">11 - 0</span>
+                                <span class="sp-team-name">Plačkovica</span>
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                              </span>
+                            </td>
+                            <td>1st assistant</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

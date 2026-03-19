@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Src ,, Biljanini Izvori,, - Ohrid, Ohrid</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Src ,, Biljanini Izvori,, - Ohrid, Ohrid</h2>
-        <h3>Historial de partidos</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Jornada</th>
-              <th>Partido</th>
-              <th>Resultado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>07.03.2026</td>
-              <td>25/26</td>
-              <td>Liga Femenina Juvenil 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10058085.html">Biljanini Izvori vs Skopje 2014</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Src ,, Biljanini Izvori,, - Ohrid, Ohrid</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial de partidos</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Competición</th>
+                  <th>Jornada</th>
+                  <th>Partido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058085.html&#39;">
+                  <td>07.03.2026</td>
+                  <td>Liga Femenina Juvenil 25/26</td>
+                  <td>12</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                      <span class="sp-team-name">Biljanini Izvori</span>
+                      <span class="sp-result">1 - 4</span>
+                      <span class="sp-team-name">Skopje 2014</span>
+                      <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

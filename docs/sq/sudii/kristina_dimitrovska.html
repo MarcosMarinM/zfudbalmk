@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kristina Dimitrovska</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,88 +74,118 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Kristina Dimitrovska</h2>
-        <h3>Historia sipas garave</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Ndeshje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-kristina_dimitrovska-1&#39;)">
-              <td>17/18</td>
-              <td>Liga e Parë e Femrave 17/18</td>
-              <td>5</td>
-            </tr>
-            <tr id="details-arbitro-kristina_dimitrovska-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>03.12.2017</td>
-                        <td>10</td>
-                        <td>
-                          <a href="../natprevari/1002423.html">Kamenica Sasa vs Rečica</a>
-                        </td>
-                        <td>0 - 0</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>19.11.2017</td>
-                        <td>8</td>
-                        <td>
-                          <a href="../natprevari/1002409.html">Brera Tiverija vs Fk Baškimi Ljuboten/Žfk</a>
-                        </td>
-                        <td>10 - 0</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>12.11.2017</td>
-                        <td>7</td>
-                        <td>
-                          <a href="../natprevari/1002401.html">Kamenica Sasa vs Istatov</a>
-                        </td>
-                        <td>1 - 6</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>29.10.2017</td>
-                        <td>5</td>
-                        <td>
-                          <a href="../natprevari/1002390.html">Kamenica Sasa vs AS United</a>
-                        </td>
-                        <td>0 - 5</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                      <tr>
-                        <td>08.10.2017</td>
-                        <td>4</td>
-                        <td>
-                          <a href="../natprevari/1002385.html">Kočani vs Kamenica Sasa</a>
-                        </td>
-                        <td>7 - 0</td>
-                        <td>Ndihmësi i dytë</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Kristina Dimitrovska</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia sipas garave</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Sezoni</th>
+                  <th>Gara</th>
+                  <th>Ndeshje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-kristina_dimitrovska-1&#39;)">
+                  <td>17/18</td>
+                  <td>Liga e Parë e Femrave 17/18</td>
+                  <td>5</td>
+                </tr>
+                <tr id="details-arbitro-kristina_dimitrovska-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002423.html&#39;">
+                            <td>03.12.2017</td>
+                            <td>10</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <span class="sp-result">0 - 0</span>
+                                <span class="sp-team-name">Rečica</span>
+                                <img class="sp-table-logo" src="../../assets/logos/recica.png" alt="Речица"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002409.html&#39;">
+                            <td>19.11.2017</td>
+                            <td>8</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <span class="sp-result">10 - 0</span>
+                                <span class="sp-team-name">Fk Baškimi Ljuboten/Žfk</span>
+                                <img class="sp-table-logo" src="../../assets/logos/NOLOGO.png" alt="Фк Башкими Љуботен/жфк"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002401.html&#39;">
+                            <td>12.11.2017</td>
+                            <td>7</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <span class="sp-result">1 - 6</span>
+                                <span class="sp-team-name">Istatov</span>
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002390.html&#39;">
+                            <td>29.10.2017</td>
+                            <td>5</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <span class="sp-result">0 - 5</span>
+                                <span class="sp-team-name">AS United</span>
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002385.html&#39;">
+                            <td>08.10.2017</td>
+                            <td>4</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                                <span class="sp-team-name">Kočani</span>
+                                <span class="sp-result">7 - 0</span>
+                                <span class="sp-team-name">Kamenica Sasa</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i dytë</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

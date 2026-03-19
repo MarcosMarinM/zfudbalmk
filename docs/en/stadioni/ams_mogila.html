@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ams Mogila</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Ams Mogila</h2>
-        <h3>Match history</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Round</th>
-              <th>Match</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>09.11.2025</td>
-              <td>25/26</td>
-              <td>Women's Second League 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057575.html">Konzuli vs Biljanini Izvori</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Ams Mogila</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Match history</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Competition</th>
+                  <th>Round</th>
+                  <th>Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057575.html&#39;">
+                  <td>09.11.2025</td>
+                  <td>Women's Second League 25/26</td>
+                  <td>7</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/konzuli.png" alt="Конзули"/>
+                      <span class="sp-team-name">Konzuli</span>
+                      <span class="sp-result">3 - 0</span>
+                      <span class="sp-team-name">Biljanini Izvori</span>
+                      <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Дејан Петровски</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,52 +74,62 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Дејан Петровски</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-dejan_petrovski-1&#39;)">
-              <td>24/25</td>
-              <td>Кадетска Женска Фудбалска Лига 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-dejan_petrovski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>10.05.2025</td>
-                        <td>22</td>
-                        <td>
-                          <a href="../natprevari/8613608.html">Џи-Џи vs Плачковица</a>
-                        </td>
-                        <td>10 - 0</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Дејан Петровски</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-dejan_petrovski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Кадетска Женска Фудбалска Лига 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-dejan_petrovski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613608.html&#39;">
+                            <td>10.05.2025</td>
+                            <td>22</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/dzi-dzi.png" alt="Џи-Џи"/>
+                                <span class="sp-team-name">Џи-Џи</span>
+                                <span class="sp-result">10 - 0</span>
+                                <span class="sp-team-name">Плачковица</span>
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

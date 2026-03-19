@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igor Stojčevski</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,85 +74,99 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igor Stojčevski</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-1&#39;)">
-              <td>20/21</td>
-              <td>Copa de la República de Macedonia 20/21</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-igor_stojcevski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>14.04.2021</td>
-                        <td>2</td>
-                        <td>
-                          <a href="../natprevari/3345465.html">Shkëndija vs AS United</a>
-                        </td>
-                        <td>2 - 3</td>
-                        <td>Árbitra</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-2&#39;)">
-              <td>17/18</td>
-              <td>Primera Liga Femenina 17/18</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-igor_stojcevski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>26.11.2017</td>
-                        <td>9</td>
-                        <td>
-                          <a href="../natprevari/1002414.html">Fk Baškimi Ljuboten/Žfk vs Istatov</a>
-                        </td>
-                        <td>0 - 10</td>
-                        <td>Árbitra</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igor Stojčevski</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-1&#39;)">
+                  <td>20/21</td>
+                  <td>Copa de la República de Macedonia 20/21</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-igor_stojcevski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3345465.html&#39;">
+                            <td>14.04.2021</td>
+                            <td>2</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                                <span class="sp-team-name">Shkëndija</span>
+                                <span class="sp-result">2 - 3</span>
+                                <span class="sp-team-name">AS United</span>
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-2&#39;)">
+                  <td>17/18</td>
+                  <td>Primera Liga Femenina 17/18</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-igor_stojcevski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002414.html&#39;">
+                            <td>26.11.2017</td>
+                            <td>9</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/NOLOGO.png" alt="Фк Башкими Љуботен/жфк"/>
+                                <span class="sp-team-name">Fk Baškimi Ljuboten/Žfk</span>
+                                <span class="sp-result">0 - 10</span>
+                                <span class="sp-team-name">Istatov</span>
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

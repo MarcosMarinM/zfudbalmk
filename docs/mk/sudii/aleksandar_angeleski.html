@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Александар Ангелески</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,61 +74,76 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Александар Ангелески</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-aleksandar_angeleski-1&#39;)">
-              <td>22/23</td>
-              <td>Прва ЖФЛ 22/23</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-aleksandar_angeleski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>02.04.2023</td>
-                        <td>15</td>
-                        <td>
-                          <a href="../natprevari/5442108.html">Цевитана vs Кочани</a>
-                        </td>
-                        <td>10 - 1</td>
-                        <td>2-ри помошник</td>
-                      </tr>
-                      <tr>
-                        <td>10.09.2022</td>
-                        <td>1</td>
-                        <td>
-                          <a href="../natprevari/5442023.html">Цевитана vs Борец</a>
-                        </td>
-                        <td>8 - 0</td>
-                        <td>2-ри помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Александар Ангелески</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-aleksandar_angeleski-1&#39;)">
+                  <td>22/23</td>
+                  <td>Прва ЖФЛ 22/23</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-aleksandar_angeleski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/5442108.html&#39;">
+                            <td>02.04.2023</td>
+                            <td>15</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                                <span class="sp-team-name">Цевитана</span>
+                                <span class="sp-result">10 - 1</span>
+                                <span class="sp-team-name">Кочани</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                              </span>
+                            </td>
+                            <td>2-ри помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/5442023.html&#39;">
+                            <td>10.09.2022</td>
+                            <td>1</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/cevitana.png" alt="Цевитана"/>
+                                <span class="sp-team-name">Цевитана</span>
+                                <span class="sp-result">8 - 0</span>
+                                <span class="sp-team-name">Борец</span>
+                                <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                              </span>
+                            </td>
+                            <td>2-ри помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

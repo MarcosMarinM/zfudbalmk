@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ffm- Teren Na Fudbalska Federacija Na Makedonija, Skopje</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Ffm- Teren Na Fudbalska Federacija Na Makedonija, Skopje</h2>
-        <h3>Historia e ndeshjeve</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Raundi</th>
-              <th>Ndeshja</th>
-              <th>Rezultati</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>18.05.2022</td>
-              <td>21/22</td>
-              <td>Kupa e RM për Femra 21/22</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/5036190.html">Kamenica Sasa vs AS United</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Ffm- Teren Na Fudbalska Federacija Na Makedonija, Skopje</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia e ndeshjeve</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gara</th>
+                  <th>Raundi</th>
+                  <th>Ndeshja</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/5036190.html&#39;">
+                  <td>18.05.2022</td>
+                  <td>Kupa e RM për Femra 21/22</td>
+                  <td>4</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                      <span class="sp-team-name">Kamenica Sasa</span>
+                      <span class="sp-result">4 - 0</span>
+                      <span class="sp-team-name">AS United</span>
+                      <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

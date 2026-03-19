@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Игралиште Во С.подареш Радовиш, С.подареш</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,42 +74,54 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Игралиште Во С.подареш Радовиш, С.подареш</h2>
-        <h3>Историја на натпревари</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Датум</th>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Коло</th>
-              <th>Натпревар</th>
-              <th>Резултат</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>27.03.2021</td>
-              <td>20/21</td>
-              <td>Прва ЖФЛ 20/21</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/3268033.html">Плачковица vs Љуботен</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>29.02.2020</td>
-              <td>19/20</td>
-              <td>Прва ЖФЛ 19/20</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1956652.html">Плачковица vs Атлетико</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Игралиште Во С.подареш Радовиш, С.подареш</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја на натпревари</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Датум</th>
+                  <th>Натпреварување</th>
+                  <th>Коло</th>
+                  <th>Натпревар</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3268033.html&#39;">
+                  <td>27.03.2021</td>
+                  <td>Прва ЖФЛ 20/21</td>
+                  <td>19</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                      <span class="sp-team-name">Плачковица</span>
+                      <span class="sp-result">0 - 6</span>
+                      <span class="sp-team-name">Љуботен</span>
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956652.html&#39;">
+                  <td>29.02.2020</td>
+                  <td>Прва ЖФЛ 19/20</td>
+                  <td>14</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                      <span class="sp-team-name">Плачковица</span>
+                      <span class="sp-result">3 - 2</span>
+                      <span class="sp-team-name">Атлетико</span>
+                      <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

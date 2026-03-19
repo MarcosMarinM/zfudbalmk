@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište Vo Bogovinje / S.</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,62 +74,82 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište Vo Bogovinje / S.</h2>
-        <h3>Match history</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Round</th>
-              <th>Match</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>18.05.2024</td>
-              <td>23/24</td>
-              <td>Women's First League 23/24</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/6961962.html">Shkëndija vs Top Gol</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>02.05.2024</td>
-              <td>23/24</td>
-              <td>Women's First League 23/24</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/6961953.html">Shkëndija vs Brera Tiverija</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>20.04.2024</td>
-              <td>23/24</td>
-              <td>Women's First League 23/24</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/6961944.html">Shkëndija vs Ljuboten</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>02.03.2024</td>
-              <td>23/24</td>
-              <td>Women's First League 23/24</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/6961916.html">Shkëndija vs Kamenica Sasa</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište Vo Bogovinje / S.</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Match history</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Competition</th>
+                  <th>Round</th>
+                  <th>Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/6961962.html&#39;">
+                  <td>18.05.2024</td>
+                  <td>Women's First League 23/24</td>
+                  <td>25</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                      <span class="sp-team-name">Shkëndija</span>
+                      <span class="sp-result">3 - 0</span>
+                      <span class="sp-team-name">Top Gol</span>
+                      <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/6961953.html&#39;">
+                  <td>02.05.2024</td>
+                  <td>Women's First League 23/24</td>
+                  <td>23</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                      <span class="sp-team-name">Shkëndija</span>
+                      <span class="sp-result">2 - 1</span>
+                      <span class="sp-team-name">Brera Tiverija</span>
+                      <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/6961944.html&#39;">
+                  <td>20.04.2024</td>
+                  <td>Women's First League 23/24</td>
+                  <td>21</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                      <span class="sp-team-name">Shkëndija</span>
+                      <span class="sp-result">3 - 4</span>
+                      <span class="sp-team-name">Ljuboten</span>
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/6961916.html&#39;">
+                  <td>02.03.2024</td>
+                  <td>Women's First League 23/24</td>
+                  <td>15</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                      <span class="sp-team-name">Shkëndija</span>
+                      <span class="sp-result">0 - 3</span>
+                      <span class="sp-team-name">Kamenica Sasa</span>
+                      <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

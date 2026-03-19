@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Igralište Vo Dračevo / Dračevo-</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Igralište Vo Dračevo / Dračevo-</h2>
-        <h3>Historial de partidos</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Jornada</th>
-              <th>Partido</th>
-              <th>Resultado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>31.08.2025</td>
-              <td>25/26</td>
-              <td>Primera Liga Femenina 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/9950218.html">Vardar vs Istatov</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Igralište Vo Dračevo / Dračevo-</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial de partidos</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Competición</th>
+                  <th>Jornada</th>
+                  <th>Partido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/9950218.html&#39;">
+                  <td>31.08.2025</td>
+                  <td>Primera Liga Femenina 25/26</td>
+                  <td>3</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/vardar.png" alt="Вардар"/>
+                      <span class="sp-team-name">Vardar</span>
+                      <span class="sp-result">0 - 11</span>
+                      <span class="sp-team-name">Istatov</span>
+                      <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

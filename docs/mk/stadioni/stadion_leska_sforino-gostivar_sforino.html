@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Стадион "леска" С.форино-гостивар, С.форино</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Стадион "леска" С.форино-гостивар, С.форино</h2>
-        <h3>Историја на натпревари</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Датум</th>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Коло</th>
-              <th>Натпревар</th>
-              <th>Резултат</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>15.09.2018</td>
-              <td>18/19</td>
-              <td>Прва ЖФЛ 18/19</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/1472025.html">Љуботен vs Кочани</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Стадион "леска" С.форино-гостивар, С.форино</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја на натпревари</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Датум</th>
+                  <th>Натпреварување</th>
+                  <th>Коло</th>
+                  <th>Натпревар</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1472025.html&#39;">
+                  <td>15.09.2018</td>
+                  <td>Прва ЖФЛ 18/19</td>
+                  <td>4</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                      <span class="sp-team-name">Љуботен</span>
+                      <span class="sp-result">1 - 9</span>
+                      <span class="sp-team-name">Кочани</span>
+                      <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

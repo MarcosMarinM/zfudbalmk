@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Игралиште во Кравари</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,62 +74,82 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Игралиште во Кравари</h2>
-        <h3>Историја на натпревари</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Датум</th>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Коло</th>
-              <th>Натпревар</th>
-              <th>Резултат</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>08.10.2025</td>
-              <td>25/26</td>
-              <td>КУП на РМ за Жени 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10265538.html">Конзули vs Љуботен</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>05.10.2025</td>
-              <td>25/26</td>
-              <td>Втора ЖФЛ 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057566.html">Конзули vs Порече</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>28.09.2025</td>
-              <td>25/26</td>
-              <td>Втора ЖФЛ 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057561.html">Конзули vs Борец</a>
-              </td>
-              <td> - </td>
-            </tr>
-            <tr>
-              <td>13.09.2025</td>
-              <td>25/26</td>
-              <td>Втора ЖФЛ 25/26</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/10057556.html">Конзули vs Плачковица</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Игралиште во Кравари</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја на натпревари</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Датум</th>
+                  <th>Натпреварување</th>
+                  <th>Коло</th>
+                  <th>Натпревар</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10265538.html&#39;">
+                  <td>08.10.2025</td>
+                  <td>КУП на РМ за Жени 25/26</td>
+                  <td>1/8Ф</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/konzuli.png" alt="Конзули"/>
+                      <span class="sp-team-name">Конзули</span>
+                      <span class="sp-result">0 - 2</span>
+                      <span class="sp-team-name">Љуботен</span>
+                      <img class="sp-table-logo" src="../../assets/logos/ljuboten.png" alt="Љуботен"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057566.html&#39;">
+                  <td>05.10.2025</td>
+                  <td>Втора ЖФЛ 25/26</td>
+                  <td>4</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/konzuli.png" alt="Конзули"/>
+                      <span class="sp-team-name">Конзули</span>
+                      <span class="sp-result">7 - 0</span>
+                      <span class="sp-team-name">Порече</span>
+                      <img class="sp-table-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057561.html&#39;">
+                  <td>28.09.2025</td>
+                  <td>Втора ЖФЛ 25/26</td>
+                  <td>3</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/konzuli.png" alt="Конзули"/>
+                      <span class="sp-team-name">Конзули</span>
+                      <span class="sp-result">17 - 0</span>
+                      <span class="sp-team-name">Борец</span>
+                      <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10057556.html&#39;">
+                  <td>13.09.2025</td>
+                  <td>Втора ЖФЛ 25/26</td>
+                  <td>1</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/konzuli.png" alt="Конзули"/>
+                      <span class="sp-team-name">Конзули</span>
+                      <span class="sp-result">3 - 0</span>
+                      <span class="sp-team-name">Плачковица</span>
+                      <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

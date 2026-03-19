@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Цане Давитков</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,61 +74,76 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Цане Давитков</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-cane_davitkov-1&#39;)">
-              <td>23/24</td>
-              <td>Втора ЖФЛ 23/24</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-cane_davitkov-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>28.10.2023</td>
-                        <td>7</td>
-                        <td>
-                          <a href="../natprevari/7019737.html">Победа 16 vs Билјанини Извори</a>
-                        </td>
-                        <td>1 - 2</td>
-                        <td>2-ри помошник</td>
-                      </tr>
-                      <tr>
-                        <td>22.10.2023</td>
-                        <td>6</td>
-                        <td>
-                          <a href="../natprevari/7019732.html">Борец vs Плачковица</a>
-                        </td>
-                        <td>0 - 6</td>
-                        <td>2-ри помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Цане Давитков</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-cane_davitkov-1&#39;)">
+                  <td>23/24</td>
+                  <td>Втора ЖФЛ 23/24</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-cane_davitkov-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019737.html&#39;">
+                            <td>28.10.2023</td>
+                            <td>7</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                                <span class="sp-team-name">Победа 16</span>
+                                <span class="sp-result">1 - 2</span>
+                                <span class="sp-team-name">Билјанини Извори</span>
+                                <img class="sp-table-logo" src="../../assets/logos/biljanini_izvori.png" alt="Билјанини Извори"/>
+                              </span>
+                            </td>
+                            <td>2-ри помошник</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019732.html&#39;">
+                            <td>22.10.2023</td>
+                            <td>6</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                                <span class="sp-team-name">Борец</span>
+                                <span class="sp-result">0 - 6</span>
+                                <span class="sp-team-name">Плачковица</span>
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                              </span>
+                            </td>
+                            <td>2-ри помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

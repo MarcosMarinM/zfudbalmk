@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Игор Стојчевски</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,85 +74,99 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Игор Стојчевски</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-1&#39;)">
-              <td>20/21</td>
-              <td>КУП на РМ за Жени 20/21</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-igor_stojcevski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>14.04.2021</td>
-                        <td>2</td>
-                        <td>
-                          <a href="../natprevari/3345465.html">Шкендија vs АС Јунајтед</a>
-                        </td>
-                        <td>2 - 3</td>
-                        <td>Главен судија</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-2&#39;)">
-              <td>17/18</td>
-              <td>Прва ЖФЛ 17/18</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-igor_stojcevski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>26.11.2017</td>
-                        <td>9</td>
-                        <td>
-                          <a href="../natprevari/1002414.html">Фк Башкими Љуботен/жфк vs Истатов</a>
-                        </td>
-                        <td>0 - 10</td>
-                        <td>Главен судија</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Игор Стојчевски</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-1&#39;)">
+                  <td>20/21</td>
+                  <td>КУП на РМ за Жени 20/21</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-igor_stojcevski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/3345465.html&#39;">
+                            <td>14.04.2021</td>
+                            <td>2</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                                <span class="sp-team-name">Шкендија</span>
+                                <span class="sp-result">2 - 3</span>
+                                <span class="sp-team-name">АС Јунајтед</span>
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-igor_stojcevski-2&#39;)">
+                  <td>17/18</td>
+                  <td>Прва ЖФЛ 17/18</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-igor_stojcevski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002414.html&#39;">
+                            <td>26.11.2017</td>
+                            <td>9</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/NOLOGO.png" alt="Фк Башкими Љуботен/жфк"/>
+                                <span class="sp-team-name">Фк Башкими Љуботен/жфк</span>
+                                <span class="sp-result">0 - 10</span>
+                                <span class="sp-team-name">Истатов</span>
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                              </span>
+                            </td>
+                            <td>Главен судија</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

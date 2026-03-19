@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ффм- Терен На Фудбалска Федерација На Македонија, Скопје</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Ффм- Терен На Фудбалска Федерација На Македонија, Скопје</h2>
-        <h3>Историја на натпревари</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Датум</th>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Коло</th>
-              <th>Натпревар</th>
-              <th>Резултат</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>18.05.2022</td>
-              <td>21/22</td>
-              <td>КУП на РМ за Жени 21/22</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/5036190.html">Каменица Саса vs АС Јунајтед</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Ффм- Терен На Фудбалска Федерација На Македонија, Скопје</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја на натпревари</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Датум</th>
+                  <th>Натпреварување</th>
+                  <th>Коло</th>
+                  <th>Натпревар</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/5036190.html&#39;">
+                  <td>18.05.2022</td>
+                  <td>КУП на РМ за Жени 21/22</td>
+                  <td>4</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/kamenica_sasa.png" alt="Каменица Саса"/>
+                      <span class="sp-team-name">Каменица Саса</span>
+                      <span class="sp-result">4 - 0</span>
+                      <span class="sp-team-name">АС Јунајтед</span>
+                      <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

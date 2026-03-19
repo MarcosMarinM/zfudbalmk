@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Goran Tančevski</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,85 +74,99 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Goran Tančevski</h2>
-        <h3>Historia sipas garave</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Ndeshje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-goran_tancevski-1&#39;)">
-              <td>24/25</td>
-              <td>Liga e Kadeteve 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-goran_tancevski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>17.05.2025</td>
-                        <td>23</td>
-                        <td>
-                          <a href="../natprevari/8613615.html">Top Gol vs Kočani</a>
-                        </td>
-                        <td>2 - 3</td>
-                        <td>Ndihmësi i parë</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-goran_tancevski-2&#39;)">
-              <td>24/25</td>
-              <td>Liga e të Rejave 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-goran_tancevski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Raundi</th>
-                        <th>Ndeshja</th>
-                        <th>Rezultati</th>
-                        <th>Roli</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>17.05.2025</td>
-                        <td>23</td>
-                        <td>
-                          <a href="../natprevari/8612639.html">Top Gol vs Kočani</a>
-                        </td>
-                        <td>2 - 2</td>
-                        <td>Gjyqtari kryesor</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Goran Tančevski</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia sipas garave</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Sezoni</th>
+                  <th>Gara</th>
+                  <th>Ndeshje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-goran_tancevski-1&#39;)">
+                  <td>24/25</td>
+                  <td>Liga e Kadeteve 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-goran_tancevski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613615.html&#39;">
+                            <td>17.05.2025</td>
+                            <td>23</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                                <span class="sp-team-name">Top Gol</span>
+                                <span class="sp-result">2 - 3</span>
+                                <span class="sp-team-name">Kočani</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                              </span>
+                            </td>
+                            <td>Ndihmësi i parë</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-goran_tancevski-2&#39;)">
+                  <td>24/25</td>
+                  <td>Liga e të Rejave 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-goran_tancevski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Data</th>
+                            <th>Raundi</th>
+                            <th>Ndeshja</th>
+                            <th>Roli</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612639.html&#39;">
+                            <td>17.05.2025</td>
+                            <td>23</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                                <span class="sp-team-name">Top Gol</span>
+                                <span class="sp-result">2 - 2</span>
+                                <span class="sp-team-name">Kočani</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                              </span>
+                            </td>
+                            <td>Gjyqtari kryesor</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

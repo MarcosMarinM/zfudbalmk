@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Erkan Aliu</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,85 +74,99 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Erkan Aliu</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-erkan_aliu-1&#39;)">
-              <td>25/26</td>
-              <td>Liga Femenina Juvenil 25/26</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-erkan_aliu-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>27.09.2025</td>
-                        <td>3</td>
-                        <td>
-                          <a href="../natprevari/10058029.html">Bashkimi vs Pobeda 16</a>
-                        </td>
-                        <td>3 - 1</td>
-                        <td>2.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-erkan_aliu-2&#39;)">
-              <td>24/25</td>
-              <td>Liga Femenina Cadete 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-erkan_aliu-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>02.06.2025</td>
-                        <td>24</td>
-                        <td>
-                          <a href="../natprevari/8613623.html">Dži-Dži vs Bashkimi</a>
-                        </td>
-                        <td>2 - 2</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Erkan Aliu</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-erkan_aliu-1&#39;)">
+                  <td>25/26</td>
+                  <td>Liga Femenina Juvenil 25/26</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-erkan_aliu-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058029.html&#39;">
+                            <td>27.09.2025</td>
+                            <td>3</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/baskimi.png" alt="Башкими"/>
+                                <span class="sp-team-name">Bashkimi</span>
+                                <span class="sp-result">3 - 1</span>
+                                <span class="sp-team-name">Pobeda 16</span>
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                              </span>
+                            </td>
+                            <td>2.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-erkan_aliu-2&#39;)">
+                  <td>24/25</td>
+                  <td>Liga Femenina Cadete 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-erkan_aliu-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613623.html&#39;">
+                            <td>02.06.2025</td>
+                            <td>24</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/dzi-dzi.png" alt="Џи-Џи"/>
+                                <span class="sp-team-name">Dži-Dži</span>
+                                <span class="sp-result">2 - 2</span>
+                                <span class="sp-team-name">Bashkimi</span>
+                                <img class="sp-table-logo" src="../../assets/logos/baskimi.png" alt="Башкими"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

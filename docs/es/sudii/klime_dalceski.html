@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Klime Dalčeski</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,127 +74,150 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Klime Dalčeski</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-klime_dalceski-1&#39;)">
-              <td>25/26</td>
-              <td>Liga Femenina Cadete 25/26</td>
-              <td>2</td>
-            </tr>
-            <tr id="details-arbitro-klime_dalceski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>14.03.2026</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/10058963.html">AS United vs Brera Tiverija</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>Árbitra</td>
-                      </tr>
-                      <tr>
-                        <td>02.10.2025</td>
-                        <td>3</td>
-                        <td>
-                          <a href="../natprevari/10058902.html">AS United vs Shkëndija</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>Árbitra</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-klime_dalceski-2&#39;)">
-              <td>25/26</td>
-              <td>Liga Femenina Juvenil 25/26</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-klime_dalceski-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>14.03.2026</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/10058089.html">AS United vs Pobeda 16</a>
-                        </td>
-                        <td>6 - 0</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-klime_dalceski-3&#39;)">
-              <td>24/25</td>
-              <td>Liga Femenina Juvenil 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-klime_dalceski-3" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>28.05.2025</td>
-                        <td>25</td>
-                        <td>
-                          <a href="../natprevari/8612652.html">AS United vs Kočani</a>
-                        </td>
-                        <td>3 - 0</td>
-                        <td>2.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Klime Dalčeski</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-klime_dalceski-1&#39;)">
+                  <td>25/26</td>
+                  <td>Liga Femenina Cadete 25/26</td>
+                  <td>2</td>
+                </tr>
+                <tr id="details-arbitro-klime_dalceski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058963.html&#39;">
+                            <td>14.03.2026</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058902.html&#39;">
+                            <td>02.10.2025</td>
+                            <td>3</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Shkëndija</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skendija.png" alt="Шкендија"/>
+                              </span>
+                            </td>
+                            <td>Árbitra</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-klime_dalceski-2&#39;)">
+                  <td>25/26</td>
+                  <td>Liga Femenina Juvenil 25/26</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-klime_dalceski-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/10058089.html&#39;">
+                            <td>14.03.2026</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">6 - 0</span>
+                                <span class="sp-team-name">Pobeda 16</span>
+                                <img class="sp-table-logo" src="../../assets/logos/pobeda_16.png" alt="Победа 16"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-klime_dalceski-3&#39;)">
+                  <td>24/25</td>
+                  <td>Liga Femenina Juvenil 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-klime_dalceski-3" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612652.html&#39;">
+                            <td>28.05.2025</td>
+                            <td>25</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/as_junajted.png" alt="АС Јунајтед"/>
+                                <span class="sp-team-name">AS United</span>
+                                <span class="sp-result">3 - 0</span>
+                                <span class="sp-team-name">Kočani</span>
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                              </span>
+                            </td>
+                            <td>2.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

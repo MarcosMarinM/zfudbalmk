@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kuštrim Lika</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="es">
@@ -73,85 +74,99 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Kuštrim Lika</h2>
-        <h3>Historial por competición</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Temporada</th>
-              <th>Competición</th>
-              <th>Partidos</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-kustrim_lika-1&#39;)">
-              <td>24/25</td>
-              <td>Liga Femenina Cadete 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-kustrim_lika-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>03.04.2025</td>
-                        <td>14</td>
-                        <td>
-                          <a href="../natprevari/8613553.html">Uskana vs Top Gol</a>
-                        </td>
-                        <td>4 - 0</td>
-                        <td>2.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-kustrim_lika-2&#39;)">
-              <td>17/18</td>
-              <td>Primera Liga Femenina 17/18</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-kustrim_lika-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Jornada</th>
-                        <th>Partido</th>
-                        <th>Resultado</th>
-                        <th>Rol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>16.05.2018</td>
-                        <td>20</td>
-                        <td>
-                          <a href="../natprevari/1002481.html">Brera Tiverija vs Skopje 2014</a>
-                        </td>
-                        <td>2 - 1</td>
-                        <td>1.ª asistente</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Kuštrim Lika</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historial por competición</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Temporada</th>
+                  <th>Competición</th>
+                  <th>Partidos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-kustrim_lika-1&#39;)">
+                  <td>24/25</td>
+                  <td>Liga Femenina Cadete 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-kustrim_lika-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613553.html&#39;">
+                            <td>03.04.2025</td>
+                            <td>14</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/uskana.png" alt="Ускана"/>
+                                <span class="sp-team-name">Uskana</span>
+                                <span class="sp-result">4 - 0</span>
+                                <span class="sp-team-name">Top Gol</span>
+                                <img class="sp-table-logo" src="../../assets/logos/top_gol.png" alt="Топ Гол"/>
+                              </span>
+                            </td>
+                            <td>2.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-kustrim_lika-2&#39;)">
+                  <td>17/18</td>
+                  <td>Primera Liga Femenina 17/18</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-kustrim_lika-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Jornada</th>
+                            <th>Partido</th>
+                            <th>Rol</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1002481.html&#39;">
+                            <td>16.05.2018</td>
+                            <td>20</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <span class="sp-result">2 - 1</span>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                              </span>
+                            </td>
+                            <td>1.ª asistente</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

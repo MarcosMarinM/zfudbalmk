@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Виктор Никлески</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="mk">
@@ -73,52 +74,62 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Виктор Никлески</h2>
-        <h3>Историја по натпреварувања</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Сезона</th>
-              <th>Натпреварување</th>
-              <th>Натпревари</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-viktor_nikleski-1&#39;)">
-              <td>18/19</td>
-              <td>Прва ЖФЛ 18/19</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-viktor_nikleski-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Датум</th>
-                        <th>Коло</th>
-                        <th>Натпревар</th>
-                        <th>Резултат</th>
-                        <th>Улога</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>19.05.2019</td>
-                        <td>23</td>
-                        <td>
-                          <a href="../natprevari/1472162.html">Атлетико vs Плачковица</a>
-                        </td>
-                        <td>17 - 0</td>
-                        <td>1-ви помошник</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Виктор Никлески</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Историја по натпреварувања</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Сезона</th>
+                  <th>Натпреварување</th>
+                  <th>Натпревари</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-viktor_nikleski-1&#39;)">
+                  <td>18/19</td>
+                  <td>Прва ЖФЛ 18/19</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-viktor_nikleski-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Датум</th>
+                            <th>Коло</th>
+                            <th>Натпревар</th>
+                            <th>Улога</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1472162.html&#39;">
+                            <td>19.05.2019</td>
+                            <td>23</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/atletiko.png" alt="Атлетико"/>
+                                <span class="sp-team-name">Атлетико</span>
+                                <span class="sp-result">17 - 0</span>
+                                <span class="sp-team-name">Плачковица</span>
+                                <img class="sp-table-logo" src="../../assets/logos/plackovica.png" alt="Плачковица"/>
+                              </span>
+                            </td>
+                            <td>1-ви помошник</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

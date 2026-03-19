@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gradsko Igralište (Makedonski Brod)</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="sq">
@@ -73,32 +74,40 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Gradsko Igralište (Makedonski Brod)</h2>
-        <h3>Historia e ndeshjeve</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Sezoni</th>
-              <th>Gara</th>
-              <th>Raundi</th>
-              <th>Ndeshja</th>
-              <th>Rezultati</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>28.10.2023</td>
-              <td>23/24</td>
-              <td>Liga e Dytë e Femrave 23/24</td>
-              <td></td>
-              <td>
-                <a href="../natprevari/7019736.html">Poreče vs Borec</a>
-              </td>
-              <td> - </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Gradsko Igralište (Makedonski Brod)</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">Historia e ndeshjeve</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Gara</th>
+                  <th>Raundi</th>
+                  <th>Ndeshja</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/7019736.html&#39;">
+                  <td>28.10.2023</td>
+                  <td>Liga e Dytë e Femrave 23/24</td>
+                  <td>7</td>
+                  <td>
+                    <span class="sp-match-cell">
+                      <img class="sp-table-logo" src="../../assets/logos/porece.png" alt="Порече"/>
+                      <span class="sp-team-name">Poreče</span>
+                      <span class="sp-result">4 - 0</span>
+                      <span class="sp-team-name">Borec</span>
+                      <img class="sp-table-logo" src="../../assets/logos/borec.png" alt="Борец"/>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>

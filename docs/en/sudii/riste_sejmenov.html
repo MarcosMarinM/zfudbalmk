@@ -7,6 +7,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Riste Sejmenov</title>
+  <link rel="icon" type="image/png" href="../../favicon.png"/>
   <link rel="stylesheet" href="../../assets/style.css"/>
 </head>
 <html lang="en">
@@ -73,118 +74,136 @@
         <div id="search-suggestions"></div>
       </div>
       <div id="main-content">
-        <h2>Riste Sejmenov</h2>
-        <h3>History by competition</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Season</th>
-              <th>Competition</th>
-              <th>Matches</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-riste_sejmenov-1&#39;)">
-              <td>24/25</td>
-              <td>Women's Cadet League 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-riste_sejmenov-1" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>31.03.2025</td>
-                        <td>16</td>
-                        <td>
-                          <a href="../natprevari/8613562.html">Brera Tiverija vs Skopje 2014</a>
-                        </td>
-                        <td>1 - 11</td>
-                        <td>1st assistant</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-riste_sejmenov-2&#39;)">
-              <td>24/25</td>
-              <td>Women's Youth League 24/25</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-riste_sejmenov-2" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>31.03.2025</td>
-                        <td>16</td>
-                        <td>
-                          <a href="../natprevari/8612586.html">Brera Tiverija vs Skopje 2014</a>
-                        </td>
-                        <td>0 - 4</td>
-                        <td>Referee</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-riste_sejmenov-3&#39;)">
-              <td>19/20</td>
-              <td>Women's First League 19/20</td>
-              <td>1</td>
-            </tr>
-            <tr id="details-arbitro-riste_sejmenov-3" class="details-row">
-              <td colspan="3">
-                <div class="details-content">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Round</th>
-                        <th>Match</th>
-                        <th>Result</th>
-                        <th>Role</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>07.12.2019</td>
-                        <td>13</td>
-                        <td>
-                          <a href="../natprevari/1956646.html">Kočani vs Istatov</a>
-                        </td>
-                        <td>0 - 6</td>
-                        <td>Referee</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="sp-container">
+          <div class="sp-header">
+            <h2>Riste Sejmenov</h2>
+          </div>
+          <section class="sp-history-section">
+            <h3 class="sp-section-title">History by competition</h3>
+            <table class="sp-table">
+              <thead>
+                <tr>
+                  <th>Season</th>
+                  <th>Competition</th>
+                  <th>Matches</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-riste_sejmenov-1&#39;)">
+                  <td>24/25</td>
+                  <td>Women's Cadet League 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-riste_sejmenov-1" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8613562.html&#39;">
+                            <td>31.03.2025</td>
+                            <td>16</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <span class="sp-result">1 - 11</span>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                              </span>
+                            </td>
+                            <td>1st assistant</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-riste_sejmenov-2&#39;)">
+                  <td>24/25</td>
+                  <td>Women's Youth League 24/25</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-riste_sejmenov-2" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/8612586.html&#39;">
+                            <td>31.03.2025</td>
+                            <td>16</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/brera_tiverija.png" alt="Брера Тиверија"/>
+                                <span class="sp-team-name">Brera Tiverija</span>
+                                <span class="sp-result">0 - 4</span>
+                                <span class="sp-team-name">Skopje 2014</span>
+                                <img class="sp-table-logo" src="../../assets/logos/skopje_2014.png" alt="Скопје 2014"/>
+                              </span>
+                            </td>
+                            <td>Referee</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="summary-row" onclick="toggleDetails(&#39;details-arbitro-riste_sejmenov-3&#39;)">
+                  <td>19/20</td>
+                  <td>Women's First League 19/20</td>
+                  <td>1</td>
+                </tr>
+                <tr id="details-arbitro-riste_sejmenov-3" class="details-row">
+                  <td colspan="3">
+                    <div class="details-content">
+                      <table class="sp-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Round</th>
+                            <th>Match</th>
+                            <th>Role</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="sp-clickable-row" onclick="window.location=&#39;../natprevari/1956646.html&#39;">
+                            <td>07.12.2019</td>
+                            <td>13</td>
+                            <td>
+                              <span class="sp-match-cell">
+                                <img class="sp-table-logo" src="../../assets/logos/kocani.png" alt="Кочани"/>
+                                <span class="sp-team-name">Kočani</span>
+                                <span class="sp-result">0 - 6</span>
+                                <span class="sp-team-name">Istatov</span>
+                                <img class="sp-table-logo" src="../../assets/logos/istatov.png" alt="Истатов"/>
+                              </span>
+                            </td>
+                            <td>Referee</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
       </div>
     </div>
     <script defer src="../../assets/script.js"></script>
