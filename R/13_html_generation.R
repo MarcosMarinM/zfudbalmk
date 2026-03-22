@@ -926,15 +926,29 @@ if (hubo_cambios) {
       )
       n_partidos <- length(indices_partidos)
       message(sprintf("   > Generating %d match profiles in parallel...", n_partidos))
+      # Pre-package per-match data to avoid exporting resultados_exitosos 
+      # (50+ MB) to every parallel worker
+      resultados_por_id <- setNames(
+        resultados_exitosos,
+        vapply(resultados_exitosos, \(x) x$partido_info$id_partido, character(1))
+      )
+      datos_por_partido <- lapply(indices_partidos, function(i) {
+        id_p <- partidos_df$id_partido[i]
+        list(
+          i = i,
+          resumen = resultados_por_id[[id_p]]
+        )
+      })
+      rm(resultados_por_id)
       if (n_partidos > 0) with_progress({
       p_partidos <- progressor(steps = n_partidos)
-      future_lapply(indices_partidos, function(i) {
+      future_lapply(datos_por_partido, function(pkt) {
+        i <- pkt$i; resumen_partido <- pkt$resumen
         partido_info <- partidos_df[i,]; id_p <- partido_info$id_partido
         
         local_name <- (entidades_df_lang %>% filter(original_name == partido_info$local))$current_lang_name[1]
         visitante_name <- (entidades_df_lang %>% filter(original_name == partido_info$visitante))$current_lang_name[1]
         
-        resumen_partido <- purrr::keep(resultados_exitosos, ~.x$partido_info$id_partido == id_p)[[1]]
         cronologia <- generar_cronologia_df(id_p, resumen_partido, entidades_df_lang, jugadoras_lang_df)
         arbitros_partido_mk <- arbitros_df %>% filter(id_partido == id_p); arbitros_partido_lang <- arbitros_partido_mk %>% left_join(entidades_df_lang, by = c("ime" = "original_name"))
         estadio_info_mk <- estadios_df %>% filter(id_partido == id_p) %>% head(1)
