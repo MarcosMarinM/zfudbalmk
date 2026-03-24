@@ -982,12 +982,12 @@ if (hubo_cambios) {
             tags$ul(pmap(df_j, function(id, PlayerName, dorsal, tipo, es_portera, es_capitana, min_entra, min_sale, minutos_jugados, ...) {
               eventos_html <- tagList()
               goles_jugadora <- goles_del_partido %>% filter(id == !!id, tipo == "Normal")
-              if (nrow(goles_jugadora) > 0) { walk(1:nrow(goles_jugadora), function(g) { gol <- goles_jugadora[g,]; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event goal", HTML(paste0("⚽︎ ", formatear_minuto_partido(gol$minuto), "'")))) }) }
+              if (nrow(goles_jugadora) > 0) { walk(1:nrow(goles_jugadora), function(g) { gol <- goles_jugadora[g,]; eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event goal", HTML(paste0("⚽︎ ", formatear_minuto_partido(gol$minuto))))) }) }
               tarjetas_jugadora <- tarjetas_del_partido %>% filter(id == !!id)
-              if (nrow(tarjetas_jugadora) > 0) { walk(1:nrow(tarjetas_jugadora), function(c) { tarjeta <- tarjetas_jugadora[c,]; card_span <- tags$span(class = if (tarjeta$tipo == "Amarilla") "card-yellow" else "card-red"); eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event", card_span, HTML(paste0("︎ ", formatear_minuto_partido(tarjeta$minuto), "'")))) }) }
-              if (!is.na(min_entra) && tipo == "Suplente") { eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-in", paste0("↑", min_entra, "'"))) }
+              if (nrow(tarjetas_jugadora) > 0) { walk(1:nrow(tarjetas_jugadora), function(c) { tarjeta <- tarjetas_jugadora[c,]; card_span <- tags$span(class = if (tarjeta$tipo == "Amarilla") "card-yellow" else "card-red"); eventos_html <<- tagAppendChild(eventos_html, tags$span(class = "player-event", card_span, HTML(paste0("︎ ", formatear_minuto_partido(tarjeta$minuto))))) }) }
+              if (!is.na(min_entra) && tipo == "Suplente") { eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-in", paste0("↑", formatear_minuto_partido(min_entra)))) }
               if (!is.na(min_sale) && min_sale < duracion_partido && !is.na(minutos_jugados) && minutos_jugados > 0) {
-                eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-out", paste0("↓", min_sale, "'")))
+                eventos_html <- tagAppendChild(eventos_html, tags$span(class = "player-event sub-out", paste0("↓", formatear_minuto_partido(min_sale))))
               }
               icono_p <- if (isTRUE(es_portera)) "🧤" else ""
               icono_c <- if (isTRUE(es_capitana)) "(C)" else ""
@@ -1021,10 +1021,15 @@ if (hubo_cambios) {
           if (nrow(goles_df_side) == 0) return(NULL)
           goles_agrupados <- goles_df_side %>%
             group_by(id, PlayerName, tipo) %>%
-            summarise(minutos = paste0(sapply(minuto, formatear_minuto_partido), "'", collapse = ", "), .groups = "drop")
+            summarise(
+              primer_gol = min(minuto, na.rm = TRUE),
+              minutos = paste0("(", paste0(sapply(minuto, formatear_minuto_partido), collapse = ", "), ")"),
+              .groups = "drop"
+            ) %>%
+            arrange(primer_gol)
           tagList(map(1:nrow(goles_agrupados), function(g) {
             gol <- goles_agrupados[g,]
-            og_label <- if (gol$tipo == "Autogol") tags$span(class = "mp-og-label", "(AG)") else NULL
+            og_label <- if (gol$tipo == "Autogol") tags$span(class = "mp-og-label", t("own_goal_label")) else NULL
             should_link <- !partido_info$es_partido_seleccion || partido_info$local == "Македонија" || partido_info$visitante == "Македонија"
             player_el <- if (should_link && !is.na(gol$id)) {
               tags$a(href = file.path(path_rel_jugadoras, paste0(gol$id, ".html")), tags$span(class = "mp-goal-player", gol$PlayerName))
@@ -1049,16 +1054,29 @@ if (hubo_cambios) {
             tagList(map(1:nrow(cronologia), function(c) {
               e <- cronologia[c,]
               es_local <- !is.na(e$equipo_canonico_mk) && e$equipo_canonico_mk == equipo_local_mk
-              minuto_fmt <- paste0(formatear_minuto_partido(e$minuto), "'")
+              minuto_fmt <- formatear_minuto_partido(e$minuto)
               
-              # Content for the event
-              player_display <- e$jugadora_nombre %||% ""
-              sub_display <- if (!is.na(e$jugadora_sub_nombre)) e$jugadora_sub_nombre else NULL
+              # Content for the event — player names as links
+              should_link <- !partido_info$es_partido_seleccion || partido_info$local == "Македонија" || partido_info$visitante == "Македонија"
+              player_el <- if (should_link && !is.na(e$jugadora_id) && nchar(e$jugadora_id) > 0) {
+                tags$a(href = file.path(path_rel_jugadoras, paste0(e$jugadora_id, ".html")),
+                       class = "player", e$jugadora_nombre %||% "")
+              } else {
+                tags$span(class = "player", e$jugadora_nombre %||% "")
+              }
+              sub_el <- if (!is.na(e$jugadora_sub_nombre)) {
+                if (should_link && !is.na(e$jugadora_sub_id) && nchar(e$jugadora_sub_id) > 0) {
+                  tags$a(href = file.path(path_rel_jugadoras, paste0(e$jugadora_sub_id, ".html")),
+                         class = "mp-player-sub", e$jugadora_sub_nombre)
+                } else {
+                  tags$span(class = "mp-player-sub", e$jugadora_sub_nombre)
+                }
+              } else NULL
               
               event_content <- tagList(
                 tags$span(class = "icon", e$icono),
-                tags$span(class = "player", player_display),
-                if (!is.null(sub_display)) tags$span(class = "mp-player-sub", sub_display)
+                player_el,
+                sub_el
               )
               
               if (es_local) {

@@ -298,15 +298,11 @@ if (nrow(partidos_pendientes_df) > 0) {
     resultado_scrape <- safe_parser(url_actual, id_partido_actual, competicion_info_actual)
     
     if (is.null(resultado_scrape$result)) {
-      # Match not played or no data: store a sentinel so it's not retried
+      # Match not played or error: skip without caching so it's retried next run
       if (is.null(resultado_scrape$error)) {
-        resultados_procesados[[id_partido_actual]] <- list(
-          result = list(ignorado = TRUE, id_partido = id_partido_actual),
-          error = NULL
-        )
-        message(paste("      --> Guardado como ignorado en caché:", id_partido_actual))
+        message(paste("      --> Partido", id_partido_actual, "ignorado (no jugado/sin datos). No se cachea."))
       } else {
-        resultados_procesados[[id_partido_actual]] <- resultado_scrape
+        message(paste("      --> Error en partido", id_partido_actual, ":", resultado_scrape$error$message))
       }
       next
     }
