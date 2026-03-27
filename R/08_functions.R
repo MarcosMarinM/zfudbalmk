@@ -2,75 +2,64 @@
 
 ### 8.1. Text Formatting and Sanitization Functions
 
-#' @title Generate a comprehensive yet optimized set of search terms.
-#' @description This function uses a "linear expansion" strategy to avoid
-#' combinatorial explosion. Instead of creating permutations of permutations, it
-#' generates a new term for each substitution rule applied to the original name.
-#' This maintains the richness of search variants desired by the user
-#' without the search index size growing exponentially.
-#' @param nombre A string with the name in Cyrillic.
-#' @return A string with all unique and optimized search terms separated by spaces.
+#' @title Normalize a name for search matching.
+#' @description Applies a 4-step normalization pipeline: lowercase, Cyrillic-to-Latin
+#' transliteration, diacritics removal, and digraph/double collapsing. The same
+#' pipeline is replicated in JavaScript (normalizeForSearch) so that user input and
+#' stored search terms converge to the same normalized form regardless of script.
+#' @param nombre A string (Cyrillic, Latin, or mixed).
+#' @return A single normalized lowercase ASCII string.
 generar_terminos_busqueda <- function(nombre) {
   if (is.na(nombre) || nchar(trimws(nombre)) == 0) return("")
   
-  nombre_lower <- tolower(nombre)
+  # Step 1: Lowercase
+  texto <- tolower(nombre)
   
-  # 8.1.1. Container for all generated terms.
-  all_terms <- c(nombre_lower)
-  
-  # 8.1.2. User-provided variant lists.
-  map_base <- c(
-    'б'='b', 'в'='v', 'г'='g', 'д'='d', 'з'='z', 'и'='i',
-    'к'='k', 'м'='m', 'н'='n', 'о'='o', 'п'='p', 'р'='r',
-    'т'='t', 'ф'='f', 'х'='h'
+
+  # Step 2: Cyrillic → Latin (1:1 map)
+  map_cyr_to_lat <- c(
+    '\u0430'='a', '\u0431'='b', '\u0432'='v', '\u0433'='g', '\u0434'='d',
+    '\u0453'='gj', '\u0435'='e', '\u0436'='z', '\u0437'='z', '\u0455'='dz',
+    '\u0438'='i', '\u0458'='j', '\u043a'='k', '\u043b'='l', '\u0459'='lj',
+    '\u043c'='m', '\u043d'='n', '\u045a'='nj', '\u043e'='o', '\u043f'='p',
+    '\u0440'='r', '\u0441'='s', '\u0442'='t', '\u045c'='kj', '\u0443'='u',
+    '\u0444'='f', '\u0445'='h', '\u0446'='c', '\u0447'='c', '\u0448'='s',
+    '\u045f'='dz'
   )
+  texto <- str_replace_all(texto, map_cyr_to_lat)
   
-  mapa_variaciones <- list(
-    'а' = c('a', 'ah'), 'с' = c('s', 'ss', 'ß'),
-    'ч' = c('č', 'ch', 'c', 'ç', 'cz', 'tch'),
-    'ш' = c('š', 'sh', 's', 'sch', 'x'),
-    'ж' = c('ž', 'zh', 'z', 'x', 'j', 'gs'),
-    'ѓ' = c('ǵ', 'gj', 'đ', 'g', 'dj', 'gh', 'dgh'),
-    'ќ' = c('ḱ', 'kj', 'ć', 'q', 'k', 'c', 'qu', 'ky'), 
-    'њ' = c('ń', 'nj', 'ñ', 'n', 'ny', 'nh'),
-    'љ' = c('ĺ', 'lj', 'll', 'l', 'ly', 'gl'),
-    'у' = c('u', 'y', 'oo', 'w'),
-    'л' = c('l', 'll', 'el'),
-    'е' = c('e', 'ë', 'ye', 'ie', 'ea'),
-    'ц' = c('c', 'ts', 'tz', 'z', 'cz'),
-    'ѕ' = c('dz', 'z', 'ds'),
-    'џ' = c('dž', 'dzh', 'xh', 'dz', 'dj', 'j', 'chj'),
-    'ј' = c('j', 'y', 'i', 'g')
+  # Step 3: Remove diacritics
+  map_diacritics <- c(
+    '\u010d'='c', '\u0161'='s', '\u017e'='z', '\u0111'='d', '\u0107'='c',
+    '\u01f5'='g', '\u1e31'='k', '\u0144'='n', '\u013a'='l', '\u00f1'='n',
+    '\u00eb'='e', '\u00e7'='c', '\u00df'='s',
+    '\u00fc'='u', '\u00f6'='o', '\u00e4'='a',
+    '\u00e1'='a', '\u00e9'='e', '\u00ed'='i', '\u00f3'='o', '\u00fa'='u',
+    '\u00e0'='a', '\u00e8'='e', '\u00ec'='i', '\u00f2'='o', '\u00f9'='u',
+    '\u00e2'='a', '\u00ea'='e', '\u00ee'='i', '\u00f4'='o', '\u00fb'='u'
   )
+  texto <- str_replace_all(texto, map_diacritics)
   
-  # 8.1.3. Linear Generation Process.
-  
-  # 8.1.4. Step 1: Add the base transliteration.
-  all_terms <- c(all_terms, str_replace_all(nombre_lower, map_base))
-  
-  # 8.1.5. Step 2: Linear expansion. For each rule in `mapa_variaciones`, create a new
-  # 8.1.6. term from the ORIGINAL name.
-  for (char_cyrillic in names(mapa_variaciones)) {
-    # 8.1.7. Optimization: only process if the character exists in the name.
-    if (str_detect(nombre_lower, fixed(char_cyrillic))) {
-      for (variant in mapa_variaciones[[char_cyrillic]]) {
-        new_term <- str_replace_all(nombre_lower, fixed(char_cyrillic), variant)
-        all_terms <- c(all_terms, new_term)
-      }
-    }
+  # Step 4: Collapse digraphs and doubles (longest first)
+  # Trigraphs
+  texto <- str_replace_all(texto, fixed("dzh"), "z")
+  texto <- str_replace_all(texto, fixed("sch"), "s")
+  texto <- str_replace_all(texto, fixed("tch"), "c")
+  texto <- str_replace_all(texto, fixed("dgh"), "g")
+  # Digraphs (Macedonian, Albanian, international)
+  digraphs <- c("xh"="z", "sh"="s", "ch"="c", "zh"="z", "gj"="g", "kj"="k",
+                "nj"="n", "lj"="l", "dj"="d", "dz"="z", "dh"="d", "th"="t",
+                "ah"="a", "ph"="f")
+  for (dg in names(digraphs)) {
+    texto <- str_replace_all(texto, fixed(dg), digraphs[[dg]])
+  }
+  # Double consonants
+  doubles <- c("ll","ss","rr","tt","ff","nn","mm","pp","bb","dd","gg","cc","zz")
+  for (dbl in doubles) {
+    texto <- str_replace_all(texto, fixed(dbl), substr(dbl, 1, 1))
   }
   
-  # 8.1.8. Step 3: Apply final simplification to all generated terms.
-  map_ascii_simplification <- c(
-    'č'='c', 'š'='s', 'ž'='z', 'đ'='d', 'ć'='c', 'ǵ'='g',
-    'ḱ'='k', 'ń'='n', 'ĺ'='l', 'ñ'='n', 'ë'='e', 'ç'='c', 'q'='k', 'x'='z', 'ß'='s'
-  )
-  
-  simplified_terms <- str_replace_all(all_terms, map_ascii_simplification)
-  
-  # 8.1.9. Step 4: Combine, remove duplicates, and return.
-  final_terms <- unique(c(all_terms, simplified_terms))
-  return(paste(final_terms, collapse = " "))
+  return(texto)
 }
 
 
@@ -473,8 +462,8 @@ generar_search_entidad <- function(df, nombres_filtro, tipo_entidad, id_prefix) 
       Тип = t(tipo_entidad),
       target_id = paste0(id_prefix, generar_id_seguro(original_name)),
       search_terms = paste(
-        tolower(current_lang_name),
-        tolower(latin_name),
+        sapply(current_lang_name, generar_terminos_busqueda, USE.NAMES = FALSE),
+        sapply(latin_name, generar_terminos_busqueda, USE.NAMES = FALSE),
         sapply(original_name, generar_terminos_busqueda, USE.NAMES = FALSE)
       )
     ) |>

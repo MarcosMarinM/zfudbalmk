@@ -647,7 +647,7 @@ th { background-color: #f2f2f2; }
 .mp-event-bottom { justify-content: flex-start; padding-top: 10px; }
 .mp-event-top a, .mp-event-bottom a { color: inherit; text-decoration: none; font-weight: 700; }
 .mp-event-top a:hover, .mp-event-bottom a:hover { text-decoration: underline; }
-.mp-player-sub { font-weight: 400; color: #666; }
+.mp-player-sub, a.mp-player-sub { font-weight: 400; color: #666; }
 .mp-minute { background-color: #fff; font-weight: 800; font-size: 16px; padding: 0 10px; z-index: 2; }
 .mp-timeline-no-events { text-align: center; color: #666; font-size: 14px; padding: 20px 0; }
 

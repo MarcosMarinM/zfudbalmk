@@ -49,8 +49,8 @@ if (hubo_cambios) {
         Тип = t("player_type"),
         target_id = paste0("jugadora-", id),
         search_terms = paste(
-          tolower(DisplayName),
-          tolower(LatinName),
+          sapply(DisplayName, generar_terminos_busqueda, USE.NAMES = FALSE),
+          sapply(LatinName, generar_terminos_busqueda, USE.NAMES = FALSE),
           sapply(CyrillicName, generar_terminos_busqueda, USE.NAMES = FALSE)
         )
       ) %>%
@@ -77,8 +77,8 @@ if (hubo_cambios) {
         Тип = t("competition_type"), 
         target_id = paste0("menu-competicion-", competicion_id), 
         search_terms = paste(
-          tolower(Име),
-          tolower(LatinName),
+          sapply(Име, generar_terminos_busqueda, USE.NAMES = FALSE),
+          sapply(LatinName, generar_terminos_busqueda, USE.NAMES = FALSE),
           sapply(nombre_completo_mk, generar_terminos_busqueda, USE.NAMES = FALSE)
         )
       ) %>% 

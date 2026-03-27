@@ -651,7 +651,7 @@ th { background-color: #f2f2f2; }
 .mp-event-bottom { justify-content: flex-start; padding-top: 10px; }
 .mp-event-top a, .mp-event-bottom a { color: inherit; text-decoration: none; font-weight: 700; }
 .mp-event-top a:hover, .mp-event-bottom a:hover { text-decoration: underline; }
-.mp-player-sub { font-weight: 400; color: #666; }
+.mp-player-sub, a.mp-player-sub { font-weight: 400; color: #666; }
 .mp-minute { background-color: #fff; font-weight: 800; font-size: 16px; padding: 0 10px; z-index: 2; }
 .mp-timeline-no-events { text-align: center; color: #666; font-size: 14px; padding: 20px 0; }
 
@@ -837,6 +837,45 @@ function switchSubTab(seasonId, competitionId, clickedButton) {
     clickedButton.classList.add('active');
 }
 
+// --- NORMALIZACIÓN PARA BÚSQUEDA (réplica de generar_terminos_busqueda en R) ---
+function normalizeForSearch(text) {
+  if (!text) return '';
+  // Step 1: Lowercase
+  let s = text.toLowerCase();
+  // Step 2: Cyrillic → Latin (1:1)
+  const cyrMap = {
+    '\u0430':'a','\u0431':'b','\u0432':'v','\u0433':'g','\u0434':'d',
+    '\u0453':'gj','\u0435':'e','\u0436':'z','\u0437':'z','\u0455':'dz',
+    '\u0438':'i','\u0458':'j','\u043a':'k','\u043b':'l','\u0459':'lj',
+    '\u043c':'m','\u043d':'n','\u045a':'nj','\u043e':'o','\u043f':'p',
+    '\u0440':'r','\u0441':'s','\u0442':'t','\u045c':'kj','\u0443':'u',
+    '\u0444':'f','\u0445':'h','\u0446':'c','\u0447':'c','\u0448':'s',
+    '\u045f':'dz'
+  };
+  s = s.replace(/[\u0430-\u045f]/g, ch => cyrMap[ch] || ch);
+  // Step 3: Remove diacritics
+  const diaMap = {
+    '\u010d':'c','\u0161':'s','\u017e':'z','\u0111':'d','\u0107':'c',
+    '\u01f5':'g','\u1e31':'k','\u0144':'n','\u013a':'l','\u00f1':'n',
+    '\u00eb':'e','\u00e7':'c','\u00df':'s',
+    '\u00fc':'u','\u00f6':'o','\u00e4':'a',
+    '\u00e1':'a','\u00e9':'e','\u00ed':'i','\u00f3':'o','\u00fa':'u',
+    '\u00e0':'a','\u00e8':'e','\u00ec':'i','\u00f2':'o','\u00f9':'u',
+    '\u00e2':'a','\u00ea':'e','\u00ee':'i','\u00f4':'o','\u00fb':'u'
+  };
+  s = s.replace(/[\u00df-\u01f5\u1e31]/g, ch => diaMap[ch] || ch);
+  // Step 4: Collapse digraphs and doubles (longest first)
+  s = s.replace(/dzh/g,'z').replace(/sch/g,'s').replace(/tch/g,'c').replace(/dgh/g,'g');
+  s = s.replace(/xh/g,'z').replace(/sh/g,'s').replace(/ch/g,'c').replace(/zh/g,'z');
+  s = s.replace(/gj/g,'g').replace(/kj/g,'k').replace(/nj/g,'n').replace(/lj/g,'l');
+  s = s.replace(/dj/g,'d').replace(/dz/g,'z').replace(/dh/g,'d').replace(/th/g,'t');
+  s = s.replace(/ah/g,'a').replace(/ph/g,'f');
+  s = s.replace(/ll/g,'l').replace(/ss/g,'s').replace(/rr/g,'r').replace(/tt/g,'t');
+  s = s.replace(/ff/g,'f').replace(/nn/g,'n').replace(/mm/g,'m').replace(/pp/g,'p');
+  s = s.replace(/bb/g,'b').replace(/dd/g,'d').replace(/gg/g,'g').replace(/cc/g,'c').replace(/zz/g,'z');
+  return s;
+}
+
 // --- FUNCIONES DE BÚSQUEDA Y UTILIDADES ---
 function getSiteBasePath() {
   const path = window.location.pathname;
@@ -863,6 +902,8 @@ function initializeSearch() {
 
   fetch(jsonUrl).then(response => response.json()).then(data => {
       searchData = data;
+      // Pre-compute normalized search terms for fast matching
+      searchData.forEach(item => { item._n = normalizeForSearch(item.search_terms); });
       if(searchInput) searchInput.disabled = false;
   }).catch(error => console.error('Error loading search data:', error));
   
@@ -932,7 +973,7 @@ function generateLink(target_id) {
 }
 
 function handleSearchInput(event) {
-    const input = event.target.value.toLowerCase().trim();
+    const rawInput = event.target.value.trim();
     const suggestionsContainer = document.getElementById('search-suggestions');
     
     if (event.key === 'Enter') {
@@ -941,26 +982,22 @@ function handleSearchInput(event) {
         return;
     }
 
-    if (input.length < 2) {
+    if (rawInput.length < 2) {
         suggestionsContainer.style.display = 'none';
         return;
     }
 
+    const normalizedInput = normalizeForSearch(rawInput);
     const matches = searchData.filter(item => 
-        item.search_terms.toLowerCase().includes(input)
-    ).slice(0, 10); // Limitar a 10 sugerencias
+        item._n.includes(normalizedInput)
+    ).slice(0, 10);
 
     if (matches.length > 0) {
         suggestionsContainer.innerHTML = '';
         matches.forEach(item => {
             const link = document.createElement('a');
             link.href = generateLink(item.target_id);
-            
-            // Resaltar la coincidencia
-            const regex = new RegExp(`(${input.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
-            const highlightedName = item.Име.replace(regex, '<strong>$1</strong>');
-            
-            link.innerHTML = `${highlightedName} <span class="search-result-type">(${item.Тип})</span>`;
+            link.innerHTML = `${item.Име} <span class="search-result-type">(${item.Тип})</span>`;
             suggestionsContainer.appendChild(link);
         });
         suggestionsContainer.style.display = 'block';
@@ -970,23 +1007,24 @@ function handleSearchInput(event) {
 }
 
 function showSearchResults() {
-    const input = document.getElementById('search-input').value.toLowerCase().trim();
+    const rawInput = document.getElementById('search-input').value.trim();
     const suggestionsContainer = document.getElementById('search-suggestions');
     const mainContent = document.getElementById('main-content');
     const body = document.body;
 
     suggestionsContainer.style.display = 'none';
 
-    if (input.length < 2) {
+    if (rawInput.length < 2) {
         mainContent.innerHTML = `<h2>${body.dataset.searchPromptMsg || 'Please enter at least 2 characters'}</h2>`;
         return;
     }
 
+    const normalizedInput = normalizeForSearch(rawInput);
     const matches = searchData.filter(item => 
-        item.search_terms.toLowerCase().includes(input)
+        item._n.includes(normalizedInput)
     );
 
-    let resultsHtml = `<h2>${body.dataset.searchResultsTitle || 'Search results for'}: "${input}"</h2>`;
+    let resultsHtml = `<h2>${body.dataset.searchResultsTitle || 'Search results for'}: "${rawInput}"</h2>`;
 
     if (matches.length > 0) {
         resultsHtml += '<div id="search-results-list"><ul>';
