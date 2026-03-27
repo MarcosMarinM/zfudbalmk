@@ -554,6 +554,19 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
 ### 10.7. Determine Scope of Changes for Incremental Generation
 message("Step 10.7: Checking for changes for incremental generation using build log...")
 
+# Load modified match IDs from extraerinfopdf.R (PDFs whose content hash changed).
+ruta_cache_info <- "cache_info.rds"
+partidos_modificados_ids <- character(0)
+if (file.exists(ruta_cache_info)) {
+  info_cambios <- readRDS(ruta_cache_info)
+  if (!is.null(info_cambios$partidos_modificados_ids)) {
+    partidos_modificados_ids <- info_cambios$partidos_modificados_ids
+  }
+}
+if (length(partidos_modificados_ids) > 0) {
+  message(paste("   >", length(partidos_modificados_ids), "modified match(es) detected from content hash changes:", paste(partidos_modificados_ids, collapse = ", ")))
+}
+
 # >>> INICIO DEL CÓDIGO AÑADIDO (Paso 1) <<<
 # Cargar el historial de competiciones para detectar ligas completamente nuevas
 ruta_comp_log <- "competition_log.rds"
@@ -579,10 +592,17 @@ if (length(partidos_eliminados_ids) > 0) {
   message(paste("   >", length(partidos_nuevos_ids), "new reports detected. Incremental update will be performed."))
   affected_match_ids <- partidos_nuevos_ids
 } else {
-  message("   > No changes detected. No need to regenerate HTML files.")
+  message("   > No changes detected from new/deleted reports.")
   affected_match_ids <- character(0)
 }
-hubo_cambios <- length(partidos_nuevos_ids) > 0 || length(partidos_eliminados_ids) > 0
+
+# Incorporate modified matches (content hash changes) into the affected scope.
+if (length(partidos_modificados_ids) > 0) {
+  affected_match_ids <- unique(c(affected_match_ids, partidos_modificados_ids))
+  message(paste("   >", length(partidos_modificados_ids), "modified match(es) added to incremental update scope."))
+}
+
+hubo_cambios <- length(affected_match_ids) > 0 || length(partidos_eliminados_ids) > 0
 if (hubo_cambios) {
   affected_competition_ids <- character(0)
   affected_player_ids <- character(0)

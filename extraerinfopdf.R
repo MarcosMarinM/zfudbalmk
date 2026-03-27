@@ -893,20 +893,44 @@ if (file.exists(ruta_cache)) {
   })
 }
 
-### 5.2. Detect File Changes
+### 5.2. Detect File Changes (by name and content hash)
 
 # 5.2.1. Get the base names of the files to use them as unique identifiers.
 nombres_archivos_actuales <- basename(archivos_pdf_actuales)
 nombres_archivos_cacheados <- names(resultados_cacheados)
 
-# 5.2.2. Identify new files (on disk but not in cache) and deleted files (in cache but not on disk).
+# 5.2.2. Calculate MD5 hashes for all current PDF files.
+hashes_actuales <- tools::md5sum(archivos_pdf_actuales)
+names(hashes_actuales) <- basename(archivos_pdf_actuales)
+
+# 5.2.3. Load previously stored hashes (if available).
+ruta_hashes <- "actas_hashes.rds"
+hashes_previos <- if (file.exists(ruta_hashes)) {
+  tryCatch(readRDS(ruta_hashes), error = function(e) character(0))
+} else {
+  character(0)
+}
+
+# 5.2.4. Identify new files (on disk but not in cache) and deleted files (in cache but not on disk).
 archivos_a_procesar_nombres <- setdiff(nombres_archivos_actuales, nombres_archivos_cacheados)
 archivos_eliminados_nombres <- setdiff(nombres_archivos_cacheados, nombres_archivos_actuales)
 
-# 5.2.3. Inform the user if reports have been deleted or modified.
+# 5.2.5. Identify modified files: same name but different hash.
+archivos_comunes <- intersect(nombres_archivos_actuales, names(hashes_previos))
+archivos_modificados_nombres <- archivos_comunes[hashes_actuales[archivos_comunes] != hashes_previos[archivos_comunes]]
+archivos_modificados_nombres <- archivos_modificados_nombres[!is.na(archivos_modificados_nombres)]
+
+if (length(archivos_modificados_nombres) > 0) {
+  message(paste(length(archivos_modificados_nombres), "modified report(s) detected by content hash. Reprocessing..."))
+  # Remove modified files from cache so they get reprocessed.
+  resultados_cacheados <- resultados_cacheados[!names(resultados_cacheados) %in% archivos_modificados_nombres]
+  archivos_a_procesar_nombres <- unique(c(archivos_a_procesar_nombres, archivos_modificados_nombres))
+}
+
+# 5.2.6. Inform the user if reports have been deleted.
 if (length(archivos_eliminados_nombres) > 0) {
-  message(paste(length(archivos_eliminados_nombres), "deleted or modified reports detected. Updating..."))
-  # 5.2.4. Remove them from the cached results set.
+  message(paste(length(archivos_eliminados_nombres), "deleted report(s) detected. Updating..."))
+  # 5.2.7. Remove them from the cached results set.
   resultados_cacheados <- resultados_cacheados[!names(resultados_cacheados) %in% archivos_eliminados_nombres]
 }
 
@@ -973,24 +997,39 @@ tryCatch({
   message(paste("Original error:", e$message))
 })
 
+# 5.5.5. Save the updated hash map for future change detection.
+saveRDS(hashes_actuales, file = ruta_hashes)
+message(paste("Content hashes saved for", length(hashes_actuales), "files to:", ruta_hashes))
+
 
 ### 5.6. Save File Change Status
 
-# 5.6.1. Determine if there were any changes (new or deleted files).
+# 5.6.1. Determine if there were any changes (new, deleted, or modified files).
 hubo_cambios <- length(archivos_a_procesar_nombres) > 0 || length(archivos_eliminados_nombres) > 0
 
-# 5.6.2. Create a simple list containing only the names of the files that have changed.
-# 5.6.3. A second script can use this information to determine which entities are affected.
+# 5.6.2. Extract match IDs from modified files so buildhtml.R can target them.
+partidos_modificados_ids <- character(0)
+if (length(archivos_modificados_nombres) > 0) {
+  ids_extraidos <- stringr::str_match(archivos_modificados_nombres, "match_(\\d+)_")[, 2]
+  partidos_modificados_ids <- ids_extraidos[!is.na(ids_extraidos)]
+}
+
+# 5.6.3. Create a list containing the names of files that changed and IDs of modified matches.
 info_cambios = list(
   hubo_cambios = hubo_cambios,
   archivos_nuevos_nombres = archivos_a_procesar_nombres,
-  archivos_eliminados_nombres = archivos_eliminados_nombres
+  archivos_eliminados_nombres = archivos_eliminados_nombres,
+  archivos_modificados_nombres = archivos_modificados_nombres,
+  partidos_modificados_ids = partidos_modificados_ids
 )
 
 # 5.6.4. Save this information for use by a potential second script.
 ruta_cache_info <- "cache_info.rds"
 saveRDS(info_cambios, file = ruta_cache_info)
 message(paste("File change information saved to:", ruta_cache_info))
+if (length(partidos_modificados_ids) > 0) {
+  message(paste("   > Modified match IDs:", paste(partidos_modificados_ids, collapse = ", ")))
+}
 
 
 #### 6. DATA AGGREGATION AND REPORTING ####
