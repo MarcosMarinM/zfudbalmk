@@ -49,3 +49,7 @@
 1,#008000,legend_champions_league
 9,#D4AF37,legend_relegation_playoff
 10,#FF0000,legend_direct_relegation
+
+[COMPETICION: Втора ЖФЛ 25/26]
+1,#008000,legend_direct_promotion
+2,#D4AF37,legend_promotion_playoff

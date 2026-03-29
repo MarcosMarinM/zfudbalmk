@@ -87,9 +87,9 @@ th { background-color: #f2f2f2; }
 .match-round { font-size: 0.8em; color: #6c757d; text-align: center; margin-bottom: 8px; }
 .match-content { display: flex; flex-direction: column; align-items: center; }
 .match-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 4px 0; }
-.team-info { display: flex; align-items: center; }
+.team-info { display: flex; align-items: center; overflow: hidden; flex: 1; }
 .logo { width: 20px; height: 20px; object-fit: contain; margin-right: 8px; }
-.name { font-weight: bold; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 30px); }
+.name { font-weight: bold; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .score { font-weight: bold; font-size: 1.1em; color: #CC0000; }
 .score-separator, .score-separator-placeholder { font-size: 1.1em; color: #CC0000; line-height: 0.5; }
 .score-separator-placeholder { visibility: hidden; }
