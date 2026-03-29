@@ -223,6 +223,172 @@ parsear_informe_web <- function(url, id_partido, competicion_info) {
   ))
 }
 
+
+#### 3B. NAJAVA PARSING AND ENRICHMENT FUNCTIONS ####
+
+#' @title Parse a "najava" (pre-match announcement) page from ffm.mk.
+#' @description Extracts structured data not available in izvestaj: goalkeeper and
+#'   captain markers, coaching staff, match delegate, team names in Cyrillic,
+#'   and competition name.
+#' @param url URL of the najava page (e.g., https://www.ffm.mk/najava/5442020/).
+#' @param id_partido Match ID (for logging purposes).
+#' @return A list with enrichment data, or NULL if parsing fails.
+parsear_najava <- function(url, id_partido) {
+  message(paste("   -> Scrapeando najava:", url))
+  doc <- read_html(url)
+
+  # Team names in Cyrillic
+  equipo_local_cyr <- doc %>% html_element(".ffm-najava__team-home") %>% html_text(trim = TRUE)
+  equipo_visitante_cyr <- doc %>% html_element(".ffm-najava__team-away") %>% html_text(trim = TRUE)
+
+  # Competition name from page
+  competicion_najava <- doc %>% html_element(".ffm-najava__competition") %>% html_text(trim = TRUE)
+
+  # Helper to find a section by title pattern
+  secciones <- doc %>% html_elements(".ffm-najava__section")
+  buscar_seccion <- function(patron) {
+    for (sec in secciones) {
+      titulo <- sec %>% html_element(".ffm-najava__section-title") %>% html_text(trim = TRUE)
+      if (!is.na(titulo) && str_detect(titulo, patron)) return(sec)
+    }
+    return(NULL)
+  }
+
+  # -- Player data (portera, capitana) by dorsal --
+  extraer_jugadoras_najava <- function(team_col_node) {
+    jugadoras <- team_col_node %>% html_elements(".ffm-najava__player")
+    if (length(jugadoras) == 0) return(tibble())
+    map_dfr(jugadoras, function(nodo) {
+      tibble(
+        dorsal = nodo %>% html_element(".ffm-najava__shirt") %>% html_text(trim = TRUE) %>% as.integer(),
+        es_portera = length(html_elements(nodo, ".ffm-najava__pos-g")) > 0,
+        es_capitana = length(html_elements(nodo, ".ffm-najava__captain")) > 0
+      )
+    })
+  }
+
+  jugadoras_local <- tibble()
+  jugadoras_visitante <- tibble()
+  sec_sostav <- buscar_seccion("Состав")
+  if (!is.null(sec_sostav)) {
+    cols <- sec_sostav %>% html_elements(".ffm-najava__team-col")
+    for (tc in cols) {
+      if (str_detect(html_attr(tc, "class"), "away")) {
+        jugadoras_visitante <- extraer_jugadoras_najava(tc)
+      } else {
+        jugadoras_local <- extraer_jugadoras_najava(tc)
+      }
+    }
+  }
+
+  # -- Coaching staff (head coach per team) --
+  entrenador_local <- NA_character_
+  entrenador_visitante <- NA_character_
+  sec_staff <- buscar_seccion("Стручен штаб")
+  if (!is.null(sec_staff)) {
+    staff_cols <- sec_staff %>% html_elements(".ffm-najava__team-col")
+    for (sc in staff_cols) {
+      es_away <- str_detect(html_attr(sc, "class"), "away")
+      items <- sc %>% html_elements(".ffm-najava__staff")
+      for (item in items) {
+        rol <- item %>% html_element(".ffm-najava__staff-role") %>% html_text(trim = TRUE)
+        nombre <- item %>% html_element(".ffm-najava__staff-name") %>% html_text(trim = TRUE)
+        if (!is.na(rol) && str_detect(rol, "Главен тренер")) {
+          if (es_away) entrenador_visitante <- nombre else entrenador_local <- nombre
+        }
+      }
+    }
+  }
+
+  # -- Match delegate (Контролор / Делегат) --
+  delegado <- NA_character_
+  sec_oficiales <- buscar_seccion("Судии и делегати")
+  if (!is.null(sec_oficiales)) {
+    oficiales <- sec_oficiales %>% html_elements(".ffm-najava__official")
+    for (of in oficiales) {
+      rol <- of %>% html_element(".ffm-najava__official-role") %>% html_text(trim = TRUE)
+      if (!is.na(rol) && str_detect(rol, "Контролор|Делегат")) {
+        delegado <- of %>% html_element(".ffm-najava__official-name") %>% html_text(trim = TRUE)
+      }
+    }
+  }
+
+  return(list(
+    equipo_local_cyr = equipo_local_cyr,
+    equipo_visitante_cyr = equipo_visitante_cyr,
+    competicion_najava = competicion_najava,
+    jugadoras_local = jugadoras_local,
+    jugadoras_visitante = jugadoras_visitante,
+    entrenador_local = entrenador_local,
+    entrenador_visitante = entrenador_visitante,
+    delegado = delegado
+  ))
+}
+
+
+#' @title Enrich an izvestaj result with data from the corresponding najava page.
+#' @description Merges najava data into the parsed izvestaj result: replaces Latin
+#'   team names with Cyrillic, sets explicit es_portera/es_capitana flags from
+#'   najava (by dorsal matching), and adds coaching staff + delegate fields.
+#' @param resultado The list returned by parsear_informe_web().
+#' @param najava The list returned by parsear_najava(), or NULL.
+#' @return The enriched resultado list.
+enriquecer_con_najava <- function(resultado, najava) {
+  if (is.null(najava)) return(resultado)
+
+  old_local <- resultado$partido_info$local
+  old_visitante <- resultado$partido_info$visitante
+  new_local <- najava$equipo_local_cyr
+  new_visitante <- najava$equipo_visitante_cyr
+
+  # Helper: replace team name in specified columns of a dataframe
+  reemplazar_equipo <- function(df, cols, old_name, new_name) {
+    if (is.null(df) || nrow(df) == 0 || is.na(new_name) || is.na(old_name)) return(df)
+    for (col in cols) {
+      if (col %in% names(df)) {
+        idx <- !is.na(df[[col]]) & df[[col]] == old_name
+        df[[col]][idx] <- new_name
+      }
+    }
+    return(df)
+  }
+
+  # 1. Replace Latin team names with Cyrillic from najava (partido_info + events)
+  if (!is.na(new_local) && nchar(new_local) > 0) {
+    resultado$partido_info$local <- new_local
+    resultado$goles <- reemplazar_equipo(resultado$goles, c("equipo_jugadora", "equipo_acreditado"), old_local, new_local)
+    resultado$tarjetas <- reemplazar_equipo(resultado$tarjetas, "equipo", old_local, new_local)
+  }
+  if (!is.na(new_visitante) && nchar(new_visitante) > 0) {
+    resultado$partido_info$visitante <- new_visitante
+    resultado$goles <- reemplazar_equipo(resultado$goles, c("equipo_jugadora", "equipo_acreditado"), old_visitante, new_visitante)
+    resultado$tarjetas <- reemplazar_equipo(resultado$tarjetas, "equipo", old_visitante, new_visitante)
+  }
+
+  # 2. Update es_portera and es_capitana in alineaciones by dorsal matching
+  actualizar_alineacion <- function(alin, najava_jug) {
+    if (nrow(alin) == 0 || nrow(najava_jug) == 0) return(alin)
+    alin %>%
+      left_join(najava_jug %>% select(dorsal, nj_portera = es_portera, nj_capitana = es_capitana), by = "dorsal") %>%
+      mutate(
+        es_portera = if_else(!is.na(nj_portera), nj_portera, es_portera),
+        es_capitana = if_else(!is.na(nj_capitana), nj_capitana, es_capitana)
+      ) %>%
+      select(-nj_portera, -nj_capitana)
+  }
+
+  resultado$alineacion_local <- actualizar_alineacion(resultado$alineacion_local, najava$jugadoras_local)
+  resultado$alineacion_visitante <- actualizar_alineacion(resultado$alineacion_visitante, najava$jugadoras_visitante)
+
+  # 3. Add fields from najava that izvestaj lacks (equivalent to PDF extraction)
+  resultado$entrenador_local <- najava$entrenador_local
+  resultado$entrenador_visitante <- najava$entrenador_visitante
+  resultado$delegado <- najava$delegado
+
+  return(resultado)
+}
+
+
 #### 4. LECTURA DE CONFIGURACIÓN Y GESTIÓN DE CACHÉ ####
 
 #### 4.1. Load competition ranges (web_competitions.txt) ####
@@ -281,6 +447,7 @@ if (nrow(partidos_pendientes_df) > 0) {
   message(paste("\nSe encontraron", nrow(partidos_pendientes_df), "nuevos informes web para procesar."))
   
   safe_parser <- safely(parsear_informe_web)
+  safe_najava <- safely(parsear_najava)
   
   mapa_jugadoras_nuevas <- tibble(nombre_latin = character(), id_asignado = character())
   siguiente_id_falso <- 990001
@@ -308,6 +475,16 @@ if (nrow(partidos_pendientes_df) > 0) {
     }
     
     if (is.null(resultado_scrape$error)) {
+      # Enrich with najava data (portera, capitana, entrenadores, Cyrillic team names)
+      url_najava <- paste0("https://www.ffm.mk/najava/", id_partido_actual, "/")
+      Sys.sleep(0.3)
+      najava_result <- safe_najava(url_najava, id_partido_actual)
+      if (!is.null(najava_result$result)) {
+        resultado_scrape$result <- enriquecer_con_najava(resultado_scrape$result, najava_result$result)
+      } else if (!is.null(najava_result$error)) {
+        message(paste("      --> Najava no disponible para partido", id_partido_actual, ":", najava_result$error$message))
+      }
+
       alineaciones_partido <- bind_rows(
         resultado_scrape$result$alineacion_local,
         resultado_scrape$result$alineacion_visitante
