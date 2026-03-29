@@ -1225,7 +1225,6 @@ if (hubo_cambios) {
                 tags$div(class = "mp-detail-row",
                   tags$span(referees_html)
                 ),
-                staff_html,
                 if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) {
                   tags$p(class = "mp-notes", nota_arbitro)
                 }
@@ -1265,6 +1264,9 @@ if (hubo_cambios) {
                 )
               )
             ),
+            
+            # === COACHING STAFF (below lineups, low prominence) ===
+            staff_html,
             
             # === PENALTIES (if applicable) ===
             if (!is.na(partido_info$penales_local) && nrow(penales_partido) > 0) {
