@@ -3,7 +3,7 @@
 if (hubo_cambios) {
   
   # --- Parallelization and progress bar setup ---
-  n_workers <- max(1, parallel::detectCores() - 1)
+  n_workers <- min(4, max(1, parallel::detectCores() - 1))
   plan(multisession, workers = n_workers)
   handlers(handler_cli(
     format = "{cli::pb_spin} [{cli::pb_current}/{cli::pb_total}] {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
@@ -132,7 +132,7 @@ if (hubo_cambios) {
     if (length(equipos_en_portada_mk) > 0) {
       nombres_traducidos <- (entidades_df_lang %>% filter(original_name %in% equipos_en_portada_mk))$current_lang_name
       longitud_max_nombre <- max(nchar(nombres_traducidos), na.rm = TRUE)
-      ancho_ficha_calculado_px <- (longitud_max_nombre * 8) + 60
+      ancho_ficha_calculado_px <- (longitud_max_nombre * 6.5) + 50
     } else {
       ancho_ficha_calculado_px <- 220
     }

@@ -53,6 +53,7 @@ original_mk,latin_sq,latin_es,latin_en
 Кешлин Копли,Cashlin Copley,Cashlin Copley,Cashlin Copley
 Кристин Нафула,Christine Nafula,Christine Nafula,Christine Nafula
 Кристина Пеев,Kristina Peev,Kristina Peev,Kristina Peev
+Лори-Ан Моис,Laurie-Ann Moïse,Laurie-Ann Moïse,Laurie-Ann Moïse
 Леандра Ќазими,Leandra Qazimi,Leandra Qazimi,Leandra Qazimi
 Летисија Силва,Leticia Silva,Leticia Silva,Leticia Silva
 Љорина Адеми,Lorina Ademi,Lorina Ademi,Lorina Ademi

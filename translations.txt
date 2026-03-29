@@ -124,6 +124,9 @@ physiotherapist,Физиотерапевт,Fizioterapeut,Fisioterapeuta,Physioth
 doctor,Доктор,Doktor,Doctor/a,Doctor
 club_representative,Клупски претставник,Përfaqësuesi i klubit,Representante,Club representative
 administrator,Администратор,Administrator,Administrador/a,Administrator
+goalkeeping_coach,Тренер на голмани,Trajneri i portierëve,Entrenador/a de porteras,Goalkeeping coach
+fitness_coach,Кондиционен тренер,Trajneri i kondicionit,Preparador/a físico/a,Fitness coach
+security_commissioner,Комесар за безбедност,Komesari i sigurisë,Comisario/a de seguridad,Security commissioner
 match_delegate,Контролор,Kontrollori,Controlador/a,Match delegate
 staff_title,Стручен штаб,Stafi teknik,Cuerpo técnico,Coaching staff
 staff_type,Стручен штаб,Staf teknik,Cuerpo técnico,Staff

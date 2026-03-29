@@ -648,15 +648,51 @@ procesar_acta <- function(acta_path) {
   info_kontrolor <- parsear_arbitro(if (!is.na(kontrolor_raw)) str_trim(kontrolor_raw) else NA_character_)
   kontrolor_nombre <- if (is.na(info_kontrolor$nombre) || info_kontrolor$nombre == "Desconocido") NA_character_ else info_kontrolor$nombre
   
-  entrenador_local <- "Desconocido"; entrenador_visitante <- "Desconocido"
-  linea_entrenadores_match <- str_extract(texto_acta, ".*Шеф на стручен штаб.*")
-  if (!is.na(linea_entrenadores_match)) {
-    partes_entrenador <- str_split(linea_entrenadores_match, "Шеф на стручен штаб")[[1]]
-    if (length(partes_entrenador) >= 1 && nchar(str_trim(partes_entrenador[1])) > 0) entrenador_local <- str_trim(partes_entrenador[1])
-    if (length(partes_entrenador) >= 2 && nchar(str_trim(partes_entrenador[2])) > 0) entrenador_visitante <- str_trim(partes_entrenador[2])
-    entrenador_local <- str_remove_all(entrenador_local, "\\d") %>% str_trim()
-    entrenador_visitante <- str_remove_all(entrenador_visitante, "\\d") %>% str_trim()
+  # 4.1.12. Parse full coaching staff block (three-column layout: local | role | away)
+  mapa_roles_pdf <- c(
+    "Шеф на стручен штаб" = "head_coach",
+    "Тренер на голмани"    = "goalkeeping_coach",
+    "Кондиционен тренер"  = "fitness_coach",
+    "Тренер"              = "assistant_coach",
+    "Физиотерапевт"       = "physiotherapist",
+    "Лекар"               = "doctor",
+    "Комесар за безбедност" = "security_commissioner",
+    "COMET администратор" = "administrator",
+    "Претставник на клуб" = "club_representative"
+  )
+  # Regex: longer labels first to avoid partial matches (e.g. "Тренер" inside "Тренер на голмани")
+  roles_regex <- paste0("(", paste(names(mapa_roles_pdf), collapse = "|"), ")")
+
+  lineas_acta <- unlist(str_split(texto_acta, "\n"))
+  idx_inicio <- grep("Шеф на стручен штаб", lineas_acta)
+  staff_local_list <- list(); staff_visitante_list <- list()
+
+  if (length(idx_inicio) > 0) {
+    idx_fin <- min(length(lineas_acta), idx_inicio[1] + 15)
+    bloque_staff <- linias_bloque <- lineas_acta[idx_inicio[1]:idx_fin]
+    for (linea in bloque_staff) {
+      if (str_detect(linea, "ПОТВРДЕН|^\\s*Резултат|^\\s*$") && !str_detect(linea, roles_regex)) break
+      m <- str_match(linea, roles_regex)
+      if (is.na(m[1,1])) next
+      rol_label <- m[1,1]
+      rol_key <- mapa_roles_pdf[rol_label]
+      partes <- str_split(linea, fixed(rol_label))[[1]]
+      nombre_local <- str_remove_all(str_trim(partes[1]), "\\d") %>% str_trim()
+      nombre_visitante <- if (length(partes) >= 2) str_remove_all(str_trim(partes[2]), "\\d") %>% str_trim() else ""
+      if (nchar(nombre_local) > 0) staff_local_list <- c(staff_local_list, list(tibble(rol = unname(rol_key), nombre = nombre_local)))
+      if (nchar(nombre_visitante) > 0) staff_visitante_list <- c(staff_visitante_list, list(tibble(rol = unname(rol_key), nombre = nombre_visitante)))
+    }
   }
+
+  staff_local_pdf <- if (length(staff_local_list) > 0) bind_rows(staff_local_list) else tibble(rol = character(), nombre = character())
+  staff_visitante_pdf <- if (length(staff_visitante_list) > 0) bind_rows(staff_visitante_list) else tibble(rol = character(), nombre = character())
+
+  # Keep entrenador_local/visitante for backward compatibility
+  entrenador_local <- "Desconocido"; entrenador_visitante <- "Desconocido"
+  hc_local <- staff_local_pdf %>% filter(rol == "head_coach")
+  hc_visitante <- staff_visitante_pdf %>% filter(rol == "head_coach")
+  if (nrow(hc_local) > 0) entrenador_local <- hc_local$nombre[1]
+  if (nrow(hc_visitante) > 0) entrenador_visitante <- hc_visitante$nombre[1]
   
   nota_arbitro <- NA_character_
   if(es_resultado_oficial) {
@@ -866,6 +902,8 @@ procesar_acta <- function(acta_path) {
     estadio = estadio, 
     entrenador_local = entrenador_local,
     entrenador_visitante = entrenador_visitante,
+    staff_local = staff_local_pdf,
+    staff_visitante = staff_visitante_pdf,
     kontrolor = kontrolor_nombre,
     nota_arbitro = nota_arbitro
   ))

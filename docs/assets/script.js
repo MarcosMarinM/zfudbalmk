@@ -218,6 +218,7 @@ function generateLink(target_id) {
         'equipo': 'timovi',
         'arbitro': 'sudii',
         'стадион': 'stadioni',
+        'staff': 'staff',
         'menu-competicion': 'natprevaruvanja'
     };
 

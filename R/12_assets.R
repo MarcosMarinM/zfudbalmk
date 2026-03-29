@@ -89,7 +89,7 @@ th { background-color: #f2f2f2; }
 .match-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 4px 0; }
 .team-info { display: flex; align-items: center; }
 .logo { width: 20px; height: 20px; object-fit: contain; margin-right: 8px; }
-.name { font-weight: bold; font-size: 0.95em; white-space: normal; }
+.name { font-weight: bold; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 30px); }
 .score { font-weight: bold; font-size: 1.1em; color: #CC0000; }
 .score-separator, .score-separator-placeholder { font-size: 1.1em; color: #CC0000; line-height: 0.5; }
 .score-separator-placeholder { visibility: hidden; }

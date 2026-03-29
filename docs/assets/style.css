@@ -85,7 +85,7 @@ th { background-color: #f2f2f2; }
 .match-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 4px 0; }
 .team-info { display: flex; align-items: center; }
 .logo { width: 20px; height: 20px; object-fit: contain; margin-right: 8px; }
-.name { font-weight: bold; font-size: 0.95em; white-space: normal; }
+.name { font-weight: bold; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 30px); }
 .score { font-weight: bold; font-size: 1.1em; color: #CC0000; }
 .score-separator, .score-separator-placeholder { font-size: 1.1em; color: #CC0000; line-height: 0.5; }
 .score-separator-placeholder { visibility: hidden; }
@@ -632,6 +632,15 @@ th { background-color: #f2f2f2; }
 .mp-referees-list li a { color: inherit; text-decoration: none; }
 .mp-referees-list li a:hover { text-decoration: underline; }
 
+/* Staff subsection inside details */
+.mp-staff-section { border-top: 2px solid #eaeaea; padding-top: 30px; }
+.mp-staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.mp-staff-list { padding: 0; margin: 0; list-style: none; }
+.mp-staff-list li { padding: 6px 0; border-bottom: 1px solid #eaeaea; font-size: 14px; }
+.mp-staff-list li a { color: inherit; text-decoration: none; }
+.mp-staff-list li a:hover { text-decoration: underline; }
+.mp-delegate { font-size: 13px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0; }
+
 /* Competition Header */
 .mp-competition-header { text-align: center; margin-bottom: 40px; }
 .mp-competition-header h2 { font-size: 20px; font-weight: 700; border-bottom: none; margin-top: 0; padding-bottom: 0; }
@@ -682,7 +691,7 @@ th { background-color: #f2f2f2; }
   .mp-scoreboard { flex-direction: column; gap: 15px; }
   .mp-team { justify-content: center !important; }
   .mp-match-info { grid-template-columns: 1fr; }
-  .mp-lineups-grid, .mp-penales-grid { grid-template-columns: 1fr; }
+  .mp-lineups-grid, .mp-penales-grid, .mp-staff-grid { grid-template-columns: 1fr; }
   .mp-timeline-container { justify-content: flex-start; gap: 10px; padding: 40px 10px; }
   .mp-timeline-event { min-width: 80px; }
 }
