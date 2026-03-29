@@ -477,6 +477,25 @@ stats_arbitros_por_temporada_df <- arbitros_df %>%
   ) %>%
   arrange(ime, desc(last_match_date))
 
+### 11.8b. Calculate Staff Profile Summaries
+if (exists("staff_df") && nrow(staff_df) > 0) {
+  stats_staff_por_temporada_df <- staff_df %>%
+    filter(rol != "match_delegate") %>%
+    left_join(partidos_df, by = "id_partido") %>%
+    mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+    group_by(nombre, competicion_temporada, competicion_nombre) %>%
+    summarise(
+      num_matches = n_distinct(id_partido),
+      last_match_date = max(fecha_date, na.rm = TRUE),
+      .groups = 'drop'
+    ) %>%
+    arrange(nombre, desc(last_match_date))
+  message(paste("   > Staff profile summaries created:", nrow(stats_staff_por_temporada_df), "entries."))
+} else {
+  stats_staff_por_temporada_df <- tibble()
+  message("   > No staff data available. Skipping staff profile summaries.")
+}
+
 ### 11.9. Identify Entities to Exclude from Individual Page Generation
 message("Identifying entities to exclude from individual page generation...")
 
@@ -534,14 +553,14 @@ message(">>>>>> CREANDO INSTANTÁNEA DE DATOS PARA PRUEBAS (entorno_procesado.RD
 objetos_a_guardar <- c(
   # Dataframes principales de datos
   "partidos_df", "apariciones_df", "goles_df_unificado", "tarjetas_df_unificado",
-  "arbitros_df", "estadios_df",
+  "arbitros_df", "estadios_df", "staff_df",
   
   # Dataframes de estadísticas agregadas
   "jugadoras_stats_df", "stats_clasificacion_por_comp_df", 
   "stats_goleadoras_por_comp_df", "stats_sanciones_por_comp_df",
   "stats_porteras_por_comp_df", "stats_trios_defensivos_df",
   "career_summary_jugadoras_df", "stats_equipos_por_temporada_df",
-  "stats_jugadoras_por_equipo_temporada_df", "stats_arbitros_por_temporada_df",
+  "stats_jugadoras_por_equipo_temporada_df", "stats_arbitros_por_temporada_df", "stats_staff_por_temporada_df",
   "national_team_career_summary_df", "national_team_career_by_category_df",
   
   # Dataframes de configuración y mapeo
@@ -552,7 +571,8 @@ objetos_a_guardar <- c(
   "estilos_clasificacion_data", "nombres_archivos_traducidos",
   
   # Variables de exclusión
-  "player_ids_to_skip", "team_names_to_skip_mk", "referee_ids_to_skip", "stadium_ids_to_skip"
+  "player_ids_to_skip", "team_names_to_skip_mk", "referee_ids_to_skip", "stadium_ids_to_skip",
+  "affected_staff_ids"
 )
 
 # Guardar solo los objetos existentes en el entorno

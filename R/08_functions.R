@@ -876,6 +876,7 @@ nombres_carpetas_relativos <- list(
   timovi = "timovi", 
   arbitros = "sudii", 
   estadios = "stadioni",
+  staff = "staff",
   logos = "logos"
 )
 
@@ -906,7 +907,7 @@ for (lang in IDIOMAS_SOPORTADOS) {
   ruta_base_lang <- file.path(RUTA_SALIDA_RAIZ, lang)
   
   # 8.6.8. Create language-specific folders (competitions, matches, etc.).
-  walk(nombres_carpetas_relativos[c("competiciones", "partidos", "jugadoras", "timovi", "arbitros", "estadios")], 
+  walk(nombres_carpetas_relativos[c("competiciones", "partidos", "jugadoras", "timovi", "arbitros", "estadios", "staff")], 
        ~ dir.create(file.path(ruta_base_lang, .x), showWarnings = FALSE, recursive = TRUE))
 }
 message("Multilingual directory structure created in: ", RUTA_SALIDA_RAIZ)

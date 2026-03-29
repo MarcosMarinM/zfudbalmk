@@ -969,6 +969,7 @@ function generateLink(target_id) {
         'equipo': 'timovi',
         'arbitro': 'sudii',
         'стадион': 'stadioni',
+        'staff': 'staff',
         'menu-competicion': 'natprevaruvanja'
     };
 
@@ -1464,6 +1465,7 @@ GENERAR_PERFILES_JUGADORA <- TRUE    # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE       # Perfiles individuales para cada equipo
 GENERAR_PERFILES_ARBITRO <- TRUE      # Perfiles individuales para cada árbitro
 GENERAR_PERFILES_ESTADIO <- TRUE      # Perfiles individuales para cada estadio
+GENERAR_PERFILES_STAFF <- TRUE        # Perfiles individuales para cada miembro de staff
 
 # ============================================================================ #
 

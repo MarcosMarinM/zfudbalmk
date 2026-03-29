@@ -125,6 +125,11 @@ doctor,Доктор,Doktor,Doctor/a,Doctor
 club_representative,Клупски претставник,Përfaqësuesi i klubit,Representante,Club representative
 match_delegate,Контролор,Kontrollori,Controlador/a,Match delegate
 staff_title,Стручен штаб,Stafi teknik,Cuerpo técnico,Coaching staff
+staff_type,Стручен штаб,Staf teknik,Cuerpo técnico,Staff
+staff_history_by_competition,Историја по натпреварувања,Historia sipas garave,Historial por competición,History by competition
+staff_header_matches,Натпревари,Ndeshje,Partidos,Matches
+staff_header_role,Улога,Roli,Cargo,Role
+staff_header_team,Тим,Ekipi,Equipo,Team
 legend_champions_league,Квалификации за Лигата на шампиони,Kualifikimet për Ligën e Kampionëve,Previa de Champions,Champions League Qualifiers
 legend_relegation_playoff,Бараж за опстанок,Play-off për mbijetesë,Play-off por la permanencia,Relegation Play-off
 legend_direct_relegation,Директно испаѓање,Rënie direkte,Descenso directo,Direct relegation

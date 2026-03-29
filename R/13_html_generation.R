@@ -67,6 +67,8 @@ if (hubo_cambios) {
     search_equipos <- generar_search_entidad(entidades_maestro_lang_df, nombres_equipos, "team_type", "equipo-")
     search_arbitros <- generar_search_entidad(entidades_maestro_lang_df, nombres_arbitros, "referee_type", "arbitro-")
     search_estadios <- generar_search_entidad(entidades_maestro_lang_df, nombres_estadios, "stadium_type", "стадион-")
+    nombres_staff_search <- if (exists("staff_df") && nrow(staff_df) > 0) unique(staff_df %>% filter(rol != "match_delegate") %>% pull(nombre)) else character(0)
+    search_staff <- if (length(nombres_staff_search) > 0) generar_search_entidad(entidades_maestro_lang_df, nombres_staff_search, "staff_type", "staff-") else tibble()
     
     # --- 3. Competiciones ---
     # Las competiciones son un caso especial, pero aplicamos la misma lógica
@@ -85,7 +87,7 @@ if (hubo_cambios) {
       select(Име, Тип, target_id, search_terms)
     
     # --- 4. Unir todo ---
-    search_index_df_lang <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones, search_estadios) %>% 
+    search_index_df_lang <- bind_rows(search_jugadoras, search_equipos, search_arbitros, search_competiciones, search_estadios, search_staff) %>% 
       # Limpieza final para eliminar duplicados y espacios extra
       mutate(search_terms = sapply(str_split(search_terms, "\\s+"), function(x) paste(unique(x), collapse = " "))) %>%
       arrange(Име)
@@ -1899,6 +1901,139 @@ if (hubo_cambios) {
         save_html(pagina_estadio_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$estadios, paste0(id_e, ".html")))
         p_estadios()
       }, future.seed = TRUE, future.packages = pkgs_paralelos)
+      })
+    }
+    
+    # ================== STAFF PROFILES ==================
+    if (GENERAR_PERFILES_STAFF && exists("staff_df") && nrow(staff_df) > 0) {
+      # Exclude delegates (no individual profiles) and staff from national team matches
+      staff_con_perfil <- staff_df %>% filter(rol != "match_delegate")
+      todos_staff <- unique(staff_con_perfil$nombre)
+      
+      # Determine which staff to (re)generate
+      staff_ids_to_skip <- character(0) # No exclusions for staff currently
+      if (!exists("affected_staff_ids")) affected_staff_ids <- character(0)
+      staff_a_generar <- todos_staff[
+        !(generar_id_seguro(todos_staff) %in% staff_ids_to_skip) &
+        (full_rebuild_needed | generar_id_seguro(todos_staff) %in% affected_staff_ids)
+      ]
+      n_staff <- length(staff_a_generar)
+      message(sprintf("   > Generating %d staff profiles in parallel...", n_staff))
+      
+      if (n_staff > 0) with_progress({
+        p_staff <- progressor(steps = n_staff)
+        future_lapply(staff_a_generar, function(staff_mk) {
+          id_s <- generar_id_seguro(staff_mk)
+          
+          current_staff_name <- (entidades_df_lang %>% filter(original_name == staff_mk))$current_lang_name[1]
+          if (is.na(current_staff_name)) current_staff_name <- staff_mk
+          
+          temporadas_summary <- stats_staff_por_temporada_df %>%
+            filter(nombre == staff_mk) %>%
+            left_join(competiciones_unicas_df, by = c("competicion_nombre", "competicion_temporada")) %>%
+            select(competicion_temporada, competicion_nombre, !!sym(comp_name_col), num_matches)
+          
+          path_rel_partidos <- file.path("..", nombres_carpetas_relativos$partidos)
+          
+          tbody_content <- if (nrow(temporadas_summary) > 0) {
+            map(1:nrow(temporadas_summary), function(j) {
+              stage <- temporadas_summary[j,]
+              details_id <- paste0("details-staff-", id_s, "-", j)
+              nombre_competicion_mostrado <- stage[[comp_name_col]]
+              
+              historial_stage_mk <- staff_con_perfil %>%
+                filter(nombre == staff_mk) %>%
+                left_join(partidos_df, by = "id_partido") %>%
+                filter(competicion_temporada == stage$competicion_temporada,
+                       competicion_nombre == stage$competicion_nombre) %>%
+                mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
+                arrange(desc(fecha_date))
+              
+              historial_stage <- historial_stage_mk %>%
+                left_join(entidades_df_lang %>% select(original_name, home_name = current_lang_name),
+                          by = c("local" = "original_name")) %>%
+                left_join(entidades_df_lang %>% select(original_name, away_name = current_lang_name),
+                          by = c("visitante" = "original_name")) %>%
+                left_join(entidades_df_lang %>% select(original_name, team_name = current_lang_name),
+                          by = c("equipo" = "original_name"))
+              
+              tabla_detalles <- tags$table(class = "sp-table",
+                tags$thead(tags$tr(
+                  tags$th(t("team_header_date")),
+                  tags$th(t("staff_header_team")),
+                  tags$th(t("match_header_match")),
+                  tags$th(t("staff_header_role"))
+                )),
+                tags$tbody(map(1:nrow(historial_stage), function(p_idx) {
+                  partido <- historial_stage[p_idx,]
+                  resultado_txt <- paste(partido$goles_local, "-", partido$goles_visitante)
+                  match_href <- file.path(path_rel_partidos, paste0(partido$id_partido, ".html"))
+                  rol_traducido <- t(partido$rol)
+                  team_display <- if (!is.na(partido$team_name)) partido$team_name else ""
+                  tags$tr(
+                    class = "sp-clickable-row",
+                    onclick = paste0("window.location='", match_href, "'"),
+                    tags$td(partido$fecha),
+                    tags$td(team_display),
+                    tags$td(
+                      tags$span(class = "sp-match-cell",
+                        get_logo_tag(partido$local, css_class = "sp-table-logo"),
+                        tags$span(class = "sp-team-name", partido$home_name),
+                        tags$span(class = "sp-result", resultado_txt),
+                        tags$span(class = "sp-team-name", partido$away_name),
+                        get_logo_tag(partido$visitante, css_class = "sp-table-logo")
+                      )
+                    ),
+                    tags$td(rol_traducido)
+                  )
+                }))
+              )
+              
+              summary_row <- tags$tr(
+                class = "summary-row", onclick = sprintf("toggleDetails('%s')", details_id),
+                tags$td(stage$competicion_temporada),
+                tags$td(nombre_competicion_mostrado),
+                tags$td(stage$num_matches)
+              )
+              
+              details_row <- tags$tr(
+                id = details_id, class = "details-row",
+                tags$td(colspan = "3", tags$div(class = "details-content", tabla_detalles))
+              )
+              
+              tagList(summary_row, details_row)
+            })
+          } else {
+            tags$tr(tags$td(colspan = "3", t("player_no_matches")))
+          }
+          
+          contenido_staff <- tagList(
+            crear_botones_navegacion(path_to_lang_root = ".."),
+            tags$div(class = "sp-container",
+              tags$div(class = "sp-header", tags$h2(current_staff_name)),
+              tags$section(class = "sp-history-section",
+                tags$h3(class = "sp-section-title", t("staff_history_by_competition")),
+                tags$table(class = "sp-table",
+                  tags$thead(tags$tr(
+                    tags$th(t("player_season")),
+                    tags$th(t("player_competition")),
+                    tags$th(t("staff_header_matches"))
+                  )),
+                  tags$tbody(tbody_content)
+                )
+              )
+            )
+          )
+          
+          pagina_staff_final <- crear_pagina_html(
+            contenido_principal = contenido_staff,
+            titulo_pagina = current_staff_name,
+            path_to_root_dir = "../..",
+            script_contraseña = script_contraseña_lang
+          )
+          save_html(pagina_staff_final, file = file.path(RUTA_SALIDA_RAIZ, lang, nombres_carpetas_relativos$staff, paste0(id_s, ".html")))
+          p_staff()
+        }, future.seed = TRUE, future.packages = pkgs_paralelos)
       })
     }
     

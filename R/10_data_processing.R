@@ -493,7 +493,8 @@ message("Step 10.5: Creating master translation and entity dataframes...")
 nombres_equipos <- unique(c(partidos_df$local, partidos_df$visitante))
 nombres_arbitros <- unique(arbitros_df$ime)
 nombres_estadios <- unique(na.omit(estadios_df$estadio))
-entidades_base_df <- tibble(original_name = c(nombres_equipos, nombres_arbitros, nombres_estadios)) %>% distinct()
+nombres_staff <- if (exists("staff_df") && nrow(staff_df) > 0) unique(staff_df$nombre) else character(0)
+entidades_base_df <- tibble(original_name = c(nombres_equipos, nombres_arbitros, nombres_estadios, nombres_staff)) %>% distinct()
 
 if (!is.null(mapa_nombres_entidades_long)) {
   entity_translations_wide <- mapa_nombres_entidades_long %>%
@@ -656,6 +657,7 @@ if (hubo_cambios) {
   affected_team_ids <- character(0)
   affected_referee_ids <- character(0)
   affected_stadium_ids <- character(0)
+  affected_staff_ids <- character(0)
   if (length(affected_match_ids) > 0) {
     partidos_afectados_df <- partidos_df %>%
       filter(id_partido %in% affected_match_ids) %>%
@@ -670,6 +672,10 @@ if (hubo_cambios) {
     if (nrow(arbitros_afectados_df) > 0) affected_referee_ids <- unique(c(affected_referee_ids, generar_id_seguro(na.omit(arbitros_afectados_df$ime))))
     estadios_afectados_df <- estadios_df %>% filter(id_partido %in% affected_match_ids)
     if (nrow(estadios_afectados_df) > 0) affected_stadium_ids <- unique(c(affected_stadium_ids, generar_id_seguro(na.omit(estadios_afectados_df$estadio))))
+    if (exists("staff_df") && nrow(staff_df) > 0) {
+      staff_afectados <- staff_df %>% filter(id_partido %in% affected_match_ids)
+      if (nrow(staff_afectados) > 0) affected_staff_ids <- unique(generar_id_seguro(na.omit(staff_afectados$nombre)))
+    }
   }
   # Forzar la actualización si hay competiciones enteras que son nuevas
   if (length(competiciones_nuevas_ids) > 0) {
