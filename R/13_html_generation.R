@@ -1135,15 +1135,18 @@ if (hubo_cambios) {
         
         # --- Build staff list ---
         staff_html <- if (nrow(staff_partido) > 0) {
-          staff_local <- staff_partido %>% filter(equipo == partido_info$local)
-          staff_visitante <- staff_partido %>% filter(equipo == partido_info$visitante)
+          staff_partido_lang <- staff_partido %>%
+            left_join(entidades_df_lang %>% select(original_name, staff_lang_name = current_lang_name), by = c("nombre" = "original_name")) %>%
+            mutate(nombre_mostrado = coalesce(staff_lang_name, nombre))
+          staff_local <- staff_partido_lang %>% filter(equipo == partido_info$local)
+          staff_visitante <- staff_partido_lang %>% filter(equipo == partido_info$visitante)
 
           render_staff_equipo <- function(df_staff) {
             if (nrow(df_staff) == 0) return(NULL)
             tags$ul(class = "mp-staff-list", map(1:nrow(df_staff), function(s) {
               stf <- df_staff[s,]
               rol_traducido <- t(stf$rol)
-              tags$li(paste0(rol_traducido, ": ", stf$nombre))
+              tags$li(paste0(rol_traducido, ": ", stf$nombre_mostrado))
             }))
           }
 

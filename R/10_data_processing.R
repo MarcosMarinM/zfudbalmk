@@ -55,6 +55,7 @@ resultados_exitosos <- map(resultados_exitosos, function(res) {
   if (is_latin(res$partido_info$visitante)) res$partido_info$visitante <- latin_to_cyrillic(res$partido_info$visitante)
   if (!is.null(res$estadio) && is_latin(res$estadio)) res$estadio <- latin_to_cyrillic(res$estadio)
   if (!is.null(res$partido_info$estadio) && is_latin(res$partido_info$estadio)) res$partido_info$estadio <- latin_to_cyrillic(res$partido_info$estadio)
+  if (!is.null(res$delegado) && !is.na(res$delegado) && is_latin(res$delegado)) res$delegado <- latin_to_cyrillic(res$delegado)
   return(res)
 })
 
@@ -138,6 +139,7 @@ if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
       res$arbitro_principal_nombre <- aplicar_conversiones(res$arbitro_principal_nombre, mapa_df = mapa_conversiones_df)
       res$arbitro_asist_1_nombre <- aplicar_conversiones(res$arbitro_asist_1_nombre, mapa_df = mapa_conversiones_df)
       res$arbitro_asist_2_nombre <- aplicar_conversiones(res$arbitro_asist_2_nombre, mapa_df = mapa_conversiones_df)
+      res$delegado <- aplicar_conversiones(res$delegado, mapa_df = mapa_conversiones_df)
     }
 
     # STEP 2: REORDENAR NOMBRES
@@ -162,6 +164,7 @@ if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
     res$arbitro_principal_nombre <- reordenar_nombre_simple(res$arbitro_principal_nombre)
     res$arbitro_asist_1_nombre <- reordenar_nombre_simple(res$arbitro_asist_1_nombre)
     res$arbitro_asist_2_nombre <- reordenar_nombre_simple(res$arbitro_asist_2_nombre)
+    res$delegado <- reordenar_nombre_simple(res$delegado)
 
     return(res)
   })
