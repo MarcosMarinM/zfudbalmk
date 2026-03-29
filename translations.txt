@@ -115,9 +115,16 @@ position_goalkeeper,Голманка,Portiere,Portera,Goalkeeper
 position_defender,Одбрана,Mbrojtëse,Defensa,Defender
 position_midfielder,Среден ред,Mesfushore,Centrocampista,Midfielder
 position_forward,Напад,Sulmuese,Delantera,Forward
-referee_main,Главен судија,Gjyqtari kryesor,Árbitra,Referee
-referee_asst1,1-ви помошник,Ndihmësi i parë,1.ª asistente,1st assistant
-referee_asst2,2-ри помошник,Ndihmësi i dytë,2.ª asistente,2nd assistant
+referee_main,Главен судија,Gjyqtari kryesor,Árbitro/a,Referee
+referee_asst1,1-ви помошник,Ndihmësi i parë,1.º/a asistente,1st assistant
+referee_asst2,2-ри помошник,Ndihmësi i dytë,2.º/a asistente,2nd assistant
+head_coach,Главен тренер,Trajneri kryesor,Entrenador/a,Head coach
+assistant_coach,Помошен тренер,Trajneri ndihmës,Asistente,Assistant coach
+physiotherapist,Физиотерапевт,Fizioterapeut,Fisioterapeuta,Physiotherapist
+doctor,Доктор,Doktor,Doctor/a,Doctor
+club_representative,Клупски претставник,Përfaqësuesi i klubit,Representante,Club representative
+match_delegate,Контролор,Kontrollori,Controlador/a,Match delegate
+staff_title,Стручен штаб,Stafi teknik,Cuerpo técnico,Coaching staff
 legend_champions_league,Квалификации за Лигата на шампиони,Kualifikimet për Ligën e Kampionëve,Previa de Champions,Champions League Qualifiers
 legend_relegation_playoff,Бараж за опстанок,Play-off për mbijetesë,Play-off por la permanencia,Relegation Play-off
 legend_direct_relegation,Директно испаѓање,Rënie direkte,Descenso directo,Direct relegation

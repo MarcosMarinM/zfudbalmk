@@ -280,6 +280,43 @@ estadios_df <- map_dfr(resultados_exitosos, function(res) {
   # CORRECCIÓN: Añadir las columnas de competición al join.
   left_join(select(partidos_df, id_partido, local, visitante, fecha, competicion_nombre, competicion_temporada), by = "id_partido")
 
+# 10.1.3. Create master staff dataframe (coaches, medical, delegates)
+staff_df <- map_dfr(resultados_exitosos, function(res) {
+  if (is.null(res) || is.null(res$partido_info)) return(NULL)
+  id_p <- res$partido_info$id_partido
+  local <- res$partido_info$local
+  visitante <- res$partido_info$visitante
+
+  filas <- tibble(id_partido = character(), nombre = character(),
+                  rol = character(), equipo = character())
+
+  # Staff completo desde najava (priority if available)
+  tiene_staff_local <- !is.null(res$staff_local) && is.data.frame(res$staff_local) && nrow(res$staff_local) > 0
+  tiene_staff_visitante <- !is.null(res$staff_visitante) && is.data.frame(res$staff_visitante) && nrow(res$staff_visitante) > 0
+
+  if (tiene_staff_local) {
+    filas <- bind_rows(filas, res$staff_local %>% mutate(id_partido = id_p, equipo = local))
+  } else if (!is.null(res$entrenador_local) && !is.na(res$entrenador_local) && res$entrenador_local != "Desconocido") {
+    # Fallback: solo entrenador jefe (típicamente desde PDF)
+    filas <- add_row(filas, id_partido = id_p, nombre = res$entrenador_local, rol = "head_coach", equipo = local)
+  }
+
+  if (tiene_staff_visitante) {
+    filas <- bind_rows(filas, res$staff_visitante %>% mutate(id_partido = id_p, equipo = visitante))
+  } else if (!is.null(res$entrenador_visitante) && !is.na(res$entrenador_visitante) && res$entrenador_visitante != "Desconocido") {
+    filas <- add_row(filas, id_partido = id_p, nombre = res$entrenador_visitante, rol = "head_coach", equipo = visitante)
+  }
+
+  # Delegado (solo desde najava)
+  if (!is.null(res$delegado) && !is.na(res$delegado)) {
+    filas <- add_row(filas, id_partido = id_p, nombre = res$delegado, rol = "match_delegate", equipo = NA_character_)
+  }
+
+  filas
+}) %>%
+  filter(!is.na(nombre), nchar(trimws(nombre)) > 0)
+
+message(paste("   > Master `staff_df` created with", nrow(staff_df), "entries."))
 message("   > All other master dataframes created.")
 
 ### 10.2. Assign Match Duration and Reassign National Team Matches

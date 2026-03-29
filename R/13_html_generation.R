@@ -951,6 +951,7 @@ if (hubo_cambios) {
         
         cronologia <- generar_cronologia_df(id_p, resumen_partido, entidades_df_lang, jugadoras_lang_df)
         arbitros_partido_mk <- arbitros_df %>% filter(id_partido == id_p); arbitros_partido_lang <- arbitros_partido_mk %>% left_join(entidades_df_lang, by = c("ime" = "original_name"))
+        staff_partido <- if (exists("staff_df") && nrow(staff_df) > 0) staff_df %>% filter(id_partido == id_p) else tibble()
         estadio_info_mk <- estadios_df %>% filter(id_partido == id_p) %>% head(1)
         estadio_name_lang <- if(nrow(estadio_info_mk) > 0) (entidades_df_lang %>% filter(original_name == estadio_info_mk$estadio))$current_lang_name[1] else t("match_unknown")
         goles_partido <- goles_df_unificado %>% filter(id_partido == id_p) %>% left_join(jugadoras_lang_df, by = "id")
@@ -1130,6 +1131,39 @@ if (hubo_cambios) {
           }))
         } else { NULL }
         
+        # --- Build staff list ---
+        staff_html <- if (nrow(staff_partido) > 0) {
+          staff_local <- staff_partido %>% filter(equipo == partido_info$local, rol != "match_delegate")
+          staff_visitante <- staff_partido %>% filter(equipo == partido_info$visitante, rol != "match_delegate")
+          delegado_row <- staff_partido %>% filter(rol == "match_delegate")
+
+          render_staff_equipo <- function(df_staff) {
+            if (nrow(df_staff) == 0) return(NULL)
+            tags$ul(class = "mp-staff-list", map(1:nrow(df_staff), function(s) {
+              stf <- df_staff[s,]
+              rol_traducido <- t(stf$rol)
+              tags$li(paste0(rol_traducido, ": ", stf$nombre))
+            }))
+          }
+
+          tagList(
+            tags$div(class = "mp-staff-section",
+              tags$div(class = "mp-detail-row", tags$span(tags$b(t("staff_title")))),
+              if (nrow(staff_local) > 0) tagList(
+                tags$div(class = "mp-staff-subtitle", local_name),
+                render_staff_equipo(staff_local)
+              ),
+              if (nrow(staff_visitante) > 0) tagList(
+                tags$div(class = "mp-staff-subtitle", visitante_name),
+                render_staff_equipo(staff_visitante)
+              ),
+              if (nrow(delegado_row) > 0) {
+                tags$div(class = "mp-delegate", paste0(t("match_delegate"), ": ", delegado_row$nombre[1]))
+              }
+            )
+          )
+        } else { NULL }
+
         # --- Goals summary data ---
         goles_resumen_local_name <- resumen_partido$partido_info$local
         goles_local_df <- goles_partido %>% filter(equipo_acreditado == goles_resumen_local_name)
@@ -1191,6 +1225,7 @@ if (hubo_cambios) {
                 tags$div(class = "mp-detail-row",
                   tags$span(referees_html)
                 ),
+                staff_html,
                 if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) {
                   tags$p(class = "mp-notes", nota_arbitro)
                 }

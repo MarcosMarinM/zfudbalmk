@@ -281,21 +281,46 @@ parsear_najava <- function(url, id_partido) {
     }
   }
 
-  # -- Coaching staff (head coach per team) --
+  # -- Coaching staff (all roles per team) --
+  mapa_roles_staff <- c(
+    "Главен тренер" = "head_coach",
+    "Помошен тренер" = "assistant_coach",
+    "Физиотерапевт" = "physiotherapist",
+    "Доктор" = "doctor",
+    "Клупски претставник" = "club_representative"
+  )
+
+  extraer_staff_equipo <- function(team_col_node) {
+    items <- team_col_node %>% html_elements(".ffm-najava__staff")
+    if (length(items) == 0) return(tibble())
+    map_dfr(items, function(item) {
+      rol_raw <- item %>% html_element(".ffm-najava__staff-role") %>% html_text(trim = TRUE)
+      nombre <- item %>% html_element(".ffm-najava__staff-name") %>% html_text(trim = TRUE)
+      if (is.na(rol_raw) || is.na(nombre)) return(tibble())
+      rol_limpio <- str_remove_all(rol_raw, ":") %>% str_trim()
+      rol_key <- mapa_roles_staff[rol_limpio]
+      # Fallback for unexpected roles
+      if (is.na(rol_key)) rol_key <- tolower(str_replace_all(rol_limpio, " ", "_"))
+      tibble(rol = unname(rol_key), nombre = nombre)
+    })
+  }
+
+  staff_local <- tibble()
+  staff_visitante <- tibble()
   entrenador_local <- NA_character_
   entrenador_visitante <- NA_character_
   sec_staff <- buscar_seccion("Стручен штаб")
   if (!is.null(sec_staff)) {
     staff_cols <- sec_staff %>% html_elements(".ffm-najava__team-col")
     for (sc in staff_cols) {
-      es_away <- str_detect(html_attr(sc, "class"), "away")
-      items <- sc %>% html_elements(".ffm-najava__staff")
-      for (item in items) {
-        rol <- item %>% html_element(".ffm-najava__staff-role") %>% html_text(trim = TRUE)
-        nombre <- item %>% html_element(".ffm-najava__staff-name") %>% html_text(trim = TRUE)
-        if (!is.na(rol) && str_detect(rol, "Главен тренер")) {
-          if (es_away) entrenador_visitante <- nombre else entrenador_local <- nombre
-        }
+      if (str_detect(html_attr(sc, "class"), "away")) {
+        staff_visitante <- extraer_staff_equipo(sc)
+        coach_row <- staff_visitante %>% filter(rol == "head_coach")
+        if (nrow(coach_row) > 0) entrenador_visitante <- coach_row$nombre[1]
+      } else {
+        staff_local <- extraer_staff_equipo(sc)
+        coach_row <- staff_local %>% filter(rol == "head_coach")
+        if (nrow(coach_row) > 0) entrenador_local <- coach_row$nombre[1]
       }
     }
   }
@@ -319,6 +344,8 @@ parsear_najava <- function(url, id_partido) {
     competicion_najava = competicion_najava,
     jugadoras_local = jugadoras_local,
     jugadoras_visitante = jugadoras_visitante,
+    staff_local = staff_local,
+    staff_visitante = staff_visitante,
     entrenador_local = entrenador_local,
     entrenador_visitante = entrenador_visitante,
     delegado = delegado
@@ -381,6 +408,8 @@ enriquecer_con_najava <- function(resultado, najava) {
   resultado$alineacion_visitante <- actualizar_alineacion(resultado$alineacion_visitante, najava$jugadoras_visitante)
 
   # 3. Add fields from najava that izvestaj lacks (equivalent to PDF extraction)
+  resultado$staff_local <- najava$staff_local
+  resultado$staff_visitante <- najava$staff_visitante
   resultado$entrenador_local <- najava$entrenador_local
   resultado$entrenador_visitante <- najava$entrenador_visitante
   resultado$delegado <- najava$delegado

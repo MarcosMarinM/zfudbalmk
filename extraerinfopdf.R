@@ -859,6 +859,8 @@ procesar_acta <- function(acta_path) {
     arbitro_asist_2_nombre = arbitro_asist_2_nombre,
     arbitro_asist_2_ciudad = arbitro_asist_2_ciudad,
     estadio = estadio, 
+    entrenador_local = entrenador_local,
+    entrenador_visitante = entrenador_visitante,
     nota_arbitro = nota_arbitro
   ))
 }
