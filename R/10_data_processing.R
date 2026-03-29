@@ -265,6 +265,13 @@ arbitros_df <- map_dfr(resultados_exitosos, function(res) {
       add_row(id_partido = id_p, ime = info_asist2$nombre, ciudad = info_asist2$ciudad, uloga = "referee_asst2")
   }
 
+  # 4. Контролор / Delegado (from najava)
+  info_delegado <- extraer_info_arbitro(res$delegado)
+  if (!is.null(info_delegado$nombre)) {
+    df_arbitros_partido <- df_arbitros_partido %>%
+      add_row(id_partido = id_p, ime = info_delegado$nombre, ciudad = info_delegado$ciudad, uloga = "match_delegate")
+  }
+
   return(df_arbitros_partido)
 }) %>%
   filter(!is.na(ime), ime != "Desconocido")
@@ -305,11 +312,6 @@ staff_df <- map_dfr(resultados_exitosos, function(res) {
     filas <- bind_rows(filas, res$staff_visitante %>% mutate(id_partido = id_p, equipo = visitante))
   } else if (!is.null(res$entrenador_visitante) && !is.na(res$entrenador_visitante) && res$entrenador_visitante != "Desconocido") {
     filas <- add_row(filas, id_partido = id_p, nombre = res$entrenador_visitante, rol = "head_coach", equipo = visitante)
-  }
-
-  # Delegado (solo desde najava)
-  if (!is.null(res$delegado) && !is.na(res$delegado)) {
-    filas <- add_row(filas, id_partido = id_p, nombre = res$delegado, rol = "match_delegate", equipo = NA_character_)
   }
 
   filas

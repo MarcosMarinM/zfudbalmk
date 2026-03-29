@@ -480,7 +480,6 @@ stats_arbitros_por_temporada_df <- arbitros_df %>%
 ### 11.8b. Calculate Staff Profile Summaries
 if (exists("staff_df") && nrow(staff_df) > 0) {
   stats_staff_por_temporada_df <- staff_df %>%
-    filter(rol != "match_delegate") %>%
     left_join(partidos_df, by = "id_partido") %>%
     mutate(fecha_date = as.Date(fecha, format = "%d.%m.%Y")) %>%
     group_by(nombre, competicion_temporada, competicion_nombre) %>%

@@ -67,7 +67,7 @@ if (hubo_cambios) {
     search_equipos <- generar_search_entidad(entidades_maestro_lang_df, nombres_equipos, "team_type", "equipo-")
     search_arbitros <- generar_search_entidad(entidades_maestro_lang_df, nombres_arbitros, "referee_type", "arbitro-")
     search_estadios <- generar_search_entidad(entidades_maestro_lang_df, nombres_estadios, "stadium_type", "стадион-")
-    nombres_staff_search <- if (exists("staff_df") && nrow(staff_df) > 0) unique(staff_df %>% filter(rol != "match_delegate") %>% pull(nombre)) else character(0)
+    nombres_staff_search <- if (exists("staff_df") && nrow(staff_df) > 0) unique(staff_df$nombre) else character(0)
     search_staff <- if (length(nombres_staff_search) > 0) generar_search_entidad(entidades_maestro_lang_df, nombres_staff_search, "staff_type", "staff-") else tibble()
     
     # --- 3. Competiciones ---
@@ -1135,9 +1135,8 @@ if (hubo_cambios) {
         
         # --- Build staff list ---
         staff_html <- if (nrow(staff_partido) > 0) {
-          staff_local <- staff_partido %>% filter(equipo == partido_info$local, rol != "match_delegate")
-          staff_visitante <- staff_partido %>% filter(equipo == partido_info$visitante, rol != "match_delegate")
-          delegado_row <- staff_partido %>% filter(rol == "match_delegate")
+          staff_local <- staff_partido %>% filter(equipo == partido_info$local)
+          staff_visitante <- staff_partido %>% filter(equipo == partido_info$visitante)
 
           render_staff_equipo <- function(df_staff) {
             if (nrow(df_staff) == 0) return(NULL)
@@ -1158,10 +1157,7 @@ if (hubo_cambios) {
               if (nrow(staff_visitante) > 0) tagList(
                 tags$div(class = "mp-staff-subtitle", visitante_name),
                 render_staff_equipo(staff_visitante)
-              ),
-              if (nrow(delegado_row) > 0) {
-                tags$div(class = "mp-delegate", paste0(t("match_delegate"), ": ", delegado_row$nombre[1]))
-              }
+              )
             )
           )
         } else { NULL }
@@ -1906,8 +1902,7 @@ if (hubo_cambios) {
     
     # ================== STAFF PROFILES ==================
     if (GENERAR_PERFILES_STAFF && exists("staff_df") && nrow(staff_df) > 0) {
-      # Exclude delegates (no individual profiles) and staff from national team matches
-      staff_con_perfil <- staff_df %>% filter(rol != "match_delegate")
+      staff_con_perfil <- staff_df
       todos_staff <- unique(staff_con_perfil$nombre)
       
       # Determine which staff to (re)generate
