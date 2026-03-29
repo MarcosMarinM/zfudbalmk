@@ -643,6 +643,11 @@ procesar_acta <- function(acta_path) {
   arbitro_asist_2_nombre <- info_arb_asist_2$nombre
   arbitro_asist_2_ciudad <- info_arb_asist_2$ciudad
   
+  # Контролор often sits at end of line (single \n), so extraer_info's \\s{2,} delimiter won't match
+  kontrolor_raw <- str_match(texto_acta, "Контролор:\\s*(.+?)(?:\\s{2,}|\\n|$)")[1, 2]
+  info_kontrolor <- parsear_arbitro(if (!is.na(kontrolor_raw)) str_trim(kontrolor_raw) else NA_character_)
+  kontrolor_nombre <- if (is.na(info_kontrolor$nombre) || info_kontrolor$nombre == "Desconocido") NA_character_ else info_kontrolor$nombre
+  
   entrenador_local <- "Desconocido"; entrenador_visitante <- "Desconocido"
   linea_entrenadores_match <- str_extract(texto_acta, ".*Шеф на стручен штаб.*")
   if (!is.na(linea_entrenadores_match)) {
@@ -861,6 +866,7 @@ procesar_acta <- function(acta_path) {
     estadio = estadio, 
     entrenador_local = entrenador_local,
     entrenador_visitante = entrenador_visitante,
+    kontrolor = kontrolor_nombre,
     nota_arbitro = nota_arbitro
   ))
 }

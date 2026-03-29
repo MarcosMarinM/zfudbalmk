@@ -41,6 +41,7 @@ original_mk,latin_sq,latin_es,latin_en
 Зилхава Ќамили,Zilhava Qamili,Zilhava Qamili,Zilhava Qamili
 Ивана Спасиќ,Ivana Spasić,Ivana Spasić,Ivana Spasić
 Ихдина Речи,Ihdina Reçi,Ihdina Reçi,Ihdina Reçi
+Исније Балажи,Isnije Ballazhi,Isnije Ballazhi,Isnije Ballazhi
 Јана Крстиќ,Jana Krstić,Jana Krstić,Jana Krstić
 Јелена Радевиќ,Jelena Radević,Jelena Radević,Jelena Radević
 Јована Вучичевич,Jovana Vučićević,Jovana Vučićević,Jovana Vučićević

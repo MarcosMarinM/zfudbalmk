@@ -970,8 +970,15 @@ if (hubo_cambios) {
           paste(t("round_prefix"), partido_info$jornada)
         }
         nota_arbitro <- resumen_partido$nota_arbitro %||% NA_character_
-        if (!is.na(nota_arbitro)) { nota_arbitro <- str_remove(nota_arbitro, "^[\\s:]*"); nota_arbitro <- gsub("[\\r\\n]+", " ", nota_arbitro) }
-        path_rel_competiciones <- file.path("..", nombres_carpetas_relativos$competiciones); path_rel_timovi <- file.path("..", nombres_carpetas_relativos$timovi); path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras); path_rel_arbitros <- file.path("..", nombres_carpetas_relativos$arbitros); path_rel_estadios <- file.path("..", nombres_carpetas_relativos$estadios)
+        if (!is.na(nota_arbitro)) {
+          nota_arbitro <- str_remove(nota_arbitro, "^[\\s:]*")
+          # Period before newline → period + space
+          nota_arbitro <- gsub("\\.\\s*[\\r\\n]+\\s*", ". ", nota_arbitro, perl = TRUE)
+          # Newline without preceding period → add period + space
+          nota_arbitro <- gsub("\\s*[\\r\\n]+\\s*", ". ", nota_arbitro, perl = TRUE)
+          nota_arbitro <- str_trim(nota_arbitro)
+        }
+        path_rel_competiciones <- file.path("..", nombres_carpetas_relativos$competiciones); path_rel_timovi <- file.path("..", nombres_carpetas_relativos$timovi); path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras); path_rel_arbitros <- file.path("..", nombres_carpetas_relativos$arbitros); path_rel_estadios <- file.path("..", nombres_carpetas_relativos$estadios); path_rel_staff <- file.path("..", nombres_carpetas_relativos$staff)
         alineacion_partido_lang <- apariciones_df %>% filter(id_partido == id_p) %>% left_join(jugadoras_lang_df, by="id")
         
         # --- Helper: render lineup for one team (new design) ---
@@ -1133,7 +1140,7 @@ if (hubo_cambios) {
           }))
         } else { NULL }
         
-        # --- Build staff list ---
+        # --- Build staff list (two-column grid, mirroring lineups) ---
         staff_html <- if (nrow(staff_partido) > 0) {
           staff_partido_lang <- staff_partido %>%
             left_join(entidades_df_lang %>% select(original_name, staff_lang_name = current_lang_name), by = c("nombre" = "original_name")) %>%
@@ -1142,23 +1149,33 @@ if (hubo_cambios) {
           staff_visitante <- staff_partido_lang %>% filter(equipo == partido_info$visitante)
 
           render_staff_equipo <- function(df_staff) {
-            if (nrow(df_staff) == 0) return(NULL)
+            if (nrow(df_staff) == 0) return(tags$ul(class = "mp-staff-list"))
             tags$ul(class = "mp-staff-list", map(1:nrow(df_staff), function(s) {
               stf <- df_staff[s,]
               rol_traducido <- t(stf$rol)
-              tags$li(paste0(rol_traducido, ": ", stf$nombre_mostrado))
+              staff_link <- tags$a(
+                href = file.path(path_rel_staff, paste0(generar_id_seguro(stf$nombre), ".html")),
+                stf$nombre_mostrado
+              )
+              tags$li(paste0(rol_traducido, ": "), staff_link)
             }))
           }
 
-          tagList(
-            tags$div(class = "mp-staff-section",
-              tags$div(class = "mp-detail-row", tags$span(tags$b(t("staff_title")))),
-              if (nrow(staff_local) > 0) tagList(
-                tags$div(class = "mp-staff-subtitle", local_name),
+          tags$section(class = "mp-staff-section",
+            tags$h3(class = "mp-section-title", t("staff_title")),
+            tags$div(class = "mp-staff-grid",
+              tags$div(class = "mp-staff-col",
+                tags$div(class = "mp-lineup-header",
+                  get_logo_tag(partido_info$local, css_class = ""),
+                  tags$h4(crear_enlace_equipo_condicional(partido_info$local, local_name))
+                ),
                 render_staff_equipo(staff_local)
               ),
-              if (nrow(staff_visitante) > 0) tagList(
-                tags$div(class = "mp-staff-subtitle", visitante_name),
+              tags$div(class = "mp-staff-col",
+                tags$div(class = "mp-lineup-header",
+                  get_logo_tag(partido_info$visitante, css_class = ""),
+                  tags$h4(crear_enlace_equipo_condicional(partido_info$visitante, visitante_name))
+                ),
                 render_staff_equipo(staff_visitante)
               )
             )

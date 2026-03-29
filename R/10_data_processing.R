@@ -55,7 +55,8 @@ resultados_exitosos <- map(resultados_exitosos, function(res) {
   if (is_latin(res$partido_info$visitante)) res$partido_info$visitante <- latin_to_cyrillic(res$partido_info$visitante)
   if (!is.null(res$estadio) && is_latin(res$estadio)) res$estadio <- latin_to_cyrillic(res$estadio)
   if (!is.null(res$partido_info$estadio) && is_latin(res$partido_info$estadio)) res$partido_info$estadio <- latin_to_cyrillic(res$partido_info$estadio)
-  if (!is.null(res$delegado) && !is.na(res$delegado) && is_latin(res$delegado)) res$delegado <- latin_to_cyrillic(res$delegado)
+  if (!is.null(res$delegado) && length(res$delegado) == 1 && !is.na(res$delegado) && is_latin(res$delegado)) res$delegado <- latin_to_cyrillic(res$delegado)
+  if (!is.null(res$kontrolor) && length(res$kontrolor) == 1 && !is.na(res$kontrolor) && is_latin(res$kontrolor)) res$kontrolor <- latin_to_cyrillic(res$kontrolor)
   return(res)
 })
 
@@ -140,6 +141,7 @@ if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
       res$arbitro_asist_1_nombre <- aplicar_conversiones(res$arbitro_asist_1_nombre, mapa_df = mapa_conversiones_df)
       res$arbitro_asist_2_nombre <- aplicar_conversiones(res$arbitro_asist_2_nombre, mapa_df = mapa_conversiones_df)
       res$delegado <- aplicar_conversiones(res$delegado, mapa_df = mapa_conversiones_df)
+      res$kontrolor <- aplicar_conversiones(res$kontrolor, mapa_df = mapa_conversiones_df)
     }
 
     # STEP 2: REORDENAR NOMBRES
@@ -165,6 +167,7 @@ if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
     res$arbitro_asist_1_nombre <- reordenar_nombre_simple(res$arbitro_asist_1_nombre)
     res$arbitro_asist_2_nombre <- reordenar_nombre_simple(res$arbitro_asist_2_nombre)
     res$delegado <- reordenar_nombre_simple(res$delegado)
+    res$kontrolor <- reordenar_nombre_simple(res$kontrolor)
 
     return(res)
   })
@@ -268,8 +271,10 @@ arbitros_df <- map_dfr(resultados_exitosos, function(res) {
       add_row(id_partido = id_p, ime = info_asist2$nombre, ciudad = info_asist2$ciudad, uloga = "referee_asst2")
   }
 
-  # 4. Контролор / Delegado (from najava)
-  info_delegado <- extraer_info_arbitro(res$delegado)
+  # 4. Контролор / Delegado (from najava or PDF)
+  # Prefer najava delegado; fall back to PDF kontrolor
+  delegado_raw <- if (!is.null(res$delegado) && length(res$delegado) == 1 && !is.na(res$delegado)) res$delegado else res$kontrolor
+  info_delegado <- extraer_info_arbitro(delegado_raw)
   if (!is.null(info_delegado$nombre)) {
     df_arbitros_partido <- df_arbitros_partido %>%
       add_row(id_partido = id_p, ime = info_delegado$nombre, ciudad = info_delegado$ciudad, uloga = "match_delegate")

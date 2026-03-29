@@ -637,10 +637,12 @@ th { background-color: #f2f2f2; }
 .mp-referees-list li a:hover { text-decoration: underline; }
 
 /* Staff subsection inside details */
-.mp-staff-section { margin-top: 10px; }
-.mp-staff-subtitle { font-weight: 600; font-size: 12px; color: #555; margin-top: 8px; margin-bottom: 2px; }
+.mp-staff-section { border-top: 2px solid #eaeaea; padding-top: 30px; }
+.mp-staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .mp-staff-list { padding: 0; margin: 0; list-style: none; }
-.mp-staff-list li { padding: 3px 0; font-size: 13px; }
+.mp-staff-list li { padding: 6px 0; border-bottom: 1px solid #eaeaea; font-size: 14px; }
+.mp-staff-list li a { color: inherit; text-decoration: none; }
+.mp-staff-list li a:hover { text-decoration: underline; }
 .mp-delegate { font-size: 13px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0; }
 
 /* Competition Header */
@@ -693,7 +695,7 @@ th { background-color: #f2f2f2; }
   .mp-scoreboard { flex-direction: column; gap: 15px; }
   .mp-team { justify-content: center !important; }
   .mp-match-info { grid-template-columns: 1fr; }
-  .mp-lineups-grid, .mp-penales-grid { grid-template-columns: 1fr; }
+  .mp-lineups-grid, .mp-penales-grid, .mp-staff-grid { grid-template-columns: 1fr; }
   .mp-timeline-container { justify-content: flex-start; gap: 10px; padding: 40px 10px; }
   .mp-timeline-event { min-width: 80px; }
 }
