@@ -39,6 +39,7 @@ if (hubo_cambios) {
     # --- 1. Jugadoras ---
     # Obtenemos tanto el nombre a mostrar en el idioma actual como el nombre latino "oficial" si existe.
     search_jugadoras_data_lang <- jugadoras_stats_df %>% 
+      filter(!(id %in% player_ids_to_skip)) %>%
       select(id, 
              DisplayName = !!sym(player_name_col), 
              LatinName = PlayerName_en, # Usamos 'en' como el nombre latino de referencia
@@ -64,10 +65,15 @@ if (hubo_cambios) {
              latin_name = translated_name_en) # 'en' como referencia latina
     
     # Search entity generation — uses centralized generar_search_entidad() from 08_functions.R
-    search_equipos <- generar_search_entidad(entidades_maestro_lang_df, nombres_equipos, "team_type", "equipo-")
-    search_arbitros <- generar_search_entidad(entidades_maestro_lang_df, nombres_arbitros, "referee_type", "arbitro-")
-    search_estadios <- generar_search_entidad(entidades_maestro_lang_df, nombres_estadios, "stadium_type", "стадион-")
+    # Exclude entities from foreign national team matches
+    nombres_equipos_search <- if (exists("team_names_to_skip_mk")) setdiff(nombres_equipos, team_names_to_skip_mk) else nombres_equipos
+    nombres_arbitros_search <- if (exists("referee_ids_to_skip")) nombres_arbitros[!(generar_id_seguro(nombres_arbitros) %in% referee_ids_to_skip)] else nombres_arbitros
+    nombres_estadios_search <- if (exists("stadium_ids_to_skip")) nombres_estadios[!(generar_id_seguro(nombres_estadios) %in% stadium_ids_to_skip)] else nombres_estadios
+    search_equipos <- generar_search_entidad(entidades_maestro_lang_df, nombres_equipos_search, "team_type", "equipo-")
+    search_arbitros <- generar_search_entidad(entidades_maestro_lang_df, nombres_arbitros_search, "referee_type", "arbitro-")
+    search_estadios <- generar_search_entidad(entidades_maestro_lang_df, nombres_estadios_search, "stadium_type", "стадион-")
     nombres_staff_search <- if (exists("staff_df") && nrow(staff_df) > 0) unique(staff_df$nombre) else character(0)
+    if (exists("staff_names_to_skip")) nombres_staff_search <- setdiff(nombres_staff_search, staff_names_to_skip)
     search_staff <- if (length(nombres_staff_search) > 0) generar_search_entidad(entidades_maestro_lang_df, nombres_staff_search, "staff_type", "staff-") else tibble()
     
     # --- 3. Competiciones ---
@@ -985,7 +991,7 @@ if (hubo_cambios) {
         render_equipo_html_new <- function(df_equipo, goles_del_partido, tarjetas_del_partido, is_national_team_match, team_original_mk_name, duracion_partido) {
           if (is.null(df_equipo) || nrow(df_equipo) == 0) { return(tags$p(t("match_no_data"))) }
           starters <- df_equipo %>% filter(tipo == "Titular")
-          subs <- df_equipo %>% filter(tipo == "Suplente")
+          subs <- df_equipo %>% filter(tipo == "Suplente") %>% arrange(dorsal)
           
           crear_lista_jugadoras <- function(df_j, duracion_partido) { 
             if (nrow(df_j) == 0) { return(tags$p(style = "color:#777;", t("match_no_players"))) }
@@ -1926,7 +1932,7 @@ if (hubo_cambios) {
       todos_staff <- unique(staff_con_perfil$nombre)
       
       # Determine which staff to (re)generate
-      staff_ids_to_skip <- character(0) # No exclusions for staff currently
+      staff_ids_to_skip <- if (exists("staff_names_to_skip") && length(staff_names_to_skip) > 0) generar_id_seguro(staff_names_to_skip) else character(0)
       if (!exists("affected_staff_ids")) affected_staff_ids <- character(0)
       staff_a_generar <- todos_staff[
         !(generar_id_seguro(todos_staff) %in% staff_ids_to_skip) &

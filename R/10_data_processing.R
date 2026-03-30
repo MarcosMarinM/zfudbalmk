@@ -359,21 +359,93 @@ apariciones_df_raw <- map_dfr(resultados_exitosos, ~ bind_rows(
   .x$alineacion_local %>% mutate(id_partido = .x$partido_info$id_partido, equipo = .x$partido_info$local),
   .x$alineacion_visitante %>% mutate(id_partido = .x$partido_info$id_partido, equipo = .x$partido_info$visitante)
 )) %>% mutate(nombre = str_squish(nombre))
+# 10.3.1. Identify homonym names from disambiguation file
+homonym_names <- if (!is.null(desambiguacion_df) && nrow(desambiguacion_df) > 0) {
+  unique(desambiguacion_df$nombre)
+} else {
+  character(0)
+}
+if (length(homonym_names) > 0) {
+  message(paste("   > Disambiguating", length(homonym_names), "homonym name(s):",
+                paste(homonym_names, collapse = ", ")))
+}
+
+# 10.3.2. Build preferred_id_map (excluding homonym names — they keep their own IDs)
 preferred_id_map <- apariciones_df_raw %>%
-  filter(!is.na(nombre), !is.na(id), str_detect(id, "^\\d{5,6}$")) %>%
+  filter(!is.na(nombre), !is.na(id), str_detect(id, "^\\d{5,6}$"),
+         !(nombre %in% homonym_names)) %>%
   count(nombre, id, name = "frequency") %>%
   group_by(nombre) %>%
   filter(frequency == max(frequency)) %>%
   slice(1) %>%
   ungroup() %>%
   select(nombre, canonical_id = id)
+
+# 10.3.3. Build id_mapping for non-homonym players
 id_mapping <- apariciones_df_raw %>%
-  filter(!is.na(nombre) & nchar(trimws(nombre)) > 2) %>%
+  filter(!is.na(nombre) & nchar(trimws(nombre)) > 2,
+         !(nombre %in% homonym_names)) %>%
   distinct(nombre) %>%
   left_join(preferred_id_map, by = "nombre") %>%
   mutate(final_id = if_else(!is.na(canonical_id), as.character(canonical_id), paste0("player_gen_", generar_id_seguro(nombre)))) %>%
   select(nombre, canonical_id = final_id)
 
+# 10.3.4. Build homonym dorsal/team profiles for disambiguation of web-scraped records
+if (length(homonym_names) > 0) {
+  homonym_profiles <- apariciones_df_raw %>%
+    filter(nombre %in% homonym_names, !is.na(id), str_detect(id, "^\\d{5,6}$")) %>%
+    left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+    group_by(nombre, id) %>%
+    summarise(
+      dorsal_freq = list(sort(table(dorsal), decreasing = TRUE)),
+      equipos = list(unique(equipo)),
+      competiciones = list(unique(competicion_nombre)),
+      .groups = "drop"
+    ) %>%
+    mutate(dorsal_principal = as.numeric(sapply(dorsal_freq, function(x) names(x)[1])))
+}
+
+# 10.3.5. Resolve IDs for homonym records without real ID (web scraping)
+resolver_id_homonima <- function(df_homonimas_sin_id) {
+  if (nrow(df_homonimas_sin_id) == 0) return(df_homonimas_sin_id)
+
+  df_homonimas_sin_id %>%
+    left_join(partidos_df %>% select(id_partido, competicion_nombre), by = "id_partido") %>%
+    rowwise() %>%
+    mutate(id = {
+      profiles <- homonym_profiles %>% filter(nombre == .data$nombre)
+      resolved <- NA_character_
+
+      if (nrow(profiles) > 0) {
+        # Criterion 1: filter by team
+        by_team <- profiles %>% filter(sapply(equipos, function(e) equipo %in% e))
+        if (nrow(by_team) == 1) {
+          resolved <- by_team$id[1]
+        } else {
+          candidates <- if (nrow(by_team) > 0) by_team else profiles
+          # Criterion 2: match by dorsal
+          if (!is.na(dorsal)) {
+            by_dorsal <- candidates %>% filter(dorsal_principal == dorsal)
+            if (nrow(by_dorsal) == 1) {
+              resolved <- by_dorsal$id[1]
+            }
+          }
+        }
+      }
+
+      if (is.na(resolved)) {
+        warning(paste0("Could not disambiguate '", nombre, "' in match ", id_partido,
+                       " (dorsal ", dorsal, ", team ", equipo, ")"))
+      }
+      resolved
+    }) %>%
+    ungroup() %>%
+    select(-competicion_nombre)
+}
+
+# 10.3.6. Apply ID mapping to event dataframes (goles, tarjetas, penales)
+# For non-homonym players: standard id_mapping join
+# For homonym players: will be resolved after apariciones_df is built
 if (nrow(goles_df_unificado) > 0) {
   goles_df_unificado <- goles_df_unificado %>%
     left_join(id_mapping, by = c("jugadora" = "nombre")) %>%
@@ -425,11 +497,90 @@ minutos_df_raw <- map_dfr(resultados_exitosos, function(res) {
   min_visitante <- calcular_minutos_equipo(res$alineacion_visitante, res$cambios_visitante, duracion)
   bind_rows(min_local, min_visitante) %>% mutate(id_partido = id_p)
 })
-apariciones_df <- apariciones_df_raw %>%
-  left_join(minutos_df_raw %>% select(id_partido, nombre, dorsal, tipo, min_entra, min_sale, minutos_jugados), by = c("id_partido", "nombre", "dorsal", "tipo")) %>%
-  select(-id) %>%
-  left_join(id_mapping, by = "nombre") %>%
-  rename(id = canonical_id) %>%
+# 10.3.7. Build apariciones_df with minutes and unified IDs
+apariciones_con_minutos <- apariciones_df_raw %>%
+  left_join(minutos_df_raw %>% select(id_partido, nombre, dorsal, tipo, min_entra, min_sale, minutos_jugados), by = c("id_partido", "nombre", "dorsal", "tipo"))
+
+if (length(homonym_names) > 0) {
+  # Split into homonym and non-homonym records
+  apar_normal <- apariciones_con_minutos %>% filter(!(nombre %in% homonym_names))
+  apar_homonym <- apariciones_con_minutos %>% filter(nombre %in% homonym_names)
+
+  # Non-homonym: standard id_mapping
+  apar_normal <- apar_normal %>%
+    select(-id) %>%
+    left_join(id_mapping, by = "nombre") %>%
+    rename(id = canonical_id)
+
+  # Homonym with real ID from PDF: keep it
+  apar_hom_con_id <- apar_homonym %>%
+    filter(!is.na(id) & str_detect(id, "^\\d{5,6}$"))
+
+  # Homonym without ID (web scraping): disambiguate
+  apar_hom_sin_id <- apar_homonym %>%
+    filter(is.na(id) | !str_detect(id, "^\\d{5,6}$")) %>%
+    select(-id)
+  apar_hom_sin_id <- resolver_id_homonima(apar_hom_sin_id)
+
+  apariciones_df <- bind_rows(apar_normal, apar_hom_con_id, apar_hom_sin_id)
+
+  # Resolve homonym IDs in event dataframes using resolved apariciones
+  homonimas_resueltas <- apariciones_df %>%
+    filter(nombre %in% homonym_names, !is.na(id)) %>%
+    distinct(id_partido, nombre, dorsal, .keep_all = FALSE) %>%
+    left_join(apariciones_df %>% filter(nombre %in% homonym_names) %>% select(id_partido, nombre, dorsal, id),
+              by = c("id_partido", "nombre", "dorsal"))
+
+  if (nrow(goles_df_unificado) > 0) {
+    goles_hom <- goles_df_unificado %>% filter(jugadora %in% homonym_names)
+    if (nrow(goles_hom) > 0) {
+      goles_df_unificado <- goles_df_unificado %>%
+        filter(!(jugadora %in% homonym_names)) %>%
+        bind_rows(
+          goles_hom %>%
+            select(-id) %>%
+            left_join(homonimas_resueltas %>% select(id_partido, nombre, dorsal, id),
+                      by = c("jugadora" = "nombre", "id_partido", "dorsal"))
+        )
+    }
+  }
+  if (nrow(tarjetas_df_unificado) > 0) {
+    tarjetas_hom <- tarjetas_df_unificado %>% filter(jugadora %in% homonym_names)
+    if (nrow(tarjetas_hom) > 0) {
+      tarjetas_df_unificado <- tarjetas_df_unificado %>%
+        filter(!(jugadora %in% homonym_names)) %>%
+        bind_rows(
+          tarjetas_hom %>%
+            select(-id) %>%
+            left_join(homonimas_resueltas %>% select(id_partido, nombre, dorsal, id),
+                      by = c("jugadora" = "nombre", "id_partido", "dorsal"))
+        )
+    }
+  }
+  if (nrow(penales_df_unificado) > 0) {
+    penales_hom <- penales_df_unificado %>% filter(jugadora %in% homonym_names)
+    if (nrow(penales_hom) > 0) {
+      penales_df_unificado <- penales_df_unificado %>%
+        filter(!(jugadora %in% homonym_names)) %>%
+        bind_rows(
+          penales_hom %>%
+            select(-id) %>%
+            left_join(homonimas_resueltas %>% select(id_partido, nombre, dorsal, id),
+                      by = c("jugadora" = "nombre", "id_partido", "dorsal"))
+        )
+    }
+  }
+
+  message(paste("   > Homonym disambiguation complete."))
+} else {
+  # No homonyms: standard path
+  apariciones_df <- apariciones_con_minutos %>%
+    select(-id) %>%
+    left_join(id_mapping, by = "nombre") %>%
+    rename(id = canonical_id)
+}
+
+apariciones_df <- apariciones_df %>%
   left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
   select(id, id_partido, nombre, dorsal, tipo, equipo, es_portera, es_capitana, competicion_nombre, competicion_temporada, everything())
 

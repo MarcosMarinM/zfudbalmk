@@ -334,7 +334,33 @@ if (file.exists(ruta_roles_forzados)) {
   message("player_role_overrides.txt not found. Continuing without role overrides.")
 }
 
-### 9.12. Load City Translations
+### 9.12. Load Homonym Disambiguation
+message("Loading homonym disambiguation rules...")
+
+ruta_desambiguacion <- "desambiguacion.txt"
+desambiguacion_df <- NULL
+if (file.exists(ruta_desambiguacion)) {
+  tryCatch({
+    desambiguacion_df <- read.csv(
+      ruta_desambiguacion,
+      stringsAsFactors = FALSE,
+      encoding = "UTF-8",
+      colClasses = "character"
+    )
+    if (nrow(desambiguacion_df) > 0) {
+      message(paste("Disambiguation rules loaded with", nrow(desambiguacion_df), "entries."))
+    } else {
+      message("Disambiguation file is empty. No disambiguation will be applied.")
+      desambiguacion_df <- NULL
+    }
+  }, error = function(e) {
+    warning("Error loading desambiguacion.txt. No disambiguation will be applied.")
+  })
+} else {
+  message("desambiguacion.txt not found. Continuing without disambiguation.")
+}
+
+### 9.13. Load City Translations
 message("Loading city name translations...")
 
 ruta_traducciones_ciudades <- "gradovi.txt"

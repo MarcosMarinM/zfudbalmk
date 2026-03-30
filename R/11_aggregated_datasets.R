@@ -542,6 +542,16 @@ message(paste("   >", length(player_ids_to_skip), "non-Macedonian players in nat
 message(paste("   >", length(referee_ids_to_skip), "referees from national team matches will be excluded from individual profiles."))
 message(paste("   >", length(stadium_ids_to_skip), "stadiums from national team matches will be excluded from individual profiles."))
 
+# 11.9.13. Staff from foreign national teams to exclude from profiles and search.
+staff_names_to_skip <- if (exists("staff_df") && nrow(staff_df) > 0) {
+  staff_df %>%
+    filter(id_partido %in% ids_partidos_seleccion,
+           equipo != "Македонија") %>%
+    pull(nombre) %>%
+    unique()
+} else character(0)
+message(paste("   >", length(staff_names_to_skip), "staff members from foreign national teams will be excluded from profiles."))
+
 
 # ==============================================================================
 # ==      AÑADIR ESTE BLOQUE PARA CREAR LA INSTANTÁNEA DE DATOS PARA PRUEBAS      ==
@@ -571,7 +581,7 @@ objetos_a_guardar <- c(
   
   # Variables de exclusión
   "player_ids_to_skip", "team_names_to_skip_mk", "referee_ids_to_skip", "stadium_ids_to_skip",
-  "affected_staff_ids"
+  "staff_names_to_skip", "desambiguacion_df", "affected_staff_ids"
 )
 
 # Guardar solo los objetos existentes en el entorno
