@@ -288,7 +288,10 @@ parsear_najava <- function(url, id_partido) {
     "Физиотерапевт" = "physiotherapist",
     "Доктор" = "doctor",
     "Клупски претставник" = "club_representative",
-    "Администратор" = "administrator"
+    "Администратор" = "administrator",
+    "Кондициски тренер" = "fitness_coach",
+    "Безбедносно лице" = "security_commissioner",
+    "Тренер на голмани" = "goalkeeping_coach"
   )
 
   extraer_staff_equipo <- function(team_col_node) {

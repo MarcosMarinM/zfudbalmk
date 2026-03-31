@@ -335,6 +335,14 @@ if (nrow(staff_df) > 0) {
   }
   staff_df <- staff_df %>%
     mutate(nombre = reordenar_nombre_idempotente(nombre))
+  # Fix role keys that fell through the web scraper's fallback as raw Macedonian
+  staff_df <- staff_df %>%
+    mutate(rol = case_when(
+      rol == "кондициски_тренер" ~ "fitness_coach",
+      rol == "безбедносно_лице" ~ "security_commissioner",
+      rol == "тренер_на_голмани" ~ "goalkeeping_coach",
+      TRUE ~ rol
+    ))
 }
 message(paste("   > Master `staff_df` created with", nrow(staff_df), "entries."))
 message("   > All other master dataframes created.")
