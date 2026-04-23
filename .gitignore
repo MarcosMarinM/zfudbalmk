@@ -14,3 +14,10 @@
 .Rproj.user/
 .positai
 /cache_backup
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
