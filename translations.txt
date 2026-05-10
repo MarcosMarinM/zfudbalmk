@@ -1,0 +1,264 @@
+key,mk,sq,es,en
+lang_name,Македонски,Shqip,Castellano,English
+back_button,← Назад,← Prapa,← Volver,← Back
+home_button,🏠 Почетна,🏠 Faqja kryesore,🏠 Inicio,🏠 Home
+search_placeholder,"Пребарај фудбалер, тим, судија, стадион...","Kërko lojtar, ekip, gjyqtar, stadium...","Buscar jugador, equipo, árbitro, estadio...","Search for player, team, referee, stadium..."
+search_button,Пребарај,Kërko,Buscar,Search
+search_results_for,"Резултати од пребарувањето за","Rezultatet e kërkimit për","Resultados de la búsqueda para","Search results for"
+no_search_results,"Нема пронајдени резултати за","Nuk u gjetën rezultate për","No se encontraron resultados para","No results found for"
+search_prompt,"Ве молиме внесете најмалку 2 карактери за да пребарувате.","Ju lutemi, shkruani të paktën 2 karaktere për të kërkuar.","Por favor, introduce al menos 2 caracteres para buscar.","Please enter at least 2 characters to search."
+portal_title,Портал на натпреварувања,Portali i garave,Portal de competiciones,Competitions portal
+schedule_title,Распоред,Orari,Calendario,Fixtures
+standings_title,Табела,Tabela,Clasificación,Table
+scorers_title,Стрелци,Golashënuesit,Goleadores,Top scorers
+disciplinary_title,Дисциплинска,Evidenca disiplinore,Disciplina,Disciplinary
+goalkeepers_title,Статистика на голмани,Statistikat e portierëve,Estadísticas de porteros,Goalkeeper stats
+defensive_trio_title,Најдобро дефанзивно трио,Treshja më e mirë mbrojtëse,Mejor trío defensivo,Best defensive trio
+final_score,Конечен резултат,Rezultati përfundimtar,Resultado final,Final score
+officials_notes,Забелешка на судијата,Shënimi i gjyqtarit,Notas del árbitro,Referee's notes
+lineups_title,Состави,Formacionet,Alineaciones,Line-ups
+timeline_title,Хронологија,Kronologjia,Cronología,Timeline
+referees_title,Судии,Gjyqtarët,Árbitros,Referees
+player_type,Фудбалер,Lojtar,Jugador,Player
+team_type,Тим,Ekip,Equipo,Team
+referee_type,Судија,Gjyqtar,Árbitro,Referee
+stadium_type,Стадион,Stadium,Estadio,Stadium
+competition_type,Натпреварување,Garë,Competición,Competition
+site_title,mfudbalmk,mfudbalmk,mfudbalmk,mfudbalmk
+no_competitions_found,Не се пронајдени натпреварувања.,Nuk u gjetën gara.,No se encontraron competiciones.,No competitions found.
+round_prefix,Коло,Raundi,Jornada,Round
+cup_round_1_16,1/16 финале,1/16 e finales,Dieciseisavos de final,Round of 32
+cup_round_1_8,1/8 финале,1/8 e finales,Octavos de final,Round of 16
+cup_round_1_4,Четвртфинале,Çerekfinale,Cuartos de final,Quarter-finals
+cup_round_1_2,Полуфинале,Gjysmëfinale,Semifinal,Semi-finals
+cup_round_final,Финале,Finale,Final,Final
+standings_no_data_message,Нема обработени валидни натпревари.,Nuk ka ndeshje të vlefshme të përpunuara.,No hay partidos válidos procesados.,No valid matches have been processed.
+standings_pos,Поз.,Poz.,Pos.,Pos
+standings_team,Тим,Ekipi,Equipo,Team
+standings_p,Н,N,J,P
+standings_w,Поб,F,G,W
+standings_d,Нер,B,E,D
+standings_l,Пор,H,P,L
+standings_gf,ДГ,GSh,GF,GF
+standings_ga,ПГ,GP,GC,GA
+standings_gd,ГР,GD,DG,GD
+standings_pts,Бод.,P.,Pts,Pts
+gk_stats_header_over_50,"Фудбалери со 75% или повеќе одиграни минути","Lojtarët me 75% ose më shumë minuta të luajtura","Jugadores con al menos el 75 % de minutos jugados","Players with 75% or more of minutes played"
+gk_stats_header_under_50,"Фудбалери со помалку од 75% одиграни минути","Lojtarët me më pak se 75% minuta të luajtura","Jugadores con menos del 75 % de minutos jugados","Players with less than 75% of minutes played"
+no_data_in_category,Нема податоци во оваа категорија.,Nuk ka të dhëna në këtë kategori.,No hay datos en esta categoría.,No data in this category.
+stats_minutes,Минути,Minuta,Minutos,Minutes
+gk_ga,ПГ,GP,GC,GA
+gk_cs,ЧМ,PM,PI,CS
+gk_ga_90,ПГ/90,GP/90,GC/90,GA/90
+stats_goals,Голови,Gola,Goles,Goals
+own_goal_label,(АГ),(AG),(AG),(OG)
+disciplinary_no_cards_message,Нема регистрирани картони.,Nuk ka kartonë të regjistruar.,No hay tarjetas registradas.,No cards recorded.
+defensive_trio_subtitle,"Дефанзивното трио од секој тим кое одиграло најмалку 50 % од можните минути заедно.","Treshja mbrojtëse nga çdo ekip që ka luajtur të paktën 50% të minutave të mundshme së bashku.","El trío defensivo de cada equipo que ha jugado al menos el 50 % de los minutos posibles en conjunto.","The defensive trio from each team that has played at least 50% of the possible minutes together."
+defensive_trio_header_trio,Трио,Treshja,Trío,Trio
+defensive_trio_header_minutes,Минути заедно,Minuta së bashku,Minutos juntos,Minutes together
+defensive_trio_header_ga,Примени голови,Gola të pranuar,Goles encajados,Goals conceded
+defensive_trio_header_ga90,Примени/90мин,Pranuar/90min,Encajados / 90 min,Conceded/90min
+defensive_trio_details_matches,Одиграни натпревари заедно,Ndeshje të luajtura së bashku,Partidos jugados juntos,Matches played together
+match_header_match,Натпревар,Ndeshja,Partido,Match
+match_header_result,Резултат,Rezultati,Resultado,Result
+match_official_result,"(Службен резултат)","(Rezultat zyrtar)","(Resultado otorgado)","(Default result)"
+match_date,Датум,Data,Fecha,Date
+match_time,Време,Koha,Hora,Time
+match_stadium,Стадион,Stadiumi,Estadio,Stadium
+match_unknown,Непознат,I panjohur,Desconocido,Unknown
+match_timeline_no_events,Нема регистрирани настани.,Nuk ka ngjarje të regjistruara.,No hay eventos registrados.,No events recorded.
+match_starting_lineup,Почетен состав,Formacioni startues,Once inicial,Starting line-up
+match_substitutes,Резерви,Rezervat,Suplentes,Substitutes
+match_no_data,Нема податоци.,Nuk ka të dhëna.,No hay datos.,No data.
+match_no_players,Нема.,Asnjë.,Ninguno.,None.
+match_timeline_goal,"Гол на %s (%s)","Gol nga %s (%s)","Gol de %s (%s)","Goal by %s (%s)"
+match_timeline_own_goal,"Автогол на %s (%s) во корист на %s","Autogol nga %s (%s) në favor të %s","Gol en propia puerta de %s (%s) a favor de %s","Own goal by %s (%s) for %s"
+match_timeline_card,"Картон за %s (%s)","Karton për %s (%s)","Tarjeta para %s (%s)","Card for %s (%s)"
+match_timeline_after_match,По натпреварот,Pas ndeshjes,Después del partido,After the match
+match_timeline_substitution,"Измена за %s: влегува %s (%s) на местото на %s (%s)","Zëvendësim për %s: hyn %s (%s) në vend të %s (%s)","Cambio en el %s: entra %s (%s) por %s (%s)","Substitution in %s: %s (%s) comes in for %s (%s)"
+player_career_summary,Резиме на кариера,Përmbledhje e karrierës,Resumen de carrera,Career summary
+player_detailed_stats,Детална статистика,Statistika të detajuara,Estadísticas detalladas,Detailed stats
+player_match_list,Список на натпревари,Lista e ndeshjeve,Lista de partidos,Match list
+player_goal_list,Список на голови,Lista e golave,Lista de goles,Goal list
+player_card_list,Список на картони,Lista e kartonëve,Lista de tarjetas,Card list
+player_season,Сезона,Sezoni,Temporada,Season
+player_competition,Натпреварување,Gara,Competición,Competition
+player_apps,Наст.,Nd.,PJ,Apps
+player_goals,Гола,G,Goles,Goals
+player_mins,мин,min,min,min
+player_called_up,Повикан,I ftuar,Convocado,Called up
+player_played,Одиграни,Luajtur,Jugados,Played
+player_starter,Почетен состав,Titullar,Titular,Starter
+player_yellow_cards,Жолти картони,Kartonë të verdhë,Tarjetas amarillas,Yellow cards
+player_red_cards,Црвени картони,Kartonë të kuq,Tarjetas rojas,Red cards
+player_no_matches,Нема одиграни натпревари.,Nuk ka ndeshje të luajtura.,No ha jugado partidos.,No matches played.
+player_no_goals,Нема постигнато голови.,Nuk ka shënuar gola.,No ha marcado goles.,No goals scored.
+player_no_cards,Нема добиено картони.,Nuk ka marrë kartonë.,No ha recibido tarjetas.,No cards received.
+player_status,Статус,Statusi,Estado,Status
+player_status_played_sub,"Резерва (одигра)","Rezervë (luajti)","Suplente (jugó)","Substitute (played)"
+player_status_called_up,Повикан,I ftuar,Convocado,Called up
+match_header_minute,Минута,Minuta,Minuto,Minute
+match_header_reason,Причина,Arsyeja,Motivo,Reason
+match_header_card,Картон,Kartoni,Tarjeta,Card
+team_history_by_competition,Историја по натпреварувања,Historia sipas garave,Historial por competición,History by competition
+team_player_stats,Статистика на фудбалери,Statistikat e lojtarëve,Estadísticas de jugadores,Player stats
+team_match_list,Список на натпревари,Lista e ndeshjeve,Lista de partidos,Match list
+team_header_date,Датум,Data,Fecha,Date
+team_header_home,Домаќин,Vendas,Local,Home
+team_header_away,Гостин,Mysafir,Visitante,Away
+referee_history_by_competition,Историја по натпреварувања,Historia sipas garave,Historial por competición,History by competition
+referee_header_matches,Натпревари,Ndeshje,Partidos,Matches
+referee_header_role,Улога,Roli,Rol,Role
+stadium_match_history,Историја на натпревари,Historia e ndeshjeve,Historial de partidos,Match history
+search_results,Резултати од пребарувањето,Rezultatet e kërkimit,Resultados de la búsqueda,Search results
+final_process_success,ПРОЦЕСОТ Е УСПЕШНО ЗАВРШЕН!,PROCESI U PËRFUNDUA ME SUKSES!,¡Proceso completado con éxito!,Process completed successfully!
+final_full_rebuild,"Извршена е целосна реконструкција на страницата.","Është bërë një rindërtim i plotë i faqes.","Se ha realizado una reconstrucción completa del sitio.","A full site rebuild has been performed."
+final_incremental_update,"Извршено е инкрементално ажурирање на страницата.","Është bërë një përditësim shtesë i faqes.","Se ha realizado una actualización incremental del sitio.","An incremental site update has been performed."
+final_site_location,"Креирана/ажурирана е статична веб-страница во папката:","Është krijuar/përditësuar një uebfaqe statike në dosjen:","Se ha creado/actualizado un sitio web estático en la carpeta:","A static website has been created/updated in the folder:"
+final_navigate_prompt,"Отворете ја датотеката 'index.html' од таа папка за да започнете со прелистување.","Hapni skedarin 'index.html' nga ajo dosje për të filluar shfletimin.","Abre el archivo 'index.html' de esa carpeta para empezar a navegar.","Open the 'index.html' file in that folder to start browsing."
+player_age_suffix,год.,vjeç,años,y.o.
+position_goalkeeper,Голман,Portier,Portero,Goalkeeper
+position_defender,Одбрана,Mbrojtës,Defensa,Defender
+position_midfielder,Среден ред,Mesfushor,Centrocampista,Midfielder
+position_forward,Напад,Sulmues,Delantero,Forward
+referee_main,Главен судија,Gjyqtari kryesor,Árbitro,Referee
+referee_asst1,1-ви помошник,Ndihmësi i parë,1.ᵉʳ asistente,1st assistant
+referee_asst2,2-ри помошник,Ndihmësi i dytë,2.º asistente,2nd assistant
+referee_asst4,4-ри судија,Gjyqtari i katërt,4.º árbitro,4th referee
+var_referee,ВАР судија,Gjyqtari VAR,Árbitro VAR,VAR Referee
+var_assistant,АВАР судија,Gjyqtari AVAR,Asistente VAR,VAR Assistant
+var_operator,ВАР оператор,Operatori VAR,Operador VAR,VAR Operator
+match_delegate,Делегат,Delegati,Delegado,Delegate
+match_kontrolor,Контролор,Kontrollori,Controlador,Controller
+head_coach,Главен тренер,Trajneri kryesor,Entrenador,Head coach
+assistant_coach,Помошен тренер,Trajneri ndihmës,Asistente,Assistant coach
+physiotherapist,Физиотерапевт,Fizioterapeut,Fisioterapeuta,Physiotherapist
+doctor,Доктор,Doktor,Doctor,Doctor
+club_representative,Клупски претставник,Përfaqësuesi i klubit,Representante,Club representative
+administrator,Администратор,Administrator,Administrador,Administrator
+goalkeeping_coach,Тренер на голмани,Trajneri i portierëve,Entrenador de porteros,Goalkeeping coach
+fitness_coach,Кондиционен тренер,Trajneri i kondicionit,Preparador físico,Fitness coach
+security_commissioner,Комесар за безбедност,Komesari i sigurisë,Comisario de seguridad,Security commissioner
+staff_title,Стручен штаб,Stafi teknik,Cuerpo técnico,Coaching staff
+staff_type,Стручен штаб,Staf teknik,Cuerpo técnico,Staff
+staff_history_by_competition,Историја по натпреварувања,Historia sipas garave,Historial por competición,History by competition
+staff_header_matches,Натпревари,Ndeshje,Partidos,Matches
+staff_header_role,Улога,Roli,Cargo,Role
+staff_header_team,Тим,Ekipi,Equipo,Team
+legend_champions_league,Квалификации за Лигата на шампиони,Kualifikimet për Ligën e Kampionëve,Previa de Champions,Champions League Qualifiers
+legend_relegation_playoff,Бараж за опстанок,Play-off për mbijetesë,Play-off por la permanencia,Relegation Play-off
+legend_direct_relegation,Директно испаѓање,Rënie direkte,Descenso directo,Direct relegation
+legend_direct_promotion,Директна промоција,Promovim direkt,Ascenso directo,Direct promotion
+legend_promotion_playoff,Бараж за промоција,Play-off për promovim,Play-off de ascenso,Promotion Play-off
+legend_promotion,Промоција,Promovim,Ascenso,Promotion
+key,mk,sq,es,en
+password_prompt,Внесете ја лозинката,Futni fjalëkalimin,Introduzca la contraseña,Enter password
+access_denied_header,Пристапот е одбиен,Qasja u refuzua,Acceso denegado,Access Denied
+access_denied_body,Процесот е откажан од страна на корисникот,Procesi u anulua nga përdoruesi,Proceso cancelado por el usuario,Process canceled by user
+password_wrong,Погрешна лозинка. Обидете се повторно,Fjalëkalim i pasaktë. Provoni përsëri,Contraseña incorrecta. Inténtelo de nuevo,Wrong password. Try again
+penalties_title,Танда на пенали,Gjuajtjet e penalltive,Tanda de penaltis,Penalty shootout
+penalties_short,ПЕН,PEN,PEN,PSO
+competition_reprezentacija,Репрезентација,Kombëtarja,Selección nacional,National team
+category_page_title,Натпревари по категорија,Ndeshjet sipas kategorisë,Partidos por categoría,Matches by category
+match_header_category,Категорија,Kategoria,Categoría,Category
+match_header_status,Наст.Nd.,Part.,Apps
+national_team_all_time_stats,Статистика на сите времиња за репрезентацијата,Statistikat e të gjitha kohërave për ekipin kombëtar,Estadísticas de la selección,National team statistics
+category_header,Категорија,Kategoria,Categoría,Category
+player_stats_for_category,Статистика на фудбалери за оваа категорија,Statistikat e lojtarëve për këtë kategori,Estadísticas de jugadores para esta categoría,Player statistics for this category
+match_list_for_category,Список на натпревари за оваа категорија,Lista e ndeshjeve për këtë kategori,Lista de partidos para esta categoría,Match list for this category
+latest_results_title,Последни резултати,Rezultatet e fundit,Últimos resultados,Latest results
+round_prefix_short,Коло,Raundi,Jornada,Round
+all_results_link,Сите резултати,Të gjitha rezultatet,Todos los resultados,All results
+mini_standings_pos,П,P,P,P
+mini_standings_team,Тим, Ekipi,Equipo,Team
+mini_standings_p,К,N,PJ,P
+mini_standings_pts,Бод,Pikë,Pts.,Pts
+standings_main_title,Табели,Tabelat,Clasificaciones,Standings
+menu_home,Почетна,Ballina,Inicio,Home
+menu_competitions,Натпреварувања,Garat,Competiciones,Competitions
+menu_archive,Архива,Arkiva,Archivo,Archive
+menu_national_team,Репрезентација,Kombëtarja,Selección,National team
+menu_players,Фудбалери,Futbollistë,Futbolistas,Players
+menu_teams,Клубови,Klubet,Clubes,Clubs
+menu_about,За проектот,Rreth,Acerca de,About
+archive_page_title,Архива на натпреварувања,Arkiva e garave,Archivo de competiciones,Competitions archive
+teams_list_title,Листа на клубови,Lista e klubeve,Lista de clubes,Clubs list
+teams_list_select_letter,Изберете буква,Zgjidhni një shkronjë,Selecciona una letra,Select a letter
+players_list_title,Листа на фудбалери,Lista e futbollistëve,Lista de futbolistas,Players list
+players_list_select_letter,Изберете буква,Zgjidhni një shkronjë,Selecciona una letra,Select a letter
+about_page_title,За проектот,Rreth projektit,Acerca del proyecto,About the project
+about_page_content,"<p>Откако ја креирав Инстаграм страницата и веб-страницата <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>, за македонскиот женски фудбал, си помислив... зошто да не создадам слична веб-страница, но со целиот македонски машки фудбал?</p><p>Така што, се фатив за работа и успеав да ја полуавтоматизирам оваа страница, која има за цел да ги собере сите резултати, табели и статистики за машкиот фудбал во Македонија. Моите социјални мрежи се отворени за повратни информации и корекции: <b><a href='https://www.instagram.com/marcosmarinm/' target='_blank' rel='noopener noreferrer'>@marcosmarinm</a></b>. Кодот со кој е создадена оваа страница е достапен на <b><a href='https://github.com/marcosmarinm/mfudbalmk' target='_blank' rel='noopener noreferrer'>ГитХаб</a></b>.</p><p>Секоја помош со известување за натпревари со официјални резултати (службен) или одложени натпревари е многу ценета. И не заборавајте да ја посетите душата на оваа страница, оригиналот, онаа што ја носам во срцето: <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>.</p><p><i>Сите податоци на оваа страница се преземени од јавните информации обезбедени од Фудбалската федерација на Македонија.</i></p>","<p>Pasi krijova faqen në Instagram dhe uebfaqen <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>, rreth futbollit të grave në Maqedoni, mendova... pse të mos krijoj edhe një uebfaqe të ngjashme por me të gjithë futbollin e burrave në Maqedoni?</p><p>Kështu që u futa në punë dhe arrita ta gjysmë-automatizoj këtë faqe, e cila synon të mbledhë të gjitha rezultatet, renditjet dhe statistikat e futbollit të burrave në Maqedoni. Rrjetet e mia sociale janë të hapura për të marrë komente dhe korrigjime: <b><a href='https://www.instagram.com/marcosmarinm/' target='_blank' rel='noopener noreferrer'>@marcosmarinm</a></b> (nuk flas shqip, më vjen keq, e nëse ka ndonjë gabim përkthimi, gjithashtu do të më pëlqente shumë të ma tregosh). Kodi me të cilin është krijuar kjo faqe është i disponueshëm në <b><a href='https://github.com/marcosmarinm/mfudbalmk' target='_blank' rel='noopener noreferrer'>GitHub</a></b>.</p><p>Çdo ndihmë duke më njoftuar për ndeshje me rezultate zyrtare ose ndeshje të pezulluara, e vlerësoj shumë. Dhe mos harroni të vizitoni shpirtin e kësaj faqeje, origjinalin, atë që mbaj në zemër: <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>.</p><p><i>Të gjitha të dhënat në këtë faqe janë nxjerrë nga informacionet publike të ofruara nga Federata e Futbollit e Maqedonisë.</i></p>","<p>Tras crear la página de Instagram y la web <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b> sobre fútbol femenino de Macedonia, pensé… ¿por qué no crear también una web similar pero con todo el fútbol masculino macedonio?</p><p>Así que me puse manos a la obra y he logrado semiautomatizar esta página, que pretende recoger todos los resultados, clasificaciones y estadísticas del fútbol masculino en Macedonia. Mis redes están abiertas para recibir feedback y correcciones: <b><a href='https://www.instagram.com/marcosmarinm/' target='_blank' rel='noopener noreferrer'>@marcosmarinm</a></b>. El código con el que se crea esta página está disponible en <b><a href='https://github.com/marcosmarinm/mfudbalmk' target='_blank' rel='noopener noreferrer'>GitHub</a></b>.</p><p>Cualquier ayuda avisando de partidos con resultados concedidos o partidos suspendidos, la agradezco mucho. Y no olvides visitar el alma de esta página, la original, la que llevo en el corazón: <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>.</p><p><i>Todos los datos de esta página están extraídos de la información pública proveída por la Federación de Fútbol de Macedonia.</i></p>","<p>After creating the Instagram page and website <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>, about Macedonian women's football, I thought... why not also create a similar website but with all Macedonian men's football?</p><p>So I got down to work and managed to semi-automate this page, which aims to collect all the results, tables, and statistics of men's football in Macedonia. My social media is open to receive feedback and corrections: <b><a href='https://www.instagram.com/marcosmarinm/' target='_blank' rel='noopener noreferrer'>@marcosmarinm</a></b>. The code used to create this page is available on <b><a href='https://github.com/marcosmarinm/mfudbalmk' target='_blank' rel='noopener noreferrer'>GitHub</a></b>.</p><p>Any help notifying me of matches with awarded results or suspended matches is greatly appreciated. And don't forget to visit the soul of this page, the original, the one I carry in my heart: <b><a href='https://marcosmarinm.github.io/zfudbalmk/' target='_blank' rel='noopener noreferrer'>zfudbalmk</a></b>.</p><p><i>All data on this page are extracted from public information provided by the Football Federation of Macedonia.</i></p>"
+season_all,Сите,Të gjitha,Todas,All
+competition_reprezentacija,Репрезентација,Kombëtarja,Selección nacional,National team
+player_nationality,Националност,Kombësia,Nacionalidad,Nationality
+player_position,Позиција,Pozicioni,Posición,Position
+player_birth_date,Дата на раѓање,Data e lindjes,Fecha de nacimiento,Date of birth
+player_birth_place,Место на раѓање,Vendi i lindjes,Lugar de nacimiento,Place of birth
+player_sub_on,Влезе од клупа,U fut nga stoli,Entró de suplente,Subbed on
+player_yellow_cards_short,Ж. картони,K. verdhë,Amarillas,Yellow c.
+player_red_cards_short,Ц. картони,K. kuq,Rojas,Red c.
+player_stats_by_season,Статистика по сезона,Statistikat për sezon,Estadísticas por temporada,Stats by season
+tab_stats,Статистика,Statistikat,Estadísticas,Statistics
+tab_matches,Натпревари,Ndeshjet,Partidos,Matches
+key,mk,sq,es,en
+club_info_title,Информации за клубот,Informacione rreth klubit,Información del club,Club info
+match_stadium,Стадион,Stadiumi,Estadio,Stadium
+team_tab_roster,Состав,Skuadra,Plantilla,Roster
+team_tab_schedule,Распоред,Orari,Calendario,Fixtures
+player_season,Сезона,Sezoni,Temporada,Season
+category_header,Категорија,Kategoria,Categoría,Category
+player_competition,Натпреварување,Gara,Competición,Competition
+position_goalkeeper,Голман,Portier,Portero,Goalkeeper
+position_defender,Одбрана,Mbrojtës,Defensa,Defender
+position_midfielder,Среден ред,Mesfushor,Centrocampista,Midfielder
+position_forward,Напад,Sulmues,Delantero,Forward
+col_dorsal,#,#,#,#
+col_player,Играч,Lojtar,Jugador,Player
+player_apps_short,Наст.,Nd.,PJ,Apps
+player_mins_short,мин,min,min,min
+player_goals_short,Гола,G,Goles,Goals
+team_roster_cards,Картони,Kartonë,Tarjetas,Cards
+team_roster_no_players,Не се пронајдени фудбалери за избраните филтри,Nuk u gjetën lojtarë për filtrat e zgjedhur,No se encontraron jugadores para los filtros seleccionados,No players found for the selected filters
+team_schedule_no_matches,Не се пронајдени натпревари за избраните филтри,Nuk u gjetën ndeshje për filtrat e zgjedhur,No se encontraron partidos para los filtros seleccionados,No matches found for the selected filters
+col_date,Датум,Data,Fecha,Date
+col_match,Натпревар,Ndeshja,Partido,Match
+category_senior,Сениори,Seniorë,Sénior,Senior
+category_youth,Младинци,Të rinj,Juvenil,Youth
+category_cadet,Кадети,Kadetë,Cadete,Cadet
+category_pioneri,Пионери,Pionierë,Pioneros,Pioneers
+category_mladi_pioneri,Млади пионери,Pionierë të Rinj,Pioneros jóvenes,Young Pioneers
+category_pomali_petlinja,Помали петлиња,Fëmijë të vegjël,Alevín,Younger kids
+category_petlinja,Петлиња,Fëmijë,Infantil,Kids
+team_roster_player,Фудбалер,Lojtar,Jugador,Player
+match_match,Натпревар,Ndeshja,Partido,Match
+dashboard_matches_title,Распоред и резултати,Orari & rezultatet,Calendario y resultados,Schedule & results
+dashboard_standings_title,Табела,Tabela,Clasificación,Standings
+dashboard_form_title,Форма,Forma,Forma,Form
+view_all_link,Види ги сите ›,Shiko të gjitha ›,Ver todo ›,View all ›
+scorers_no_data_message,"Нема регистрирани стрелци во ова натпреварување.","Nuk ka golashënues të regjistruar në këtë garë.","No hay goleadores registrados en esta competición.","There are no registered goal scorers in this competition."
+disciplinary_no_cards_message,"Нема регистрирани картони во ова натпреварување.","Nuk ka kartonë të regjistruar në këtë garë.","No hay tarjetas registradas en esta competición.","There are no registered cards in this competition."
+see_full_list,Целосна листа,Listë e plotë,Lista completa,Full list
+stadium_total_matches,Вкупно натпревари,Totali i ndeshjeve,Total de partidos,Total matches
+stadium_seasons,Сезони,Sezonet,Temporadas,Seasons
+stadium_teams,Екипи домаќини,Ekipet nikoqire,Equipos locales,Home teams
+match_cancelled,ОТКАЖАН,ANULUAR,CANCELADO,CANCELLED
+nav.treta_liga,Трета лига,Liga e Tretë,Tercera Liga,Third League
+nav.opstinski,Општински лиги,Ligat komunale,Ligas municipales,Municipal Leagues
+nav.mladinci_cat_base,Младинци,Të Rinj,Juveniles,Youth
+nav.kadeti_cat_base,Кадети,Kadetë,Cadetes,Cadets
+nav.pioneri_cat_base,Пионери,Pionierë,Pioneros,Pioneers
+nav.ppioneri_cat_base,Млади пионери,Pionierë të rinj,Pioneros jóvenes,Young Pioneers
+nav.petlinja_cat_base,Петлиња,Fëmijët,Infantiles,Kids
+nav.detski_cat_base,Детска лига,Liga e fëmijëve,Liga infantil,Children's League
+nav.mladinski,Младински категории,Kategoritë e Rinisë,Categorías base,Youth categories
+nav.sub_prefix,У,U,sub-,U
+nav.ofl_skopje,ОФЛ Скопје,OFL Shkup,OFL Skopie,OFL Skopje
+nav.ofl_bitola,ОФЛ Битола,OFL Manastir,OFL Bitola,OFL Bitola
+nav.ofl_prilep,ОФЛ Прилеп,OFL Prilep,OFL Prilep,OFL Prilep
+nav.ofl_kumanovo,ОФЛ Куманово,OFL Kumanovë,OFL Kumanovo,OFL Kumanovo
+nav.ofl_veles,ОФЛ Велес,OFL Veles,OFL Veles,OFL Veles
+nav.ofl_tetovo,ОФЛ Тетово,OFL Tetovë,OFL Tetovo,OFL Tetovo
+nav.ofl_gostivar,ОФЛ Гостивар,OFL Gostivar,OFL Gostivar,OFL Gostivar
+nav.ofl_struga,ОФЛ Струга,OFL Strugë,OFL Struga,OFL Struga
+nav.pomali_petlinja_cat_base,Помали петлиња,Fëmijë të vegjël,Alevines,Younger kids
+category_other,Останато,Te tjera,Otros,Other

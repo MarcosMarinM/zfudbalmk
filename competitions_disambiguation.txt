@@ -1,0 +1,14 @@
+# competitions_disambiguation.txt
+# Format (TSV): original	season	group	teams
+#  - original: Кратко Име as scraped (can include or omit season)
+#  - season: season string (e.g. 25/26). Leave empty to match any season.
+#  - group: group label to append, e.g. А or Б
+#  - teams: pipe-separated list of team names EXACTLY as they appear in the data
+#
+# Example rows (fill the teams column with real team names, separated by '|'):
+# ПФ Лига Кзманово	25/26	А	ФК Пример1|ФК Пример2|ФК Пример3|ФК Пример4
+# ПФ Лига Кзманово	25/26	Б	ФК Пример5|ФК Пример6|ФК Пример7|ФК Пример8
+
+original	season	group	teams
+ПФ Лига Кзманово	25/26	А	Јуниор|Костурник|Речица|Четирце|Ран Производ|Прогон|Клечовце
+ПФ Лига Кзманово	25/26	Б	Победа Тромеѓа|Македонија Агино|Лириа Черкези|Ррамалиа|Карпош 93|Куманова-Милано 2010|Козјак|Орашац
