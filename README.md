@@ -1,4 +1,4 @@
-Project for collecting Macedonian men's football data and building a website.
+Project for collecting Macedonian women's football data and building a website.
 
 This repository contains the core scripts and reference data needed to scrape sources, process records and generate static html pages.
 

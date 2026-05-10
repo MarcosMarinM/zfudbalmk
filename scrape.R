@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-# scrape_ffm_masculino.R
 # Scraper inteligente con tracking de estados, early-exit, y optimización de peticiones
 
 # --- Instalación y carga robusta de paquetes ---

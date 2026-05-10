@@ -352,9 +352,10 @@ if (hubo_cambios) {
     message(paste("     > Current season determined as:", temporada_actual_str))
 
     competiciones_en_portada_mk <- c(
-      "\u041f\u0440\u0432\u0430 \u041c\u0424\u041b", "\u0412\u0442\u043e\u0440\u0430 \u041c\u0424\u041b", "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430 \u0421\u0423\u041f\u0415\u0420 \u043b\u0438\u0433\u0430",
-      "\u0422\u0440\u0435\u0442\u0430 \u043b\u0438\u0433\u0430 \u0418\u0421\u0422\u041e\u041a", "\u0422\u0440\u0435\u0442\u0430 \u043b\u0438\u0433\u0430 \u0417\u0410\u041f\u0410\u0414", "\u0422\u0440\u0435\u0442\u0430 \u043b\u0438\u0433\u0430 \u0421\u0415\u0412\u0415\u0420", 
-      "\u0422\u0440\u0435\u0442\u0430 \u043b\u0438\u0433\u0430 \u0408\u0423\u0413", "\u0422\u0440\u0435\u0442\u0430 \u043b\u0438\u0433\u0430 \u0408\u0423\u0413\u041e\u0417\u0410\u041f\u0410\u0414"
+      "\u041f\u0440\u0432\u0430 \u0416\u0424\u041b",
+      "\u0412\u0442\u043e\u0440\u0430 \u0416\u0424\u041b",
+      "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430 \u0416\u0435\u043d\u0441\u043a\u0430 \u0424\u0443\u0434\u0431\u0430\u043b\u0441\u043a\u0430 \u041b\u0438\u0433\u0430",
+      "\u041a\u0430\u0434\u0435\u0442\u0441\u043a\u0430 \u0416\u0435\u043d\u0441\u043a\u0430 \u0424\u0443\u0434\u0431\u0430\u043b\u0441\u043a\u0430 \u041b\u0438\u0433\u0430"
     )
 
     equipos_en_portada_mk <- partidos_df %>%
@@ -2174,8 +2175,14 @@ if (hubo_cambios) {
 
             # --- 1. CONSTRUIR LA CABECERA DEL PERFIL ---
             info_items <- list()
-            if (!is.na(jugadora$codigo_iso)) {
-              info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L8.35 12H11v7.93zM13 19.93V12h2.65l4.14 2.21c-.43 3.32-3.26 5.95-6.79 6.72zM13 4.07V10h2.65l4.14-2.21C19.37 4.56 16.54 2 13 2.07zM11 4.07c3.53 0 6.37 2.49 6.79 5.72L13 10H11V4.07zM4.26 8.21C4.08 7.43 4 6.64 4 5.86c0-1.03.24-2 .66-2.87l4.14 2.22H4.26zm.43 7.58c.2.6.46 1.17.78 1.7L9.61 14H4.69z"/></svg>')), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_nationality")), tags$span(class = "bio-value", jugadora$nombre_macedonio %||% jugadora$nacionalidad)))
+            if (!is.na(jugadora$nacionalidad) && nzchar(jugadora$nacionalidad)) {
+              tiene_codigo_iso <- !is.na(jugadora$codigo_iso) && nzchar(jugadora$codigo_iso)
+              icono_nacionalidad <- if (tiene_codigo_iso) {
+                tags$img(src = paste0("https://kapowaz.github.io/square-flags/flags/", jugadora$codigo_iso, ".svg"), width = "24", height = "24", style = "border-radius:2px;")
+              } else {
+                HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L8.35 12H11v7.93zM13 19.93V12h2.65l4.14 2.21c-.43 3.32-3.26 5.95-6.79 6.72zM13 4.07V10h2.65l4.14-2.21C19.37 4.56 16.54 2 13 2.07zM11 4.07c3.53 0 6.37 2.49 6.79 5.72L13 10H11V4.07zM4.26 8.21C4.08 7.43 4 6.64 4 5.86c0-1.03.24-2 .66-2.87l4.14 2.22H4.26zm.43 7.58c.2.6.46 1.17.78 1.7L9.61 14H4.69z"/></svg>')
+              }
+              info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", icono_nacionalidad), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_nationality")), tags$span(class = "bio-value", jugadora$nacionalidad)))
             }
             mapa_pos_traducida <- c("goalkeeper" = t_html("position_goalkeeper"), "defender" = t_html("position_defender"), "midfielder" = t_html("position_midfielder"), "forward" = t_html("position_forward"))
             if (!is.na(jugadora$posicion_final_unificada) && jugadora$posicion_final_unificada != "") {

@@ -850,6 +850,7 @@ apariciones_df_raw <- map_dfr(resultados_exitosos, ~ bind_rows(
 if (exists("ids_excluidos_stats") && length(ids_excluidos_stats) > 0) {
   apariciones_df_raw <- apariciones_df_raw %>% filter(!id_partido %in% ids_excluidos_stats)
 }
+apariciones_df_raw <- apariciones_df_raw %>% mutate(.ade_row = row_number())
 # --- Mapeo de Identificadores y Algoritmo ADE (Automated Disambiguation Engine) ---
 message("   > Running Automated Disambiguation Engine (ADE)...")
 
@@ -908,10 +909,98 @@ calcular_gap_intervalos <- function(min_a, max_a, min_b, max_b) {
   as.numeric(inicio_tardio - fin_temprano)
 }
 
-# Paso 2: Resumir intervalos de fechas y compatibilidad biol\u00f3gica por nombre + equipo
+# Adaptive conflict threshold: wider during off-season (Jun-Jul) to avoid
+# false splits when players transfer over the summer break.
+get_umbral_conflicto <- function(min_a, max_a, min_b, max_b) {
+  if (any(is.na(c(min_a, max_a, min_b, max_b)))) return(15)
+  boundary_dates <- c(
+    max(min_a, min_b),  # inicio_tardio
+    min(max_a, max_b)   # fin_temprano
+  )
+  meses <- as.integer(format(boundary_dates, "%m"))
+  if (any(meses %in% c(6, 7))) return(60)
+  return(15)
+}
+
+# Paso 1.5: Intra-club homonym detection (same-match / same-day conflicts)
+# Two players with the same name in the same club can only be distinguished
+# if they appear in the same match or on the same day.
+apariciones_con_fechas <- apariciones_con_fechas %>%
+  mutate(intra_cluster = 1L)
+
+conflict_groups <- apariciones_con_fechas %>%
+  filter(!is.na(equipo)) %>%
+  group_by(nombre, equipo, id_partido, fecha_date) %>%
+  mutate(match_day_count = n()) %>%
+  ungroup() %>%
+  group_by(nombre, equipo) %>%
+  filter(any(match_day_count > 1)) %>%
+  ungroup() %>%
+  distinct(nombre, equipo)
+
+if (nrow(conflict_groups) > 0) {
+  for (g in seq_len(nrow(conflict_groups))) {
+    nm <- conflict_groups$nombre[g]
+    eq <- conflict_groups$equipo[g]
+    idx <- which(apariciones_con_fechas$nombre == nm & 
+                 apariciones_con_fechas$equipo == eq)
+    sub <- apariciones_con_fechas[idx, ] %>% arrange(fecha_date)
+    n <- nrow(sub)
+
+    # Incompatibility: same match or same day as the match
+    incompatible <- matrix(FALSE, n, n)
+    for (i in seq_len(n)) {
+      for (j in seq_len(n)) {
+        if (i >= j) next
+        same_match <- sub$id_partido[i] == sub$id_partido[j]
+        same_day <- sub$fecha_date[i] == sub$fecha_date[j]
+        incompatible[i, j] <- incompatible[j, i] <- (same_match || same_day)
+      }
+    }
+
+    # Greedy assignment: process appearances chronologically,
+    # assign to first compatible existing cluster, or create new one
+    clusters <- list()
+    cluster_dates <- list()  # track (min_date, max_date) per cluster
+    assignments <- integer(n)
+    
+    for (i in seq_len(n)) {
+      assigned <- FALSE
+      for (c_idx in seq_along(clusters)) {
+        conflict <- FALSE
+        for (j in clusters[[c_idx]]) {
+          if (incompatible[i, j]) {
+            conflict <- TRUE
+            break
+          }
+        }
+        if (!conflict) {
+          clusters[[c_idx]] <- c(clusters[[c_idx]], i)
+          assignments[i] <- c_idx
+          assigned <- TRUE
+          break
+        }
+      }
+      if (!assigned) {
+        clusters[[length(clusters) + 1]] <- i
+        assignments[i] <- length(clusters)
+      }
+    }
+    
+    apariciones_con_fechas$intra_cluster[idx] <- assignments
+  }
+  
+  n_intra_splits <- sum(apariciones_con_fechas$intra_cluster > 1, na.rm = TRUE)
+  if (n_intra_splits > 0) {
+    message(paste("   > Intra-club splitting: resolved", n_intra_splits, 
+                  "appearances across", nrow(conflict_groups), "conflicting (name, team) groups."))
+  }
+}
+
+# Paso 2: Resumir intervalos de fechas y compatibilidad biol\u00f3gica por nombre + equipo (+ intra_cluster)
 id_assignments <- apariciones_con_fechas %>%
   filter(!is.na(fecha_date), !is.na(equipo)) %>%
-  group_by(nombre, equipo) %>%
+  group_by(nombre, equipo, intra_cluster) %>%
   summarise(
     min_fecha = min(fecha_date, na.rm = TRUE),
     max_fecha = max(fecha_date, na.rm = TRUE),
@@ -924,9 +1013,8 @@ id_assignments <- apariciones_con_fechas %>%
 list_res <- lapply(split(id_assignments, id_assignments$nombre), function(teams_data) {
     teams_data <- teams_data %>% arrange(min_fecha)
     n_teams <- nrow(teams_data)
-    umbral_dias_conflicto <- 15
 
-    # Jugador sin homonimos obvios (solo en un equipo)
+    # Jugador sin homonimos obvios (solo en un equipo, un solo intra_cluster)
     if (n_teams == 1) {
       teams_data$cluster <- 1
       teams_data$is_homonym <- FALSE
@@ -946,9 +1034,8 @@ list_res <- lapply(split(id_assignments, id_assignments$nombre), function(teams_
         c_has_menor <- any(sapply(c_items, function(x) isTRUE(x$has_menor)), na.rm = TRUE) || isTRUE(t_row$has_menor)
         bio_conflict <- c_has_mayor && c_has_menor
 
-        # Por defecto, un gap <= 15 dias se interpreta como conflicto temporal.
-        # Excepcion: en mercado (verano/invierno) se permite gap corto positivo
-        # para no separar fichajes reales, salvo conflicto biologico.
+        # Adaptive temporal conflict: threshold depends on whether the gap
+        # spans the off-season (Jun-Jul), when transfer gaps are naturally wider.
         temporal_conflict <- FALSE
         for (ct in c_items) {
           gap_dias <- calcular_gap_intervalos(
@@ -958,7 +1045,12 @@ list_res <- lapply(split(id_assignments, id_assignments$nombre), function(teams_
             ct$max_fecha
           )
 
-          conflicto_temporal_ct <- is.finite(gap_dias) && gap_dias <= umbral_dias_conflicto
+          umbral <- get_umbral_conflicto(
+            t_row$min_fecha, t_row$max_fecha,
+            ct$min_fecha, ct$max_fecha
+          )
+
+          conflicto_temporal_ct <- is.finite(gap_dias) && gap_dias <= umbral
           es_gap_positivo <- is.finite(gap_dias) && gap_dias > 0
 
           inicio_tardio <- max(t_row$min_fecha, ct$min_fecha)
@@ -1000,11 +1092,21 @@ id_mapping_heuristic <- bind_rows(list_res) %>%
 message(paste("   > ADE resolved", sum(id_mapping_heuristic$is_homonym)/2, "pairs of homonyms mathematically."))
 
 # Paso 4: Devolver los IDs finales a las apariciones
+# Merge intra_cluster back into raw appearances using .ade_row carried from Paso 1.
 apariciones_df_raw <- apariciones_df_raw %>%
-  filter(!is.na(nombre) & nchar(trimws(nombre)) > 2) %>%
-  left_join(id_mapping_heuristic %>% select(nombre, equipo, final_id), by = c("nombre", "equipo")) %>%
+  filter(!is.na(nombre) & nchar(trimws(nombre)) > 2)
+
+intra_cluster_map <- apariciones_con_fechas %>%
+  select(.ade_row, intra_cluster) %>%
+  distinct()
+
+apariciones_df_raw <- apariciones_df_raw %>%
+  left_join(intra_cluster_map, by = ".ade_row") %>%
+  mutate(intra_cluster = if_else(is.na(intra_cluster), 1L, intra_cluster)) %>%
+  left_join(id_mapping_heuristic %>% select(nombre, equipo, intra_cluster, final_id), 
+            by = c("nombre", "equipo", "intra_cluster")) %>%
   mutate(id = if_else(!is.na(final_id), as.character(final_id), generar_id_seguro(nombre))) %>%
-  select(-any_of("final_id"))
+  select(-any_of(c("final_id", ".ade_row")))
 
 # Diccionario seguro de {nombre_jugador + equipo} a ID
 id_mapping <- apariciones_df_raw %>%
@@ -1219,10 +1321,9 @@ if (!is.null(mapa_roles_forzados_df) && nrow(mapa_roles_forzados_df) > 0) {
 }
 message("   > Player appearances consolidated and IDs unified.")
 
-### 10.4. Process and Translate Demographic Data
-message("Step 10.4: Skipping player position datapath (not used for this deployment).")
+### 10.4. Process Player Bio Data from igracki.xlsx
+message("Step 10.4: Processing player bio data...")
 
-# Simplificamos: no necesitamos el bloque de posiciones externas, lo dejamos vac\u00edo.
 posiciones_procesadas_df <- tibble(
   id = character(),
   posicion_final_unificada = character(),
@@ -1230,6 +1331,55 @@ posiciones_procesadas_df <- tibble(
   fecha_nacimiento = as.Date(character()),
   ciudad_nacimiento = character()
 )
+
+position_cols <- c("GK", "DL", "DC", "DR", "DM", "WBL", "WBR", "ML", "MC", "MR", "AML", "AMC", "AMR", "SC")
+
+if (exists("jugadoras_bio_raw_df") && !is.null(jugadoras_bio_raw_df) && nrow(jugadoras_bio_raw_df) > 0) {
+  posiciones_procesadas_df <- jugadoras_bio_raw_df %>%
+    mutate(
+      id = if_else(
+        is.na(.data[["First Name"]]) | is.na(.data[["Second Name"]]),
+        NA_character_,
+        generar_id_seguro(paste(.data[["First Name"]], .data[["Second Name"]]))
+      )
+    ) %>%
+    rowwise() %>%
+    mutate(
+      posicion_final_unificada = {
+        vals <- c_across(all_of(position_cols))
+        if (all(is.na(vals))) {
+          NA_character_
+        } else {
+          first_pos_idx <- which.max(vals)
+          first_pos <- if (length(first_pos_idx) > 0) position_cols[first_pos_idx] else NA_character_
+          if (is.na(first_pos)) {
+            NA_character_
+          } else if (first_pos == "GK") {
+            "goalkeeper"
+          } else if (first_pos %in% c("DL", "DC", "DR", "WBL", "WBR")) {
+            "defender"
+          } else if (first_pos %in% c("DM", "ML", "MC", "MR")) {
+            "midfielder"
+          } else if (first_pos %in% c("AML", "AMC", "AMR", "SC")) {
+            "forward"
+          } else {
+            NA_character_
+          }
+        }
+      }
+    ) %>%
+    ungroup() %>%
+    mutate(
+      nacionalidad = .data[["Nationality Name"]],
+      fecha_nacimiento = as.Date(.data[["Date Of Birth"]]),
+      ciudad_nacimiento = .data[["City Of Birth Name"]]
+    ) %>%
+    select(id, posicion_final_unificada, nacionalidad, fecha_nacimiento, ciudad_nacimiento)
+
+  message(paste("   > Processed", nrow(posiciones_procesadas_df), "player bio records."))
+} else {
+  message("   > No player bio data available. Bio fields will remain empty.")
+}
 
 ### 10.5. Create Master Translation and Entity Dataframes
 message("Step 10.5: Creating master translation and entity dataframes...")
@@ -1322,7 +1472,7 @@ if (exists("partidos_df") && nrow(partidos_df) > 0) {
 
   competiciones_base_df <- partidos_df %>%
     filter(competicion_nombre != "\u0420\u0435\u043f\u0440\u0435\u0437\u0435\u043d\u0442\u0430\u0446\u0438\u0458\u0430") %>%
-    distinct(competicion_nombre, competicion_temporada, categoria, division, vid_natprevaruvanje, min_age, max_age) %>%
+    distinct(competicion_nombre, competicion_temporada, temporada_display, categoria, division, vid_natprevaruvanje, min_age, max_age) %>%
     mutate(
       nombre_lower = tolower(competicion_nombre),
       start_year = as.integer(str_extract(competicion_temporada, "^\\d{2,4}")),

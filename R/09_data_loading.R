@@ -187,23 +187,26 @@ if (file.exists(ruta_comps_ffm)) {
 ### 9.2. Load Nationality Mappings
 message("Loading nationality mappings...")
 
-ruta_mapeo_iso <- if (file.exists("nacionalidades_mapeo.txt")) "nacionalidades_mapeo.txt" else "dictionaries/nacionalidades_mapeo.txt"
-ruta_traduccion_mk <- if (file.exists("nacionalidades_traduccion.txt")) "nacionalidades_traduccion.txt" else "dictionaries/nacionalidades_traduccion.txt"
+ruta_nationalities <- if (file.exists("nationalities.txt")) "nationalities.txt" else "dictionaries/nationalities.txt"
 mapeo_completo_df <- NULL
 
-if (file.exists(ruta_mapeo_iso) && file.exists(ruta_traduccion_mk)) {
+if (file.exists(ruta_nationalities)) {
   tryCatch({
-    mapeo_iso_df <- read.csv(ruta_mapeo_iso, stringsAsFactors = FALSE)
-    traduccion_mk_df <- read.csv(ruta_traduccion_mk, stringsAsFactors = FALSE, encoding = "UTF-8")
-    mapeo_completo_df <- merge(mapeo_iso_df, traduccion_mk_df, by = "nombre_ingles", all = TRUE)
-    mapeo_completo_df$clave_lower <- tolower(trimws(mapeo_completo_df$nombre_ingles))
-    message("Nationality mappings loaded successfully.")
+    nat_df <- read.csv(ruta_nationalities, stringsAsFactors = FALSE)
+    mapeo_completo_df <- nat_df %>%
+      mutate(
+        nombre_ingles = country_name,
+        codigo_iso = iso_code,
+        nombre_macedonio = NA_character_,
+        clave_lower = tolower(trimws(country_name))
+      ) %>%
+      select(nombre_ingles, codigo_iso, nombre_macedonio, clave_lower)
+    message(paste("Nationality mappings loaded successfully with", nrow(mapeo_completo_df), "entries."))
   }, error = function(e) {
-    warning("Error loading nationality mappings. Flag functionality will be disabled.")
-    message("Error was: ", e$message)
+    warning("Error loading nationalities.txt. Flags will not be displayed.")
   })
 } else {
-  warning("Nationality mapping files not found. Flag functionality will be disabled.")
+  message("nationalities.txt not found. Flags will not be displayed.")
 }
 
 
@@ -747,3 +750,18 @@ if (file.exists(ruta_nc)) {
 
 mapa_nombres_latinos <<- unlist(as.list(mapa_nombres_latinos_env))
 message(paste("Built mapa_nombres_latinos with", length(mapa_nombres_latinos), "entries."))
+
+### 9.15. Load Player Bio Data from igracki.xlsx
+message("Loading player bio data from igracki.xlsx...")
+jugadoras_bio_raw_df <- NULL
+ruta_igracki <- "igracki.xlsx"
+if (file.exists(ruta_igracki)) {
+  tryCatch({
+    jugadoras_bio_raw_df <- read_excel(ruta_igracki)
+    message(paste("igracki.xlsx loaded successfully with", nrow(jugadoras_bio_raw_df), "player records."))
+  }, error = function(e) {
+    warning("Error reading igracki.xlsx: ", e$message)
+  })
+} else {
+  message("igracki.xlsx not found. Player bio data will not be available.")
+}
