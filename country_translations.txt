@@ -1,0 +1,212 @@
+key,mk,sq,es,en
+af,Авганистан,Afganistan,Afganistán,Afghanistan
+al,Албанија,Shqipëri,Albania,Albania
+dz,Алжир,Algjeri,Argelia,Algeria
+as,Американска Самоа,Samoa Amerikane,Samoa Americana,American Samoa
+ad,Андора,Andorra,Andorra,Andorra
+ao,Ангола,Angola,Angola,Angola
+ai,Ангвила,Angilë,Anguila,Anguilla
+ag,Антигва и Барбуда,Antigua e Barbuda,Antigua y Barbuda,Antigua and Barbuda
+ar,Аргентина,Argjentina,Argentina,Argentina
+am,Ерменија,Armeni,Armenia,Armenia
+aw,Аруба,Aruba,Aruba,Aruba
+au,Австралија,Australi,Australia,Australia
+at,Австрија,Austri,Austria,Austria
+az,Азербејџан,Azerbejxhan,Azerbaiyán,Azerbaijan
+bs,Бахами,Bahamet,Bahamas,Bahamas
+bh,Бахреин,Bahrejn,Bahréin,Bahrain
+bd,Бангладеш,Bangladesh,Bangladesh,Bangladesh
+bb,Барбадос,Barbados,Barbados,Barbados
+by,Белорусија,Bjellorusi,Bielorrusia,Belarus
+be,Белгија,Belgjikë,Bélgica,Belgium
+bz,Белизе,Belizë,Belice,Belize
+bj,Бенин,Benin,Benín,Benin
+bm,Бермуди,Bermudë,Bermudas,Bermuda
+bt,Бутан,Butan,Bután,Bhutan
+bo,Боливија,Bolivi,Bolivia,Bolivia
+ba,Босна и Херцеговина,Bosnja dhe Hercegovina,Bosnia y Herzegovina,Bosnia and Herzegovina
+bw,Боцвана,Botsvanë,Botsuana,Botswana
+br,Бразил,Brazil,Brasil,Brazil
+bn,Брунеј,Brunej,Brunéi,Brunei
+bg,Бугарија,Bullgari,Bulgaria,Bulgaria
+bf,Буркина Фасо,Burkina Faso,Burkina Faso,Burkina Faso
+bi,Бурунди,Burundi,Burundi,Burundi
+cv,Зелениот 'Рт,Kepi i Gjelbër,Cabo Verde,Cabo Verde
+kh,Камбоџа,Kamboxha,Camboya,Cambodia
+cm,Камерун,Kamerun,Camerún,Cameroon
+ca,Канада,Kanada,Canadá,Canada
+ky,Кајмански Острови,Ishujt Kajman,Islas Caimán,Cayman Islands
+cf,Централноафриканска Република,Republika e Qendrës Afrikane,República Centroafricana,Central African Republic
+td,Чад,Chad,Chad,Chad
+cl,Чиле,Kili,Chile,Chile
+cn,Кина,Kinë,China,China
+co,Колумбија,Kolumbi,Colombia,Colombia
+km,Комори,Komore,Comoras,Comoros
+cg,Конго,Kongo,Congo,Congo
+cd,Демократска Република Конго,Republika Demokratike e Kongos,República Democrática del Congo,Democratic Republic of the Congo
+ck,Кукови Острови,Ishujt Kuk,Islas Cook,Cook Islands
+cr,Костарика,Kosta Rika,Costa Rica,Costa Rica
+hr,Хрватска,Kroaci,Croacia,Croatia
+cu,Куба,Kubë,Cuba,Cuba
+cw,Курасао,Kurasa,Curazao,Curaçao
+cy,Кипар,Qipro,Chipre,Cyprus
+cz,Чешка,Çeki,Chequia,Czechia
+dk,Данска,Danimarkë,Dinamarca,Denmark
+dj,Џибути,Xhibuti,Yibuti,Djibouti
+dm,Доминика,Dominikë,Dominica,Dominica
+do,Доминиканска Република,Republika Dominikane,República Dominicana,Dominican Republic
+ec,Еквадор,Ekuador,Ecuador,Ecuador
+eg,Египет,Egjipt,Egipto,Egypt
+sv,Ел Салвадор,El Salvador,El Salvador,El Salvador
+gb-eng,Англија,Angli,Inglaterra,England
+gq,Екваторска Гвинеја,Guinea Ekuatoriale,Guinea Ecuatorial,Equatorial Guinea
+er,Еритреја,Eritre,Eritrea,Eritrea
+ee,Естонија,Estoni,Estonia,Estonia
+sz,Есватини,Eswatini,Eswatini,Eswatini
+et,Етиопија,Etiopi,Etiopía,Ethiopia
+fo,Фарски Острови,Ishujt Faroe,Islas Feroe,Faroe Islands
+fj,Фиџи,Fiji,Fiji,Fiji
+fi,Финска,Finne,Finlandia,Finland
+fr,Франција,Francë,Francia,France
+ga,Габон,Gabon,Gabón,Gabon
+gm,Гамбија,Gambia,Gambia,Gambia
+ge,Грузија,Gjeorgji,Georgia,Georgia
+de,Германија,Gjermani,Alemania,Germany
+gh,Гана,Ganë,Ghana,Ghana
+gi,Гибралтар,Bregu i Shtetit,Gibraltar,Gibraltar
+gr,Грција,Greqi,Grecia,Greece
+gd,Гренада,Grenada,Granada,Grenada
+gu,Гуам,Guam,Guam,Guam
+gt,Гватемала,Guatemalë,Guatemala,Guatemala
+gn,Гвинеја,Guine,Guinea,Guinea
+gw,Гвинеја-Бисао,Guine-Bisau,Guinea-Bissau,Guinea-Bissau
+gy,Гвајана,Guajanë,Guyana,Guyana
+ht,Хаити,Haiti,Haití,Haiti
+hn,Хондурас,Honduras,Honduras,Honduras
+hk,Хонгконг,Hong Kong,Hong Kong,Hong Kong
+hu,Унгарија,Hungari,Hungría,Hungary
+is,Исланд,Islandë,Islandia,Iceland
+in,Индија,Indi,India,India
+id,Индонезија,Indonezi,Indonesia,Indonesia
+ir,Иран,Iran,Irán,Iran
+iq,Ирак,Irak,Irak,Iraq
+ie,Ирска,Irlandë,Irlanda,Ireland
+il,Израел,Izrael,Israel,Israel
+it,Италија,Itali,Italia,Italy
+ci,Брегот на Слоновата Коска,Bregu i Fildishtë,Costa de Marfil,Ivory Coast
+jm,Јамајка,Xhamajkë,Jamaica,Jamaica
+jp,Јапонија,Japoni,Japón,Japan
+jo,Јордан,Jordani,Jordania,Jordan
+kz,Казахстан,Kazakistan,Kazajistán,Kazakhstan
+ke,Кенија,Kenia,Kenia,Kenya
+xk,Косово,Kosovë,Kosovo,Kosovo
+kw,Кувајт,Kuvajt,Kuwait,Kuwait
+kg,Киргистан,Kirgistan,Kirguistán,Kyrgyzstan
+la,Лаос,Laos,Laos,Laos
+lv,Латвија,Letoni,Letonia,Latvia
+lb,Либан,Liban,Líbano,Lebanon
+ls,Лесото,Lesoto,Lesoto,Lesotho
+lr,Либерија,Liberi,Liberia,Liberia
+ly,Либија,Libi,Libia,Libya
+li,Лихтенштајн,Lihtenshtajn,Liechtenstein,Liechtenstein
+lt,Литванија,Lituania,Lituania,Lithuania
+lu,Луксембург,Luksemburg,Luxemburgo,Luxembourg
+mo,Макао,Makao,Macao,Macao
+mg,Мадагаскар,Madagaskar,Madagascar,Madagascar
+mw,Малави,Malavi,Malawi,Malawi
+my,Малезија,Malesia,Malasia,Malaysia
+mv,Малдиви,Maldivet,Maldivas,Maldives
+ml,Мали,Mali,Malí,Mali
+mt,Малта,Maltë,Malta,Malta
+mr,Мавританија,Mauritani,Mauritania,Mauritania
+mu,Маврициус,Mauricius,Mauricio,Mauritius
+mx,Мексико,Meksikë,México,Mexico
+md,Молдавија,Moldavi,Moldavia,Moldova
+mn,Монголија,Mongoli,Mongolia,Mongolia
+me,Црна Гора,Mali Zi,Montenegro,Montenegro
+ms,Монтсерат,Montserrat,Montserrat,Montserrat
+ma,Мароко,Marokë,Marruecos,Morocco
+mz,Мозамбик,Mozambik,Mozambique,Mozambique
+mm,Мјанмар,Mianmar,Myanmar,Myanmar
+na,Намибија,Namibi,Namibia,Namibia
+np,Непал,Nepal,Nepal,Nepal
+nl,Холандија,Holandë,Países Bajos,Netherlands
+nc,Нова Каледонија,Kaledonia e Re,Nueva Caledonia,New Caledonia
+nz,Нов Зеланд,Zelanda e Re,Nueva Zelanda,New Zealand
+ni,Никарагва,Nikaragua,Nicaragua,Nicaragua
+ne,Нигер,Niger,Níger,Niger
+ng,Нигерија,Nigeri,Nigeria,Nigeria
+kp,Северна Кореја,Koreja e Veriut,Corea del Norte,North Korea
+mk,Македонија,Maqedonia,Macedonia,Macedonia
+gb-nir,Северна Ирска,Irlanda e Veriut,Irlanda del Norte,Northern Ireland
+no,Норвешка,Norvegji,Noruega,Norway
+om,Оман,Oman,Omán,Oman
+pk,Пакистан,Pakistan,Pakistán,Pakistan
+ps,Палестина,Palestinë,Palestina,Palestine
+pa,Панама,Panamë,Panamá,Panama
+pg,Папуа Нова Гвинеја,Papua Guinea e Re,Papúa Nueva Guinea,Papua New Guinea
+py,Парагвај,Paraguai,Paraguay,Paraguay
+pe,Перу,Peru,Perú,Peru
+ph,Филипини,Filipine,Filipinas,Philippines
+pl,Полска,Poloni,Polonia,Poland
+pt,Португалија,Portugali,Portugal,Portugal
+pr,Порторико,Porto Riko,Puerto Rico,Puerto Rico
+qa,Катар,Katar,Catar,Qatar
+ro,Романија,Rumani,Rumania,Romania
+ru,Русија,Rusi,Rusia,Russia
+rw,Руанда,Ruandë,Ruanda,Rwanda
+kn,Свети Китс и Невис,Shën Kitsi dhe Nevis,San Cristóbal y las Nieves,Saint Kitts and Nevis
+lc,Света Луција,Shën Lucia,Santa Lucía,Saint Lucia
+vc,Свети Винсент и Гренадини,Shën Vincenti dhe Grenadinet,San Vicente y las Granadinas,Saint Vincent and the Grenadines
+ws,Самоа,Samoa,Samoa,Samoa
+sm,Сан Марино,San Marino,San Marino,San Marino
+st,Сао Томе и Принсипе,Sao Tomë dhe Prinçi,Santo Tomé y Príncipe,São Tomé and Príncipe
+sa,Саудиска Арабија,Arabia Saudite,Arabia Saudí,Saudi Arabia
+gb-sct,Шкотска,Skoci,Escocia,Scotland
+sn,Сенегал,Senegal,Senegal,Senegal
+rs,Србија,Serbi,Serbia,Serbia
+sc,Сејшели,Seishellet,Seychelles,Seychelles
+sl,Сиера Леоне,Sierra Leone,Sierra Leona,Sierra Leone
+sg,Сингапур,Singapor,Singapur,Singapore
+sk,Словачка,Sllovaki,Eslovaquia,Slovakia
+si,Словенија,Slloveni,Eslovenia,Slovenia
+sb,Соломонски Острови,Ishujt Solomon,Islas Salomón,Solomon Islands
+so,Сомалија,Somali,Somalia,Somalia
+za,Јужна Африка,Afrika e Jugut,Sudáfrica,South Africa
+kr,Јужна Кореја,Koreja e Jugut,Corea del Sur,South Korea
+ss,Јужен Судан,Sudani i Jugut,Sudán del Sur,South Sudan
+es-variant,Шпанија,Spanjë,España,Spain
+lk,Шри Ланка,Sri Lanka,Sri Lanka,Sri Lanka
+sd,Судан,Sudani,Sudán,Sudan
+sr,Суринам,Surinami,Surinam,Suriname
+se,Шведска,Suedi,Suecia,Sweden
+ch,Швајцарија,Zvicërr,Suiza,Switzerland
+sy,Сирија,Siri,Siria,Syria
+tw,Тајван,Tajvan,Taiwán,Taiwan
+tj,Таџикистан,Taxhikistan,Tayikistán,Tajikistan
+tz,Танзанија,Tanzani,Tanzania,Tanzania
+th,Тајланд,Tailanda,Tailandia,Thailand
+tl,Источен Тимор,Timor Lindor,Timor Oriental,Timor-Leste
+tg,Того,Togo,Togo,Togo
+to,Тонга,Tonga,Tonga,Tonga
+tt,Тринидад и Тобаго,Trinidadi dhe Tobago,Trinidad y Tobago,Trinidad and Tobago
+tn,Тунис,Tunizi,Túnez,Tunisia
+tr,Турција,Turqi,Turquía,Turkey
+tm,Туркменистан,Turkmenistan,Turkmenistán,Turkmenistan
+tc,Острови Туркс и Кајкос,Ishujt Turq dhe Kaikos,Islas Turcas y Caicos,Turks and Caicos Islands
+tv,Тувалу,Tuvalu,Tuvalu,Tuvalu
+ug,Уганда,Uganda,Uganda,Uganda
+ua,Украина,Ukrain,Ucrania,Ukraine
+ae,Обединети Арапски Емирати,Emiratët e Bashkuara Arabe,Emiratos Árabes Unidos,United Arab Emirates
+us,Соединети Држави,Shtetet e Bashkuara,Estados Unidos,United States
+uy,Уругвај,Urugua,Uruguay,Uruguay
+uz,Узбекистан,Uzbekistan,Uzbekistán,Uzbekistan
+vu,Вануату,Vanuatu,Vanuatu,Vanuatu
+ve,Венецуела,Venezuelë,Venezuela,Venezuela
+vn,Виетнам,Vietnam,Vietnam,Vietnam
+vg,Британски Девствени Острови,Ishujt Vergjina Britanike,Islas Vírgenes Británicas,British Virgin Islands
+vi,Американски Девствени Острови,Ishujt Vergjina Amerikane,Islas Vírgenes de EE. UU.,US Virgin Islands
+gb-wls,Велс,Uells,Gales,Wales
+ye,Јемен,Jemen,Yemen,Yemen
+zm,Замбија,Zambia,Zambia,Zambia
+zw,Зимбабве,Zimbabwe,Zimbabue,Zimbabwe

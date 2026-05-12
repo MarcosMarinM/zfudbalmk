@@ -2182,7 +2182,19 @@ if (hubo_cambios) {
               } else {
                 HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L8.35 12H11v7.93zM13 19.93V12h2.65l4.14 2.21c-.43 3.32-3.26 5.95-6.79 6.72zM13 4.07V10h2.65l4.14-2.21C19.37 4.56 16.54 2 13 2.07zM11 4.07c3.53 0 6.37 2.49 6.79 5.72L13 10H11V4.07zM4.26 8.21C4.08 7.43 4 6.64 4 5.86c0-1.03.24-2 .66-2.87l4.14 2.22H4.26zm.43 7.58c.2.6.46 1.17.78 1.7L9.61 14H4.69z"/></svg>')
               }
-              info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", icono_nacionalidad), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_nationality")), tags$span(class = "bio-value", jugadora$nacionalidad)))
+              nacionalidad_traducida <- tagList(lapply(IDIOMAS_SOPORTADOS, function(l) {
+                texto <- jugadora$nacionalidad
+                if (!is.null(mapa_traducciones_paises_df) && nrow(mapa_traducciones_paises_df) > 0) {
+                  lookup_key <- if (!is.na(jugadora$codigo_iso) && nzchar(jugadora$codigo_iso)) tolower(jugadora$codigo_iso) else jugadora$nacionalidad
+                  row <- mapa_traducciones_paises_df %>% filter(key == lookup_key | mk == lookup_key)
+                  if (nrow(row) > 0 && l %in% names(row)) {
+                    val <- as.character(row[[l]][1])
+                    if (!is.na(val) && nzchar(val)) texto <- val
+                  }
+                }
+                tags$span(class = paste0("lang-", l), texto)
+              }))
+              info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", icono_nacionalidad), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_nationality")), tags$span(class = "bio-value", nacionalidad_traducida)))
             }
             mapa_pos_traducida <- c("goalkeeper" = t_html("position_goalkeeper"), "defender" = t_html("position_defender"), "midfielder" = t_html("position_midfielder"), "forward" = t_html("position_forward"))
             if (!is.na(jugadora$posicion_final_unificada) && jugadora$posicion_final_unificada != "") {
@@ -2200,18 +2212,25 @@ if (hubo_cambios) {
               edad_texto <- if (!is.na(jugadora$edad)) tagList(" (", jugadora$edad, " ", t_html("player_age_suffix"), ")") else ""
               info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>')), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_birth_date")), tags$span(class = "bio-value", tagList(fecha_formateada, edad_texto))))
             }
-            ciudad_original_en <- jugadora$ciudad_nacimiento
-            if (!is.na(ciudad_original_en) && ciudad_original_en != "") {
-              ciudad_a_mostrar <- ciudad_original_en
-              if (!is.null(mapa_ciudades_long_df)) {
-                traduccion <- mapa_ciudades_long_df %>%
-                  filter(.data$lang == idioma_actual, en == ciudad_original_en) %>%
-                  pull(translated_city)
-                if (length(traduccion) > 0) {
-                  ciudad_a_mostrar <- traduccion[1]
+            ciudad_original_mk <- jugadora$ciudad_nacimiento
+            if (!is.na(ciudad_original_mk) && ciudad_original_mk != "") {
+              ciudad_traducida <- tagList(lapply(IDIOMAS_SOPORTADOS, function(l) {
+                if (l == "mk") {
+                  tags$span(class = "lang-mk", ciudad_original_mk)
+                } else {
+                  texto <- ciudad_original_mk
+                  if (!is.null(mapa_ciudades_long_df) && nrow(mapa_ciudades_long_df) > 0) {
+                    traduccion <- mapa_ciudades_long_df %>%
+                      filter(.data$lang == l, mk == ciudad_original_mk) %>%
+                      pull(translated_city)
+                    if (length(traduccion) > 0 && !is.na(traduccion[1]) && nzchar(traduccion[1])) {
+                      texto <- traduccion[1]
+                    }
+                  }
+                  tags$span(class = paste0("lang-", l), texto)
                 }
-              }
-              info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>')), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_birth_place")), tags$span(class = "bio-value", ciudad_a_mostrar)))
+              }))
+              info_items[[length(info_items) + 1]] <- tags$div(class = "bio-item", tags$div(class = "bio-icon", HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>')), tags$div(class = "bio-text", tags$span(class = "bio-label", t_html("player_birth_place")), tags$span(class = "bio-value", ciudad_traducida)))
             }
 
             # --- 2. CONSTRUIR TARJETA DE ESTAD\u00cdSTICAS (L\u00d3GICA CORREGIDA) ---

@@ -187,7 +187,7 @@ if (file.exists(ruta_comps_ffm)) {
 ### 9.2. Load Nationality Mappings
 message("Loading nationality mappings...")
 
-ruta_nationalities <- if (file.exists("nationalities.txt")) "nationalities.txt" else "dictionaries/nationalities.txt"
+ruta_nationalities <- if (file.exists("country_codes.txt")) "country_codes.txt" else "dictionaries/country_codes.txt"
 mapeo_completo_df <- NULL
 
 if (file.exists(ruta_nationalities)) {
@@ -195,18 +195,18 @@ if (file.exists(ruta_nationalities)) {
     nat_df <- read.csv(ruta_nationalities, stringsAsFactors = FALSE)
     mapeo_completo_df <- nat_df %>%
       mutate(
-        nombre_ingles = country_name,
-        codigo_iso = iso_code,
+        nombre_ingles = trimws(nombre_ingles),
+        codigo_iso = tolower(trimws(codigo_iso)),
         nombre_macedonio = NA_character_,
-        clave_lower = tolower(trimws(country_name))
+        clave_lower = tolower(trimws(nombre_ingles))
       ) %>%
       select(nombre_ingles, codigo_iso, nombre_macedonio, clave_lower)
     message(paste("Nationality mappings loaded successfully with", nrow(mapeo_completo_df), "entries."))
   }, error = function(e) {
-    warning("Error loading nationalities.txt. Flags will not be displayed.")
+    warning("Error loading country_codes.txt. Flags will not be displayed.")
   })
 } else {
-  message("nationalities.txt not found. Flags will not be displayed.")
+  message("country_codes.txt not found. Flags will not be displayed.")
 }
 
 
@@ -544,7 +544,7 @@ if (file.exists(ruta_traducciones_paises)) {
       ruta_traducciones_paises, 
       stringsAsFactors = FALSE, 
       encoding = "UTF-8",
-      check.names = FALSE # 9.9.1. Important for handling columns like 'translation_es'.
+      check.names = FALSE
     )
     message(paste("Country translations loaded successfully with", nrow(mapa_traducciones_paises_df), "entries."))
   }, error = function(e) {
@@ -703,7 +703,7 @@ if (file.exists(ruta_traducciones_ciudades)) {
     
     mapa_ciudades_long_df <- mapa_ciudades_df %>%
       pivot_longer(
-        cols = -en, 
+        cols = -mk, 
         names_to = "lang",
         values_to = "translated_city"
       )

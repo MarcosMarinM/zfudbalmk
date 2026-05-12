@@ -1243,7 +1243,7 @@ function initializeTeamProfilePage() {
       <th class="sortable" data-sort-key="Yellows" style="width:12%;">${t.col_cards}</th>
     </tr></thead><tbody>`;
     filteredData.forEach(player => {
-      const position = t[player.posicion_final_unificada] || player.posicion_final_unificada || '';
+      const position = t["position_" + player.posicion_final_unificada] || player.posicion_final_unificada || '';
       const playerName = player[`PlayerName_${currentLang}`] || player.PlayerName_mk || '';
       const playerURL = `${getBasePath()}igraci/${player.id}.html`;
       html += `<tr onclick="window.location.href='${playerURL}'">

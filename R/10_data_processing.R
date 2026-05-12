@@ -997,6 +997,36 @@ if (nrow(conflict_groups) > 0) {
   }
 }
 
+# --- Paso 1.6: Split multi-stint (nombre, equipo) groups at large gaps ---
+# A player may leave a club and return later (e.g. after playing for another team).
+# Grouping all appearances by (nombre, equipo) would create one continuous date
+# range that artificially overlaps with the other club's dates, causing false splits.
+# We detect gaps > 180 days within the same (nombre, equipo) group and split
+# into separate stints so each stint's date range is compact and non-overlapping.
+UMBRAL_ESTANCIA_DIAS <- 180
+
+apariciones_con_fechas <- apariciones_con_fechas %>%
+  arrange(nombre, equipo, intra_cluster, fecha_date) %>%
+  group_by(nombre, equipo, intra_cluster) %>%
+  mutate(
+    gap_prev = as.numeric(difftime(fecha_date, lag(fecha_date, default = first(fecha_date)), units = "days")),
+    stint_n = cumsum(coalesce(gap_prev > UMBRAL_ESTANCIA_DIAS, FALSE)) + 1L,
+    intra_cluster = as.integer(intra_cluster * 1000L + stint_n)
+  ) %>%
+  ungroup() %>%
+  select(-gap_prev, -stint_n)
+
+n_multi_stint <- apariciones_con_fechas %>%
+  distinct(nombre, equipo, intra_cluster) %>%
+  group_by(nombre, equipo) %>%
+  filter(n() > 1) %>%
+  nrow()
+
+if (n_multi_stint > 0) {
+  message(paste("   > Multi-stint splitting: detected", n_multi_stint,
+                "player-team groups with multiple separate stints."))
+}
+
 # Paso 2: Resumir intervalos de fechas y compatibilidad biol\u00f3gica por nombre + equipo (+ intra_cluster)
 id_assignments <- apariciones_con_fechas %>%
   filter(!is.na(fecha_date), !is.na(equipo)) %>%
@@ -1417,7 +1447,7 @@ for (lang_code in setdiff(IDIOMAS_SOPORTADOS, "mk")) {
 
 if (!is.null(mapa_traducciones_paises_df) && nrow(mapa_traducciones_paises_df) > 0) {
   paises_para_unir <- mapa_traducciones_paises_df %>%
-    rename(original_name = original_mk) %>%
+    rename(original_name = mk) %>%
     rename_with(~ paste0("country_", .), .cols = -original_name)
   entidades_maestro_df <- entidades_maestro_df %>%
     left_join(paises_para_unir, by = "original_name")
