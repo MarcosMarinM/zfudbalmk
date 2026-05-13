@@ -1702,6 +1702,8 @@ t_html <- function(key) {
 #' @param original_name_mk The original Macedonian name of the entity.
 #' @return An htmltools tagList with one span per language.
 entity_name_spans <- function(original_name_mk) {
+  # Safety: if original_name_mk is non-scalar (e.g. from a duplicated join), use the first element
+  if (length(original_name_mk) > 1) original_name_mk <- original_name_mk[1]
   tagList(
     lapply(IDIOMAS_SOPORTADOS, function(lang) {
       col <- paste0("translated_name_", lang)
@@ -1709,7 +1711,7 @@ entity_name_spans <- function(original_name_mk) {
       nombre <- entidades_maestro_df[[col]][entidades_maestro_df$original_name == original_name_mk]
       if (length(nombre) == 0 || is.na(nombre[1])) {
         # Try normalized match (collapse spaces, replace NBSP, lowercase)
-        if (is.null(original_name_mk) || is.na(original_name_mk)) {
+        if (isTRUE(is.null(original_name_mk)) || length(original_name_mk) == 0 || isTRUE(is.na(original_name_mk))) {
           nombre <- original_name_mk
         } else {
           norm_input <- tolower(str_squish(str_replace_all(as.character(original_name_mk), "\u00A0", " ")))

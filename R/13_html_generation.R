@@ -244,11 +244,13 @@ if (hubo_cambios) {
     # For the SPA architecture, we need all languages available for spans
     jugadoras_lang_df <- jugadoras_stats_df %>%
       select(id, starts_with("PlayerName_")) %>%
+      distinct(id, .keep_all = TRUE) %>%
       mutate(PlayerName = !!player_name_col_sym)
     jugadoras_all_lang_df <- jugadoras_lang_df # ALIAS for different script sections
 
     entidades_all_lang_df <- entidades_maestro_df %>%
       select(original_name, starts_with("translated_name_")) %>%
+      distinct(original_name, .keep_all = TRUE) %>%
       mutate(current_lang_name = !!entity_name_col_sym)
     entidades_df_lang_all <- entidades_all_lang_df # ALIAS for different script sections
 
@@ -1619,6 +1621,11 @@ if (hubo_cambios) {
               nota_arbitro <- gsub("\\s*[\\r\\n]+\\s*", ". ", nota_arbitro, perl = TRUE)
               nota_arbitro <- str_trim(nota_arbitro)
             }
+            # Override with referee_notes.txt if available (file is authoritative)
+            if (exists("referee_notes_map") && !is.null(referee_notes_map) && id_p %in% names(referee_notes_map)) {
+              val <- referee_notes_map[id_p]
+              if (!is.na(val) && nchar(trimws(val)) > 0) nota_arbitro <- val
+            }
             path_rel_competiciones <- file.path("..", nombres_carpetas_relativos$competiciones)
             path_rel_timovi <- file.path("..", nombres_carpetas_relativos$timovi)
             path_rel_jugadoras <- file.path("..", nombres_carpetas_relativos$jugadoras)
@@ -2076,7 +2083,7 @@ if (hubo_cambios) {
                       tags$span(referees_html)
                     ),
                     if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) {
-                      tags$p(class = "mp-notes", nota_arbitro)
+                      tags$p(class = "mp-notes", tags$strong(t_html("officials_notes"), ": "), nota_arbitro)
                     }
                   )
                 ),
@@ -2354,12 +2361,13 @@ if (hubo_cambios) {
               career_accordion_html <- tags$div(
                 class = "season-accordion-container",
                 tags$h3(t_html("player_stats_by_season")),
-                map(1:nrow(all_seasons), function(s_idx) {
+                map(seq_len(nrow(all_seasons)), function(s_idx) {
                   season_info <- all_seasons[s_idx, ]
                   season_name <- season_info$competicion_temporada
+                  if (length(season_name) != 1) return(NULL)
                   season_type <- season_info$type
                   season_id_safe <- paste0(str_replace_all(tolower(season_name), "[^a-z0-9]", "-"), "-", s_idx)
-                  if (season_type == "national") {
+                  if (isTRUE(season_type == "national") || identical(season_type, "national")) {
                     stats_tab_content <- tags$table(
                       class = "stats-table-season",
                       tags$thead(tags$tr(map(tagList(t_html("category_header"), t_html("player_apps"), t_html("player_starter"), t_html("player_goals"), HTML('<span class="card-icon-header yellow"></span>'), HTML('<span class="card-icon-header red"></span>'), t_html("player_mins")), tags$th))),

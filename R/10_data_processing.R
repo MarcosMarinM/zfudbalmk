@@ -1121,6 +1121,20 @@ id_mapping_heuristic <- bind_rows(list_res) %>%
 
 message(paste("   > ADE resolved", sum(id_mapping_heuristic$is_homonym)/2, "pairs of homonyms mathematically."))
 
+# Paso 3.5: Recalcular IDs usando el nombre latino en ingles de name_corrections.txt
+if (exists("mapa_nombres_jugadoras_long") && !is.null(mapa_nombres_jugadoras_long) && nrow(mapa_nombres_jugadoras_long) > 0) {
+  en_subset <- mapa_nombres_jugadoras_long[mapa_nombres_jugadoras_long$lang == "en", ]
+  correcciones_id <- stats::setNames(en_subset$translated_name, en_subset$original_mk)
+  id_mapping_heuristic <- id_mapping_heuristic %>%
+    rowwise() %>%
+    mutate(
+      base_id = if (nombre %in% names(correcciones_id)) generar_id_seguro(correcciones_id[nombre]) else base_id,
+      final_id = if (is_homonym) paste0(base_id, "_", cluster) else base_id
+    ) %>%
+    ungroup()
+  message(paste("   > Recalculated IDs for", sum(id_mapping_heuristic$nombre %in% names(correcciones_id)), "players using English Latin form."))
+}
+
 # Paso 4: Devolver los IDs finales a las apariciones
 # Merge intra_cluster back into raw appearances using .ade_row carried from Paso 1.
 apariciones_df_raw <- apariciones_df_raw %>%
@@ -1402,7 +1416,18 @@ if (exists("jugadoras_bio_raw_df") && !is.null(jugadoras_bio_raw_df) && nrow(jug
     mutate(
       nacionalidad = .data[["Nationality Name"]],
       fecha_nacimiento = as.Date(.data[["Date Of Birth"]]),
-      ciudad_nacimiento = .data[["City Of Birth Name"]]
+      ciudad_nacimiento = {
+        rc <- .data[["City Of Birth Name"]]
+        needs <- !is.na(rc) & nchar(trimws(rc)) > 0 & sapply(rc, is_latin, USE.NAMES = FALSE)
+        cc <- rc
+        cc[needs] <- latin_to_cyrillic(rc[needs])
+        if (exists("mapa_ciudades_long_df") && !is.null(mapa_ciudades_long_df) && nrow(mapa_ciudades_long_df) > 0) {
+          known <- needs & cc %in% mapa_ciudades_long_df$mk
+          ifelse(known, cc, rc)
+        } else {
+          rc
+        }
+      }
     ) %>%
     select(id, posicion_final_unificada, nacionalidad, fecha_nacimiento, ciudad_nacimiento)
 

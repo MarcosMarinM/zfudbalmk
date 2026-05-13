@@ -765,3 +765,22 @@ if (file.exists(ruta_igracki)) {
 } else {
   message("igracki.xlsx not found. Player bio data will not be available.")
 }
+
+### 9.16. Load Referee Notes
+message("Loading referee notes...")
+ruta_referee_notes <- if (file.exists("referee_notes.txt")) "referee_notes.txt" else "dictionaries/referee_notes.txt"
+referee_notes_map <- NULL
+if (file.exists(ruta_referee_notes)) {
+  tryCatch({
+    referee_notes_df <- read.csv(ruta_referee_notes, stringsAsFactors = FALSE,
+                                 encoding = "UTF-8", header = FALSE,
+                                 col.names = c("match_id", "note_text"),
+                                 colClasses = "character")
+    referee_notes_map <- setNames(trimws(referee_notes_df$note_text), trimws(referee_notes_df$match_id))
+    message(paste("   > Referee notes loaded for", length(referee_notes_map), "matches."))
+  }, error = function(e) {
+    warning("Error loading referee_notes.txt. Referee notes will not be available.")
+  })
+} else {
+  message("   > referee_notes.txt not found. Referee notes will not be available.")
+}
