@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "zfudbalmk",
     "public": "docs",
     "ignore": [
       "firebase.json",
