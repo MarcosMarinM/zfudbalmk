@@ -29,6 +29,7 @@ if (!exists("apariciones_df") || nrow(apariciones_df) == 0) {
   
   if (!is.null(mapa_nombres_jugadoras_long)) {
     player_translations_wide <- mapa_nombres_jugadoras_long %>%
+      distinct(original_mk, lang, .keep_all = TRUE) %>%
       pivot_wider(id_cols = original_mk, names_from = lang, values_from = translated_name, names_prefix = "PlayerName_")
     jugadoras_stats_temp <- jugadoras_stats_temp %>% left_join(player_translations_wide, by = c("PlayerName_mk" = "original_mk"))
   }

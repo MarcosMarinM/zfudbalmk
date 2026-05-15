@@ -2,7 +2,7 @@ key,mk,sq,es,en
 lang_name,Македонски,Shqip,Castellano,English
 back_button,← Назад,← Prapa,← Volver,← Back
 home_button,🏠 Почетна,🏠 Faqja kryesore,🏠 Inicio,🏠 Home
-search_placeholder,"Пребарај фудбалерка, тим, судијка, стадион...","Kërko lojtare, ekip, gjyqtare, stadium...","Buscar jugadora, equipo, árbitra, estadio...","Search for player, team, referee, stadium..."
+search_placeholder,"Пребарај фудбалерка, тим, судија, стадион...","Kërko lojtare, ekip, gjyqtar, stadium...","Buscar jugadora, equipo, árbitro, estadio...","Search for player, team, referee, stadium..."
 search_button,Пребарај,Kërko,Buscar,Search
 search_results_for,"Резултати од пребарувањето за","Rezultatet e kërkimit për","Resultados de la búsqueda para","Search results for"
 no_search_results,"Нема пронајдени резултати за","Nuk u gjetën rezultate për","No se encontraron resultados para","No results found for"
@@ -15,13 +15,13 @@ disciplinary_title,Дисциплинска,Evidenca disiplinore,Disciplina,Disc
 goalkeepers_title,Статистика на голманки,Statistikat e portiereve,Estadísticas de porteras,Goalkeeper stats
 defensive_trio_title,Најдобро дефанзивно трио,Treshja më e mirë mbrojtëse,Mejor trío defensivo,Best defensive trio
 final_score,Конечен резултат,Rezultati përfundimtar,Resultado final,Final score
-officials_notes,Забелешка на судијката,Shënimi i gjyqtares,Notas de la árbitra,Referee's notes
+officials_notes,Забелешка на судијата,Shënimi i gjyqtarit,Notas del árbitro,Referee's notes
 lineups_title,Состави,Formacionet,Alineaciones,Line-ups
 timeline_title,Хронологија,Kronologjia,Cronología,Timeline
-referees_title,Судијки,Gjyqtaret,Árbitras,Referees
+referees_title,Судии,Gjyqtarët,Árbitros,Referees
 player_type,Фудбалерка,Lojtare,Jugadora,Player
 team_type,Тим,Ekip,Equipo,Team
-referee_type,Судијка,Gjyqtare,Árbitra,Referee
+referee_type,Судија,Gjyqtar,Árbitro,Referee
 stadium_type,Стадион,Stadium,Estadio,Stadium
 competition_type,Натпреварување,Garë,Competición,Competition
 site_title,@zfudbalmk,@zfudbalmk,@zfudbalmk,@zfudbalmk
@@ -121,15 +121,15 @@ position_goalkeeper,Голманка,Portiere,Portera,Goalkeeper
 position_defender,Одбрана,Mbrojtëse,Defensa,Defender
 position_midfielder,Среден ред,Mesfushore,Centrocampista,Midfielder
 position_forward,Напад,Sulmuese,Delantera,Forward
-referee_main,Главна судијка,Gjyqtarja kryesore,Árbitra,Referee
-referee_asst1,1-ва помошничка,Ndihmësja e parë,1.ª asistente,1st assistant
-referee_asst2,2-ра помошничка,Ndihmësja e dytë,2.ª asistente,2nd assistant
-referee_asst4,4-та судијка,Gjyqtarja e katërt,4.ª árbitra,4th referee
-var_referee,ВАР судијка,Gjyqtarja VAR,Árbitra VAR,VAR Referee
-var_assistant,АВАР судијка,Gjyqtarja AVAR,Asistente VAR,VAR Assistant
-var_operator,ВАР операторка,Operatorja VAR,Operadora VAR,VAR Operator
-match_delegate,Делегатка,Delegatja,Delegada,Delegate
-match_kontrolor,Контролорка,Kontrollorja,Controladora,Controller
+referee_main,Главен судија,Gjyqtari kryesor,Árbitro principal,Referee
+referee_asst1,1. помошен судија,Ndihmësi i parë,1.ᵉʳ asistente,1st assistant
+referee_asst2,2. помошен судија,Ndihmësi i dytë,2.º asistente,2nd assistant
+referee_asst4,4. судија,Gjyqtari i katërt,4.º árbitro,4th official
+var_referee,ВАР судија,Gjyqtari VAR,Árbitro VAR,VAR Referee
+var_assistant,АВАР судија,Gjyqtari AVAR,Asistente VAR,VAR Assistant
+var_operator,ВАР оператор,Operatori VAR,Operador VAR,VAR Operator
+match_delegate,Делегат,Delegati,Delegado,Match delegate
+match_kontrolor,Контролор,Kontrollori,Controlador,Match controller
 head_coach,Главен тренер,Trajner kryesor,Entrenador principal,Head coach
 assistant_coach,Помошен тренер,Trajner ndihmës,Asistente,Assistant coach
 physiotherapist,Физиотерапевт,Fizioterapeut,Fisioterapeuta,Physiotherapist
@@ -187,7 +187,7 @@ teams_list_select_letter,Изберете буква,Zgjidhni një shkronjë,Sel
 players_list_title,Листа на фудбалерки,Lista e futbollisteve,Lista de futbolistas,Players list
 players_list_select_letter,Изберете буква,Zgjidhni një shkronjë,Selecciona una letra,Select a letter
 about_page_title,За проектот,Rreth projektit,Acerca del proyecto,About the project
-about_page_content,"<p>@zfudbalmk е личен проект создаден од <b>Маркос Марин Мартин</b>, ентузијаст од Мадрид со пасија за две работи: женскиот фудбал и Македонија.</p><p>Главната цел е да му се даде на македонскиот женски фудбал видливоста што ја заслужува. Она што започна како едноставна Инстаграм страница (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) еволуираше во оваа веб-страница, дизајнирана да ги направи статистиките, резултатите и податоците за играчите подостапни за сите.</p><p>Ако имате предлози, корекции или едноставно сакате да разговараме за фудбал, <b>директните пораки на Инстаграм</b> се секогаш отворени!</p>","<p>@zfudbalmk është një projekt personal i krijuar nga <b>Marcos Marín Martín</b>, një entuziast nga Madridi me një pasion për dy gjëra: futbollin e femrave dhe Maqedoninë.</p><p>Qëllimi kryesor është t'i jepet futbollit të femrave maqedonase dukshmëria që meriton. Ajo që filloi si një faqe e thjeshtë në Instagram (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) ka evoluar në këtë uebfaqe, e dizajnuar për t'i bërë statistikat e lojtareve, rezultatet dhe të dhënat më të aksesueshme për të gjithë.</p><p>Nëse keni sugjerime, korrigjime, apo thjesht dëshironi të bisedoni për futboll, <b>mesazhet direkte në Instagram</b> janë gjithmonë të hapura!</p>","<p>@zfudbalmk es un proyecto personal creado por <b>Marcos Marín Martín</b>, un aficionado de Madrid apasionado por dos cosas: el fútbol femenino y Macedonia.</p><p>El objetivo principal es dar al fútbol femenino macedonio la visibilidad que merece. Lo que comenzó como una simple página de Instagram (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) ha evolucionado a este sitio web, diseñado para hacer que las estadísticas, resultados y datos de las jugadoras sean más accesibles para todo el mundo.</p><p>Si tienes alguna sugerencia, corrección o simplemente quieres charlar sobre fútbol, ¡los <b>mensajes directos en Instagram</b> están siempre abiertos!</p>","<p>zfudbalmk is a personal project created by <b>Marcos Marín Martín</b>, an enthusiast from Madrid with a passion for two things: women's football and Macedonia.</p><p>The main goal is to give Macedonian women's football the visibility it deserves. What started as a simple Instagram page (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) has evolved into this website, designed to make player stats, results, and data more accessible to everyone.</p><p>If you have any suggestions, corrections, or just want to chat about football, the <b>DMs on Instagram</b> are always open!</p>"
+about_page_content,"<p>@zfudbalmk е личен проект создаден од <b>Маркос Марин Мартин</b>, ентузијаст од Мадрид со пасија за две работи: женскиот фудбал и Македонија.</p><p>Главната цел е да му се даде на македонскиот женски фудбал видливоста што ја заслужува. Она што започна како едноставна Инстаграм страница (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) еволуираше во оваа веб-страница, дизајнирана да ги направи статистиките, резултатите и податоците за играчите подостапни за сите.</p><p>Ако имате предлози, корекции или едноставно сакате да разговараме за фудбал, <b>директните пораки на Инстаграм</b> се секогаш отворени! Кодот со кој е создадена оваа страница е достапен на <b><a href='https://github.com/marcosmarinm/zfudbalmk-auto' target='_blank' rel='noopener noreferrer'>ГитХаб</a></b>.</p><p><i>Податоците за натпреварите на оваа страница се преземени од јавните информации обезбедени од Фудбалската федерација на Македонија.</i></p>","<p>@zfudbalmk është një projekt personal i krijuar nga <b>Marcos Marín Martín</b>, një entuziast nga Madridi me një pasion për dy gjëra: futbollin e femrave dhe Maqedoninë.</p><p>Qëllimi kryesor është t'i jepet futbollit të femrave maqedonase dukshmëria që meriton. Ajo që filloi si një faqe e thjeshtë në Instagram (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) ka evoluar në këtë uebfaqe, e dizajnuar për t'i bërë statistikat e lojtareve, rezultatet dhe të dhënat më të aksesueshme për të gjithë.</p><p>Nëse keni sugjerime, korrigjime, apo thjesht dëshironi të bisedoni për futboll, <b>mesazhet direkte në Instagram</b> janë gjithmonë të hapura! Kodi me të cilin është krijuar kjo faqe është i disponueshëm në <b><a href='https://github.com/marcosmarinm/zfudbalmk-auto' target='_blank' rel='noopener noreferrer'>GitHub</a></b>.</p><p><i>Të dhënat e ndeshjeve në këtë faqe janë nxjerrë nga informacionet publike të ofruara nga Federata e Futbollit e Maqedonisë.</i></p>","<p>@zfudbalmk es un proyecto personal creado por <b>Marcos Marín Martín</b>, un aficionado de Madrid apasionado por dos cosas: el fútbol femenino y Macedonia.</p><p>El objetivo principal es dar al fútbol femenino macedonio la visibilidad que merece. Lo que comenzó como una simple página de Instagram (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) ha evolucionado a este sitio web, diseñado para hacer que las estadísticas, resultados y datos de las jugadoras sean más accesibles para todo el mundo.</p><p>Si tienes alguna sugerencia, corrección o simplemente quieres charlar sobre fútbol, ¡los <b>mensajes directos en Instagram</b> están siempre abiertos! El código con el que se crea esta página está disponible en <b><a href='https://github.com/marcosmarinm/zfudbalmk-auto' target='_blank' rel='noopener noreferrer'>GitHub</a></b>.</p><p><i>Los datos de los partidos de esta página están extraídos de la información pública proveída por la Federación de Fútbol de Macedonia.</i></p>","<p>zfudbalmk is a personal project created by <b>Marcos Marín Martín</b>, an enthusiast from Madrid with a passion for two things: women's football and Macedonia.</p><p>The main goal is to give Macedonian women's football the visibility it deserves. What started as a simple Instagram page (<b><a href='https://www.instagram.com/zfudbalmk/' target='_blank' rel='noopener noreferrer'>@zfudbalmk</a></b>) has evolved into this website, designed to make player stats, results, and data more accessible to everyone.</p><p>If you have any suggestions, corrections, or just want to chat about football, the <b>DMs on Instagram</b> are always open! The code used to create this page is available on <b><a href='https://github.com/marcosmarinm/zfudbalmk-auto' target='_blank' rel='noopener noreferrer'>GitHub</a></b>.</p><p><i>The match data on this page are extracted from public information provided by the Football Federation of Macedonia.</i></p>"
 season_all,Сите,Të gjitha,Todas,All
 competition_reprezentacija,Репрезентација,Kombëtarja,Selección nacional,National team
 player_nationality,Националност,Kombësia,Nacionalidad,Nationality
