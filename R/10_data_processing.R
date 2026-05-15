@@ -1125,6 +1125,15 @@ message(paste("   > ADE resolved", sum(id_mapping_heuristic$is_homonym)/2, "pair
 if (exists("mapa_nombres_jugadoras_long") && !is.null(mapa_nombres_jugadoras_long) && nrow(mapa_nombres_jugadoras_long) > 0) {
   en_subset <- mapa_nombres_jugadoras_long[mapa_nombres_jugadoras_long$lang == "en", ]
   correcciones_id <- stats::setNames(en_subset$translated_name, en_subset$original_mk)
+  # Also add reordered versions of each key since the ADE uses reordered names
+  add_reordered <- function(nm) {
+    palabras <- stringr::str_split(trimws(nm), "\\s+")[[1]]
+    if (length(palabras) >= 2) paste(rev(palabras), collapse = " ") else nm
+  }
+  reordered_keys <- vapply(names(correcciones_id), add_reordered, character(1))
+  extra_keys <- stats::setNames(correcciones_id, reordered_keys)
+  correcciones_id <- c(correcciones_id, extra_keys[!names(extra_keys) %in% names(correcciones_id)])
+
   id_mapping_heuristic <- id_mapping_heuristic %>%
     rowwise() %>%
     mutate(
@@ -1432,6 +1441,45 @@ if (exists("jugadoras_bio_raw_df") && !is.null(jugadoras_bio_raw_df) && nrow(jug
     select(id, posicion_final_unificada, nacionalidad, fecha_nacimiento, ciudad_nacimiento)
 
   message(paste("   > Processed", nrow(posiciones_procesadas_df), "player bio records."))
+  
+  # 10.4.1. Reconcile bio IDs with ADE IDs
+  # Bio IDs are generated from igracki.xlsx (First Name + Second Name) but don't
+  # include _1, _2 suffixes the ADE assigns to homonyms. Match via base_id and
+  # remap to the ADE final_id so the join in 11_aggregated_datasets.R succeeds.
+  if (exists("id_mapping_heuristic") && !is.null(id_mapping_heuristic) && nrow(id_mapping_heuristic) > 0 &&
+      nrow(posiciones_procesadas_df) > 0) {
+    
+    ade_lookup <- id_mapping_heuristic %>%
+      filter(!is.na(base_id), !is.na(final_id)) %>%
+      distinct(base_id, final_id) %>%
+      group_by(base_id) %>%
+      summarise(ade_ids = list(final_id), .groups = "drop")
+    
+    bio_expanded <- posiciones_procesadas_df %>%
+      left_join(ade_lookup, by = c("id" = "base_id"))
+    
+    has_ade <- !is.na(bio_expanded$ade_ids)
+    n_homonyms <- sum(lengths(bio_expanded$ade_ids[has_ade]) > 1, na.rm = TRUE)
+    
+    bio_matched <- bio_expanded %>%
+      filter(has_ade) %>%
+      rowwise() %>%
+      mutate(ade_id_list = list(unlist(ade_ids))) %>%
+      ungroup() %>%
+      tidyr::unnest(ade_id_list) %>%
+      mutate(id = ade_id_list) %>%
+      select(-ade_ids, -ade_id_list)
+    
+    bio_unmatched <- bio_expanded %>%
+      filter(!has_ade) %>%
+      select(-ade_ids)
+    
+    posiciones_procesadas_df <- bind_rows(bio_matched, bio_unmatched)
+    
+    message(paste0("   > Reconciled ", nrow(bio_matched), " bio records with ADE IDs",
+                   if (n_homonyms > 0) paste0(" (", n_homonyms, " homonyms expanded)") else "",
+                   "."))
+  }
 } else {
   message("   > No player bio data available. Bio fields will remain empty.")
 }

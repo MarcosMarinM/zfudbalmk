@@ -732,16 +732,21 @@ if (exists("mapa_clubs_latin") && !is.null(mapa_clubs_latin)) {
 ruta_nc <- if (file.exists("name_corrections.txt")) "name_corrections.txt" else "dictionaries/name_corrections.txt"
 if (file.exists(ruta_nc)) {
   nc_df <- read.csv(ruta_nc, stringsAsFactors = FALSE, encoding = "UTF-8")
-  if ("mk" %in% names(nc_df)) {
+  # Support both 'mk' and 'original_mk' as the key column name
+  key_col <- if ("mk" %in% names(nc_df)) "mk" else names(nc_df)[1]
+  en_col <- if ("en" %in% names(nc_df)) "en" else if ("latin_en" %in% names(nc_df)) "latin_en" else NA_character_
+  sq_col <- if ("sq" %in% names(nc_df)) "sq" else if ("latin_sq" %in% names(nc_df)) "latin_sq" else NA_character_
+
+  if (!is.na(key_col)) {
     for (i in seq_len(nrow(nc_df))) {
       latin_val <- NA_character_
-      if ("en" %in% names(nc_df) && !is.na(nc_df$en[i]) && nzchar(trimws(nc_df$en[i]))) {
-        latin_val <- nc_df$en[i]
-      } else if ("sq" %in% names(nc_df) && !is.na(nc_df$sq[i]) && nzchar(trimws(nc_df$sq[i]))) {
-        latin_val <- nc_df$sq[i]
+      if (!is.na(en_col) && !is.na(nc_df[i, en_col]) && nzchar(trimws(nc_df[i, en_col]))) {
+        latin_val <- nc_df[i, en_col]
+      } else if (!is.na(sq_col) && !is.na(nc_df[i, sq_col]) && nzchar(trimws(nc_df[i, sq_col]))) {
+        latin_val <- nc_df[i, sq_col]
       }
-      if (!is.na(nc_df$mk[i]) && nzchar(trimws(nc_df$mk[i])) && !is.na(latin_val)) {
-        k <- tolower(stringr::str_squish(nc_df$mk[i]))
+      if (!is.na(nc_df[i, key_col]) && nzchar(trimws(nc_df[i, key_col])) && !is.na(latin_val)) {
+        k <- tolower(stringr::str_squish(nc_df[i, key_col]))
         mapa_nombres_latinos_env[[k]] <- as.character(latin_val)
       }
     }
