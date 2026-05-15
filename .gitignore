@@ -1,0 +1,37 @@
+# 1. Ignore all files
+*
+
+# 2. Allow folders (not their contents)
+!*/
+
+# 3. File exceptions
+!.gitignore
+!*.yml
+!*.yaml
+!*.R
+!*.txt
+!*.xlsx
+!*.rds
+!README.md
+!favicon.png
+!/firebase.json
+!/.firebaserc
+
+# 4. Folders and their contents exceptions
+!/.github/
+!/Logos/**
+
+# 5. Blacklist (ignore under all circumstances)
+/docs/
+/Dropbox/
+/Actas/
+/cache_backup/
+/scratch/
+.Rproj.user/
+.positai/
+*.RData
+*.Rdata
+.DS_Store
+.Rhistory
+.Ruserdata
+*.Rproj

@@ -1,0 +1,97 @@
+name: Scrape, build and deploy
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    # --- TEMPORADA ALTA (febrero a mayo / agosto a noviembre) ---
+    
+    # Lunes a jueves: Dos veces al día (15:09 y 21:09 UTC)
+    - cron: '9 15,21 * 2,3,4,5,8,9,10,11 1-4'
+    
+    # Viernes, sábado y domingo: CADA MEDIA HORA durante los partidos
+    # (Desde las 08:00 UTC hasta las 21:00 UTC, a los minutos 09 y 39)
+    # Esto cubre en tu reloj local aprox. de 10:00 a 23:00
+    - cron: '9,39 8-21 * 2,3,4,5,8,9,10,11 0,5,6'
+
+    # --- PERÍODOS DE DESCANSO (dic, ene, jun, jul) ---
+    
+    # Una vez al día a las 21:09 UTC para mantener viva la caché
+    - cron: '9 21 * 1,6,7,12 *'
+
+  workflow_dispatch:
+  
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'   # <-- añade esto
+          use-public-rspm: true
+
+      # Obtener la versión de R como string para la caché
+      - name: Get R version
+        id: get-r-version
+        run: echo "version=$(Rscript -e 'cat(R.version$major, R.version$minor, sep=\".\")')" >> $GITHUB_OUTPUT
+
+      # Instalar dependencias de sistema (sin cambios)
+      - name: Install system dependencies (Ubuntu)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev
+
+      - name: R packages cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          # clave incluyendo versión de R
+          key: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-${{ hashFiles('scrape.R', 'buildhtml.R') }}
+          restore-keys: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-
+
+      - name: Scrape
+        run: Rscript scrape.R
+
+      - name: Commit and push .rds
+        if: always() # Se ejecuta SIEMPRE para no perder el auto-guardado si R falla a medias
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Añadir todos los archivos .rds explícitamente (el pathspec de Git busca en todas las carpetas)
+          git add \*.rds
+          
+          # Comprobar si hay cambios reales en los archivos .rds
+          if ! git diff --staged --quiet; then
+            echo "Nuevos datos detectados. Preparando commit..."
+            git commit -m "Auto-update via GitHub Actions"
+            
+            # EL ANTÍDOTO: Traer cualquier cambio externo (colisiones, re-runs, edits)
+            git pull --rebase origin main
+            
+            # Subir todo con seguridad
+            git push
+          else
+            echo "No hubo cambios en los datos durante esta sesión."
+          fi
+
+      - name: Build HTML
+        run: Rscript buildhtml.R
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: zfudbalmk-mmm
