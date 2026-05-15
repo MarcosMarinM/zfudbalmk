@@ -2083,7 +2083,10 @@ if (hubo_cambios) {
                       tags$span(referees_html)
                     ),
                     if (!is.na(nota_arbitro) && nchar(nota_arbitro) > 0) {
-                      tags$p(class = "mp-notes", tags$strong(t_html("officials_notes"), ": "), nota_arbitro)
+                      tags$div(class = "mp-notes",
+                        tags$strong(class = "mp-notes-label", t_html("officials_notes")),
+                        tags$p(class = "mp-notes-text", nota_arbitro)
+                      )
                     }
                   )
                 ),

@@ -702,7 +702,9 @@ th { background-color: #f2f2f2; }
 .mp-lineup .mp-lineup-sub-header { margin-top: 20px; font-size: 13px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 8px; border-bottom: 2px solid #8B0000; display: inline-block; }
 
 /* Officials Notes */
-.mp-notes { white-space: pre-wrap; background-color: #f9f9f9; border-left: 3px solid #ccc; padding: 10px; margin-bottom: 30px; }
+.mp-notes { background-color: #f9f9f9; border-left: 3px solid #e0a800; padding: 8px 12px; margin: 10px 0 20px; border-radius: 0 4px 4px 0; }
+.mp-notes-label { display: block; margin-bottom: 4px; font-size: 0.9em; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+.mp-notes-text { margin: 0; font-size: 0.95em; line-height: 1.5; }
 
 /* Penalties */
 .mp-penales-section { border-top: 2px solid #eaeaea; padding-top: 30px; margin-top: 10px; }
@@ -1424,7 +1426,7 @@ if (file.exists("favicon.png")) {
 
 GENERAR_PAGINAS_ESTATICAS <- FALSE # Incluye: Inicio, Archivo, Lista de Equipos/Jugadoras, Acerca de
 GENERAR_PAGINAS_COMPETICION <- FALSE # Todas las p\u00e1ginas de competiciones (men\u00fas y tablas)
-GENERAR_PERFILES_PARTIDO <- FALSE # Perfiles individuales para cada partido
+GENERAR_PERFILES_PARTIDO <- TRUE # Perfiles individuales para cada partido
 GENERAR_PERFILES_JUGADORA <- TRUE # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE # Perfiles individuales para cada equipo
 GENERAR_PERFILES_ARBITRO <- TRUE # Perfiles individuales para cada \u00e1rbitro
