@@ -424,7 +424,7 @@ partidos_df <- partidos_df %>%
       
       # Helper to normalize club names by removing common prefixes (FK, ФК, etc.)
       norm_club <- function(x) {
-        tolower(trimws(str_replace_all(x, "(?i)^\\s*(fk|фк|жфк|zfk|shfk|шфк)\\s+", "")))
+        tolower(trimws(str_replace_all(x, "(?i)^[[:space:]]*(fk|фк|жфк|zfk|shfk|шфк)[[:space:]]+", "")))
       }
       
       p_local <- norm_club(local[i])
@@ -438,7 +438,7 @@ partidos_df <- partidos_df %>%
           (norm_club(cancelled_matches_rules$club) == p_local | 
            norm_club(cancelled_matches_rules$club) == p_visit))
     }),
-    # Identify if a team is retired from the competition AT ALL (ignoring jornada_inicio for point exclusion)
+    # Identify if a match involves a retired team from round >= jornada_inicio
     .es_equipo_retirado = sapply(seq_len(n()), function(i) {
       if (nrow(cancelled_matches_rules) == 0) return(FALSE)
       
@@ -449,8 +449,10 @@ partidos_df <- partidos_df %>%
       p_local <- norm_club(local[i])
       p_visit <- norm_club(visitante[i])
       p_comp_completa <- tolower(trimws(paste(competicion_nombre[i], temporada_display[i])))
+      p_jornada <- as.integer(jornada[i])
       
-      any(tolower(trimws(cancelled_matches_rules$competicion)) == p_comp_completa &
+      any(cancelled_matches_rules$jornada_inicio <= p_jornada &
+          tolower(trimws(cancelled_matches_rules$competicion)) == p_comp_completa &
           (norm_club(cancelled_matches_rules$club) == p_local | 
            norm_club(cancelled_matches_rules$club) == p_visit))
     }),
@@ -467,6 +469,93 @@ partidos_df <- partidos_df %>%
   ) %>%
   select(-.es_retirado_por_regla, -.es_equipo_retirado)
 
+# 10.1.1.0.5 Generate placeholder entries for withdrawn teams' future cancelled matches
+if (exists("cancelled_matches_rules") && nrow(cancelled_matches_rules) > 0) {
+  placeholders_cancelados <- map_dfr(seq_len(nrow(cancelled_matches_rules)), function(i) {
+    rule <- cancelled_matches_rules[i, ]
+    club <- rule$club
+    comp_rule <- rule$competicion
+    inicio <- rule$jornada_inicio
+    
+    norm_club <- function(x) {
+      tolower(trimws(str_replace_all(x, "(?i)^\\s*(fk|фк|жфк|zfk|shfk|шфк)\\s+", "")))
+    }
+    club_norm <- norm_club(club)
+    
+    # Find existing matches for this club+competition
+    partidos_club <- partidos_df %>%
+      filter(
+        paste(competicion_nombre, temporada_display) == comp_rule,
+        norm_club(local) == club_norm | norm_club(visitante) == club_norm
+      ) %>%
+      mutate(jornada_int = as.integer(jornada)) %>%
+      arrange(jornada_int)
+    
+    if (nrow(partidos_club) == 0) return(NULL)
+    
+    first_half <- partidos_club %>% filter(jornada_int < inicio)
+    if (nrow(first_half) == 0) return(NULL)
+    
+    n_opponents <- nrow(first_half)
+    
+    # Total rounds in this competition
+    max_jornada_comp <- partidos_df %>%
+      filter(paste(competicion_nombre, temporada_display) == comp_rule) %>%
+      pull(jornada) %>% as.integer() %>% max(na.rm = TRUE)
+    
+    total_rounds <- max(max_jornada_comp, 2 * n_opponents, 
+                        max(first_half$jornada_int, na.rm = TRUE))
+    
+    existing_rounds <- partidos_club$jornada_int
+    rounds_to_gen <- setdiff(seq(inicio, total_rounds), existing_rounds)
+    
+    map_dfr(rounds_to_gen, function(r) {
+      mirror_round <- r - n_opponents
+      if (mirror_round < 1 || mirror_round > nrow(first_half)) return(NULL)
+      
+      mirror <- first_half[mirror_round, ]
+      
+      # Swap home/away for return fixture
+      local_ph <- mirror$visitante
+      visit_ph <- mirror$local
+      
+      # Ensure the withdrawn club is involved
+      if (norm_club(local_ph) != club_norm && norm_club(visit_ph) != club_norm) return(NULL)
+      
+      tibble(
+        id_partido = NA_character_,
+        competicion_nombre = first_half$competicion_nombre[1],
+        competicion_temporada = first_half$competicion_temporada[1],
+        jornada = as.character(r),
+        fecha = NA_character_,
+        hora = NA_character_,
+        local = local_ph,
+        visitante = visit_ph,
+        goles_local = NA_integer_,
+        goles_visitante = NA_integer_,
+        es_cancelado = TRUE,
+        es_retirado = TRUE,
+        temporada_display = first_half$temporada_display[1]
+      )
+    })
+  })
+  
+  if (!is.null(placeholders_cancelados) && nrow(placeholders_cancelados) > 0) {
+    # Add missing columns that partidos_df has but placeholders don't
+    for (col in setdiff(names(partidos_df), names(placeholders_cancelados))) {
+      if (is.logical(partidos_df[[col]])) {
+        placeholders_cancelados[[col]] <- FALSE
+      } else if (is.numeric(partidos_df[[col]])) {
+        placeholders_cancelados[[col]] <- NA_integer_
+      } else {
+        placeholders_cancelados[[col]] <- NA_character_
+      }
+    }
+    partidos_df <- bind_rows(partidos_df, placeholders_cancelados)
+    message(paste("   > Generated", nrow(placeholders_cancelados), 
+                  "cancelled placeholders for withdrawn teams"))
+  }
+}
 
 
 # 10.1.1.1. Normalize and attach competition category to each match
@@ -551,8 +640,8 @@ if (exists("mapa_categorias_competiciones") && nrow(mapa_categorias_competicione
       max_age = coalesce(
         max_age_mapa,
         case_when(
-        categoria == "\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438" ~ 19,
-        categoria == "\u041a\u0430\u0434\u0435\u0442\u0438" ~ 18,
+        categoria == "\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438" ~ 16,
+        categoria == "\u041a\u0430\u0434\u0435\u0442\u0438" ~ 14,
         categoria == "\u041f\u0438\u043e\u043d\u0435\u0440\u0438" ~ 17,
         categoria == "\u041c\u043b\u0430\u0434\u0438 \u041f\u0438\u043e\u043d\u0435\u0440\u0438" ~ 16,
         categoria == "\u041f\u0435\u0442\u043b\u0438\u045a\u0430" ~ 15,

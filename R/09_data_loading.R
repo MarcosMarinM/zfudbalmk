@@ -48,7 +48,7 @@ parsear_estilos_clasificacion <- function(ruta_archivo) {
     return(list())
   })
 }
-ruta_estilos_clasificacion <- if (file.exists("estilos_clasificacion.txt")) "estilos_clasificacion.txt" else "dictionaries/estilos_clasificacion.txt"
+ruta_estilos_clasificacion <- if (file.exists("classification_styles.txt")) "classification_styles.txt" else "dictionaries/classification_styles.txt"
 estilos_clasificacion_data <- parsear_estilos_clasificacion(ruta_estilos_clasificacion)
 
 

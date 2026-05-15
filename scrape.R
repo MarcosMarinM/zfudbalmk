@@ -1120,8 +1120,7 @@ main <- function() {
            grepl(tolower(trimws(p_info$local)), tolower(trimws(club)), fixed = TRUE) |
            grepl(tolower(trimws(club)), tolower(trimws(p_info$visitante)), fixed = TRUE) |
            grepl(tolower(trimws(p_info$visitante)), tolower(trimws(club)), fixed = TRUE)),
-          (grepl(tolower(trimws(competicion)), tolower(trimws(p_info$competicion_nombre)), fixed = TRUE) |
-           grepl(tolower(trimws(p_info$competicion_nombre)), tolower(trimws(competicion)), fixed = TRUE)),
+          tolower(trimws(paste(p_info$competicion_nombre, p_info$competicion_temporada))) == tolower(trimws(competicion)),
           j_match >= jornada_inicio
         ) %>%
         ungroup()
@@ -1130,7 +1129,7 @@ main <- function() {
       return(NULL)
     }))
   }
-  
+
   ids_excluidos_all <- unique(c(ids_excluidos, ids_excluidos_dinamicos))
 
   # --- RETROACTIVE DETECTION: Detect previously-normal matches now in exclusion list ---
@@ -1276,6 +1275,13 @@ main <- function() {
         if (najava_vacia_excl) {
           consecutivos_vacios <- consecutivos_vacios + 1
           message(sprintf("   ID %s: najava vacía (excluded, %d/7 consecutivos)", id_chr, consecutivos_vacios))
+          # Archive in tracking so we never retry
+          tracking <- actualizar_tracking(
+            tracking, id_chr, "Archived",
+            fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
+            ahora = ahora, intentos = 0L, tiene_datos = FALSE,
+            comp_nombre = NA_character_, comp_temporada = NA_character_
+          )
           if (consecutivos_vacios >= 7) {
             message(sprintf("   >>> EARLY EXIT: 7 IDs vacíos consecutivos en %s.", comp$label))
             break
@@ -1412,6 +1418,13 @@ main <- function() {
         if (najava_vacia) {
           consecutivos_vacios <- consecutivos_vacios + 1
           message(sprintf("   ID %s: najava vacía (%d/7 consecutivos)", id_chr, consecutivos_vacios))
+          # Archive in tracking so we never retry (these are "jumped" IDs, not real matches)
+          tracking <- actualizar_tracking(
+            tracking, id_chr, "Archived",
+            fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
+            ahora = ahora, intentos = 0L, tiene_datos = FALSE,
+            comp_nombre = NA_character_, comp_temporada = NA_character_
+          )
           if (consecutivos_vacios >= 7) {
             message(sprintf("   >>> EARLY EXIT: 7 IDs vacíos consecutivos en %s. Saltando competición.", comp$label))
             break
