@@ -1425,8 +1425,8 @@ if (file.exists("favicon.png")) {
 # Para una construcci\u00f3n completa, todos deben estar en TRUE.
 
 GENERAR_PAGINAS_ESTATICAS <- TRUE 
-GENERAR_PAGINAS_COMPETICION <- FALSE 
-GENERAR_PERFILES_PARTIDO <- FALSE # Perfiles individuales para cada partido
+GENERAR_PAGINAS_COMPETICION <- TRUE
+GENERAR_PERFILES_PARTIDO <- TRUE # Perfiles individuales para cada partido
 GENERAR_PERFILES_JUGADORA <- TRUE # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE # Perfiles individuales para cada equipo
 GENERAR_PERFILES_ARBITRO <- TRUE # Perfiles individuales para cada \u00e1rbitro
