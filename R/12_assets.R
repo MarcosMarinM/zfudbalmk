@@ -944,7 +944,7 @@ function normalizeForSearch(text) {
 
 function initializeSearch() {
   const basePath = getBasePath();
-  const jsonUrl = `${basePath}assets/search_data.json`;
+  const jsonUrl = "__CDN_SEARCH_DATA_URL__";
   const searchInput = document.getElementById('search-input');
 
   fetch(jsonUrl).then(r => r.json()).then(data => {

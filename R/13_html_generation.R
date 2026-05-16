@@ -333,6 +333,10 @@ if (hubo_cambios) {
     writeLines(search_data_json, ruta_json_salida, useBytes = TRUE)
     message("     > Unified search index saved to: ", basename(ruta_json_salida))
 
+    # Also write to repo root so the CI workflow can push it to the CDN orphan branch
+    writeLines(search_data_json, "search_data.json", useBytes = TRUE)
+    message("     > CDN copy saved to repo root: search_data.json")
+
     if (PROTEGER_CON_CONTRASENA) {
       la_contrasena <- "secreto123"
       message("     > Password protection ENABLED.")

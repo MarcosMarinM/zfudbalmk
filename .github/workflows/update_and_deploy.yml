@@ -88,6 +88,43 @@ jobs:
       - name: Build HTML
         run: Rscript buildhtml.R
 
+      - name: Force-push search_data.json to CDN orphan branch
+        run: |
+          if [ ! -f search_data.json ]; then
+            echo "search_data.json not found. Skipping CDN push."
+            exit 0
+          fi
+
+          mkdir -p /tmp/cdn-push
+          cp search_data.json /tmp/cdn-push/
+          cd /tmp/cdn-push
+
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b data-cdn
+          git add search_data.json
+          git commit -m "CDN Data Update"
+
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MarcosMarinM/zfudbalmk.git
+          git push origin data-cdn --force
+
+          # Verify and capture the commit hash from the remote
+          CDN_HASH=$(git ls-remote origin data-cdn | awk '{print $1}')
+          echo "CDN_HASH=$CDN_HASH" >> $GITHUB_ENV
+          echo "Pushed search_data.json to data-cdn branch (hash: $CDN_HASH)"
+
+      - name: Inject CDN URL into script.js
+        run: |
+          if [ -n "${CDN_HASH}" ]; then
+            CDN_URL="https://cdn.jsdelivr.net/gh/MarcosMarinM/zfudbalmk@${CDN_HASH}/search_data.json"
+            echo "Injecting CDN URL: $CDN_URL"
+            sed -i "s|__CDN_SEARCH_DATA_URL__|${CDN_URL}|g" docs/assets/script.js
+            echo "CDN URL injected successfully."
+          else
+            echo "CDN_HASH not set. Keeping placeholder. Search data will not be available."
+          fi
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
