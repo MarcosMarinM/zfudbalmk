@@ -765,6 +765,6 @@ historial_partidos_con_categoria <- partidos_df %>%
       categoria == "\u0414\u0435\u0442\u0441\u043a\u0430 \u043b\u0438\u0433\u0430" ~ "category_kids",
       TRUE ~ "category_senior"
     ),
-    home_logo_url = paste0("../../assets/logos/", generar_id_seguro(local), ".webp"),
-    away_logo_url = paste0("../../assets/logos/", generar_id_seguro(visitante), ".webp")
+    home_logo_url = paste0(CDN_LOGOS_URL, local, ".webp"),
+    away_logo_url = paste0(CDN_LOGOS_URL, visitante, ".webp")
   )

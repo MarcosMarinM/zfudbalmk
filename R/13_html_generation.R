@@ -1011,7 +1011,7 @@ if (hubo_cambios) {
                 }
                 tags$tr(
                   tags$td(style = if (!is.null(regla_actual)) paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;") else NULL, fila_raw$Pos),
-                  tags$td(class = "team-cell", tags$img(class = "team-logo", src = ruta_relativa_logo_html, alt = "Logo"), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), entity_name_spans(nombre_equipo_original)), if (!is.na(fila_raw$puntos_deducidos) && fila_raw$puntos_deducidos > 0) tags$span(style = "color:#8B0000; font-weight:normal; font-size:0.85em;", paste0(" (\u2013", fila_raw$puntos_deducidos, ")")) else NULL),
+                  tags$td(class = "team-cell", tags$img(class = "team-logo", src = ruta_relativa_logo_html, alt = "Logo", loading = "lazy"), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), entity_name_spans(nombre_equipo_original)), if (!is.na(fila_raw$puntos_deducidos) && fila_raw$puntos_deducidos > 0) tags$span(style = "color:#8B0000; font-weight:normal; font-size:0.85em;", paste0(" (\u2013", fila_raw$puntos_deducidos, ")")) else NULL),
                   tags$td(fila_raw$P), tags$td(fila_raw$W), tags$td(fila_raw$D), tags$td(fila_raw$L), tags$td(fila_raw$GF), tags$td(fila_raw$GA), tags$td(fila_raw$GD), tags$td(fila_raw$Pts)
                 )
               }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) {
@@ -1287,7 +1287,7 @@ if (hubo_cambios) {
                 }
                 tags$tr(
                   tags$td(style = if (!is.null(regla_actual)) paste0("border-left: 5px solid ", regla_actual$color, "; font-weight: bold;") else NULL, fila_raw$Pos),
-                  tags$td(class = "team-cell", tags$img(class = "team-logo", src = ruta_relativa_logo_html, alt = "Logo"), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), entity_name_spans(nombre_equipo_original)), if (!is.na(fila_raw$puntos_deducidos) && fila_raw$puntos_deducidos > 0) tags$span(style = "color:#8B0000; font-weight:normal; font-size:0.85em;", paste0(" (\u2013", fila_raw$puntos_deducidos, ")")) else NULL),
+                  tags$td(class = "team-cell", tags$img(class = "team-logo", src = ruta_relativa_logo_html, alt = "Logo", loading = "lazy"), tags$a(href = file.path("..", nombres_carpetas_relativos$timovi, paste0(generar_id_seguro(nombre_equipo_original), ".html")), entity_name_spans(nombre_equipo_original)), if (!is.na(fila_raw$puntos_deducidos) && fila_raw$puntos_deducidos > 0) tags$span(style = "color:#8B0000; font-weight:normal; font-size:0.85em;", paste0(" (\u2013", fila_raw$puntos_deducidos, ")")) else NULL),
                   tags$td(fila_raw$P), tags$td(fila_raw$W), tags$td(fila_raw$D), tags$td(fila_raw$L), tags$td(fila_raw$GF), tags$td(fila_raw$GA), tags$td(fila_raw$GD), tags$td(fila_raw$Pts)
                 )
               }))), if (!is.null(estilos_comp) && length(estilos_comp$leyenda) > 0) {
@@ -2188,7 +2188,7 @@ if (hubo_cambios) {
             if (!is.na(jugadora$nacionalidad) && nzchar(jugadora$nacionalidad)) {
               tiene_codigo_iso <- !is.na(jugadora$codigo_iso) && nzchar(jugadora$codigo_iso)
               icono_nacionalidad <- if (tiene_codigo_iso) {
-                tags$img(src = paste0("https://kapowaz.github.io/square-flags/flags/", jugadora$codigo_iso, ".svg"), width = "24", height = "24", style = "border-radius:2px;")
+                tags$img(src = paste0("https://kapowaz.github.io/square-flags/flags/", jugadora$codigo_iso, ".svg"), width = "24", height = "24", style = "border-radius:2px;", loading = "lazy")
               } else {
                 HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L8.35 12H11v7.93zM13 19.93V12h2.65l4.14 2.21c-.43 3.32-3.26 5.95-6.79 6.72zM13 4.07V10h2.65l4.14-2.21C19.37 4.56 16.54 2 13 2.07zM11 4.07c3.53 0 6.37 2.49 6.79 5.72L13 10H11V4.07zM4.26 8.21C4.08 7.43 4 6.64 4 5.86c0-1.03.24-2 .66-2.87l4.14 2.22H4.26zm.43 7.58c.2.6.46 1.17.78 1.7L9.61 14H4.69z"/></svg>')
               }
@@ -2791,7 +2791,7 @@ if (hubo_cambios) {
             # --- 3.4. Construcci\u00f3n del HTML de la p\u00e1gina (Literal) ---
             team_header_final <- tags$div(
               class = "team-header-container-v5",
-              tags$div(class = "team-logo-main", tags$img(src = ruta_logo_principal, alt = "Logo")),
+              tags$div(class = "team-logo-main", tags$img(src = ruta_logo_principal, alt = "Logo", loading = "lazy")),
               tags$div(
                 class = "team-header-info",
                 tags$h2(class = "team-name-v3", team_name_spans_val),

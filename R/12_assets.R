@@ -1306,7 +1306,7 @@ function initializeTeamProfilePage() {
         const scoreText = (isCancelled && !isOfficial) ? t.match_cancelled : `${match.goles_local}${scoreSuffix} : ${match.goles_visitante}${scoreSuffix}`;
         html += `<div class="${rowClass}" onclick="${matchURL !== '#' ? `window.location.href='${matchURL}'` : ''}">
           <div class="cell-date">${match.fecha}</div>
-          <div class="cell-match"><span class="team-home">${match.local_lang} <img src="${match.home_logo_url}" class="team-logo-small"></span><span class="match-score">${scoreText}</span><span class="team-away"><img src="${match.away_logo_url}" class="team-logo-small"> ${match.visitante_lang}</span></div>
+          <div class="cell-match"><span class="team-home">${match.local_lang} <img src="${match.home_logo_url}" class="team-logo-small" loading="lazy"></span><span class="match-score">${scoreText}</span><span class="team-away"><img src="${match.away_logo_url}" class="team-logo-small" loading="lazy"> ${match.visitante_lang}</span></div>
           <div class="cell-competition">${match.CompeticionLang}</div></div>`;
     });
     html += '</div>';
@@ -1355,7 +1355,7 @@ function initializeCompetitionHub() {
       const scoreText = (isCancelled && !isOfficial) ? t.match_cancelled : (partido.resultado ? partido.resultado : '-');
       const stadiumInfo = partido.lugar_lang ? `<div class="comp-hub-match-stadium">${t.stadium}: ${partido.lugar_lang}</div>` : '';
       const dateInfo = partido.fecha ? `<div class="comp-hub-match-date">${partido.fecha}</div>` : '';
-      matchesContainerEl.innerHTML += `<${wrapperTag} class="comp-hub-match-row ${isClickable}" ${hrefAttr}><div class="comp-hub-match-time">${dateInfo} ${stadiumInfo}</div><div class="comp-hub-match-teams"><span class="comp-hub-team-home">${partido.local_lang} <img src="${partido.local_logo_path}" class="comp-hub-team-logo"></span><span class="comp-hub-match-score">${scoreText}</span><span class="comp-hub-team-away"><img src="${partido.visitante_logo_path}" class="comp-hub-team-logo"> ${partido.visitante_lang}</span></div></${wrapperTag}>`;
+      matchesContainerEl.innerHTML += `<${wrapperTag} class="comp-hub-match-row ${isClickable}" ${hrefAttr}><div class="comp-hub-match-time">${dateInfo} ${stadiumInfo}</div><div class="comp-hub-match-teams"><span class="comp-hub-team-home">${partido.local_lang} <img src="${partido.local_logo_path}" class="comp-hub-team-logo" loading="lazy"></span><span class="comp-hub-match-score">${scoreText}</span><span class="comp-hub-team-away"><img src="${partido.visitante_logo_path}" class="comp-hub-team-logo" loading="lazy"> ${partido.visitante_lang}</span></div></${wrapperTag}>`;
     });
   }
 

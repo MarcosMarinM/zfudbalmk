@@ -787,11 +787,13 @@ calcular_minuto_sort <- function(minuto) {
 #' @param path_to_root Relative path from the calling page to the docs/ root.
 #' @return A string with the relative path to the logo file.
 get_club_logo_path <- function(nombre_equipo_mk, path_to_root = "..") {
-  nombre_archivo <- paste0(generar_id_seguro(nombre_equipo_mk), ".webp")
-  if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo))) {
-    nombre_archivo <- "NOLOGO.webp"
+  # Local existence check uses Latin transliteration (matching build copy process)
+  nombre_archivo_latin <- paste0(generar_id_seguro(nombre_equipo_mk), ".webp")
+  if (!file.exists(file.path(RUTA_LOGOS_DESTINO, nombre_archivo_latin))) {
+    return(paste0(CDN_LOGOS_URL, "NOLOGO.webp"))
   }
-  file.path(path_to_root, nombres_carpetas_relativos$assets, nombres_carpetas_relativos$logos, nombre_archivo)
+  # CDN URL uses original Cyrillic name (matching GitHub Logos/ folder filenames)
+  paste0(CDN_LOGOS_URL, nombre_equipo_mk, ".webp")
 }
 
 #' @title Get an HTML img tag for a team logo.
@@ -806,9 +808,9 @@ get_logo_tag <- function(nombre_equipo_mk, path_to_root = "..", css_class = "tea
   iso_code <- get_national_team_iso(nombre_equipo_mk)
   if (!is.na(iso_code)) {
     flag_url <- paste0("https://hatscripts.github.io/circle-flags/flags/", iso_code, ".svg")
-    tags$img(class = paste(css_class, "national-team-flag"), src = flag_url, alt = nombre_equipo_mk)
+    tags$img(class = paste(css_class, "national-team-flag"), src = flag_url, alt = nombre_equipo_mk, loading = "lazy")
   } else {
-    tags$img(class = css_class, src = get_club_logo_path(nombre_equipo_mk, path_to_root), alt = nombre_equipo_mk)
+    tags$img(class = css_class, src = get_club_logo_path(nombre_equipo_mk, path_to_root), alt = nombre_equipo_mk, loading = "lazy")
   }
 }
 
@@ -1427,12 +1429,12 @@ crear_bloque_resultados_competicion <- function(comp_info, partidos_jornada_df, 
 
     fila_local <- tags$div(
       class = "match-row",
-      tags$div(class = "team-info", tags$img(src = logo_local_src, class = "logo"), tags$span(class = "name", entity_name_spans(partido$local))),
+      tags$div(class = "team-info", tags$img(src = logo_local_src, class = "logo", loading = "lazy"), tags$span(class = "name", entity_name_spans(partido$local))),
       if (show_score) tags$span(class = "score", paste0(partido$goles_local, score_suffix)) else NULL
     )
     fila_visitante <- tags$div(
       class = "match-row",
-      tags$div(class = "team-info", tags$img(src = logo_visitante_src, class = "logo"), tags$span(class = "name", entity_name_spans(partido$visitante))),
+      tags$div(class = "team-info", tags$img(src = logo_visitante_src, class = "logo", loading = "lazy"), tags$span(class = "name", entity_name_spans(partido$visitante))),
       if (show_score) tags$span(class = "score", paste0(partido$goles_visitante, score_suffix)) else NULL
     )
 
@@ -1560,7 +1562,7 @@ crear_tabla_clasificacion_portada <- function(comp_info, stats_clasificacion_por
 
           tags$tr(
             tags$td(style = estilo_borde, class = "pos-cell", fila$Pos),
-            tags$td(class = "logo-cell", tags$img(class = "mini-logo", src = logo_src)),
+            tags$td(class = "logo-cell", tags$img(class = "mini-logo", src = logo_src, loading = "lazy")),
             tags$td(class = "abbr-cell", tagList(lapply(IDIOMAS_SOPORTADOS, function(l) {
               abbr <- if (!is.null(abreviaturas_lang_df) && nrow(abreviaturas_lang_df) > 0) {
                 abreviaturas_lang_df %>%
@@ -1865,6 +1867,9 @@ get_entity_name <- function(original_name_mk, lang) {
 }
 
 ### 8.6. Path Definitions and Multilingual Directory Creation
+
+# 8.6.0. CDN base URL for logos (served via jsDelivr from GitHub).
+CDN_LOGOS_URL <- "https://cdn.jsdelivr.net/gh/MarcosMarinM/zfudbalmk@main/Logos/"
 
 # 8.6.1. Define base folder and file names.
 # 8.6.2. Names are defined in Macedonian to maintain internal consistency.
