@@ -904,7 +904,7 @@ function activateDefaultAlphabetLetter(langCode) {
 }
 
 function getBasePath() {
-  const isSubfolder = /\/(natprevaruvanja|natprevari|igraci|timovi|sudii|stadioni|staff)\//.test(window.location.pathname);
+  const isSubfolder = /\/(natprevaruvanja|natprevari|igracki|timovi|sudii|stadioni|staff)\//.test(window.location.pathname);
   return isSubfolder ? '../' : './';
 }
 
@@ -914,7 +914,7 @@ function generateLink(target_id) {
     const type = parts[0];
     const id = parts.slice(1).join('-');
     const paths = {
-        'jugadora': 'igraci', 'equipo': 'timovi', 'arbitro': 'sudii',
+        'jugadora': 'igracki', 'equipo': 'timovi', 'arbitro': 'sudii',
         '\u0441\u0442\u0430\u0434\u0438\u043e\u043d': 'stadioni', 'staff': 'staff', 'menu-competicion': 'natprevaruvanja'
     };
     if (paths[type]) return `${basePath}${paths[type]}/${id}.html`;
@@ -1247,7 +1247,7 @@ function initializeTeamProfilePage() {
     filteredData.forEach(player => {
       const position = t["position_" + player.posicion_final_unificada] || player.posicion_final_unificada || '';
       const playerName = player[`PlayerName_${currentLang}`] || player.PlayerName_mk || '';
-      const playerURL = `${getBasePath()}igraci/${player.id}.html`;
+      const playerURL = `${getBasePath()}igracki/${player.id}.html`;
       html += `<tr onclick="window.location.href='${playerURL}'">
         <td>${player.dorsal_principal || '-'}</td>
         <td><div class="player-info-cell"><div class="player-name">${playerName}</div><div class="player-position">${position}</div></div></td>
@@ -1425,8 +1425,8 @@ if (file.exists("favicon.png")) {
 # Para una construcci\u00f3n completa, todos deben estar en TRUE.
 
 GENERAR_PAGINAS_ESTATICAS <- TRUE 
-GENERAR_PAGINAS_COMPETICION <- TRUE 
-GENERAR_PERFILES_PARTIDO <- TRUE # Perfiles individuales para cada partido
+GENERAR_PAGINAS_COMPETICION <- FALSE 
+GENERAR_PERFILES_PARTIDO <- FALSE # Perfiles individuales para cada partido
 GENERAR_PERFILES_JUGADORA <- TRUE # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE # Perfiles individuales para cada equipo
 GENERAR_PERFILES_ARBITRO <- TRUE # Perfiles individuales para cada \u00e1rbitro

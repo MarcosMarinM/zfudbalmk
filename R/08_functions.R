@@ -1878,7 +1878,7 @@ nombres_carpetas_relativos <- list(
   assets = "assets",
   competiciones = "natprevaruvanja",
   partidos = "natprevari",
-  jugadoras = "igraci",
+  jugadoras = "igracki",
   timovi = "timovi",
   arbitros = "sudii",
   estadios = "stadioni",
@@ -1893,7 +1893,7 @@ nombres_archivos_traducidos <- list(
   sanciones = "disciplinska",
   archive = "arhiva",
   about = "za-proektot",
-  players = "fudbaleri",
+  players = "fudbalerki",
   teams = "klubovi"
 )
 
