@@ -1054,16 +1054,24 @@ if (hubo_cambios) {
               filter(Minutes > 0, !is.na(PlayerName_mk)) %>%
               select(id, Pos, starts_with("PlayerName_"), TeamNames_mk, GA90, GA, Minutes, CS)
             if (nrow(tabla_porteras_comp) > 0) {
-              generar_tabla_html_porteras <- function(df, table_id) {
+              # Determine GA base minutes for this competition's header label
+              cat_norm_porteras <- normalizar_categoria_competicion(comp_info$categoria, comp_info$competicion_nombre)
+              ga_base_minutos_header <- case_when(
+                cat_norm_porteras %in% c("\u041a\u0430\u0434\u0435\u0442\u0438", "\u041a\u0430\u0434\u0435\u0442\u0441\u043a\u0430") ~ 60,
+                cat_norm_porteras %in% c("\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438", "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430", "\u041f\u0435\u0442\u043b\u0438\u045a\u0430", "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430") ~ 80,
+                TRUE ~ 90
+              )
+              ga_header_key <- paste0("gk_ga_", ga_base_minutos_header)
+              generar_tabla_html_porteras <- function(df, table_id, ga_key) {
                 if (is.null(df) || nrow(df) == 0) {
                   return(tags$p(t_html("no_data_in_category")))
                 }
-                tags$table(id = table_id, `data-sort-col` = "6", `data-sort-dir` = "desc", tags$thead(tags$tr(tags$th(t_html("standings_pos")), tags$th(t_html("player_type")), tags$th(t_html("team_type")), tags$th(class = "sortable-header", onclick = sprintf("sortTable('%s', 3)", table_id), t_html("gk_ga_90")), tags$th(t_html("gk_ga")), tags$th(t_html("stats_minutes")), tags$th(class = "sortable-header desc", onclick = sprintf("sortTable('%s', 6)", table_id), t_html("gk_cs")))), tags$tbody(map(1:nrow(df), function(j) {
+                tags$table(id = table_id, `data-sort-col` = "6", `data-sort-dir` = "desc", tags$thead(tags$tr(tags$th(t_html("standings_pos")), tags$th(t_html("player_type")), tags$th(t_html("team_type")), tags$th(class = "sortable-header", onclick = sprintf("sortTable('%s', 3)", table_id), t_html(ga_key)), tags$th(t_html("gk_ga")), tags$th(t_html("stats_minutes")), tags$th(class = "sortable-header desc", onclick = sprintf("sortTable('%s', 6)", table_id), t_html("gk_cs")))), tags$tbody(map(1:nrow(df), function(j) {
                   p <- df[j, ]
                   tags$tr(tags$td(p$Pos), tags$td(tags$a(href = file.path("..", nombres_carpetas_relativos$jugadoras, paste0(p$id, ".html")), player_name_spans_from_row(p))), tags$td(render_team_names(p$TeamNames_mk)), tags$td(format(round(p$GA90, 2), nsmall = 2)), tags$td(p$GA), tags$td(p$Minutes), tags$td(p$CS))
                 })))
               }
-              contenido_porteras <- tagList(crear_botones_navegacion(".."), tags$h2(tagList(t_html("goalkeepers_title"), " - ", comp_name_spans(comp_info))), generar_tabla_html_porteras(tabla_porteras_comp, "tabla-porteras"))
+              contenido_porteras <- tagList(crear_botones_navegacion(".."), tags$h2(tagList(t_html("goalkeepers_title"), " - ", comp_name_spans(comp_info))), generar_tabla_html_porteras(tabla_porteras_comp, "tabla-porteras", ga_header_key))
               nombre_archivo_porteras <- paste0(comp_id, "_golmanki.html")
               save_page_html(crear_pagina_html(contenido_porteras, t("site_title"), "..", script_password_lang), file.path(RUTA_SALIDA_RAIZ, nombres_carpetas_relativos$competiciones, nombre_archivo_porteras))
               lista_botones_menu[[length(lista_botones_menu) + 1]] <- tags$a(href = nombre_archivo_porteras, class = "menu-button", t_html("goalkeepers_title"))

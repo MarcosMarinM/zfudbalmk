@@ -615,8 +615,8 @@ crear_barra_navegacion <- function(path_to_root = ".", current_page_id = "home")
     mutate(
       categoria = if_else(is_youth_nav, categoria_nav, categoria),
       max_age = case_when(
-        categoria == "\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438" ~ 19,
-        categoria == "\u041a\u0430\u0434\u0435\u0442\u0438" ~ 18,
+        categoria == "\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438" ~ 16,
+        categoria == "\u041a\u0430\u0434\u0435\u0442\u0438" ~ 14,
         categoria == "\u041f\u0438\u043e\u043d\u0435\u0440\u0438" ~ 17,
         categoria == "\u041c\u043b\u0430\u0434\u0438 \u041f\u0438\u043e\u043d\u0435\u0440\u0438" ~ 16,
         categoria == "\u041f\u0435\u0442\u043b\u0438\u045a\u0430" ~ 15,
@@ -827,16 +827,16 @@ normalizar_categoria_competicion <- function(categoria_raw, nombre_comp = "") {
     str_detect(texto_combo, "(\u043f\u043e\u043c\u0430\u043b\u0438|pomali).{0,10}(\u043f\u0435\u0442\u043b\u0438|petli)|(\u043f\u0435\u0442\u043b\u0438|petli).{0,10}(\u043f\u043e\u043c\u0430\u043b\u0438|pomali)") ~ "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430", # U15
     str_detect(texto_combo, "\u043f\u0435\u0442\u043b\u0438\u045a\u0430|petlinja|petlinj\u00eb") ~ "\u041f\u0435\u0442\u043b\u0438\u045a\u0430",
     
-    # U16
+    # U16 (Млади Пионери = 16, not 14)
     str_detect(texto_combo, "(\u043c\u043b\u0430\u0434\u0438|\u043f\u043e\u043c\u043b\u0430\u0434\u0438|mladi|young).{0,10}(\u043f\u0438\u043e\u043d\u0435\u0440|pioner)") ~ "\u041c\u043b\u0430\u0434\u0438 \u041f\u0438\u043e\u043d\u0435\u0440\u0438",
     
     # U17
     str_detect(texto_combo, "\u043f\u0438\u043e\u043d\u0435\u0440|pioner|pioneer") ~ "\u041f\u0438\u043e\u043d\u0435\u0440\u0438",
     
-    # U18
+    # U14
     str_detect(texto_combo, "\u043a\u0430\u0434\u0435\u0442|kadet|cadet") ~ "\u041a\u0430\u0434\u0435\u0442\u0438",
     
-    # U19
+    # U16
     str_detect(texto_combo, "\u043c\u043b\u0430\u0434\u0438\u043d|mladin|youth|juven") ~ "\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438",
     
     # U13

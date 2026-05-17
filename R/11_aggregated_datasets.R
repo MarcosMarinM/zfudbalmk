@@ -280,7 +280,11 @@ porteras_apariciones_df <- apariciones_comp_context_df %>%
   mutate(
     duracion_partido = coalesce(duracion_partido, 90),
     categoria_normalizada = normalizar_categoria_competicion(categoria, competicion_nombre),
-    ga_base_minutos = if_else(categoria_normalizada %in% c("\u041f\u0435\u0442\u043b\u0438\u045a\u0430", "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430"), 80, 90),
+    ga_base_minutos = case_when(
+      categoria_normalizada %in% c("\u041a\u0430\u0434\u0435\u0442\u0438", "\u041a\u0430\u0434\u0435\u0442\u0441\u043a\u0430") ~ 60,
+      categoria_normalizada %in% c("\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438", "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430", "\u041f\u0435\u0442\u043b\u0438\u045a\u0430", "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430") ~ 80,
+      TRUE ~ 90
+    ),
     min_entra_normalizado = normalizar_minuto_evento(min_entra),
     min_sale_normalizado = normalizar_minuto_evento(min_sale)
   ) %>%
@@ -353,7 +357,11 @@ stats_minutos <- porteras_partido_stats %>%
 stats_base_ga <- porteras_partido_stats %>%
   group_by(id, competicion_nombre, competicion_temporada) %>%
   summarise(
-    GA_base_minutos = if_else(any(ga_base_minutos == 80, na.rm = TRUE), 80, 90),
+    GA_base_minutos = case_when(
+      any(ga_base_minutos == 60, na.rm = TRUE) ~ 60,
+      any(ga_base_minutos == 80, na.rm = TRUE) ~ 80,
+      TRUE ~ 90
+    ),
     .groups = 'drop'
   )
 

@@ -49,6 +49,8 @@ no_data_in_category,Нема податоци во оваа категорија
 stats_minutes,Минути,Minuta,Minutos,Minutes
 gk_ga,ПГ,GP,GC,GA
 gk_cs,ЧМ,PM,PI,CS
+gk_ga_60,ПГ/60,GP/60,GC/60,GA/60
+gk_ga_80,ПГ/80,GP/80,GC/80,GA/80
 gk_ga_90,ПГ/90,GP/90,GC/90,GA/90
 stats_goals,Голови,Gola,Goles,Goals
 own_goal_label,(АГ),(AG),(AG),(OG)
