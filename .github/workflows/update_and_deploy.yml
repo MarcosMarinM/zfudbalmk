@@ -69,7 +69,7 @@ jobs:
           restore-keys: |
             rds-cache-${{ runner.os }}-
 
-      - name: Fallback: download from release or restore from git history (if cache miss)
+      - name: "Fallback: download from release or restore from git history (if cache miss)"
         if: steps.cache-rds.outputs.cache-hit != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
