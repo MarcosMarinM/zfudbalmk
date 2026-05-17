@@ -79,10 +79,11 @@ jobs:
             tar xzf rds-cache.tar.gz
             rm rds-cache.tar.gz
             echo "Restored from release asset."
-          # 2nd tier: restore .rds files from previous git commit
-          # (useful on first run after rm --cached: HEAD~1 still has them tracked)
-          elif git restore --source=HEAD~1 -- '*.rds' 2>/dev/null; then
-            echo "Restored .rds files from git history (HEAD~1)."
+          # 2nd tier: restore .rds files from git history
+          # Finds the last commit before they were deleted (by looking at parent of deletion commit)
+          elif RDS_SOURCE=$(git log --diff-filter=D -- '*.rds' --format='%H~1' -1 2>/dev/null) && \
+               git restore --source="$RDS_SOURCE" -- '*.rds' 2>/dev/null; then
+            echo "Restored .rds files from git history ($RDS_SOURCE)."
           # 3rd tier: nothing available — scrape from scratch
           else
             echo "No release and no .rds in git history — will scrape from scratch."
