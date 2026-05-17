@@ -1544,18 +1544,16 @@ if (hubo_cambios) {
               tibble()
             }
 
-            normalize_team_name <- function(x) {
-              x <- as.character(x)
-              x <- stringr::str_to_lower(x)
-              x <- stringr::str_replace_all(x, "[[:space:]]+", " ")
-              x <- stringr::str_trim(x)
-              x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
-              x <- tolower(x)
-              x <- stringr::str_replace_all(x, "[^[:alnum:] ]+", "")
-              x <- stringr::str_replace_all(x, "[[:space:]]+", " ")
-              x <- stringr::str_trim(x)
-              x
-            }
+normalize_team_name <- function(x) {
+  x <- as.character(x)
+  x <- stringr::str_to_lower(x)
+  x <- stringr::str_replace_all(x, "[[:space:]]+", " ")
+  x <- stringr::str_trim(x)
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- tolower(x)
+  x <- stringr::str_replace_all(x, "[^[:alnum:]]+", "")
+  x
+}
 
             if (nrow(goles_partido) > 0 && exists("entidades_maestro_df")) {
               equipo_lookup <- entidades_maestro_df %>%
@@ -1984,6 +1982,12 @@ if (hubo_cambios) {
                   grepl(visitante_norm, equipo_acreditado_canonico_norm, ignore.case = TRUE) ~ FALSE,
                   grepl(local_norm, equipo_norm, ignore.case = TRUE) ~ TRUE,
                   grepl(visitante_norm, equipo_norm, ignore.case = TRUE) ~ FALSE,
+
+                  # 4b. Fallback sin espacios (robusto ante diferencias de transliteracion iconv entre macOS y Linux)
+                  grepl(gsub("[[:space:]]+", "", local_norm), gsub("[[:space:]]+", "", equipo_acreditado_canonico_norm), fixed = TRUE) ~ TRUE,
+                  grepl(gsub("[[:space:]]+", "", visitante_norm), gsub("[[:space:]]+", "", equipo_acreditado_canonico_norm), fixed = TRUE) ~ FALSE,
+                  grepl(gsub("[[:space:]]+", "", local_norm), gsub("[[:space:]]+", "", equipo_norm), fixed = TRUE) ~ TRUE,
+                  grepl(gsub("[[:space:]]+", "", visitante_norm), gsub("[[:space:]]+", "", equipo_norm), fixed = TRUE) ~ FALSE,
                   TRUE ~ NA
                 )
               )
