@@ -69,15 +69,23 @@ jobs:
           restore-keys: |
             rds-cache-${{ runner.os }}-
 
-      - name: Fallback download from release (if cache miss)
+      - name: Fallback: download from release or restore from git history (if cache miss)
         if: steps.cache-rds.outputs.cache-hit != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download actas-cache -p "rds-cache.tar.gz" --clobber 2>/dev/null || echo "No release asset found — will scrape from scratch."
-          if [ -f rds-cache.tar.gz ]; then
+          # 1st tier: download from GitHub Release (fast, always has latest)
+          if gh release download actas-cache -p "rds-cache.tar.gz" --clobber 2>/dev/null; then
             tar xzf rds-cache.tar.gz
             rm rds-cache.tar.gz
+            echo "Restored from release asset."
+          # 2nd tier: restore .rds files from previous git commit
+          # (useful on first run after rm --cached: HEAD~1 still has them tracked)
+          elif git restore --source=HEAD~1 -- '*.rds' 2>/dev/null; then
+            echo "Restored .rds files from git history (HEAD~1)."
+          # 3rd tier: nothing available — scrape from scratch
+          else
+            echo "No release and no .rds in git history — will scrape from scratch."
           fi
 
       - name: Scrape
