@@ -65,19 +65,31 @@ jobs:
         with:
           path: |
             *.rds
-          key: rds-cache-${{ runner.os }}-${{ github.run_id }}
+          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            rds-cache-${{ runner.os }}-
+            rds-cache-v2-${{ runner.os }}-
 
-      - name: Fallback download from release (if cache miss)
+      - name: "Fallback: use workspace files, download from release, or restore from git history"
         if: steps.cache-rds.outputs.cache-hit != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download actas-cache -p "rds-cache.tar.gz" --clobber 2>/dev/null || echo "No release asset found — will scrape from scratch."
-          if [ -f rds-cache.tar.gz ]; then
+          # 0th tier: .rds files already present from git checkout (e.g. they're tracked in repo)
+          if ls *.rds >/dev/null 2>&1; then
+            echo ".rds files already present in workspace — using them directly."
+          # 1st tier: download from GitHub Release (fast, always has latest)
+          elif gh release download actas-cache -p "rds-cache.tar.gz" --clobber 2>/dev/null; then
             tar xzf rds-cache.tar.gz
             rm rds-cache.tar.gz
+            echo "Restored from release asset."
+          # 2nd tier: restore .rds files from git history
+          # Finds the last commit before they were deleted (by looking at parent of deletion commit)
+          elif RDS_SOURCE=$(git log --diff-filter=D -- '*.rds' --format='%H~1' -1 2>/dev/null) && \
+               git restore --source="$RDS_SOURCE" -- '*.rds' 2>/dev/null; then
+            echo "Restored .rds files from git history ($RDS_SOURCE)."
+          # 3rd tier: nothing available — scrape from scratch
+          else
+            echo "No release and no .rds in git history — will scrape from scratch."
           fi
 
       - name: Scrape
@@ -89,7 +101,7 @@ jobs:
         with:
           path: |
             *.rds
-          key: rds-cache-${{ runner.os }}-${{ github.run_id }}
+          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
 
       - name: Upload RDS to release (single rotating asset)
         if: always()
