@@ -11,7 +11,6 @@
 !*.R
 !*.txt
 !*.xlsx
-!*.rds
 !README.md
 !favicon.png
 !/firebase.json
@@ -29,6 +28,7 @@
 /scratch/
 .Rproj.user/
 .positai/
+*.rds
 *.RData
 *.Rdata
 .DS_Store

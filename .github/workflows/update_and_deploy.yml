@@ -59,31 +59,50 @@ jobs:
           key: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-${{ hashFiles('scrape.R', 'buildhtml.R') }}
           restore-keys: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-
 
+      - name: Restore RDS from cache
+        id: cache-rds
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            *.rds
+          key: rds-cache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            rds-cache-${{ runner.os }}-
+
+      - name: Fallback download from release (if cache miss)
+        if: steps.cache-rds.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download actas-cache -p "rds-cache.tar.gz" --clobber 2>/dev/null || echo "No release asset found — will scrape from scratch."
+          if [ -f rds-cache.tar.gz ]; then
+            tar xzf rds-cache.tar.gz
+            rm rds-cache.tar.gz
+          fi
+
       - name: Scrape
         run: Rscript scrape.R
 
-      - name: Commit and push .rds
-        if: always() # Se ejecuta SIEMPRE para no perder el auto-guardado si R falla a medias
+      - name: Save RDS to cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            *.rds
+          key: rds-cache-${{ runner.os }}-${{ github.run_id }}
+
+      - name: Upload RDS to release (single rotating asset)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          
-          # Añadir todos los archivos .rds explícitamente (el pathspec de Git busca en todas las carpetas)
-          git add \*.rds
-          
-          # Comprobar si hay cambios reales en los archivos .rds
-          if ! git diff --staged --quiet; then
-            echo "Nuevos datos detectados. Preparando commit..."
-            git commit -m "Auto-update via GitHub Actions"
-            
-            # EL ANTÍDOTO: Traer cualquier cambio externo (colisiones, re-runs, edits)
-            git pull --rebase origin main
-            
-            # Subir todo con seguridad
-            git push
+          tar czf rds-cache.tar.gz *.rds
+          if gh release view actas-cache &>/dev/null; then
+            gh release upload actas-cache rds-cache.tar.gz --clobber
           else
-            echo "No hubo cambios en los datos durante esta sesión."
+            gh release create actas-cache rds-cache.tar.gz --title "actas-cache" --notes "Auto-updated cache files"
           fi
+          rm rds-cache.tar.gz
 
       - name: Build HTML
         run: Rscript buildhtml.R
