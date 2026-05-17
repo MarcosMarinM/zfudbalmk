@@ -1,79 +1,79 @@
-# ŽFudbalMK — Macedonian Women's Football Data & Website
+# zfudbalmk — Macedonian women's football data & website
 
-Automated data pipeline that scrapes match data from the Football Federation of Macedonia (FFM) website and generates a bilingual (Macedonian/Albanian) static website with Spanish fallback.
+Automated data pipeline that scrapes match data from the Football Federation of Macedonia (FFM) website and generates a static website in Macedonian, Albanian, Spanish and English.
 
-**Live site:** [zfudbalmk-mmm.web.app](https://zfudbalmk-mmm.web.app)
+**Live site:** [zfudbalmk.web.app](https://zfudbalmk.web.app)
 
 ---
 
-## How It Works
+## How it works
 
 ### 1. Scraping (`Rscript scrape.R`)
 
 The scraper reads ID ranges from `rangos_ids.txt` and fetches match data (najava + partido pages) from `ffm.mk` for each ID. It uses a two-tier cache system:
 
-- **`actas_cache.rds`** — Stores raw scraped match data keyed by FFM match ID
-- **`tracking.rds`** — Tracks the state of each match (Archived, Live_Post, Scheduled, Cancelado, etc.)
+- **`actas_cache.rds`** — stores raw scraped match data keyed by FFM match ID.
+- **`tracking.rds`** — tracks the state of each match (archived, live_post, scheduled, cancelled, etc.).
 
 On each run, the scraper:
-1. Loads the cache and tracking files
-2. Skips IDs that are already marked as "Archived" in tracking
-3. Scrapes only new/unprocessed IDs
-4. Saves the updated cache and tracking
+
+1. Loads the cache and tracking files.
+2. Skips IDs already marked as archived.
+3. Scrapes only new or unprocessed IDs.
+4. Saves the updated cache and tracking.
 
 ### 2. Building (`Rscript buildhtml.R`)
 
 Processes the scraped data and generates a complete static HTML site in `docs/`:
 
-- Competition hubs with round-by-round match schedules
-- Team profile pages with rosters and schedules
-- Player profile pages with statistics
-- Referee profile pages
-- Match detail pages with lineups and events
-- Multilingual support (Macedonian, Albanian, Spanish, English)
+- Competition hubs with round-by-round match schedules.
+- Team profile pages with rosters and schedules.
+- Player profile pages with statistics.
+- Referee profile pages.
+- Match detail pages with lineups and events.
+- Multilingual support (Macedonian, Albanian, Spanish, English).
 
 ### 3. Deployment (GitHub Actions)
 
-Every push to `main` (and scheduled runs during the season) triggers the workflow `.github/workflows/update_and_deploy.yml`:
+Every push to `main` (and scheduled runs during the season) triggers the workflow in `.github/workflows/update_and_deploy.yml`:
 
-1. **Checkout** — clones the repo (with full git history via `fetch-depth: 0`)
-2. **Cache restore** — tries `actions/cache` for a fast `.rds` restore
-3. **Fallback** (if cache miss) — 4-tier fallback:
-   - **Tier 0:** `.rds` files already present in workspace (from git checkout)
-   - **Tier 1:** Download from GitHub Release (`actas-cache` asset)
-   - **Tier 2:** Restore from git history (last commit before `.rds` deletion)
-   - **Tier 3:** Scrape from scratch
-4. **Scrape** — `Rscript scrape.R`
-5. **Save to cache** — uploads updated `.rds` to `actions/cache`
-6. **Upload to release** — creates `rds-cache.tar.gz` and uploads to the `actas-cache` GitHub Release (replaces previous asset)
-7. **Build HTML** — `Rscript buildhtml.R`
-8. **CDN push** — pushes `search_data.json` to orphan `data-cdn` branch for jsDelivr CDN
-9. **Deploy** — deploys to Firebase Hosting
+1. **Checkout** — clones the repo with full git history (`fetch-depth: 0`).
+2. **Cache restore** — tries `actions/cache` for a fast `.rds` restore.
+3. **Fallback** (if cache miss) — four tiers:
+   - Tier 0: `.rds` files already in workspace (from git checkout).
+   - Tier 1: download from GitHub release (`actas-cache` asset).
+   - Tier 2: restore from git history (last commit before `.rds` deletion).
+   - Tier 3: scrape from scratch.
+4. **Scrape** — `Rscript scrape.R`.
+5. **Save to cache** — uploads updated `.rds` to `actions/cache`.
+6. **Upload to release** — creates `rds-cache.tar.gz` and uploads it to the `actas-cache` GitHub release (replaces the previous asset).
+7. **Build HTML** — `Rscript buildhtml.R`.
+8. **CDN push** — pushes `search_data.json` to an orphan `data-cdn` branch for jsDelivr CDN.
+9. **Deploy** — deploys to Firebase hosting.
 
-#### Cache Persistence
+#### Cache persistence
 
 | Mechanism | Purpose | Speed |
 |---|---|---|
 | `actions/cache` (v2) | Fast restore between runs | ~1s |
-| GitHub Release (`actas-cache`) | Long-term backup (7-day cache expiry) | ~3s |
+| GitHub release (`actas-cache`) | Long-term backup (7-day cache expiry) | ~3s |
 | Git tracking (committed `.rds`) | Last-resort seed | instant |
 
-The `.rds` files are committed to git **once** as a seed. The workflow never commits them back — they travel via cache and release. This keeps the repository lightweight.
+The `.rds` files are committed to git once as a seed. The workflow never commits them back — they travel via cache and release. This keeps the repository lightweight.
 
 ---
 
-## File Structure
+## File structure
 
-### Core Scripts
+### Core scripts
 
 | File | Purpose |
 |---|---|
 | `scrape.R` | Scrapes match data from FFM website |
 | `buildhtml.R` | Generates the static HTML site |
 | `consultar.R` | Interactive R console helpers for ad-hoc queries and debugging |
-| `test_fix.R` | Ad-hoc fixes and data patching |
 
-### R Pipeline Modules (`R/`)
+### R pipeline modules (`R/`)
 
 | File | Purpose |
 |---|---|
@@ -92,13 +92,13 @@ The `.rds` files are committed to git **once** as a seed. The workflow never com
 | `13_html_generation.R` | HTML page builders |
 | `14_output.R` | File writing and site assembly |
 
-### Reference Data Files
+### Reference data files
 
 | File | Purpose |
 |---|---|
 | `rangos_ids.txt` | FFM match ID ranges per competition |
 | `competitions.txt` | Competition names and metadata |
-| `translations.txt` | Multilingual UI strings (MK, SQ, ES, EN) |
+| `translations.txt` | Multilingual UI strings (mk, sq, es, en) |
 | `abbreviations.txt` | Club name abbreviations |
 | `clubs_latin.txt` | Latin-script club names (non-trivial transliterations) |
 | `name_corrections.txt` | Player/club name corrections |
@@ -113,15 +113,15 @@ The `.rds` files are committed to git **once** as a seed. The workflow never com
 | `conversions.txt` | Data normalisation rules |
 | `gradovi.txt` | City/town names |
 | `classification_styles.txt` | League classification CSS styles |
-| `comps_ffm.xlsx` | Competition metadata spreadsheet (source mapping) |
+| `comps_ffm.xlsx` | Competition metadata spreadsheet |
 | `igracki.xlsx` | Player registry spreadsheet with biographical data |
 
-### Cache Files (gitignored, tracked as seed)
+### Cache files (gitignored, tracked as seed)
 
 | File | Purpose |
 |---|---|
 | `actas_cache.rds` | Scraped match data (keyed by FFM ID) |
-| `tracking.rds` | Match state tracking (Archived, Live_Post, etc.) |
+| `tracking.rds` | Match state tracking (archived, live_post, etc.) |
 | `cache_info.rds` | Cache metadata and timestamps |
 | `official_results_cache.rds` | Cached official results |
 | `cancelled_matches_cache.rds` | Cached cancelled matches |
@@ -129,32 +129,33 @@ The `.rds` files are committed to git **once** as a seed. The workflow never com
 
 ### Output (`docs/`)
 
-Generated static site deployed to Firebase Hosting.
+Generated static site deployed to Firebase hosting.
 
 ---
 
-## Running Locally
+## Running locally
 
 ### Prerequisites
 
-- R (≥ 4.0)
+- R (>= 4.0)
 - System dependencies (Ubuntu/Debian):
-  ```bash
-  sudo apt-get install libcurl4-openssl-dev libssl-dev libxml2-dev \
-    libfontconfig1-dev libharfbuzz-dev libfribidi-dev
-  ```
-
-### Quick Start
 
 ```bash
-# Scrape new data
+sudo apt-get install libcurl4-openssl-dev libssl-dev libxml2-dev \
+  libfontconfig1-dev libharfbuzz-dev libfribidi-dev
+```
+
+### Quick start
+
+```bash
+# scrape new data
 Rscript scrape.R
 
-# Build the static site
+# build the static site
 Rscript buildhtml.R
 ```
 
-> **Note:** The first scrape fetches all IDs from `rangos_ids.txt` (~2,100 matches) and takes ~30 minutes due to rate limiting. Subsequent runs only fetch new/unprocessed data.
+> **Note:** The first scrape fetches all IDs from `rangos_ids.txt` (~2,100 matches) and takes ~30 minutes due to rate limiting. Subsequent runs only fetch new or unprocessed data.
 
 The generated site will be in `docs/`. Open `docs/index.html` in a browser to preview.
 
@@ -164,22 +165,24 @@ The generated site will be in `docs/`. Open `docs/index.html` in a browser to pr
 
 The GitHub Actions workflow runs on a schedule aligned with the Macedonian women's football season:
 
-- **High season** (Feb–May, Aug–Nov): Multiple times daily
-  - Mon–Thu: Twice daily (15:09, 21:09 UTC)
-  - Fri–Sun: Every 30 min during match hours (08:00–21:00 UTC)
-- **Off season** (Jun–Jul, Dec–Jan): Once daily (21:09 UTC) to keep caches warm
+- **High season** (February–May, August–November): multiple times daily
+  - Monday–Thursday: twice daily (15:09, 21:09 UTC)
+  - Friday–Sunday: every 30 minutes during match hours (08:00–21:00 UTC)
+- **Off season** (June–July, December–January): once daily (21:09 UTC) to keep caches warm
+
+The workflow can also be triggered manually from the GitHub Actions tab.
 
 ---
 
 ## Translations
 
-The site supports 4 languages, defined in `translations.txt`:
+The site supports four languages, defined in `translations.txt`:
 
 | Code | Language |
 |---|---|
-| `mk` | Macedonian (default) |
+| `mk` | Macedonian |
 | `sq` | Albanian |
-| `es` | Spanish (fallback) |
+| `es` | Spanish |
 | `en` | English |
 
 ---
