@@ -1546,13 +1546,10 @@ if (hubo_cambios) {
 
 normalize_team_name <- function(x) {
   x <- as.character(x)
-  x <- stringr::str_to_lower(x)
-  x <- stringr::str_replace_all(x, "[[:space:]]+", " ")
-  x <- stringr::str_trim(x)
-  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
   x <- tolower(x)
-  x <- stringr::str_replace_all(x, "[^[:alnum:]]+", "")
-  x
+  x <- str_replace_all(x, "[[:space:]]+", " ")
+  x <- str_trim(x)
+  ifelse(is.na(x) | x == "", NA_character_, x)
 }
 
             if (nrow(goles_partido) > 0 && exists("entidades_maestro_df")) {
