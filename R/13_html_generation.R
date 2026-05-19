@@ -1169,6 +1169,52 @@ if (hubo_cambios) {
                 NA_character_
               }
 
+              # Goal scorers for share snapshot
+              goles_local_list <- list()
+              goles_visitante_list <- list()
+              if (exists("goles_df_unificado") && "id_partido" %in% names(goles_df_unificado) && !is.na(partido$id_partido) && !is_placeholder_match && !is_cancelled) {
+                goles_match <- goles_df_unificado %>%
+                  filter(id_partido == partido$id_partido, tipo %in% c("Normal", "Autogol")) %>%
+                  left_join(jugadoras_lang_df, by = "id")
+                if (nrow(goles_match) > 0) {
+                  if (!"equipo_acreditado" %in% names(goles_match)) {
+                    goles_match <- goles_match %>% mutate(equipo_acreditado = NA_character_)
+                  }
+                  local_norm <- tolower(str_trim(partido$local))
+                  visitante_norm <- tolower(str_trim(partido$visitante))
+                  goles_match <- goles_match %>%
+                    mutate(
+                      is_local = !is.na(equipo_acreditado) & tolower(str_trim(equipo_acreditado)) == local_norm,
+                      is_visitante = !is.na(equipo_acreditado) & tolower(str_trim(equipo_acreditado)) == visitante_norm,
+                      is_autogol = tipo == "Autogol"
+                    ) %>%
+                    mutate(
+                      goal_for_local = ifelse(is_autogol, is_visitante, is_local),
+                      goal_for_visitante = ifelse(is_autogol, is_local, is_visitante)
+                    )
+                  goles_local_df <- goles_match %>% filter(goal_for_local)
+                  goles_visitante_df <- goles_match %>% filter(goal_for_visitante)
+                  if (nrow(goles_local_df) > 0) {
+                    goles_local_list <- map(1:nrow(goles_local_df), function(gi) {
+                      g <- goles_local_df[gi, ]
+                      list(
+                        nombre = as.character(player_name_spans_from_row(g)),
+                        is_autogol = isTRUE(g$is_autogol)
+                      )
+                    })
+                  }
+                  if (nrow(goles_visitante_df) > 0) {
+                    goles_visitante_list <- map(1:nrow(goles_visitante_df), function(gi) {
+                      g <- goles_visitante_df[gi, ]
+                      list(
+                        nombre = as.character(player_name_spans_from_row(g)),
+                        is_autogol = isTRUE(g$is_autogol)
+                      )
+                    })
+                  }
+                }
+              }
+
               list(
                 id_partido = partido$id_partido,
                 local_lang = as.character(entity_name_spans(partido$local)),
@@ -1178,8 +1224,11 @@ if (hubo_cambios) {
                 resultado = resultado_texto,
                 lugar_lang = if (length(lugar_partido_mk) > 0) as.character(entity_name_spans(lugar_partido_mk[1])) else NA_character_,
                 fecha = partido$fecha %||% NA_character_,
+                hora = partido$hora %||% NA_character_,
                 es_cancelado = isTRUE(partido$es_cancelado),
-                es_resultado_oficial = isTRUE(partido$es_resultado_oficial)
+                es_resultado_oficial = isTRUE(partido$es_resultado_oficial),
+                goles_local = goles_local_list,
+                goles_visitante = goles_visitante_list
               )
             })
 
@@ -1330,6 +1379,7 @@ if (hubo_cambios) {
             stats_goleadoras = datos_top_goleadoras,
             stats_tarjetas = datos_top_tarjetas,
             stats_porteras = datos_top_porteras,
+            comp_name = as.character(comp_name_spans(comp_info)),
             links = list(
               goleadoras = nombre_archivo_goleadoras,
               tarjetas = nombre_archivo_sanciones,
@@ -1343,7 +1393,8 @@ if (hubo_cambios) {
               see_all = as.character(t_html("see_full_list")),
               stadium = as.character(t_html("match_stadium")),
               match_cancelled = as.character(t_html("match_cancelled")),
-              no_matches_in_round = as.character(t_html("match_timeline_no_events"))
+              no_matches_in_round = as.character(t_html("match_timeline_no_events")),
+              share_round = as.character(t_html("share_round"))
             )
           ), auto_unbox = TRUE, na = "null")
 
@@ -1376,7 +1427,14 @@ if (hubo_cambios) {
                     href = nombre_archivo_partidos, class = "comp-hub-title-link",
                     tags$h3(class = "comp-hub-section-title", t_html("schedule_title"))
                   ),
-                  tags$a(href = nombre_archivo_partidos, class = "comp-hub-see-all-link", tagList(t_html("all_results_link"), " >"))
+                  tags$a(href = nombre_archivo_partidos, class = "comp-hub-see-all-link", tagList(t_html("all_results_link"), " >")),
+                  tags$button(
+                    id = "comp-hub-share-btn",
+                    class = "comp-hub-share-btn",
+                    title = t_html("share_round"),
+                    HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>'),
+                    t_html("share_round")
+                  )
                 ),
                 tags$div(
                   class = "comp-hub-schedule-nav",
@@ -1407,7 +1465,13 @@ if (hubo_cambios) {
                       href = nombre_archivo_partidos, class = "comp-hub-title-link",
                       tags$h3(class = "comp-hub-section-title", t_html("schedule_title"))
                     ),
-                    tags$a(href = nombre_archivo_partidos, class = "comp-hub-see-all-link", tagList(t_html("all_results_link"), " >"))
+                    tags$a(href = nombre_archivo_partidos, class = "comp-hub-see-all-link", tagList(t_html("all_results_link"), " >")),                    tags$button(
+                    id = "comp-hub-share-btn",
+                    class = "comp-hub-share-btn",
+                    title = t_html("share_round"),
+                    HTML('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>'),
+                    t_html("share_round")
+                  )
                   ),
                   tags$div(
                     class = "comp-hub-schedule-nav",

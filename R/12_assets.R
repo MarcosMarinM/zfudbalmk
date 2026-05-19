@@ -393,6 +393,38 @@ th { background-color: #f2f2f2; }
   cursor: not-allowed;
 }
 
+/* --- Share Snapshot Button --- */
+.comp-hub-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #8B0000, #CC0000);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.25);
+  white-space: nowrap;
+}
+.comp-hub-share-btn:hover {
+  background: linear-gradient(135deg, #a00000, #e60000);
+  box-shadow: 0 4px 14px rgba(139, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+.comp-hub-share-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(139, 0, 0, 0.3);
+}
+.comp-hub-share-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .comp-hub-match-row {
   display: block;
   text-decoration: none;
@@ -1401,8 +1433,364 @@ function initializeCompetitionHub() {
   window.currentRoundIndex = currentRoundIndex; // Store globally for switchLanguage
   window.renderScheduleRound = renderScheduleRound;
   window.renderStatsTable = renderStatsTable;
+  window.hubData = hubData; // Expose for snapshot
   renderScheduleRound(currentRoundIndex);
   renderStatsTable('goleadoras');
+
+  // ========================================================================
+  // SOCIAL MEDIA SNAPSHOT (9:16 canvas render)
+  // ========================================================================
+  // --- Helpers for snapshot ---
+  function extractCurrentLangText(htmlString, lang) {
+    if (!htmlString) return '';
+    const div = document.createElement('div');
+    div.innerHTML = htmlString;
+    const span = div.querySelector(`.lang-${lang}`);
+    return span ? span.textContent : (div.textContent || div.innerText || '').trim();
+  }
+
+  function formatMatchDate(fechaStr) {
+    if (!fechaStr) return '';
+    const parts = fechaStr.split('.');
+    if (parts.length !== 3) return fechaStr;
+    const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    const dayNames = {
+      mk: ['\u041d\u0435\u0434', '\u041f\u043e\u043d', '\u0412\u0442\u043e', '\u0421\u0440\u0435', '\u0427\u0435\u0442', '\u041f\u0435\u0442', '\u0421\u0430\u0431'],
+      sq: ['Die', 'H\u00ebn', 'Mar', 'M\u00ebr', 'Enj', 'Pre', 'Sht'],
+      es: ['Dom', 'Lun', 'Mar', 'Mi\u00e9', 'Jue', 'Vie', 'S\u00e1b'],
+      en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    };
+    const names = dayNames[currentLang] || dayNames.en;
+    return `${names[d.getDay()]}, ${fechaStr}`;
+  }
+
+  const shareBtn = document.getElementById('comp-hub-share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => shareRoundSnapshot(hubData, currentRoundIndex));
+  }
+
+  async function shareRoundSnapshot(hubData, roundIndex) {
+    const roundData = hubData.jornadas_data[roundIndex];
+    if (!roundData || roundData.partidos.length === 0) return;
+
+    // Disable button during generation
+    const shareBtnLoadingText = extractCurrentLangText(hubData.translations.share_round || '', currentLang);
+    if (shareBtn) {
+      shareBtn.disabled = true;
+      shareBtn.dataset.originalHtml = shareBtn.innerHTML;
+      shareBtn.textContent = '\u23F3 ' + shareBtnLoadingText;
+    }
+
+    try {
+
+    const W = 1080;
+    const H = 1920;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // --- Background gradient ---
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#1a0a0a');
+    grad.addColorStop(0.25, '#2d1010');
+    grad.addColorStop(0.75, '#1a0a0a');
+    grad.addColorStop(1, '#0d0505');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // --- Top accent line ---
+    ctx.fillStyle = '#CC0000';
+    ctx.fillRect(0, 0, W, 6);
+
+    // --- Competition name (current language only) ---
+    const compName = extractCurrentLangText(hubData.comp_name || '', currentLang);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 52px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    wrapText(ctx, compName, W / 2, 80, W - 120, 60);
+
+    // --- Decorative separator ---
+    ctx.strokeStyle = '#CC0000';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 200, 170);
+    ctx.lineTo(W / 2 + 200, 170);
+    ctx.stroke();
+
+    // --- Season / subtitle ---
+    const seasonText = hubData.comp_temporada || '';
+    if (seasonText) {
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(seasonText, W / 2, 185);
+    }
+
+    // --- Round name ---
+    ctx.fillStyle = '#E0C080';
+    ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const roundNameFromJson = extractCurrentLangText(roundData.jornada_nombre || '', currentLang);
+    const roundNum = String(roundData.jornada_id_raw || '');
+    const roundName = roundNum && !roundNameFromJson.includes(roundNum)
+      ? roundNameFromJson + ' ' + roundNum
+      : roundNameFromJson;
+    ctx.fillText(roundName, W / 2, 210);
+
+    // --- Matches ---
+    const startY = 320;
+    const matchCardH = 170;
+    const matchGap = 24;
+    const maxVisible = Math.min(roundData.partidos.length, 8);
+
+    // Pre-load logos
+    const logoCache = {};
+    const loadLogo = (url) => {
+      if (!url) return null;
+      if (logoCache[url] !== undefined) return logoCache[url];
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { logoCache[url] = img; resolve(img); };
+        img.onerror = () => { logoCache[url] = null; resolve(null); };
+        img.src = url;
+      });
+    };
+
+    // Load all logos in parallel
+    const logoUrls = new Set();
+    for (let i = 0; i < maxVisible; i++) {
+      const p = roundData.partidos[i];
+      if (p.local_logo_path) logoUrls.add(p.local_logo_path);
+      if (p.visitante_logo_path) logoUrls.add(p.visitante_logo_path);
+    }
+    await Promise.all([...logoUrls].map(loadLogo));
+
+    // Draw each match card
+    for (let i = 0; i < maxVisible; i++) {
+      const p = roundData.partidos[i];
+      const cardY = startY + i * (matchCardH + matchGap);
+
+      // Card background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+      roundRect(ctx, 80, cardY, W - 160, matchCardH, 16);
+      ctx.fill();
+
+      // Card border
+      ctx.strokeStyle = 'rgba(139, 0, 0, 0.3)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, 80, cardY, W - 160, matchCardH, 16);
+      ctx.stroke();
+
+      const centerY = cardY + matchCardH / 2 - 4;
+      const scoreX = W / 2;
+
+      // Extract current-language-only team names
+      const localName = extractCurrentLangText(p.local_lang, currentLang);
+      const visitName = extractCurrentLangText(p.visitante_lang, currentLang);
+
+      // Left team: logo on far left, name right of logo, both left-aligned
+      const leftLogo = logoCache[p.local_logo_path];
+      if (leftLogo) {
+        ctx.drawImage(leftLogo, 120, centerY - 24, 48, 48);
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '600 34px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      // Truncate name if too long for available space
+      const maxNameWidth = 300;
+      let displayLocalName = localName;
+      while (ctx.measureText(displayLocalName).width > maxNameWidth && displayLocalName.length > 3) {
+        displayLocalName = displayLocalName.slice(0, -1);
+      }
+      if (displayLocalName !== localName) displayLocalName += '...';
+      ctx.fillText(displayLocalName, 185, centerY);
+
+      // Score centered with subtle pill background
+      const scoreText = p.resultado || '-';
+      ctx.fillStyle = 'rgba(204, 0, 0, 0.12)';
+      const scoreTextWidth = ctx.measureText(scoreText).width;
+      const pillW = Math.max(scoreTextWidth + 36, 90);
+      const pillH = 52;
+      roundRect(ctx, scoreX - pillW / 2, centerY - pillH / 2, pillW, pillH, 12);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(204, 0, 0, 0.25)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, scoreX - pillW / 2, centerY - pillH / 2, pillW, pillH, 12);
+      ctx.stroke();
+
+      // Score centered
+      ctx.fillStyle = '#CC0000';
+      ctx.font = 'bold 44px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(scoreText, scoreX, centerY);
+
+      // Right team: name right of center, logo on far right
+      const rightLogo = logoCache[p.visitante_logo_path];
+      if (rightLogo) {
+        ctx.drawImage(rightLogo, W - 168, centerY - 24, 48, 48);
+      }
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '600 34px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      let displayVisitName = visitName;
+      while (ctx.measureText(displayVisitName).width > maxNameWidth && displayVisitName.length > 3) {
+        displayVisitName = displayVisitName.slice(0, -1);
+      }
+      if (displayVisitName !== visitName) displayVisitName += '...';
+      ctx.fillText(displayVisitName, W - 185, centerY);
+
+      // Goal scorers
+      if (p.goles_local && p.goles_local.length > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        const scorersY = cardY + 90;
+        const maxScorers = 2;
+        const displayScorers = p.goles_local.slice(0, maxScorers).map(g => {
+          const name = extractCurrentLangText(g.nombre || '', currentLang);
+          return g.is_autogol ? name + ' (OG)' : name;
+        });
+        let fullText = displayScorers.join(', ');
+        if (p.goles_local.length > maxScorers) fullText += ' +' + (p.goles_local.length - maxScorers);
+        let scorersText = fullText;
+        const maxScorerWidth = 300;
+        while (ctx.measureText(scorersText).width > maxScorerWidth && scorersText.length > 3) {
+          scorersText = scorersText.slice(0, -1);
+        }
+        if (scorersText !== fullText) scorersText += '...';
+        ctx.fillText(scorersText, 185, scorersY);
+      }
+      if (p.goles_visitante && p.goles_visitante.length > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        const scorersY = cardY + 90;
+        const maxScorers = 2;
+        const displayScorers = p.goles_visitante.slice(0, maxScorers).map(g => {
+          const name = extractCurrentLangText(g.nombre || '', currentLang);
+          return g.is_autogol ? name + ' (OG)' : name;
+        });
+        let fullText = displayScorers.join(', ');
+        if (p.goles_visitante.length > maxScorers) fullText += ' +' + (p.goles_visitante.length - maxScorers);
+        let scorersText = fullText;
+        const maxScorerWidth = 300;
+        while (ctx.measureText(scorersText).width > maxScorerWidth && scorersText.length > 3) {
+          scorersText = scorersText.slice(0, -1);
+        }
+        if (scorersText !== fullText) scorersText += '...';
+        ctx.fillText(scorersText, W - 185, scorersY);
+      }
+
+      // Date & time line (separate from stadium)
+      const dateTimeParts = [];
+      if (p.fecha) {
+        dateTimeParts.push(formatMatchDate(p.fecha));
+      }
+      if (p.hora) {
+        dateTimeParts.push(p.hora);
+      }
+      if (dateTimeParts.length > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(dateTimeParts.join('  \u00b7  '), W / 2, cardY + matchCardH - 58);
+      }
+
+      // Stadium line
+      if (p.lugar_lang) {
+        const lugarText = extractCurrentLangText(p.lugar_lang, currentLang);
+        if (lugarText) {
+          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          ctx.font = '20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(lugarText, W / 2, cardY + matchCardH - 30);
+        }
+      }
+
+    }
+
+    // --- Footer ---
+    const footerY = startY + maxVisible * (matchCardH + matchGap) + 60;
+    ctx.fillStyle = 'rgba(204, 0, 0, 0.5)';
+    ctx.fillRect(W / 2 - 150, footerY, 300, 3);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('@zfudbalmk', W / 2, footerY + 30);
+
+    // --- Download ---
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeComp = extractCurrentLangText(hubData.comp_name || '', currentLang).replace(/[^a-z0-9]/gi, '_').substring(0, 30) || 'competition';
+      const safeRound = extractCurrentLangText(roundData.jornada_nombre || 'round', currentLang).replace(/[^a-z0-9]/gi, '_').substring(0, 20);
+      a.download = safeComp + '_' + safeRound + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      // Restore button
+      if (shareBtn) {
+        shareBtn.disabled = false;
+        shareBtn.innerHTML = shareBtn.dataset.originalHtml || '';
+      }
+    }, 'image/png');
+
+    } catch(e) {
+      console.error('Snapshot generation failed:', e);
+      if (shareBtn) {
+        shareBtn.disabled = false;
+        shareBtn.innerHTML = shareBtn.dataset.originalHtml || '';
+      }
+    }
+  }
+
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let currentY = y;
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i] + ' ';
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && i > 0) {
+        ctx.fillText(line.trim(), x, currentY);
+        line = words[i] + ' ';
+        currentY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line.trim(), x, currentY);
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
 }
 
 )"
