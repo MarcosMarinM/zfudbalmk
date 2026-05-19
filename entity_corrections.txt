@@ -177,7 +177,7 @@ original_mk,latin_sq,latin_es,latin_en
 "Стадион „Борис Трајковски“ (Гази Баба, Скопје)","Stadiumi Boris Trajkovski (Gazi Babë, Shkup)","Estadio Boris Trajkovski (Gazi Baba, Skopie)","Boris Trajkovski Stadium (Gazi Baba, Skopje)"
 "Стадион „Борис Трајковски“ во Маџари (Гази Баба, Скопје)","Stadiumi Boris Trajkovski në Maxhari (Gazi Babë, Shkup)","Estadio Boris Trajkovski en Madžari (Gazi Baba, Skopie)","Boris Trajkovski Stadium in Madžari (Gazi Baba, Skopje)"
 "Стадион „Гоце Делчев“ (Прилеп)","Stadiumi Goce Dellçev (Përlep)","Estadio Goce Delčev (Prilep)","Goce Delčev Stadium (Prilep)"
-"Стадион „Дојранско Езеро во Нов Дојран“ (Дојран)","Stadiumi Liqeni i Dojranit në Dojran të Ri (Dojran)","Estadio Dojransko Ezero en Nov Dojran (Dojran)","Dojransko Ezero Stadium in Nov Dojran (Dojran)"
+"Стадион „Дојранско Езеро“ во Нов Дојран (Дојран)","Stadiumi Liqeni i Dojranit në Dojran të Ri (Dojran)","Estadio Dojransko Ezero en Nov Dojran (Dojran)","Dojransko Ezero Stadium in Nov Dojran (Dojran)"
 "Стадион „Кукуш“ во Турново (Струмица)","Stadiumi Kukush në Turnovë (Strumicë)","Estadio Kukuš en Turnovo (Strumica)","Kukuš Stadium in Turnovo (Strumica)"
 "Стадион „Леска“ (Форино, Гостивар)","Stadiumi Leska (Forinë, Gostivar)","Estadio Leska (Forino, Gostivar)","Leska Stadium (Forino, Gostivar)"
 "Стадион „Леска“ во Форино (Гостивар)","Stadiumi Leska në Forinë (Gostivar)","Estadio Leska en Forino (Gostivar)","Leska Stadium in Forino (Gostivar)"
