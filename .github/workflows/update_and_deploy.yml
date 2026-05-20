@@ -88,27 +88,6 @@ jobs:
       - name: Scrape
         run: Rscript scrape.R
 
-      - name: Save RDS to cache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            *.rds
-          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
-
-      - name: Upload RDS to release (single rotating asset)
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          tar czf rds-cache.tar.gz *.rds
-          if gh release view actas-cache &>/dev/null; then
-            gh release upload actas-cache rds-cache.tar.gz --clobber
-          else
-            gh release create actas-cache rds-cache.tar.gz --title "actas-cache" --notes "Auto-updated cache files"
-          fi
-          rm rds-cache.tar.gz
-
       # Delete build logs + clean docs/ to force a full rebuild from scratch
       - name: Force full rebuild (delete build logs and clean docs)
         run: |
@@ -131,6 +110,28 @@ jobs:
             gh release create actas-cache docs-cache.tar.gz --title "actas-cache" --notes "Auto-updated cache files"
           fi
           rm docs-cache.tar.gz
+
+      # Guardar RDS después del build para incluir build_log.rds y competition_log.rds actualizados
+      - name: Save RDS to cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            *.rds
+          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
+
+      - name: Upload RDS to release (single rotating asset)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar czf rds-cache.tar.gz *.rds
+          if gh release view actas-cache &>/dev/null; then
+            gh release upload actas-cache rds-cache.tar.gz --clobber
+          else
+            gh release create actas-cache rds-cache.tar.gz --title "actas-cache" --notes "Auto-updated cache files"
+          fi
+          rm rds-cache.tar.gz
 
       - name: Save docs to cache
         if: always()

@@ -7,10 +7,10 @@ on:
     # Lunes a jueves: Dos veces al día (15:09 y 21:09 UTC)
     - cron: '9 15,21 * 2,3,4,5,8,9,10,11 1-4'
     
-    # Viernes, sábado y domingo: CADA 10 MINUTOS durante los partidos
-    # (Desde las 08:00 UTC hasta las 21:50 UTC)
-    # Esto cubre en tu reloj local aprox. de 10:00 a 23:50
-    - cron: '*/10 8-21 * 2,3,4,5,8,9,10,11 0,5,6'
+    # Viernes, sábado y domingo: CADA 15 MINUTOS durante los partidos
+    # (Desde las 10:00 UTC hasta las 18:50 UTC)
+    # Esto cubre en tu reloj local aprox. de 12:00 a 20:50
+    - cron: '*/15 10-18 * 2,3,4,5,8,9,10,11 0,5,6'
 
     # --- PERÍODOS DE DESCANSO (dic, ene, jun, jul) ---
     
@@ -126,6 +126,11 @@ jobs:
             echo "Sin cambios. Saltando build, subida de docs, CDN y deploy."
           fi
 
+      - name: Build HTML (incremental)
+        if: steps.check-changes.outputs.hubo_cambios == 'true'
+        run: Rscript buildhtml.R
+
+      # Guardar RDS después del build para incluir build_log.rds y competition_log.rds actualizados
       - name: Save RDS to cache
         if: always()
         uses: actions/cache/save@v4
@@ -146,10 +151,6 @@ jobs:
             gh release create actas-cache rds-cache.tar.gz --title "actas-cache" --notes "Auto-updated cache files"
           fi
           rm rds-cache.tar.gz
-
-      - name: Build HTML (incremental)
-        if: steps.check-changes.outputs.hubo_cambios == 'true'
-        run: Rscript buildhtml.R
 
       - name: Save docs to cache
         if: steps.check-changes.outputs.hubo_cambios == 'true'
