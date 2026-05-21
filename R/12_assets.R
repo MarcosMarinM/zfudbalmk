@@ -2107,8 +2107,8 @@ if (file.exists("favicon.png")) {
 # regeneran. Esto es \u00fatil para hacer pruebas r\u00e1pidas en una secci\u00f3n.
 # Para una construcci\u00f3n completa, todos deben estar en TRUE.
 
-GENERAR_PAGINAS_ESTATICAS <- FALSE 
-GENERAR_PAGINAS_COMPETICION <- FALSE
+GENERAR_PAGINAS_ESTATICAS <- TRUE
+GENERAR_PAGINAS_COMPETICION <- TRUE
 GENERAR_PERFILES_PARTIDO <- TRUE # Perfiles individuales para cada partido
 GENERAR_PERFILES_JUGADORA <- TRUE # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE # Perfiles individuales para cada equipo
