@@ -2077,8 +2077,8 @@ normalize_team_name <- function(x) {
                 is_local_goal = if_else(!is.na(tipo) & tipo == "Autogol", !is_player_local, is_player_local)
               )
 
-              goles_local_df <- goles_partido %>% filter(is_local_goal == TRUE)
-              goles_visitante_df <- goles_partido %>% filter(is_local_goal == FALSE)
+              goles_local_df <- goles_partido %>% filter(is_local_goal == TRUE) %>% arrange(minuto)
+              goles_visitante_df <- goles_partido %>% filter(is_local_goal == FALSE) %>% arrange(minuto)
 
               # Si a\u00fan quedaran NAs inasignables (muy improbable con la capa de la alineaci\u00f3n)
               goles_na_df <- goles_partido %>% filter(is.na(is_local_goal))
@@ -2091,8 +2091,43 @@ normalize_team_name <- function(x) {
               goles_visitante_df <- tibble()
             }
 
+
+            # --- SNAPSHOT DATA FOR SHARE BUTTON ---
+            match_snapshot_data <- list(
+              homeTeam = as.character(entity_name_spans(partido_info$local)),
+              awayTeam = as.character(entity_name_spans(partido_info$visitante)),
+              homeScore = if (!is.na(partido_info$goles_local)) as.character(partido_info$goles_local) else "0",
+              awayScore = if (!is.na(partido_info$goles_visitante)) as.character(partido_info$goles_visitante) else "0",
+              homeGoals = if (nrow(goles_local_df) > 0) {
+                map(1:nrow(goles_local_df), function(gi) {
+                  g <- goles_local_df[gi, ]
+                  list(player = as.character(player_name_spans_from_row(g)), minute = if (!is.na(g$minuto)) paste0(g$minuto, "'") else "", is_autogol = isTRUE(g$tipo == "Autogol"))
+                })
+              } else list(),
+              awayGoals = if (nrow(goles_visitante_df) > 0) {
+                map(1:nrow(goles_visitante_df), function(gi) {
+                  g <- goles_visitante_df[gi, ]
+                  list(player = as.character(player_name_spans_from_row(g)), minute = if (!is.na(g$minuto)) paste0(g$minuto, "'") else "", is_autogol = isTRUE(g$tipo == "Autogol"))
+                })
+              } else list(),
+              stadium = if (nrow(estadio_info_mk) > 0) as.character(estadio_name_spans) else "",
+              date = partido_info$fecha %||% "",
+              time = partido_info$hora %||% "",
+              lang = idioma_actual,
+              comp_name = as.character(comp_name_spans_val),
+              jornada_texto = as.character(jornada_texto),
+              jornada = as.character(partido_info$jornada %||% ""),
+              local_logo_path = get_club_logo_path(partido_info$local),
+              visitante_logo_path = get_club_logo_path(partido_info$visitante),
+              translations = list(share_match = t("share_match"))
+            )
             # --- MAIN CONTENT ---
             contenido_partido <- tagList(
+              tags$script(
+                type = "application/json",
+                id = "match-snapshot-data",
+                HTML(jsonlite::toJSON(match_snapshot_data, auto_unbox = TRUE))
+              ),
               crear_botones_navegacion(".."),
               tags$div(
                 class = "mp-container",
@@ -2127,6 +2162,31 @@ normalize_team_name <- function(x) {
                     class = "mp-team mp-team-away",
                     tags$div(class = "mp-team-logo", get_logo_tag(partido_info$visitante, css_class = "")),
                     tags$div(class = "mp-team-name", crear_enlace_equipo_condicional(partido_info$visitante, entity_name_spans(partido_info$visitante)))
+                  )
+                ),
+
+                # === MATCH SHARE BUTTON ===
+                tags$section(
+                  class = "mp-share-section",
+                  tags$button(
+                    id = "mp-share-btn",
+                    class = "mp-share-btn",
+                    `aria-label` = t("share_match"),
+                    tags$svg(
+                      xmlns = "http://www.w3.org/2000/svg",
+                      viewBox = "0 0 24 24",
+                      fill = "none",
+                      stroke = "currentColor",
+                      `stroke-width` = "2",
+                      `stroke-linecap` = "round",
+                      `stroke-linejoin` = "round",
+                      tags$circle(cx = "18", cy = "5", r = "3"),
+                      tags$circle(cx = "6", cy = "12", r = "3"),
+                      tags$circle(cx = "18", cy = "19", r = "3"),
+                      tags$line(x1 = "8.59", y1 = "13.51", x2 = "15.42", y2 = "17.49"),
+                      tags$line(x1 = "15.41", y1 = "6.51", x2 = "8.59", y2 = "10.49")
+                    ),
+                    tags$span(t("share_match"))
                   )
                 ),
 

@@ -425,6 +425,38 @@ th { background-color: #f2f2f2; }
   flex-shrink: 0;
 }
 
+/* --- Match Profile Share Button --- */
+.mp-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #8B0000, #CC0000);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.25);
+  white-space: nowrap;
+}
+.mp-share-btn:hover {
+  background: linear-gradient(135deg, #a00000, #e60000);
+  box-shadow: 0 4px 14px rgba(139, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+.mp-share-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(139, 0, 0, 0.3);
+}
+.mp-share-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .comp-hub-match-row {
   display: block;
   text-decoration: none;
@@ -849,6 +881,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (document.getElementById('team-page-data')) initializeTeamProfilePage();
   if (document.getElementById('competition-hub-data')) initializeCompetitionHub();
+  if (document.getElementById('match-snapshot-data')) {
+    const matchShareBtn = document.getElementById('mp-share-btn');
+    if (matchShareBtn) {
+      matchShareBtn.addEventListener('click', shareMatchSnapshot);
+    }
+  }
 });
 
 /**
@@ -1353,6 +1391,321 @@ function initializeTeamProfilePage() {
   window.updateScheduleView = updateScheduleView;
 }
 
+
+// ========================================================================
+// GLOBAL SNAPSHOT HELPERS (used by both hub and match profiles)
+// ========================================================================
+
+
+// ========================================================================
+// SOCIAL MEDIA SNAPSHOT (9:16 canvas render)
+// ========================================================================
+// --- Helpers for snapshot ---
+function extractCurrentLangText(htmlString, lang) {
+    if (!htmlString) return '';
+    const div = document.createElement('div');
+    div.innerHTML = htmlString;
+    const span = div.querySelector(`.lang-${lang}`);
+    return span ? span.textContent : (div.textContent || div.innerText || '').trim();
+}
+
+function formatMatchDate(fechaStr) {
+    if (!fechaStr) return '';
+    const parts = fechaStr.split('.');
+    if (parts.length !== 3) return fechaStr;
+    const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    const dayNames = {
+      mk: ['\u041d\u0435\u0434', '\u041f\u043e\u043d', '\u0412\u0442\u043e', '\u0421\u0440\u0435', '\u0427\u0435\u0442', '\u041f\u0435\u0442', '\u0421\u0430\u0431'],
+      sq: ['Die', 'H\u00ebn', 'Mar', 'M\u00ebr', 'Enj', 'Pre', 'Sht'],
+      es: ['Dom', 'Lun', 'Mar', 'Mi\u00e9', 'Jue', 'Vie', 'S\u00e1b'],
+      en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    };
+    const names = dayNames[currentLang] || dayNames.en;
+    return `${names[d.getDay()]}, ${fechaStr}`;
+}
+
+// ========================================================================
+// MATCH PROFILE SNAPSHOT (9:16 canvas render)
+// ========================================================================
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let currentY = y;
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i] + ' ';
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && i > 0) {
+        ctx.fillText(line.trim(), x, currentY);
+        line = words[i] + ' ';
+        currentY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line.trim(), x, currentY);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
+
+// ========================================================================
+// MATCH PROFILE SNAPSHOT (9:16 canvas render)
+// ========================================================================
+async function shareMatchSnapshot() {
+    const dataEl = document.getElementById('match-snapshot-data');
+    if (!dataEl) return;
+    const matchData = JSON.parse(dataEl.textContent);
+
+    const shareBtn = document.getElementById('mp-share-btn');
+    if (shareBtn) {
+      shareBtn.disabled = true;
+      shareBtn.dataset.originalHtml = shareBtn.innerHTML;
+      shareBtn.textContent = '\u23F3 ' + extractCurrentLangText(matchData.translations.share_match || '', currentLang);
+    }
+
+    try {
+      const W = 1080;
+      const H = 1920;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // Background
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#1a0a0a');
+      grad.addColorStop(0.3, '#2d1010');
+      grad.addColorStop(0.7, '#1a0a0a');
+      grad.addColorStop(1, '#0d0505');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Top accent line
+      ctx.fillStyle = '#CC0000';
+      ctx.fillRect(0, 0, W, 6);
+
+      // Competition name
+      const compName = extractCurrentLangText(matchData.comp_name || '', currentLang);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      wrapText(ctx, compName, W / 2, 70, W - 120, 52);
+
+      // Decorative separator
+      ctx.strokeStyle = '#CC0000';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 180, 155);
+      ctx.lineTo(W / 2 + 180, 155);
+      ctx.stroke();
+
+      // Jornada
+      const roundNameRaw = extractCurrentLangText(matchData.jornada_texto || '', currentLang);
+      const roundNum = String(matchData.jornada || '');
+      const roundName = roundNum && !roundNameRaw.includes(roundNum)
+        ? roundNameRaw + ' ' + roundNum
+        : roundNameRaw;
+      ctx.fillStyle = '#E0C080';
+      ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(roundName, W / 2, 175);
+
+      // Pre-load logos
+      const logoCache = {};
+      const loadLogo = (url) => {
+        if (!url) return null;
+        if (logoCache[url] !== undefined) return logoCache[url];
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => { logoCache[url] = img; resolve(img); };
+          img.onerror = () => { logoCache[url] = null; resolve(null); };
+          img.src = url;
+        });
+      };
+
+      await Promise.all([loadLogo(matchData.local_logo_path), loadLogo(matchData.visitante_logo_path)]);
+
+      // Scoreboard card
+      const boardY = 280;
+      const boardH = 500;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+      roundRect(ctx, 80, boardY, W - 160, boardH, 20);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(139, 0, 0, 0.4)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, 80, boardY, W - 160, boardH, 20);
+      ctx.stroke();
+
+      const centerY = boardY + boardH / 2;
+
+      // Local team
+      const localName = extractCurrentLangText(matchData.homeTeam || '', currentLang);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      let displayLocalName = localName;
+      while (ctx.measureText(displayLocalName).width > 300 && displayLocalName.length > 3) {
+        displayLocalName = displayLocalName.slice(0, -1);
+      }
+      if (displayLocalName !== localName) displayLocalName += '...';
+      ctx.fillText(displayLocalName, W / 2 - 220, centerY - 90);
+
+      const localLogo = logoCache[matchData.local_logo_path];
+      if (localLogo) {
+        ctx.drawImage(localLogo, W / 2 - 280, centerY - 70, 120, 120);
+      }
+
+      // Visitante team
+      const visitName = extractCurrentLangText(matchData.awayTeam || '', currentLang);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      let displayVisitName = visitName;
+      while (ctx.measureText(displayVisitName).width > 300 && displayVisitName.length > 3) {
+        displayVisitName = displayVisitName.slice(0, -1);
+      }
+      if (displayVisitName !== visitName) displayVisitName += '...';
+      ctx.fillText(displayVisitName, W / 2 + 220, centerY - 90);
+
+      const visitLogo = logoCache[matchData.visitante_logo_path];
+      if (visitLogo) {
+        ctx.drawImage(visitLogo, W / 2 + 160, centerY - 70, 120, 120);
+      }
+
+      // Score
+      const scoreText = (matchData.homeScore || '0') + ' - ' + (matchData.awayScore || '0');
+      ctx.fillStyle = 'rgba(204, 0, 0, 0.15)';
+      const scoreTextWidth = ctx.measureText(scoreText).width;
+      const pillW = Math.max(scoreTextWidth + 50, 140);
+      const pillH = 80;
+      roundRect(ctx, W / 2 - pillW / 2, centerY - pillH / 2, pillW, pillH, 16);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(204, 0, 0, 0.3)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, W / 2 - pillW / 2, centerY - pillH / 2, pillW, pillH, 16);
+      ctx.stroke();
+
+      ctx.fillStyle = '#CC0000';
+      ctx.font = 'bold 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(scoreText, W / 2, centerY);
+
+      // Date, time, stadium (inside card)
+      const dateTimeParts = [];
+      if (matchData.date) dateTimeParts.push(formatMatchDate(matchData.date));
+      if (matchData.time) dateTimeParts.push(matchData.time);
+
+      const infoY = centerY + 70;
+      if (dateTimeParts.length > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(dateTimeParts.join('  \u00b7  '), W / 2, infoY);
+      }
+
+      if (matchData.stadium) {
+        const lugarText = extractCurrentLangText(matchData.stadium, currentLang);
+        if (lugarText) {
+          ctx.fillStyle = 'rgba(255,255,255,0.45)';
+          ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(lugarText, W / 2, infoY + 45);
+        }
+      }
+
+      // Goal scorers
+      let scorersY = boardY + boardH + 70;
+
+      if (matchData.homeGoals && matchData.homeGoals.length > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        matchData.homeGoals.forEach((g, i) => {
+          const name = extractCurrentLangText(g.player || '', currentLang);
+          const og = g.is_autogol ? ' (OG)' : '';
+          ctx.fillText(name + og + ' ' + g.minute, W / 2 - 60, scorersY + i * 38);
+        });
+      }
+
+      if (matchData.awayGoals && matchData.awayGoals.length > 0) {
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        matchData.awayGoals.forEach((g, i) => {
+          const name = extractCurrentLangText(g.player || '', currentLang);
+          const og = g.is_autogol ? ' (OG)' : '';
+          ctx.fillText(g.minute + ' ' + name + og, W / 2 + 60, scorersY + i * 38);
+        });
+      }
+
+      const maxScorerLines = Math.max(
+        (matchData.homeGoals || []).length,
+        (matchData.awayGoals || []).length
+      );
+      if (maxScorerLines > 0) scorersY += maxScorerLines * 38 + 30;
+
+      // Footer
+      const footerY = H - 120;
+      ctx.fillStyle = 'rgba(204, 0, 0, 0.5)';
+      ctx.fillRect(W / 2 - 150, footerY, 300, 3);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('@zfudbalmk', W / 2, footerY + 30);
+
+      // Download
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safeLocal = extractCurrentLangText(matchData.homeTeam || 'home', currentLang).replace(/[^a-z0-9]/gi, '_').substring(0, 20);
+        const safeVisit = extractCurrentLangText(matchData.awayTeam || 'away', currentLang).replace(/[^a-z0-9]/gi, '_').substring(0, 20);
+        a.download = safeLocal + '_vs_' + safeVisit + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (shareBtn) {
+          shareBtn.disabled = false;
+          shareBtn.innerHTML = shareBtn.dataset.originalHtml || '';
+        }
+      }, 'image/png');
+
+    } catch(e) {
+      console.error('Match snapshot generation failed:', e);
+      if (shareBtn) {
+        shareBtn.disabled = false;
+        shareBtn.innerHTML = shareBtn.dataset.originalHtml || '';
+      }
+    }
+}
+
 function initializeCompetitionHub() {
   const dataEl = document.getElementById('competition-hub-data');
   if (!dataEl) return;
@@ -1436,33 +1789,6 @@ function initializeCompetitionHub() {
   window.hubData = hubData; // Expose for snapshot
   renderScheduleRound(currentRoundIndex);
   renderStatsTable('goleadoras');
-
-  // ========================================================================
-  // SOCIAL MEDIA SNAPSHOT (9:16 canvas render)
-  // ========================================================================
-  // --- Helpers for snapshot ---
-  function extractCurrentLangText(htmlString, lang) {
-    if (!htmlString) return '';
-    const div = document.createElement('div');
-    div.innerHTML = htmlString;
-    const span = div.querySelector(`.lang-${lang}`);
-    return span ? span.textContent : (div.textContent || div.innerText || '').trim();
-  }
-
-  function formatMatchDate(fechaStr) {
-    if (!fechaStr) return '';
-    const parts = fechaStr.split('.');
-    if (parts.length !== 3) return fechaStr;
-    const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-    const dayNames = {
-      mk: ['\u041d\u0435\u0434', '\u041f\u043e\u043d', '\u0412\u0442\u043e', '\u0421\u0440\u0435', '\u0427\u0435\u0442', '\u041f\u0435\u0442', '\u0421\u0430\u0431'],
-      sq: ['Die', 'H\u00ebn', 'Mar', 'M\u00ebr', 'Enj', 'Pre', 'Sht'],
-      es: ['Dom', 'Lun', 'Mar', 'Mi\u00e9', 'Jue', 'Vie', 'S\u00e1b'],
-      en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    };
-    const names = dayNames[currentLang] || dayNames.en;
-    return `${names[d.getDay()]}, ${fechaStr}`;
-  }
 
   const shareBtn = document.getElementById('comp-hub-share-btn');
   if (shareBtn) {
@@ -1760,37 +2086,6 @@ function initializeCompetitionHub() {
     }
   }
 
-  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    let line = '';
-    let currentY = y;
-    for (let i = 0; i < words.length; i++) {
-      const testLine = line + words[i] + ' ';
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && i > 0) {
-        ctx.fillText(line.trim(), x, currentY);
-        line = words[i] + ' ';
-        currentY += lineHeight;
-      } else {
-        line = testLine;
-      }
-    }
-    ctx.fillText(line.trim(), x, currentY);
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  }
 }
 
 )"
@@ -1812,8 +2107,8 @@ if (file.exists("favicon.png")) {
 # regeneran. Esto es \u00fatil para hacer pruebas r\u00e1pidas en una secci\u00f3n.
 # Para una construcci\u00f3n completa, todos deben estar en TRUE.
 
-GENERAR_PAGINAS_ESTATICAS <- TRUE 
-GENERAR_PAGINAS_COMPETICION <- TRUE
+GENERAR_PAGINAS_ESTATICAS <- FALSE 
+GENERAR_PAGINAS_COMPETICION <- FALSE
 GENERAR_PERFILES_PARTIDO <- TRUE # Perfiles individuales para cada partido
 GENERAR_PERFILES_JUGADORA <- TRUE # Perfiles individuales para cada jugadora
 GENERAR_PERFILES_EQUIPO <- TRUE # Perfiles individuales para cada equipo

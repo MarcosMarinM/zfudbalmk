@@ -265,3 +265,4 @@ nav.ofl_gostivar,ОФЛ Гостивар,OFL Gostivar,OFL Gostivar,OFL Gostivar
 nav.ofl_struga,ОФЛ Струга,OFL Strugë,OFL Struga,OFL Struga
 nav.pomali_petlinja_cat_base,Помали петлиња,Fëmijë të vegjël,Alevines,Younger kids
 category_other,Останато,Te tjera,Otras,Otherr
+share_match,Сподели,Shpërndaj,Compartir,Share
