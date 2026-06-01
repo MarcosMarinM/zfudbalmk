@@ -590,8 +590,11 @@ leer_exclusiones <- function() {
 #                   120 min después del pitido inicial.
 #   "Live_Post"  → Ya pasaron 120 min pero el izvestaj aún no tiene datos
 #                   completos; reintentar en la próxima ejecución.
+#                   También se usa para najavas que fallaron (red/rate-limit).
+#                   Se reintenta hasta 3 veces antes de archivar.
 #   "Archived"   → Izvestaj con alineaciones = datos definitivos; NUNCA
 #                   volver a consultar.
+#                   O najava vacía después de 3 intentos fallidos.
 # ============================================================================
 cargar_tracking <- function(ruta = "tracking.rds") {
   if (file.exists(ruta)) {
@@ -1275,13 +1278,36 @@ main <- function() {
         if (najava_vacia_excl) {
           consecutivos_vacios <- consecutivos_vacios + 1
           message(sprintf("   ID %s: najava vacía (excluded, %d/7 consecutivos)", id_chr, consecutivos_vacios))
-          # Archive in tracking so we never retry
-          tracking <- actualizar_tracking(
-            tracking, id_chr, "Archived",
-            fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
-            ahora = ahora, intentos = 0L, tiene_datos = FALSE,
-            comp_nombre = NA_character_, comp_temporada = NA_character_
-          )
+          
+          # No archivar inmediatamente: reintentar hasta 3 veces por si es
+          # rate-limiting transitorio de FFM
+          intentos_prev_excl <- 0L
+          idx_excl <- which(tracking$id_partido == id_chr)
+          if (length(idx_excl) > 0) {
+            intentos_prev_excl <- tracking$intentos_izvestaj[idx_excl[1]]
+          }
+          nuevos_intentos_excl <- intentos_prev_excl + 1L
+          
+          if (nuevos_intentos_excl >= 3) {
+            # 3 strikes: archivar permanentemente (probablemente no es un partido real)
+            tracking <- actualizar_tracking(
+              tracking, id_chr, "Archived",
+              fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
+              ahora = ahora, intentos = nuevos_intentos_excl, tiene_datos = FALSE,
+              comp_nombre = NA_character_, comp_temporada = NA_character_
+            )
+            message(sprintf("   ID %s: najava vacía x3 → ARCHIVED permanentemente.", id_chr))
+          } else {
+            # Reintentar en la próxima ejecución
+            tracking <- actualizar_tracking(
+              tracking, id_chr, "Live_Post",
+              fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
+              ahora = ahora, intentos = nuevos_intentos_excl, tiene_datos = FALSE,
+              comp_nombre = NA_character_, comp_temporada = NA_character_
+            )
+            message(sprintf("   ID %s: najava vacía (intento %d/3) → Live_Post para reintentar.", id_chr, nuevos_intentos_excl))
+          }
+          
           if (consecutivos_vacios >= 7) {
             message(sprintf("   >>> EARLY EXIT: 7 IDs vacíos consecutivos en %s.", comp$label))
             break
@@ -1418,13 +1444,36 @@ main <- function() {
         if (najava_vacia) {
           consecutivos_vacios <- consecutivos_vacios + 1
           message(sprintf("   ID %s: najava vacía (%d/7 consecutivos)", id_chr, consecutivos_vacios))
-          # Archive in tracking so we never retry (these are "jumped" IDs, not real matches)
-          tracking <- actualizar_tracking(
-            tracking, id_chr, "Archived",
-            fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
-            ahora = ahora, intentos = 0L, tiene_datos = FALSE,
-            comp_nombre = NA_character_, comp_temporada = NA_character_
-          )
+          
+          # No archivar inmediatamente: reintentar hasta 3 veces por si es
+          # rate-limiting transitorio de FFM
+          intentos_prev_naj <- 0L
+          idx_naj <- which(tracking$id_partido == id_chr)
+          if (length(idx_naj) > 0) {
+            intentos_prev_naj <- tracking$intentos_izvestaj[idx_naj[1]]
+          }
+          nuevos_intentos_naj <- intentos_prev_naj + 1L
+          
+          if (nuevos_intentos_naj >= 3) {
+            # 3 strikes: archivar permanentemente (probablemente no es un partido real)
+            tracking <- actualizar_tracking(
+              tracking, id_chr, "Archived",
+              fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
+              ahora = ahora, intentos = nuevos_intentos_naj, tiene_datos = FALSE,
+              comp_nombre = NA_character_, comp_temporada = NA_character_
+            )
+            message(sprintf("   ID %s: najava vacía x3 → ARCHIVED permanentemente.", id_chr))
+          } else {
+            # Reintentar en la próxima ejecución
+            tracking <- actualizar_tracking(
+              tracking, id_chr, "Live_Post",
+              fecha_partido = as.POSIXct(NA, tz = "Europe/Skopje"),
+              ahora = ahora, intentos = nuevos_intentos_naj, tiene_datos = FALSE,
+              comp_nombre = NA_character_, comp_temporada = NA_character_
+            )
+            message(sprintf("   ID %s: najava vacía (intento %d/3) → Live_Post para reintentar.", id_chr, nuevos_intentos_naj))
+          }
+
           if (consecutivos_vacios >= 7) {
             message(sprintf("   >>> EARLY EXIT: 7 IDs vacíos consecutivos en %s. Saltando competición.", comp$label))
             break
