@@ -48,3 +48,4 @@ id_partido,goles_local,goles_visitante
 1002447,3,0
 1002475,0,3
 1002438,3,0
+10059018,0,3
