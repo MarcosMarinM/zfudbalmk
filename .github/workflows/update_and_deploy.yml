@@ -52,15 +52,19 @@ jobs:
           key: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-${{ hashFiles('scrape.R', 'buildhtml.R') }}
           restore-keys: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-
 
+      - name: Get last RDS-modifying commit hash
+        id: rds-commit
+        run: echo "hash=$(git log -1 --format='%H' -- '*.rds')" >> $GITHUB_OUTPUT
+
       - name: Restore RDS from cache
         id: cache-rds
         uses: actions/cache/restore@v4
         with:
           path: |
             *.rds
-          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
+          key: rds-cache-v3-${{ runner.os }}-${{ steps.rds-commit.outputs.hash }}
           restore-keys: |
-            rds-cache-v2-${{ runner.os }}-
+            rds-cache-v3-${{ runner.os }}-${{ steps.rds-commit.outputs.hash }}
 
       - name: "Fallback: use workspace files, download from release, or restore from git history"
         if: steps.cache-rds.outputs.cache-hit != 'true'
@@ -118,7 +122,7 @@ jobs:
         with:
           path: |
             *.rds
-          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
+          key: rds-cache-v3-${{ runner.os }}-${{ steps.rds-commit.outputs.hash }}
 
       - name: Upload RDS to release (single rotating asset)
         if: always()

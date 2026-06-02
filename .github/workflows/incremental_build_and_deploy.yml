@@ -55,15 +55,19 @@ jobs:
           key: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-${{ hashFiles('scrape.R', 'buildhtml.R') }}
           restore-keys: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-
 
+      - name: Get last RDS-modifying commit hash
+        id: rds-commit
+        run: echo "hash=$(git log -1 --format='%H' -- '*.rds')" >> $GITHUB_OUTPUT
+
       - name: Restore RDS from cache
         id: cache-rds
         uses: actions/cache/restore@v4
         with:
           path: |
             *.rds
-          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
+          key: rds-cache-v3-${{ runner.os }}-${{ steps.rds-commit.outputs.hash }}
           restore-keys: |
-            rds-cache-v2-${{ runner.os }}-
+            rds-cache-v3-${{ runner.os }}-${{ steps.rds-commit.outputs.hash }}
 
       - name: "Fallback: use workspace files, download from release, or restore from git history"
         if: steps.cache-rds.outputs.cache-hit != 'true'
@@ -119,6 +123,12 @@ jobs:
         id: check-changes
         run: |
           hubo=$(Rscript -e 'info <- readRDS("cache_info.rds"); cat(ifelse(info$hubo_cambios, "true", "false"))' 2>/dev/null || echo "true")
+          # Si el scraper no detecto cambios, verificar si los RDS cambiaron en el commit actual
+          if [ "$hubo" != "true" ] && git diff --name-only HEAD~1 HEAD -- '*.rds' 2>/dev/null | grep -q '.'; then
+            echo "RDS files changed in commit. Forcing page regeneration."
+            rm -f build_log.rds
+            hubo="true"
+          fi
           echo "hubo_cambios=$hubo" >> $GITHUB_OUTPUT
           if [ "$hubo" = "true" ]; then
             echo "Cambios detectados. Continuando con build y deploy."
@@ -137,7 +147,7 @@ jobs:
         with:
           path: |
             *.rds
-          key: rds-cache-v2-${{ runner.os }}-${{ github.run_id }}
+          key: rds-cache-v3-${{ runner.os }}-${{ steps.rds-commit.outputs.hash }}
 
       - name: Upload RDS to release (single rotating asset)
         if: always()
