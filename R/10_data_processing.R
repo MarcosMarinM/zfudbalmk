@@ -256,6 +256,10 @@ if (is.null(attr(resultados_exitosos, "nombres_procesados"))) {
   message("   > Names have already been corrected and reordered in a previous run. Skipping.")
 }
 
+# 10.0.4.1. Apply club continuity rules (season-aware club name replacements)
+# This is deferred to after master dataframes are created (see 10.1.1.2 below)
+# so that season info from partidos_df can be joined to goals/cards.
+
 # 10.0.5. Simplify referee names (post-correction)
 message("   > Simplifying referee names...")
 resultados_exitosos <- map(resultados_exitosos, function(res) {
@@ -915,6 +919,62 @@ for (df_name in c("goles_df_unificado", "tarjetas_df_unificado", "penales_df_uni
 }
 
 message(paste("   > All other master dataframes created."))
+
+# 10.1.1.3. Apply club continuity rules (season-aware club name replacements)
+if (exists("club_continuity_df") && !is.null(club_continuity_df) && nrow(club_continuity_df) > 0) {
+  message("   > Applying club continuity rules to master dataframes...")
+
+  # Apply to partidos_df (main match dataframe)
+  partidos_df <- aplicar_club_continuity(
+    partidos_df,
+    columnas = c("local", "visitante"),
+    continuity_df = club_continuity_df,
+    temporada_col = "competicion_temporada"
+  )
+
+  # Apply to goles_df_unificado (join season info first)
+  if (exists("goles_df_unificado") && nrow(goles_df_unificado) > 0 &&
+      all(c("equipo_jugadora", "equipo_acreditado") %in% names(goles_df_unificado))) {
+    goles_df_unificado <- goles_df_unificado %>%
+      left_join(partidos_df %>% select(id_partido, competicion_temporada), by = "id_partido") %>%
+      aplicar_club_continuity(
+        columnas = c("equipo_jugadora", "equipo_acreditado"),
+        continuity_df = club_continuity_df,
+        temporada_col = "competicion_temporada"
+      ) %>%
+      select(-competicion_temporada)
+  }
+
+  # Apply to tarjetas_df_unificado (join season info first)
+  if (exists("tarjetas_df_unificado") && nrow(tarjetas_df_unificado) > 0 &&
+      "equipo" %in% names(tarjetas_df_unificado)) {
+    tarjetas_df_unificado <- tarjetas_df_unificado %>%
+      left_join(partidos_df %>% select(id_partido, competicion_temporada), by = "id_partido") %>%
+      aplicar_club_continuity(
+        columnas = "equipo",
+        continuity_df = club_continuity_df,
+        temporada_col = "competicion_temporada"
+      ) %>%
+      select(-competicion_temporada)
+  }
+
+  # Apply to penales_df_unificado (join season info first)
+  if (exists("penales_df_unificado") && !is.null(penales_df_unificado) && nrow(penales_df_unificado) > 0 &&
+      "equipo" %in% names(penales_df_unificado)) {
+    penales_df_unificado <- penales_df_unificado %>%
+      left_join(partidos_df %>% select(id_partido, competicion_temporada), by = "id_partido") %>%
+      aplicar_club_continuity(
+        columnas = "equipo",
+        continuity_df = club_continuity_df,
+        temporada_col = "competicion_temporada"
+      ) %>%
+      select(-competicion_temporada)
+  }
+
+  message("   > Club continuity rules applied to all master dataframes.")
+} else {
+  message("   > No club continuity rules to apply.")
+}
 
 ### 10.2. Assign Match Duration (national team logic disabled)
 message("Step 10.2: Applying business logic (match duration; national team logic disabled)...")

@@ -1,0 +1,2 @@
+old_name,new_name,season_from
+"Конзули","Пелистер","26/27"

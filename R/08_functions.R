@@ -232,6 +232,64 @@ aplicar_conversiones <- function(data_input, columnas = NULL, mapa_df) {
   }
 }
 
+# ============================================================================
+# CLUB CONTINUITY: Apply season-aware club name replacements
+# ============================================================================
+#'
+#' @title Apply club continuity rules to replace renamed club names.
+#' @description For matches in seasons BEFORE the transition, replace the new
+#' club name with the old name. This allows historical matches to display the
+#' name the club was known by at that time.
+#' @param data_input A dataframe or character vector.
+#' @param columnas Column names to apply continuity to (for dataframes).
+#' @param continuity_df Dataframe with old_name, new_name, season_from columns.
+#' @param temporada_col Name of the season column in the dataframe (default: competicion_temporada).
+#' @return The modified dataframe or vector.
+aplicar_club_continuity <- function(data_input, columnas = NULL, continuity_df, temporada_col = "competicion_temporada") {
+  # Guard clauses
+  if (is.null(continuity_df) || nrow(continuity_df) == 0) {
+    return(data_input)
+  }
+  if (is.null(data_input) || (is.data.frame(data_input) && nrow(data_input) == 0) ||
+      (!is.data.frame(data_input) && length(data_input) == 0)) {
+    return(data_input)
+  }
+
+  if (is.data.frame(data_input)) {
+    df <- data_input
+    # Apply each continuity rule
+    for (i in seq_len(nrow(continuity_df))) {
+      old_name <- continuity_df$old_name[i]
+      new_name <- continuity_df$new_name[i]
+      from_season <- continuity_df$season_from[i]
+
+      for (col_name in intersect(columnas, names(df))) {
+        # Replace new_name with old_name only for seasons BEFORE from_season
+        if (temporada_col %in% names(df)) {
+          df[[col_name]] <- ifelse(
+            df[[col_name]] == new_name & !is.na(df[[temporada_col]]) &
+              df[[temporada_col]] < from_season,
+            old_name,
+            df[[col_name]]
+          )
+        } else {
+          # No season column: unconditionally replace
+          df[[col_name]] <- ifelse(df[[col_name]] == new_name, old_name, df[[col_name]])
+        }
+      }
+    }
+    return(df)
+  } else if (is.character(data_input)) {
+    # For character vectors without season context, replace all occurrences
+    result <- data_input
+    for (i in seq_len(nrow(continuity_df))) {
+      result <- ifelse(result == continuity_df$new_name[i], continuity_df$old_name[i], result)
+    }
+    return(result)
+  }
+  return(data_input)
+}
+
 #' @title Reorder names from "Lastname Firstname" to "Firstname Lastname" idempotently.
 #' @description This function uses heuristics to detect if a two-word name is in
 #' the "Lastname Firstname" format by checking for common Macedonian feminine

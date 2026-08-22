@@ -111,6 +111,7 @@ The `.rds` files are committed to git once as a seed. The workflow never commits
 | `competitions_disambiguation.txt` | Ambiguous competition name resolution |
 | `sanctions.txt` | Player/club sanctions |
 | `conversions.txt` | Data normalisation rules |
+| `club_continuity.txt` | Club name changes across seasons (old→new with season threshold) |
 | `gradovi.txt` | City/town names |
 | `classification_styles.txt` | League classification CSS styles |
 | `comps_ffm.xlsx` | Competition metadata spreadsheet |

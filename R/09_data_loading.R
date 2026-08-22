@@ -241,6 +241,39 @@ if (file.exists(ruta_conversiones)) {
 }
 
 
+### 9.3.1 Load Club Continuity Rules
+message("Loading club continuity rules...")
+
+ruta_club_continuity <- if (file.exists("club_continuity.txt")) "club_continuity.txt" else "dictionaries/club_continuity.txt"
+club_continuity_df <- NULL
+if (file.exists(ruta_club_continuity)) {
+  tryCatch({
+    club_continuity_df <- read.csv(ruta_club_continuity, stringsAsFactors = FALSE, encoding = "UTF-8")
+    # Normalize column names
+    names(club_continuity_df) <- tolower(trimws(names(club_continuity_df)))
+    # Ensure required columns exist
+    if (all(c("old_name", "new_name", "season_from") %in% names(club_continuity_df))) {
+      club_continuity_df <- club_continuity_df %>%
+        mutate(
+          old_name = trimws(old_name),
+          new_name = trimws(new_name),
+          season_from = trimws(season_from)
+        ) %>%
+        filter(!is.na(old_name), !is.na(new_name), old_name != "", new_name != "")
+      message(paste("   > Loaded", nrow(club_continuity_df), "club continuity rules from", ruta_club_continuity))
+    } else {
+      warning("club_continuity.txt is missing required columns (old_name, new_name, season_from). Skipping.")
+      club_continuity_df <- NULL
+    }
+  }, error = function(e) {
+    warning(paste("Error loading club_continuity.txt:", e$message))
+    club_continuity_df <<- NULL
+  })
+} else {
+  message("club_continuity.txt not found. Continuing without club continuity rules.")
+}
+
+
 ### 9.4. Load Dynamic Name Translations and Corrections
 message("Loading dynamic name translations/corrections...")
 
