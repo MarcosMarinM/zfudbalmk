@@ -1438,14 +1438,17 @@ minutos_df_raw <- map_dfr(resultados_exitosos, function(res) {
       cambios_procesados <- cambios %>%
         mutate(d_entra = as.numeric(str_match(texto, "Entra .*?\\((\\d+)\\)")[, 2]), d_sale = as.numeric(str_match(texto, "por .*?\\((\\d+)\\)")[, 2])) %>%
         select(minuto, d_entra, d_sale) %>%
-        filter(!is.na(d_entra) & !is.na(d_sale))
-      for (i in 1:nrow(cambios_procesados)) {
+        # Skip substitutions without a recorded minute (cannot place them on the
+        # timeline) and without a parseable jersey number. Otherwise the NA would
+        # propagate to min_entra/min_sale and make minutos_jugados = NA.
+        filter(!is.na(d_entra) & !is.na(d_sale) & !is.na(minuto))
+      for (i in seq_len(nrow(cambios_procesados))) {
         cambio <- cambios_procesados[i, ]
         jugadoras_con_minutos <- jugadoras_con_minutos %>% 
           mutate(
-            min_sale = if_else(dorsal == cambio$d_sale, as.numeric(cambio$minuto), min_sale), 
-            min_entra = if_else(dorsal == cambio$d_entra, as.numeric(cambio$minuto), min_entra),
-            fue_sustituido = if_else(dorsal == cambio$d_sale, TRUE, fue_sustituido)
+            min_sale = if_else(!is.na(dorsal) & dorsal == cambio$d_sale, as.numeric(cambio$minuto), min_sale), 
+            min_entra = if_else(!is.na(dorsal) & dorsal == cambio$d_entra, as.numeric(cambio$minuto), min_entra),
+            fue_sustituido = if_else(!is.na(dorsal) & dorsal == cambio$d_sale, TRUE, fue_sustituido)
           )
       }
     }

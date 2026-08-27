@@ -601,18 +601,36 @@ stats_jugadoras_por_equipo_temporada_df <- apariciones_comp_context_df %>%
     .groups = 'drop'
   ) %>%
   left_join(
-    goles_df_unificado %>%
-      filter(tipo == "Normal") %>%
-      left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
-      group_by(id, equipo = equipo_jugadora, competicion_nombre, competicion_temporada) %>%
-      summarise(Goals = n(), .groups = 'drop'),
+    {
+      # CORRECCIÓN: atribuir los goles al equipo canónico de la jugadora en cada
+      # partido (vía id + id_partido) en lugar de unir por `equipo_jugadora`,
+      # cuyo valor puede venir en alfabeto latino y nunca coincidiría con el
+      # nombre en cirílico de la aparición (todo el roster salía con 0 goles).
+      mapa_partido_jugadora_a_equipo <- apariciones_comp_context_df %>%
+        distinct(id, id_partido, equipo_canonico = equipo)
+      goles_df_unificado %>%
+        filter(tipo == "Normal", !is.na(id)) %>%
+        left_join(mapa_partido_jugadora_a_equipo, by = c("id", "id_partido"), relationship = "many-to-many") %>%
+        left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+        filter(!is.na(equipo_canonico)) %>%
+        group_by(id, equipo = equipo_canonico, competicion_nombre, competicion_temporada) %>%
+        summarise(Goals = n(), .groups = 'drop')
+    },
     by = c("id", "equipo", "competicion_nombre", "competicion_temporada")
   ) %>%
   left_join(
-    tarjetas_df_unificado %>%
-      left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
-      group_by(id, equipo, competicion_nombre, competicion_temporada) %>%
-      summarise(Yellows = sum(tipo == "Amarilla", na.rm = TRUE), Reds = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop'),
+    {
+      # CORRECCIÓN: mismo criterio para las tarjetas (equipo canónico por partido).
+      mapa_partido_jugadora_a_equipo <- apariciones_comp_context_df %>%
+        distinct(id, id_partido, equipo_canonico = equipo)
+      tarjetas_df_unificado %>%
+        filter(!is.na(id)) %>%
+        left_join(mapa_partido_jugadora_a_equipo, by = c("id", "id_partido"), relationship = "many-to-many") %>%
+        left_join(partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada), by = "id_partido") %>%
+        filter(!is.na(equipo_canonico)) %>%
+        group_by(id, equipo = equipo_canonico, competicion_nombre, competicion_temporada) %>%
+        summarise(Yellows = sum(tipo == "Amarilla", na.rm = TRUE), Reds = sum(tipo == "Roja", na.rm = TRUE), .groups = 'drop')
+    },
     by = c("id", "equipo", "competicion_nombre", "competicion_temporada")
   ) %>%
   mutate(across(c(Goals, Yellows, Reds), ~replace_na(., 0))) %>%

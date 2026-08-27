@@ -1,0 +1,18 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Volumes/Builds/packages/sonoma-arm64/Rlib/4.6/00LOCK-base64enc/00new/base64enc/libs/base64enc.so'
+relocations:
+  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _B64_encode, symObjAddr: 0x0, symBinAddr: 0x1200, symSize: 0x340 }
+  - { offset: 0x4D, size: 0x8, addend: 0x0, symName: _stb, symObjAddr: 0x3D9F, symBinAddr: 0x80E0, symSize: 0x0 }
+  - { offset: 0xAE, size: 0x8, addend: 0x0, symName: _B64_encode, symObjAddr: 0x0, symBinAddr: 0x1200, symSize: 0x340 }
+  - { offset: 0x5EA, size: 0x8, addend: 0x0, symName: _base64encode, symObjAddr: 0x340, symBinAddr: 0x1540, symSize: 0x100 }
+  - { offset: 0x67B, size: 0x8, addend: 0x0, symName: _B64_decode, symObjAddr: 0x440, symBinAddr: 0x1640, symSize: 0x200 }
+  - { offset: 0x971, size: 0x8, addend: 0x0, symName: _base64decode, symObjAddr: 0x640, symBinAddr: 0x1840, symSize: 0x474 }
+  - { offset: 0xBD6, size: 0x8, addend: 0x0, symName: _dummy, symObjAddr: 0x0, symBinAddr: 0x1CC0, symSize: 0x14 }
+  - { offset: 0xBE3, size: 0x8, addend: 0x0, symName: _dummy, symObjAddr: 0x0, symBinAddr: 0x1CC0, symSize: 0x14 }
+  - { offset: 0xC47, size: 0x8, addend: 0x0, symName: _C_URIencode, symObjAddr: 0x0, symBinAddr: 0x1D00, symSize: 0x4A0 }
+  - { offset: 0xC82, size: 0x8, addend: 0x0, symName: _C_URIencode, symObjAddr: 0x0, symBinAddr: 0x1D00, symSize: 0x4A0 }
+  - { offset: 0x1140, size: 0x8, addend: 0x0, symName: _utf8_check, symObjAddr: 0x0, symBinAddr: 0x21C0, symSize: 0x2F8 }
+  - { offset: 0x1167, size: 0x8, addend: 0x0, symName: _cause, symObjAddr: 0x1A0D, symBinAddr: 0xA0E0, symSize: 0x0 }
+  - { offset: 0x121C, size: 0x8, addend: 0x0, symName: _utf8_check, symObjAddr: 0x0, symBinAddr: 0x21C0, symSize: 0x2F8 }
+...

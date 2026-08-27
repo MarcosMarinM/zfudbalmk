@@ -1,0 +1,17 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Volumes/Builds/packages/sonoma-arm64/Rlib/4.6/00LOCK-tibble/00new/tibble/libs/tibble.so'
+relocations:
+  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _tibble_restore_impl, symObjAddr: 0x0, symBinAddr: 0x1200, symSize: 0x80 }
+  - { offset: 0x41, size: 0x8, addend: 0x0, symName: _tibble_restore_impl, symObjAddr: 0x0, symBinAddr: 0x1200, symSize: 0x80 }
+  - { offset: 0x1C0, size: 0x8, addend: 0x0, symName: _tibble_make_rownames, symObjAddr: 0x80, symBinAddr: 0x1280, symSize: 0xC4 }
+  - { offset: 0x34C, size: 0x8, addend: 0x0, symName: _tibble_string_to_indices, symObjAddr: 0x0, symBinAddr: 0x1380, symSize: 0x2C0 }
+  - { offset: 0x479, size: 0x8, addend: 0x0, symName: _tibble_string_to_indices, symObjAddr: 0x0, symBinAddr: 0x1380, symSize: 0x2C0 }
+  - { offset: 0x7FB, size: 0x8, addend: 0x0, symName: _tibble_need_coerce, symObjAddr: 0x2C0, symBinAddr: 0x1640, symSize: 0x70 }
+  - { offset: 0x917, size: 0x8, addend: 0x0, symName: _R_init_tibble, symObjAddr: 0x0, symBinAddr: 0x16C0, symSize: 0x48 }
+  - { offset: 0x93E, size: 0x8, addend: 0x0, symName: _CallEntries, symObjAddr: 0x48, symBinAddr: 0x4048, symSize: 0x0 }
+  - { offset: 0x9C8, size: 0x8, addend: 0x0, symName: _R_init_tibble, symObjAddr: 0x0, symBinAddr: 0x16C0, symSize: 0x48 }
+  - { offset: 0xB78, size: 0x8, addend: 0x0, symName: _tibble_matrixToDataFrame, symObjAddr: 0x0, symBinAddr: 0x1740, symSize: 0x480 }
+  - { offset: 0xEBC, size: 0x8, addend: 0x0, symName: _tibble_matrixToDataFrame, symObjAddr: 0x0, symBinAddr: 0x1740, symSize: 0x480 }
+  - { offset: 0x172E, size: 0x8, addend: 0x0, symName: _get_data, symObjAddr: 0x480, symBinAddr: 0x1BC0, symSize: 0xA0 }
+...

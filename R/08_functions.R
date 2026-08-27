@@ -524,8 +524,17 @@ crear_barra_navegacion <- function(path_to_root = ".", current_page_id = "home")
   }
 
   # 0. Cubos Estrictos (Buckets)
+  # A competition is senior when: it is explicitly categorized as senior, OR its
+  # category is missing/unknown (e.g. a new season not yet present in comps_ffm.xlsx)
+  # and its name does not identify it as a youth/cadet/petlinja competition. This
+  # keeps newly-added seniors leagues (e.g. 26/27) visible in the menu even before
+  # their category is mapped, while youth categories are still excluded by name.
   comps_senior <- competiciones_activas %>%
-    filter(str_detect(categoria_norm, "\u0441\u0435\u043d\u0438\u043e\u0440|senior"), !is_youth_nav)
+    filter(
+      (str_detect(categoria_norm, "\u0441\u0435\u043d\u0438\u043e\u0440|senior") |
+         (categoria_norm == "" & !is_youth_nav)),
+      !is_youth_nav
+    )
 
   # Buckets are now more robust to Latin/Cyrillic and casing
   df_prva <- comps_senior %>% filter(str_detect(competicion_nombre, "^(?i)(\u041f\u0440\u0432\u0430|Prva)"))
