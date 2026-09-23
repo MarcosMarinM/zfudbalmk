@@ -229,8 +229,10 @@ if (file.exists(ruta_conversiones)) {
       ) %>%
       # Seleccionar solo las columnas necesarias.
       select(original_lower, corregido) %>%
-      # Asegurarse de que el mapa en s\u00ed no tenga filas duplicadas.
-      distinct()
+      # Asegurarse de que el mapa tenga UNA fila por clave. Si hubiera dos
+      # canonicos distintos para el mismo original, el left_join de
+      # `aplicar_conversiones` duplicaria filas (y alargaria vectores).
+      distinct(original_lower, .keep_all = TRUE)
     
     message("Corrections file loaded and processed for case-insensitive matching.")
   }, error = function(e) {

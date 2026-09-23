@@ -1,0 +1,97 @@
+====================================================================
+ TRASPASOS - FÚTBOL FEMENINO MACEDONIO
+ Comparativa: FINAL temporada 25/26 (últimos partidos con alineación)
+   vs INICIO temporada 26/27 (primeras 2 jornadas de la Prva)
+ Se incluyen jugadoras procedentes de la Vtora (Segunda) 25/26.
+ ID = número de federación según igracki.xlsx (blanco si no consta).
+====================================================================
+
+####  ЖФК Вардар 2023  ####
+   - Туџарска Тина (Tudjarska Tina)   | previo: ФК Слободен/ЖФК       | ID: 
+   - Алексовска Андреа (Aleksovska Andrea) | previo: ФК ТОП ГОЛ/ЖФК          | ID: 260314
+   - Спирова Фросина (Spirova Frosina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 148160
+   - Стојановска Мила (Stojanovska Mila) | previo: ФК Слободен/ЖФК       | ID: 250219
+   - Грозданова Меланија (Grozdanova Melanija) | previo: ЖФК ЉУБОТЕН              | ID: 137674
+   - Величковска Ева (Velichkovska Eva) | previo: ЖФК ЉУБОТЕН              | ID: 142594
+   - Луканова Лина (Lukanova Lina)    | previo: ФК АСС УНИТЕД/ЖФК    | ID: 249861
+   - Кицара Џенита (Kicara Djenita)   | previo: ЖФК КОЧАНИ                | ID: 
+   - Накова Настасја (Nakova Nastasja) | previo: ЖФК ЉУБОТЕН              | ID: 142294
+   - Недева Викторија (Nedeva Viktorija) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 134029
+   - Крстева Кристина (Krsteva Kristina) | previo: ЖФК СКОПЈЕ 2014           | ID: 249870
+   - Боризоска Ана (Borizoska Ana)    | previo: ЖФК СКОПЈЕ 2014           | ID: 249583
+   - Бојкова Зорица (Bojkova Zorica) | previo: ЖФК БИЉАНИНИ ИЗВОРИ 2010 | ID: 147167
+
+####  ЖФК КАМЕНИCА САСА  ####
+   - Савович Анџела (Savovich Andjela) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Шопска Антонина (Shopska Antonina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 250148
+   - Николовска Елеонора (Nikolovska Eleonora) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 135134
+   - Туркоглу Селин (Turkoglu Selin) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+
+####  ЖФК КОЧАНИ  ####
+   - Бојкова Марија (Bojkova Marija) | previo: ЖФК БИЉАНИНИ ИЗВОРИ 2010 | ID: 130110
+   - Ѓоргиева Сара (Gjorgieva Sara)   | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Велинова Софија (Velinova Sofija) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Маринковска Стефанија (Marinkovska Stefanija) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 267893
+
+####  ЖФК ЉУБОТЕН  ####
+   - Ферреира Лима Ионара (Ferreira Lima Ionara) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Попески Калина (Popeski Kalina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Оливеира До Насцименто Лоурдес Роберта (Oliveira Do Nascimento Lourdes Roberta) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Јовиц Габријела (Jovic Gabrijela) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Де Матос Гуабираба Јеннјфер Тисциане (De Matos Guabiraba Jennyfer Tisciane) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Сулејмани Едина (Sulejmani Edina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 129104
+   - Имери Халиме (Imeri Halime)       | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 141897
+   - Додевска Михаела (Dodevska Mihaela) | previo: ЖФК СКОПЈЕ 2014           | ID: 250250
+
+####  ЖФК ПЕЛИСТЕР ПРО 2026 Битола  ####
+   - Сиљаноска Мартина (Siljanoska Martina) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 135425
+   - Велкоска Леонора (Velkoska Leonora) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 143443
+   - Ристевска Александра (Ristevska Aleksandra) | previo: ФК ТОП ГОЛ/ЖФК          | ID: 251189
+   - Марковска Михаела (Markovska Mihaela) | previo: ЖФК Вардар 2023           | ID: 140404
+   - Стојановска Марија (Stojanovska Marija) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 151007
+   - Марковска Анета (Markovska Aneta) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 251134
+   - Коваческа Мина (Kovacheska Mina) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 141306
+   - Нешковска Тамара (Neshkovska Tamara) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 142710
+   - Димитриоска Мелиса Милица (Dimitrioska Melisa Milica) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Талевска Мила (Talevska Mila)    | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 112313
+   - Перканоска Стефанија (Perkanoska Stefanija) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 249286
+   - Јовановска Стефани (Jovanovska Stefani) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 125641
+   - Милошевска Ивана (Miloshevska Ivana) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Димовска Ангела (Dimovska Angela) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Ангелеска Теа (Angeleska Tea)    | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Петровска Сара (Petrovska Sara) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Најдовска Стефани (Najdovska Stefani) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 259667
+   - Димитриоска Сара Слободанка (Dimitrioska Sara Slobodanka) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Трајческа Јана (Trajcheska Jana) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+   - Трајческа Јована (Trajcheska Jovana) | previo: ЖФК КОНЗУЛИ ЈУНАЈТЕД | ID: 
+
+####  ЖФК РЕЧИCА  ####
+   (sin altas detectadas)
+
+####  ЖФК СКОПЈЕ 2014  ####
+   - Поповска Анастасија (Popovska Anastasija) | previo: ФК Слободен/ЖФК       | ID: 
+   - Милевска Ивана (Milevska Ivana) | previo: ЖФК Вардар 2023           | ID: 249622
+   - Талевска Натали (Talevska Natali) | previo: ЖФК Вардар 2023           | ID: 145303
+   - Трајковска Ангелина (Trajkovska Angelina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Милошевска Јана (Miloshevska Jana) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Јорданова Христина (Jordanova Hristina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+
+####  ЖФК СЦИСТАТОВ 2015 Скопје  ####
+   - Петкова Катерина (Petkova Katerina) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 193389
+   - Здравевска Ива (Zdravevska Iva) | previo: ЖФК Вардар 2023           | ID: 
+   - Тофиловска Ана (Tofilovska Ana) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Новак Ива (Novak Iva)                | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Христова Ева (Hristova Eva)       | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Наумовска Јована (Naumovska Jovana) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Илиевска Матеа (Ilievska Matea) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 260442
+   - Головска Ања (Golovska Anja)      | previo: ЖФК СКОПЈЕ 2014           | ID: 141496
+
+####  ЖФК ТИВЕРИЈА БРЕРА АД  ####
+   - Зафирова Дора (Zafirova Dora)    | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Трајкова Убавка (Trajkova Ubavka) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+   - Одуро Чристабел Оппонг (Oduro Christabel Oppong) | previo: Sin club en 25/26 (debut/nueva incorporación) | ID: 
+
+####  ФК АСС УНИТЕД/ЖФК  ####
+   - Јулчовска Марија (Julchovska Marija) | previo: ЖФК БИЉАНИНИ ИЗВОРИ 2010 | ID: 144959
+   - Трајкоска Емилија (Trajkoska Emilija) | previo: ЖФК БИЉАНИНИ ИЗВОРИ 2010 | ID: 
+

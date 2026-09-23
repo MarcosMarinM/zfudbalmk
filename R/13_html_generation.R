@@ -1055,7 +1055,7 @@ if (hubo_cambios) {
               select(id, Pos, starts_with("PlayerName_"), TeamNames_mk, GA90, GA, Minutes, CS)
             if (nrow(tabla_porteras_comp) > 0) {
               # Determine GA base minutes for this competition's header label
-              cat_norm_porteras <- normalizar_categoria_competicion(comp_info$categoria, comp_info$competicion_nombre)
+              cat_norm_porteras <- categoria_duracion_reducida(comp_info$categoria, comp_info$competicion_temporada, comp_info$competicion_nombre)
               ga_base_minutos_header <- case_when(
                 cat_norm_porteras %in% c("\u041a\u0430\u0434\u0435\u0442\u0438", "\u041a\u0430\u0434\u0435\u0442\u0441\u043a\u0430") ~ 60,
                 cat_norm_porteras %in% c("\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438", "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430", "\u041f\u0435\u0442\u043b\u0438\u045a\u0430", "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430") ~ 80,

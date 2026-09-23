@@ -279,7 +279,7 @@ porteras_apariciones_df <- apariciones_comp_context_df %>%
   left_join(partidos_df %>% select(id_partido, duracion_partido, categoria), by = "id_partido") %>%
   mutate(
     duracion_partido = coalesce(duracion_partido, 90),
-    categoria_normalizada = normalizar_categoria_competicion(categoria, competicion_nombre),
+    categoria_normalizada = categoria_duracion_reducida(categoria, competicion_temporada_ctx, competicion_nombre),
     ga_base_minutos = case_when(
       categoria_normalizada %in% c("\u041a\u0430\u0434\u0435\u0442\u0438", "\u041a\u0430\u0434\u0435\u0442\u0441\u043a\u0430") ~ 60,
       categoria_normalizada %in% c("\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438", "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430", "\u041f\u0435\u0442\u043b\u0438\u045a\u0430", "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430") ~ 80,

@@ -195,6 +195,15 @@ aplicar_conversiones <- function(data_input, columnas = NULL, mapa_df) {
   if (is.null(data_input) || (is.data.frame(data_input) && nrow(data_input) == 0) || (!is.data.frame(data_input) && length(data_input) == 0)) {
     return(data_input)
   }
+  # 3. Blindaje many-to-one: el mapa debe tener UNA fila por clave. Si tuviera
+  #    varias (por ejemplo dos canonicos distintos para el mismo original), el
+  #    left_join duplicaria filas en los dataframes (jugadoras repetidas en
+  #    plantillas/goles/tarjetas) y alargaria los vectores de texto (un
+  #    `estadio` o `kontrolor` de 1 elemento pasaria a 2). Conservamos la
+  #    primera aparicion, que es la que ya ganaba en el resto del pipeline.
+  if ("original_lower" %in% names(mapa_df)) {
+    mapa_df <- mapa_df %>% distinct(original_lower, .keep_all = TRUE)
+  }
 
   # (normalize_for_join is now a global utility function in this file)
 
@@ -847,6 +856,21 @@ calcular_minuto_sort <- function(minuto) {
   return(as.numeric(minuto))
 }
 
+#' @title Convert a substitution clock minute to played time for minutes math.
+#' @description The first minute of the second half is recorded as
+#'   `duracion_partido / 2 + 1` (e.g. 46' for a 90-minute match). The half-time
+#'   interval is not playing time, so that boundary is mapped back to
+#'   `duracion_partido / 2` (45'); every other minute is returned unchanged.
+#'   This makes a half-time substitution count as 45 + 45 minutes instead of
+#'   46 + 44, without altering the displayed minute.
+#' @param minuto Clock minute (numeric), possibly NA.
+#' @param duracion_partido Match duration in minutes (e.g. 90, 80, 60).
+#' @return The minute adjusted to played time.
+minuto_jugado_descanso <- function(minuto, duracion_partido) {
+  medio <- duracion_partido / 2
+  ifelse(!is.na(minuto) & minuto == medio + 1, medio, minuto)
+}
+
 #' @title Get the relative file path to a club team's logo.
 #' @description Always returns a local path (no national team flag logic).
 #'   Falls back to "NOLOGO.webp" if not found.
@@ -914,6 +938,31 @@ normalizar_categoria_competicion <- function(categoria_raw, nombre_comp = "") {
     
     TRUE ~ categoria_raw_chr
   )
+}
+
+#' @title Category label gated by the legacy reduced-duration rule.
+#' @description Cadet (60') and youth (80') competitions only had shortened
+#'   matches up to the 2025/26 season. From the 2026/27 season onwards those
+#'   leagues play full 90-minute matches, so the legacy limits must be ignored
+#'   for the new seasons while staying intact for older ones (never applied
+#'   retroactively). Returns the normalized category when the reduced-duration
+#'   limits still apply for the given season, and NA otherwise so the duration
+#'   falls back to 90 minutes.
+#' @param categoria_raw Raw category label.
+#' @param temporada Season label, e.g. "25/26" or "26/27".
+#' @param nombre_comp Competition name (used for category normalization).
+#' @return Normalized category label, or NA when the 90-minute rule applies.
+categoria_duracion_reducida <- function(categoria_raw, temporada, nombre_comp = "") {
+  categoria_norm <- normalizar_categoria_competicion(categoria_raw, nombre_comp)
+
+  inicio <- suppressWarnings(as.integer(
+    sub("/.*$", "", str_squish(coalesce(as.character(temporada), "")))
+  ))
+  if (!is.na(inicio) && inicio < 100) inicio <- inicio + 2000
+
+  # Seasons before 2026/27 (and unknown ones) keep the 60/80-minute limits.
+  limite_reducido_activo <- is.na(inicio) || inicio < 2026
+  ifelse(limite_reducido_activo, categoria_norm, NA_character_)
 }
 
 #' @title Check if competition uses cup round naming.
