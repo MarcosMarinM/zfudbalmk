@@ -958,10 +958,10 @@ categoria_duracion_reducida <- function(categoria_raw, temporada, nombre_comp = 
   inicio <- suppressWarnings(as.integer(
     sub("/.*$", "", str_squish(coalesce(as.character(temporada), "")))
   ))
-  if (!is.na(inicio) && inicio < 100) inicio <- inicio + 2000
+  inicio <- ifelse(!is.na(inicio) & inicio < 100, inicio + 2000, inicio)
 
   # Seasons before 2026/27 (and unknown ones) keep the 60/80-minute limits.
-  limite_reducido_activo <- is.na(inicio) || inicio < 2026
+  limite_reducido_activo <- is.na(inicio) | inicio < 2026
   ifelse(limite_reducido_activo, categoria_norm, NA_character_)
 }
 
