@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
@@ -52,8 +52,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-${{ hashFiles('scrape.R', 'buildhtml.R') }}
-          restore-keys: ${{ runner.os }}-r-${{ steps.get-r-version.outputs.version }}-pacman-
+          key: ${{ runner.os }}-ubuntu-24.04-r-${{ steps.get-r-version.outputs.version }}-pacman-v2-${{ hashFiles('scrape.R', 'buildhtml.R', 'R/**') }}
+          restore-keys: ${{ runner.os }}-ubuntu-24.04-r-${{ steps.get-r-version.outputs.version }}-pacman-v2-
 
       - name: Get last RDS-modifying commit hash
         id: rds-commit
