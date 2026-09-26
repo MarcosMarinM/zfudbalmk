@@ -1,7 +1,7 @@
 original_mk,latin_sq,latin_es,latin_en
 Селин Туркоглу,Selin Türkoğlu,Selin Türkoğlu,Selin Türkoğlu
-Габријела Јовиќ,Gabriela Jović,Gabriela Jović,Gabriela Jović
-Јенифер Гуабираба,Jennyifer Guabiraba,Jennyifer Guabiraba,Jennyifer Guabiraba
+Габријела Јовиќ,Gabrijela Jović,Gabrijela Jović,Gabrijela Jović
+Џенифер Гуабираба,Jennyfer Guabiraba,Jennyfer Guabiraba,Jennyfer Guabiraba
 Лурдес Роберта,Lourdes Roberta,Lourdes Roberta,Lourdes Roberta
 Ионара Лима,Ionara Lima,Ionara Lima,Ionara Lima
 Кристабел Одуро,Christabel Oduro,Christabel Oduro,Christabel Oduro
