@@ -977,12 +977,11 @@ if (exists("club_continuity_df") && !is.null(club_continuity_df) && nrow(club_co
 }
 
 ### 10.2. Assign Match Duration (national team logic disabled)
-# Cadet (60') and youth (80') limits only survive up to the 2025/26 season;
-# from 2026/27 those leagues play 90 minutes (see categoria_duracion_reducida).
+# Cadet (60') and youth (80') limits apply in every season.
 message("Step 10.2: Applying business logic (match duration; national team logic disabled)...")
 partidos_df <- partidos_df %>%
   mutate(
-    categoria_normalizada_duracion = categoria_duracion_reducida(categoria, competicion_temporada, competicion_nombre),
+    categoria_normalizada_duracion = normalizar_categoria_competicion(categoria, competicion_nombre),
     duracion_partido = case_when(
       categoria_normalizada_duracion %in% c("\u041a\u0430\u0434\u0435\u0442\u0438", "\u041a\u0430\u0434\u0435\u0442\u0441\u043a\u0430") ~ 60,
       categoria_normalizada_duracion %in% c("\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438", "\u041c\u043b\u0430\u0434\u0438\u043d\u0441\u043a\u0430", "\u041f\u0435\u0442\u043b\u0438\u045a\u0430", "\u041f\u043e\u043c\u0430\u043b\u0438 \u043f\u0435\u0442\u043b\u0438\u045a\u0430") ~ 80,

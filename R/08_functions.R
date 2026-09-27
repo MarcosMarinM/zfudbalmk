@@ -940,31 +940,6 @@ normalizar_categoria_competicion <- function(categoria_raw, nombre_comp = "") {
   )
 }
 
-#' @title Category label gated by the legacy reduced-duration rule.
-#' @description Cadet (60') and youth (80') competitions only had shortened
-#'   matches up to the 2025/26 season. From the 2026/27 season onwards those
-#'   leagues play full 90-minute matches, so the legacy limits must be ignored
-#'   for the new seasons while staying intact for older ones (never applied
-#'   retroactively). Returns the normalized category when the reduced-duration
-#'   limits still apply for the given season, and NA otherwise so the duration
-#'   falls back to 90 minutes.
-#' @param categoria_raw Raw category label.
-#' @param temporada Season label, e.g. "25/26" or "26/27".
-#' @param nombre_comp Competition name (used for category normalization).
-#' @return Normalized category label, or NA when the 90-minute rule applies.
-categoria_duracion_reducida <- function(categoria_raw, temporada, nombre_comp = "") {
-  categoria_norm <- normalizar_categoria_competicion(categoria_raw, nombre_comp)
-
-  inicio <- suppressWarnings(as.integer(
-    sub("/.*$", "", str_squish(coalesce(as.character(temporada), "")))
-  ))
-  inicio <- ifelse(!is.na(inicio) & inicio < 100, inicio + 2000, inicio)
-
-  # Seasons before 2026/27 (and unknown ones) keep the 60/80-minute limits.
-  limite_reducido_activo <- is.na(inicio) | inicio < 2026
-  ifelse(limite_reducido_activo, categoria_norm, NA_character_)
-}
-
 #' @title Check if competition uses cup round naming.
 #' @param nombre_competicion Competition name.
 #' @return TRUE when it is a cup competition and not an elimination stage marker.
