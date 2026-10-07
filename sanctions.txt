@@ -1,3 +1,4 @@
 competicion_nombre,competicion_temporada,equipo,puntos_deducidos,motivo
 "Прва лига",25/26,Љуботен,12,"."
 "Втора лига",24/25,Борец,3,"."
+"Втора лига",26/27,Плачковица,3,"."
