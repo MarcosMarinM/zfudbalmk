@@ -5,3 +5,4 @@ original_mk,abbr_mk,abbr_sq,abbr_es,abbr_en
 АС Јунајтед,ЈУН,UNI,UNI,UNI
 Брера Тиверија,ТИВ,TIV,TIV,TIV
 Шкупи,ШКУ,SKU,SKU,SKU
+Топ Грлс,ТГР,TGR,TGR,TGR

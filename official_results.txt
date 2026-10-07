@@ -50,3 +50,4 @@ id_partido,goles_local,goles_visitante
 1002438,3,0
 10059018,0,3
 12237795,3,0
+12177290,3,0
