@@ -2138,6 +2138,7 @@ normalize_team_name <- function(x) {
               time = partido_info$hora %||% "",
               lang = idioma_actual,
               comp_name = as.character(comp_name_spans_val),
+              comp_name_base = as.character(comp_name_spans(partido_comp_info, season_override = "")),
               jornada_texto = as.character(jornada_texto),
               jornada = as.character(partido_info$jornada %||% ""),
               round_label = as.character(

@@ -1830,7 +1830,7 @@ async function shareMatchSnapshot() {
 
       const view = {
         title: resultTitle ? resultTitle.toUpperCase() : '',
-        comp: extractCurrentLangText(matchData.comp_name || '', currentLang),
+        comp: (extractCurrentLangText(matchData.comp_name_base || '', currentLang) || '').trim() || extractCurrentLangText(matchData.comp_name || '', currentLang),
         round: extractCurrentLangText(matchData.round_label || '', currentLang),
         homeName: extractCurrentLangText(matchData.homeTeam || '', currentLang),
         awayName: extractCurrentLangText(matchData.awayTeam || '', currentLang),
@@ -1839,7 +1839,8 @@ async function shareMatchSnapshot() {
         homeScorers: buildScorerGroups(matchData.homeGoals, (h) => extractCurrentLangText(h, currentLang), ogLabel),
         awayScorers: buildScorerGroups(matchData.awayGoals, (h) => extractCurrentLangText(h, currentLang), ogLabel),
         dateLine: dateLineParts.join('  \u00b7  '),
-        stadium: extractCurrentLangText(matchData.stadium || '', currentLang)
+        stadium: extractCurrentLangText(matchData.stadium || '', currentLang),
+        theme: matchData.theme || null
       };
 
       drawMatchSnapshot(ctx, W, H, view, { home: homeLogo, away: awayLogo });
