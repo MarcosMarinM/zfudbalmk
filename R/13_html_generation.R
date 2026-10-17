@@ -1199,6 +1199,7 @@ if (hubo_cambios) {
                       g <- goles_local_df[gi, ]
                       list(
                         nombre = as.character(player_name_spans_from_row(g)),
+                        minuto = if ("minuto" %in% names(g) && !is.na(g$minuto)) paste0(g$minuto, "'") else "",
                         is_autogol = isTRUE(g$is_autogol)
                       )
                     })
@@ -1208,6 +1209,7 @@ if (hubo_cambios) {
                       g <- goles_visitante_df[gi, ]
                       list(
                         nombre = as.character(player_name_spans_from_row(g)),
+                        minuto = if ("minuto" %in% names(g) && !is.na(g$minuto)) paste0(g$minuto, "'") else "",
                         is_autogol = isTRUE(g$is_autogol)
                       )
                     })
@@ -1244,6 +1246,21 @@ if (hubo_cambios) {
                 }
               },
               jornada_id_raw = j,
+              jornada_label = if (is_friendly_comp) {
+                as.character(j)
+              } else if (is_cup) {
+                as.character(etiqueta_jornada_por_clave(unname(mapa_claves_ronda_copa[str_squish(as.character(j))]), j))
+              } else {
+                as.character(tagList(lapply(IDIOMAS_SOPORTADOS, function(l) {
+                  palabra_ronda <- textos[[l]][["round_prefix"]] %||% ""
+                  valor_ronda <- if (identical(l, "mk")) {
+                    paste0(j, ". ", tolower(palabra_ronda))
+                  } else {
+                    paste0(tolower(palabra_ronda), " ", j)
+                  }
+                  tags$span(class = paste0("lang-", l), valor_ronda)
+                })))
+              },
               partidos = partidos_data
             )
           })
@@ -1380,6 +1397,10 @@ if (hubo_cambios) {
             stats_tarjetas = datos_top_tarjetas,
             stats_porteras = datos_top_porteras,
             comp_name = as.character(comp_name_spans(comp_info)),
+            comp_name_base = as.character(comp_name_spans(comp_info, season_override = "")),
+            comp_temporada = as.character(comp_info$competicion_temporada %||% ""),
+            comp_slug = generar_id_seguro(comp_info$competicion_nombre),
+            theme = tema_tarjeta_partido(comp_info$competicion_nombre),
             links = list(
               goleadoras = nombre_archivo_goleadoras,
               tarjetas = nombre_archivo_sanciones,
@@ -1394,7 +1415,9 @@ if (hubo_cambios) {
               stadium = as.character(t_html("match_stadium")),
               match_cancelled = as.character(t_html("match_cancelled")),
               no_matches_in_round = as.character(t_html("match_timeline_no_events")),
-              share_round = as.character(t_html("share_round"))
+              share_round = as.character(t_html("share_round")),
+              results_title = as.character(t_html("match_header_results")),
+              season = as.character(t_html("player_season"))
             )
           ), auto_unbox = TRUE, na = "null")
 
@@ -2124,7 +2147,7 @@ normalize_team_name <- function(x) {
                     valor_ronda <- if (identical(l, "mk")) {
                       paste0(as.character(partido_info$jornada), ". ", tolower(palabra_ronda))
                     } else {
-                      paste0(palabra_ronda, " ", as.character(partido_info$jornada))
+                      paste0(tolower(palabra_ronda), " ", as.character(partido_info$jornada))
                     }
                     tags$span(class = paste0("lang-", l), valor_ronda)
                   }))

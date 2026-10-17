@@ -63,6 +63,7 @@ defensive_trio_header_ga90,Примени/90мин,Pranuar/90min,Encajados / 90 
 defensive_trio_details_matches,Одиграни натпревари заедно,Ndeshje të luajtura së bashku,Partidos jugados juntos,Matches played together
 match_header_match,Натпревар,Ndeshja,Partido,Match
 match_header_result,Резултат,Rezultati,Resultado,Result
+match_header_results,Резултати,Rezultatet,Resultados,Results
 match_official_result,"(Службен резултат)","(Rezultat zyrtar)","(Resultado otorgado)","(Default result)"
 match_date,Датум,Data,Fecha,Date
 match_time,Време,Koha,Hora,Time
