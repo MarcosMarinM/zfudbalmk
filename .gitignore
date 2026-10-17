@@ -22,6 +22,11 @@
 
 # 5. Blacklist (ignore under all circumstances)
 /docs/
+/preview/
+/.rlib/
+/.commandcode/
+/.freebuff/
+/.dirac-symbol-index/
 /Dropbox/
 /Actas/
 /cache_backup/

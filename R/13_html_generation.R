@@ -2117,9 +2117,31 @@ normalize_team_name <- function(x) {
               comp_name = as.character(comp_name_spans_val),
               jornada_texto = as.character(jornada_texto),
               jornada = as.character(partido_info$jornada %||% ""),
+              round_label = as.character(
+                if (!is.na(partido_info$jornada) && grepl("^[0-9]+$", as.character(partido_info$jornada))) {
+                  tagList(lapply(IDIOMAS_SOPORTADOS, function(l) {
+                    palabra_ronda <- textos[[l]][["round_prefix"]] %||% ""
+                    valor_ronda <- if (identical(l, "mk")) {
+                      paste0(as.character(partido_info$jornada), ". ", tolower(palabra_ronda))
+                    } else {
+                      paste0(palabra_ronda, " ", as.character(partido_info$jornada))
+                    }
+                    tags$span(class = paste0("lang-", l), valor_ronda)
+                  }))
+                } else {
+                  jornada_texto
+                }
+              ),
+              local_slug = generar_id_seguro(partido_info$local),
+              visitante_slug = generar_id_seguro(partido_info$visitante),
+              theme = tema_tarjeta_partido(partido_info$competicion_nombre),
               local_logo_path = get_club_logo_path(partido_info$local),
               visitante_logo_path = get_club_logo_path(partido_info$visitante),
-              translations = list(share_match = t("share_match"))
+              translations = list(
+                share_match = t("share_match"),
+                result_title = setNames(lapply(IDIOMAS_SOPORTADOS, function(l) textos[[l]][["match_header_result"]] %||% "Result"), IDIOMAS_SOPORTADOS),
+                own_goal = setNames(lapply(IDIOMAS_SOPORTADOS, function(l) textos[[l]][["own_goal_label"]] %||% "(OG)"), IDIOMAS_SOPORTADOS)
+              )
             )
             # --- MAIN CONTENT ---
             contenido_partido <- tagList(

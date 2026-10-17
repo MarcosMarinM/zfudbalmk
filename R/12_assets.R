@@ -1460,9 +1460,186 @@ function roundRect(ctx, x, y, w, h, r) {
     ctx.closePath();
 }
 
-// ========================================================================
-// MATCH PROFILE SNAPSHOT (9:16 canvas render)
-// ========================================================================
+// >>> MATCH_SNAPSHOT_RENDER_START
+var MATCH_SNAPSHOT_FONT = 'Rubik, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+function ensureRubikFont() {
+    if (window.__rubikReady) return window.__rubikReady;
+    window.__rubikReady = new Promise(function (resolve) {
+      var settled = false;
+      var done = function () { if (!settled) { settled = true; resolve(); } };
+      var loadFaces = function () {
+        if (document.fonts && document.fonts.load) {
+          Promise.all([
+            document.fonts.load('400 40px Rubik'),
+            document.fonts.load('600 92px Rubik')
+          ]).then(done, done);
+        } else {
+          done();
+        }
+      };
+      try {
+        var existing = document.getElementById('rubik-font-link');
+        if (existing) {
+          loadFaces();
+        } else {
+          var link = document.createElement('link');
+          link.id = 'rubik-font-link';
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap';
+          link.onload = loadFaces;
+          link.onerror = done;
+          document.head.appendChild(link);
+        }
+        setTimeout(done, 4000);
+      } catch (e) {
+        done();
+      }
+    });
+    return window.__rubikReady;
+}
+
+function buildScorerGroups(goals, extractName, ogLabel) {
+    var order = [];
+    var byName = {};
+    (goals || []).forEach(function (g) {
+      var rawName = extractName(g.player || '') || '';
+      var ownGoalText = String(ogLabel || '(OG)').replace(/[()]/g, '').trim();
+      var name = g.is_autogol ? ownGoalText : rawName;
+      var minute = String(g.minute || '').replace(/'/g, '').trim();
+      if (!byName[name]) { byName[name] = []; order.push(name); }
+      if (minute) byName[name].push(minute);
+    });
+    return order.map(function (name) { return { name: name, minutes: byName[name] }; });
+}
+
+function snapshotFont(ctx, weight, size) {
+    ctx.font = weight + ' ' + size + 'px ' + MATCH_SNAPSHOT_FONT;
+}
+
+function snapshotText(ctx, text, x, y, maxWidth, size, weight, color, align, baseline, trackingEm) {
+    var supportsTracking = typeof ctx.letterSpacing === 'string';
+    var fontSize = size;
+    var applyFont = function (fs) {
+      snapshotFont(ctx, weight, fs);
+      if (supportsTracking) ctx.letterSpacing = ((trackingEm || 0) * fs).toFixed(2) + 'px';
+    };
+    ctx.fillStyle = color;
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    applyFont(fontSize);
+    while (fontSize > 12 && ctx.measureText(text).width > maxWidth) {
+      fontSize -= 2;
+      applyFont(fontSize);
+    }
+    ctx.fillText(text, x, y);
+    if (supportsTracking) ctx.letterSpacing = '0px';
+}
+
+function snapshotFits(ctx, text, maxWidth, size, weight, trackingEm) {
+    var supportsTracking = typeof ctx.letterSpacing === 'string';
+    snapshotFont(ctx, weight, size);
+    if (supportsTracking) ctx.letterSpacing = ((trackingEm || 0) * size).toFixed(2) + 'px';
+    var fits = ctx.measureText(text).width <= maxWidth;
+    if (supportsTracking) ctx.letterSpacing = '0px';
+    return fits;
+}
+
+function withAlpha(hex, alpha) {
+    var h = String(hex || '#ffffff').replace('#', '');
+    if (h.length === 3) h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2);
+    var n = parseInt(h, 16);
+    if (isNaN(n)) return hex;
+    return 'rgba(' + ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + alpha + ')';
+}
+
+function drawMatchSnapshot(ctx, W, H, data, logos) {
+    var theme = data.theme || {};
+    var OUTER = theme.outer || '#c2281b';
+    var INNER = theme.inner || '#be372c';
+    var ACCENT = theme.accent || '#fbe84d';
+    var TEXT = theme.text || '#ffffff';
+
+    ctx.fillStyle = OUTER;
+    ctx.fillRect(0, 0, W, H);
+
+    var card = { x: 42, y: 129, w: 996, h: 1663, r: 42 };
+    ctx.fillStyle = INNER;
+    roundRect(ctx, card.x, card.y, card.w, card.h, card.r);
+    ctx.fill();
+
+    snapshotText(ctx, data.title || '', W / 2, 212, card.w - 120, 102, '600', ACCENT, 'center', 'middle', -0.02);
+
+    var subtitle = [data.comp, data.round].filter(Boolean).join(' | ');
+    snapshotText(ctx, subtitle, W / 2, 295, card.w - 140, 38, '600', ACCENT, 'center', 'middle', -0.02);
+
+    var scoreY = 916;
+    var tileCy = 916;
+    var tile = 198;
+    var tileR = 34;
+    var pad = 2;
+    var homeCx = 286;
+    var awayCx = 798;
+
+    var drawTile = function (img, cx) {
+      ctx.fillStyle = '#ffffff';
+      roundRect(ctx, cx - tile / 2, tileCy - tile / 2, tile, tile, tileR);
+      ctx.fill();
+      if (img) {
+        var box = tile - pad * 2;
+        var ratio = Math.min(box / img.width, box / img.height);
+        var dw = img.width * ratio;
+        var dh = img.height * ratio;
+        ctx.drawImage(img, cx - dw / 2, tileCy - dh / 2, dw, dh);
+      }
+    };
+    drawTile(logos && logos.home, homeCx);
+    drawTile(logos && logos.away, awayCx);
+
+    var scoreText = (data.homeScore || '0') + ':' + (data.awayScore || '0');
+    snapshotText(ctx, scoreText, W / 2, scoreY, 520, 81, '600', TEXT, 'center', 'middle', -0.02);
+
+    snapshotText(ctx, data.homeName || '', homeCx, 1040, 340, 44, '600', TEXT, 'center', 'middle', -0.02);
+    snapshotText(ctx, data.awayName || '', awayCx, 1040, 340, 44, '600', TEXT, 'center', 'middle', -0.02);
+
+    var scorersTop = 1098;
+    var scorerLead = 41;
+    var scorerBarrier = W / 2;
+    var scorerGap = 24;
+    var homeColW = 2 * Math.max(140, scorerBarrier - scorerGap - homeCx);
+    var awayColW = 2 * Math.max(140, awayCx - scorerBarrier - scorerGap);
+    var drawScorers = function (groups, x, colW) {
+      var y = scorersTop;
+      (groups || []).forEach(function (g) {
+        var minutes = g.minutes && g.minutes.length ? '(' + g.minutes.join(', ') + ')' : '';
+        var oneLine = minutes ? g.name + ' ' + minutes : g.name;
+        if (!minutes || snapshotFits(ctx, oneLine, colW, 36, '400', -0.04)) {
+          snapshotText(ctx, oneLine, x, y, colW, 36, '400', TEXT, 'center', 'middle', -0.04);
+          y += scorerLead;
+        } else {
+          snapshotText(ctx, g.name, x, y, colW, 36, '400', TEXT, 'center', 'middle', -0.04);
+          y += scorerLead;
+          snapshotText(ctx, minutes, x, y, colW, 36, '400', TEXT, 'center', 'middle', -0.04);
+          y += scorerLead;
+        }
+      });
+    };
+    drawScorers(data.homeScorers, homeCx, homeColW);
+    drawScorers(data.awayScorers, awayCx, awayColW);
+
+    var infoY = 1480;
+    if (data.dateLine) {
+      snapshotText(ctx, data.dateLine, W / 2, infoY, card.w - 200, 34, '400', withAlpha(TEXT, 0.85), 'center', 'middle', 0);
+      infoY += 54;
+    }
+    if (data.stadium) {
+      snapshotText(ctx, data.stadium, W / 2, infoY, card.w - 200, 30, '400', withAlpha(TEXT, 0.62), 'center', 'middle', 0);
+    }
+
+    snapshotText(ctx, '@zfudbalmk', W / 2, 1757, card.w - 200, 28, '600', ACCENT, 'center', 'middle', -0.02);
+}
+// >>> MATCH_SNAPSHOT_RENDER_END
+
 async function shareMatchSnapshot() {
     const dataEl = document.getElementById('match-snapshot-data');
     if (!dataEl) return;
@@ -1476,6 +1653,8 @@ async function shareMatchSnapshot() {
     }
 
     try {
+      await ensureRubikFont();
+
       const W = 1080;
       const H = 1920;
       const canvas = document.createElement('canvas');
@@ -1483,208 +1662,51 @@ async function shareMatchSnapshot() {
       canvas.height = H;
       const ctx = canvas.getContext('2d');
 
-      // Background
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#1a0a0a');
-      grad.addColorStop(0.3, '#2d1010');
-      grad.addColorStop(0.7, '#1a0a0a');
-      grad.addColorStop(1, '#0d0505');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
+      const tr = matchData.translations || {};
+      const pickLang = (obj) => (obj && (obj[currentLang] || obj.mk || obj.en)) || '';
+      const resultTitle = pickLang(tr.result_title);
+      const ogLabel = pickLang(tr.own_goal);
 
-      // Top accent line
-      ctx.fillStyle = '#CC0000';
-      ctx.fillRect(0, 0, W, 6);
+      const loadLogo = (url) => new Promise((resolve) => {
+        if (!url) return resolve(null);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = url;
+      });
 
-      // Competition name
-      const compName = extractCurrentLangText(matchData.comp_name || '', currentLang);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      wrapText(ctx, compName, W / 2, 70, W - 120, 52);
+      const [homeLogo, awayLogo] = await Promise.all([
+        loadLogo(matchData.local_logo_path),
+        loadLogo(matchData.visitante_logo_path)
+      ]);
 
-      // Decorative separator
-      ctx.strokeStyle = '#CC0000';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(W / 2 - 180, 155);
-      ctx.lineTo(W / 2 + 180, 155);
-      ctx.stroke();
+      const dateLineParts = [];
+      if (matchData.date) dateLineParts.push(formatMatchDate(matchData.date));
+      if (matchData.time) dateLineParts.push(matchData.time);
 
-      // Jornada
-      const roundNameRaw = extractCurrentLangText(matchData.jornada_texto || '', currentLang);
-      const roundNum = String(matchData.jornada || '');
-      const roundName = roundNum && !roundNameRaw.includes(roundNum)
-        ? roundNameRaw + ' ' + roundNum
-        : roundNameRaw;
-      ctx.fillStyle = '#E0C080';
-      ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText(roundName, W / 2, 175);
-
-      // Pre-load logos
-      const logoCache = {};
-      const loadLogo = (url) => {
-        if (!url) return null;
-        if (logoCache[url] !== undefined) return logoCache[url];
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => { logoCache[url] = img; resolve(img); };
-          img.onerror = () => { logoCache[url] = null; resolve(null); };
-          img.src = url;
-        });
+      const view = {
+        title: resultTitle ? resultTitle.toUpperCase() : '',
+        comp: extractCurrentLangText(matchData.comp_name || '', currentLang),
+        round: extractCurrentLangText(matchData.round_label || '', currentLang),
+        homeName: extractCurrentLangText(matchData.homeTeam || '', currentLang),
+        awayName: extractCurrentLangText(matchData.awayTeam || '', currentLang),
+        homeScore: matchData.homeScore || '0',
+        awayScore: matchData.awayScore || '0',
+        homeScorers: buildScorerGroups(matchData.homeGoals, (h) => extractCurrentLangText(h, currentLang), ogLabel),
+        awayScorers: buildScorerGroups(matchData.awayGoals, (h) => extractCurrentLangText(h, currentLang), ogLabel),
+        dateLine: dateLineParts.join('  \u00b7  '),
+        stadium: extractCurrentLangText(matchData.stadium || '', currentLang)
       };
 
-      await Promise.all([loadLogo(matchData.local_logo_path), loadLogo(matchData.visitante_logo_path)]);
+      drawMatchSnapshot(ctx, W, H, view, { home: homeLogo, away: awayLogo });
 
-      // Scoreboard card
-      const boardY = 280;
-      const boardH = 500;
-
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-      roundRect(ctx, 80, boardY, W - 160, boardH, 20);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(139, 0, 0, 0.4)';
-      ctx.lineWidth = 2;
-      roundRect(ctx, 80, boardY, W - 160, boardH, 20);
-      ctx.stroke();
-
-      const centerY = boardY + boardH / 2;
-
-      // Local team
-      const localName = extractCurrentLangText(matchData.homeTeam || '', currentLang);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      let displayLocalName = localName;
-      while (ctx.measureText(displayLocalName).width > 300 && displayLocalName.length > 3) {
-        displayLocalName = displayLocalName.slice(0, -1);
-      }
-      if (displayLocalName !== localName) displayLocalName += '...';
-      ctx.fillText(displayLocalName, W / 2 - 220, centerY - 90);
-
-      const localLogo = logoCache[matchData.local_logo_path];
-      if (localLogo) {
-        ctx.drawImage(localLogo, W / 2 - 280, centerY - 70, 120, 120);
-      }
-
-      // Visitante team
-      const visitName = extractCurrentLangText(matchData.awayTeam || '', currentLang);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      let displayVisitName = visitName;
-      while (ctx.measureText(displayVisitName).width > 300 && displayVisitName.length > 3) {
-        displayVisitName = displayVisitName.slice(0, -1);
-      }
-      if (displayVisitName !== visitName) displayVisitName += '...';
-      ctx.fillText(displayVisitName, W / 2 + 220, centerY - 90);
-
-      const visitLogo = logoCache[matchData.visitante_logo_path];
-      if (visitLogo) {
-        ctx.drawImage(visitLogo, W / 2 + 160, centerY - 70, 120, 120);
-      }
-
-      // Score
-      const scoreText = (matchData.homeScore || '0') + ' - ' + (matchData.awayScore || '0');
-      ctx.fillStyle = 'rgba(204, 0, 0, 0.15)';
-      const scoreTextWidth = ctx.measureText(scoreText).width;
-      const pillW = Math.max(scoreTextWidth + 50, 140);
-      const pillH = 80;
-      roundRect(ctx, W / 2 - pillW / 2, centerY - pillH / 2, pillW, pillH, 16);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(204, 0, 0, 0.3)';
-      ctx.lineWidth = 2;
-      roundRect(ctx, W / 2 - pillW / 2, centerY - pillH / 2, pillW, pillH, 16);
-      ctx.stroke();
-
-      ctx.fillStyle = '#CC0000';
-      ctx.font = 'bold 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(scoreText, W / 2, centerY);
-
-      // Date, time, stadium (inside card)
-      const dateTimeParts = [];
-      if (matchData.date) dateTimeParts.push(formatMatchDate(matchData.date));
-      if (matchData.time) dateTimeParts.push(matchData.time);
-
-      const infoY = centerY + 70;
-      if (dateTimeParts.length > 0) {
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.font = '28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(dateTimeParts.join('  \u00b7  '), W / 2, infoY);
-      }
-
-      if (matchData.stadium) {
-        const lugarText = extractCurrentLangText(matchData.stadium, currentLang);
-        if (lugarText) {
-          ctx.fillStyle = 'rgba(255,255,255,0.45)';
-          ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'top';
-          ctx.fillText(lugarText, W / 2, infoY + 45);
-        }
-      }
-
-      // Goal scorers
-      let scorersY = boardY + boardH + 70;
-
-      if (matchData.homeGoals && matchData.homeGoals.length > 0) {
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'top';
-        matchData.homeGoals.forEach((g, i) => {
-          const name = extractCurrentLangText(g.player || '', currentLang);
-          const og = g.is_autogol ? ' (OG)' : '';
-          ctx.fillText(name + og + ' ' + g.minute, W / 2 - 60, scorersY + i * 38);
-        });
-      }
-
-      if (matchData.awayGoals && matchData.awayGoals.length > 0) {
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        matchData.awayGoals.forEach((g, i) => {
-          const name = extractCurrentLangText(g.player || '', currentLang);
-          const og = g.is_autogol ? ' (OG)' : '';
-          ctx.fillText(g.minute + ' ' + name + og, W / 2 + 60, scorersY + i * 38);
-        });
-      }
-
-      const maxScorerLines = Math.max(
-        (matchData.homeGoals || []).length,
-        (matchData.awayGoals || []).length
-      );
-      if (maxScorerLines > 0) scorersY += maxScorerLines * 38 + 30;
-
-      // Footer
-      const footerY = H - 120;
-      ctx.fillStyle = 'rgba(204, 0, 0, 0.5)';
-      ctx.fillRect(W / 2 - 150, footerY, 300, 3);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('@zfudbalmk', W / 2, footerY + 30);
-
-      // Download
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const safeLocal = extractCurrentLangText(matchData.homeTeam || 'home', currentLang).replace(/[^a-z0-9]/gi, '_').substring(0, 20);
-        const safeVisit = extractCurrentLangText(matchData.awayTeam || 'away', currentLang).replace(/[^a-z0-9]/gi, '_').substring(0, 20);
+        const safeLocal = (matchData.local_slug || '').trim() || 'home';
+        const safeVisit = (matchData.visitante_slug || '').trim() || 'away';
         a.download = safeLocal + '_vs_' + safeVisit + '.png';
         document.body.appendChild(a);
         a.click();

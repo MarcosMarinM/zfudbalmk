@@ -135,6 +135,22 @@ generar_id_seguro <- function(nombre) {
   return(id_sanitizada)
 }
 
+#' @title Theme colours for the match share card, by competition.
+#' @param competicion_nombre Competition name in Macedonian.
+#' @return A list with outer, inner, accent and text colours.
+tema_tarjeta_partido <- function(competicion_nombre) {
+  nombre <- tolower(as.character(competicion_nombre %||% ""))
+  if (grepl("куп", nombre)) {
+    list(outer = "#B9A500", inner = "#E0CC25", accent = "#C70000", text = "#000000")
+  } else if (grepl("втора", nombre)) {
+    list(outer = "#BF3F34", inner = "#BC554D", accent = "#fbe84d", text = "#ffffff")
+  } else if (grepl("кадетска|младинска", nombre)) {
+    list(outer = "#B8554C", inner = "#CC7B74", accent = "#fbe84d", text = "#ffffff")
+  } else {
+    list(outer = "#c2281b", inner = "#be372c", accent = "#fbe84d", text = "#ffffff")
+  }
+}
+
 #' @title Get the ISO 3166-1 alpha-2 code for a national team.
 #' @param team_name_mk Team name in Macedonian.
 #' @return The ISO code (e.g., "mk", "gb") or NA if it's not a known national team.
