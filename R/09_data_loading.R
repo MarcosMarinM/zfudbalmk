@@ -69,7 +69,10 @@ mapa_categorias_competiciones <- tibble(
   categoria           = character(),
   "vid_natprevaruvanje" = character(),
   min_age             = numeric(),
-  max_age             = numeric()
+  max_age             = numeric(),
+  dob_from            = as.Date(character()),
+  dob_to              = as.Date(character()),
+  season_start        = numeric()
 )
 
 ruta_comps_ffm <- if (file.exists("comps_ffm.xlsx")) "comps_ffm.xlsx" else "dictionaries/comps_ffm.xlsx"
@@ -90,6 +93,26 @@ if (file.exists(ruta_comps_ffm)) {
     kategorija_col <- if (n_cols >= 16) names(df_comps_ffm)[16] else NA_character_
     min_age_col    <- if (n_cols >= 22) names(df_comps_ffm)[22] else NA_character_
     max_age_col    <- if (n_cols >= 23) names(df_comps_ffm)[23] else NA_character_
+    dob_from_col   <- if (n_cols >= 25) names(df_comps_ffm)[25] else NA_character_
+    dob_to_col     <- if (n_cols >= 26) names(df_comps_ffm)[26] else NA_character_
+    season_col     <- if ("\u0421\u0435\u0437\u043e\u043d\u0430" %in% names(df_comps_ffm))
+                        "\u0421\u0435\u0437\u043e\u043d\u0430" else NA_character_
+
+    parse_excel_date <- function(x) {
+      if (inherits(x, "Date")) return(x)
+      if (inherits(x, "POSIXt")) return(as.Date(x))
+      suppressWarnings(as.Date(as.character(x), format = "%Y-%m-%d"))
+    }
+
+    season_to_start_year <- function(x) {
+      x <- trimws(as.character(x))
+      out <- rep(NA_integer_, length(x))
+      i4 <- which(!is.na(x) & grepl("^\\d{4}/\\d{4}$", x))
+      i2 <- which(!is.na(x) & grepl("^\\d{2}/\\d{2}$", x))
+      out[i4] <- as.integer(substr(x[i4], 1, 4))
+      out[i2] <- 2000L + as.integer(substr(x[i2], 1, 2))
+      out
+    }
 
     if (anyNA(c(kratko_ime_col, kategorija_col))) {
       warning("comps_ffm.xlsx: required columns (3 and 16) not found. Category mapping skipped.")
@@ -107,8 +130,18 @@ if (file.exists(ruta_comps_ffm)) {
                        else NA_real_,
           max_age    = if (!is.na(max_age_col))
                          suppressWarnings(as.numeric(.data[[max_age_col]]))
-                       else NA_real_
+                       else NA_real_,
+          dob_from   = if (!is.na(dob_from_col))
+                         parse_excel_date(.data[[dob_from_col]])
+                       else as.Date(NA),
+          dob_to     = if (!is.na(dob_to_col))
+                         parse_excel_date(.data[[dob_to_col]])
+                       else as.Date(NA),
+          season_raw = if (!is.na(season_col))
+                         trimws(as.character(.data[[season_col]]))
+                       else NA_character_
         ) %>%
+        mutate(season_start = season_to_start_year(season_raw)) %>%
         filter(!is.na(kratko_ime) & kratko_ime != "",
                !is.na(categoria)  & categoria  != "" & categoria != "NA")
 
@@ -129,7 +162,10 @@ if (file.exists(ruta_comps_ffm)) {
           categoria           = categoria,
           "vid_natprevaruvanje" = vid,
           min_age             = min_age,
-          max_age             = max_age
+          max_age             = max_age,
+          dob_from            = dob_from,
+          dob_to              = dob_to,
+          season_start        = season_start
         )
 
       # === LONG-YEAR rows: cover "\u041f\u0440\u0432\u0430 \u041c\u0424\u041b 2025/26" in case scrape.R returns 4-digit year ===
@@ -155,12 +191,16 @@ if (file.exists(ruta_comps_ffm)) {
       secondary_rows <- raw_map %>%
         mutate(base_name = strip_season_suffix(kratko_ime)) %>%
         filter(base_name != kratko_ime) %>%
+        arrange(desc(season_start)) %>%
         transmute(
           competicion_nombre  = base_name,
           categoria           = categoria,
           "vid_natprevaruvanje" = vid,
           min_age             = min_age,
-          max_age             = max_age
+          max_age             = max_age,
+          dob_from            = dob_from,
+          dob_to              = dob_to,
+          season_start        = season_start
         )
 
       mapa_categorias_competiciones <- bind_rows(primary_rows, long_year_rows, secondary_rows) %>%

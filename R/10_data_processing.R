@@ -613,6 +613,49 @@ if (!"min_age" %in% names(partidos_df)) {
 if (!"max_age" %in% names(partidos_df)) {
   partidos_df$max_age <- NA_real_
 }
+if (!"dob_from" %in% names(partidos_df)) {
+  partidos_df$dob_from <- as.Date(NA)
+}
+if (!"dob_to" %in% names(partidos_df)) {
+  partidos_df$dob_to <- as.Date(NA)
+}
+
+strip_season_suffix_comp <- function(x) {
+  x %>%
+    str_replace("\\s+\\d{4}-\\d{4}\\s*$", "") %>%
+    str_replace("\\s+\\d{4}/\\d{4}\\s*$", "") %>%
+    str_replace("\\s+\\d{4}/\\d{2}\\s*$", "") %>%
+    str_replace("\\s+\\d{2}/\\d{2}\\s*$", "") %>%
+    str_squish()
+}
+
+season_start_from_temporada <- function(x) {
+  x <- str_squish(as.character(x))
+  out <- rep(NA_integer_, length(x))
+  i4 <- which(!is.na(x) & str_detect(x, "^\\d{4}/\\d{4}$"))
+  i2 <- which(!is.na(x) & str_detect(x, "^\\d{2}/\\d{2}$"))
+  out[i4] <- as.integer(substr(x[i4], 1, 4))
+  out[i2] <- 2000L + as.integer(substr(x[i2], 1, 2))
+  out
+}
+
+shift_date_years <- function(d, n) {
+  out <- as.Date(d)
+  for (i in seq_along(out)) {
+    if (is.na(out[i]) || is.na(n[i]) || n[i] == 0) next
+    y <- as.integer(format(out[i], "%Y")) + as.integer(n[i])
+    m <- as.integer(format(out[i], "%m"))
+    day <- as.integer(format(out[i], "%d"))
+    value <- suppressWarnings(as.Date(sprintf("%04d-%02d-%02d", y, m, day)))
+    if (is.na(value)) {
+      day <- if (m == 2) 28L else day
+      value <- suppressWarnings(as.Date(sprintf("%04d-%02d-%02d", y, m, day)))
+    }
+    out[i] <- value
+  }
+  out
+}
+
 if (exists("mapa_categorias_competiciones") && nrow(mapa_categorias_competiciones) > 0 && nrow(partidos_df) > 0) {
   mapa_categorias_competiciones_raw <- mapa_categorias_competiciones %>%
     mutate(
@@ -624,9 +667,32 @@ if (exists("mapa_categorias_competiciones") && nrow(mapa_categorias_competicione
       categoria_mapa = categoria,
       vid_natprevaruvanje_mapa = vid_natprevaruvanje,
       min_age_mapa = min_age,
-      max_age_mapa = max_age
+      max_age_mapa = max_age,
+      dob_from_mapa = dob_from,
+      dob_to_mapa = dob_to,
+      season_start_mapa = season_start
     ) %>%
     distinct(competicion_nombre_key_raw, .keep_all = TRUE)
+
+  mapa_categorias_base_raw <- mapa_categorias_competiciones %>%
+    mutate(
+      competicion_nombre_base_key = normalize_competition_name_for_lookup(
+        strip_season_suffix_comp(competicion_nombre)
+      )
+    ) %>%
+    filter(!is.na(competicion_nombre_base_key)) %>%
+    arrange(desc(season_start)) %>%
+    select(
+      competicion_nombre_base_key,
+      categoria_base = categoria,
+      vid_natprevaruvanje_base = vid_natprevaruvanje,
+      min_age_base = min_age,
+      max_age_base = max_age,
+      dob_from_base = dob_from,
+      dob_to_base = dob_to,
+      season_start_base = season_start
+    ) %>%
+    distinct(competicion_nombre_base_key, .keep_all = TRUE)
 
   partidos_df <- partidos_df %>%
     mutate(
@@ -634,15 +700,20 @@ if (exists("mapa_categorias_competiciones") && nrow(mapa_categorias_competicione
         competicion_nombre,
         if ("competicion_temporada" %in% names(.)) competicion_temporada else NULL
       ),
-      competicion_nombre_key_raw = normalize_competition_name_for_lookup(competicion_nombre_raw_for_categoria)
+      competicion_nombre_key_raw = normalize_competition_name_for_lookup(competicion_nombre_raw_for_categoria),
+      competicion_nombre_base_key = normalize_competition_name_for_lookup(
+        strip_season_suffix_comp(competicion_nombre_raw_for_categoria)
+      )
     ) %>%
     left_join(mapa_categorias_competiciones_raw, by = "competicion_nombre_key_raw") %>%
+    left_join(mapa_categorias_base_raw, by = "competicion_nombre_base_key") %>%
     mutate(
-      categoria = categoria_mapa,
-      "vid_natprevaruvanje" = coalesce(vid_natprevaruvanje_mapa, "vid_natprevaruvanje"),
-      min_age = coalesce(min_age_mapa, min_age),
+      categoria = coalesce(categoria_mapa, categoria_base, as.character(categoria)),
+      "vid_natprevaruvanje" = coalesce(vid_natprevaruvanje_mapa, vid_natprevaruvanje_base, "vid_natprevaruvanje"),
+      min_age = coalesce(min_age_mapa, min_age_base, min_age),
       max_age = coalesce(
         max_age_mapa,
+        max_age_base,
         case_when(
         categoria == "\u041c\u043b\u0430\u0434\u0438\u043d\u0446\u0438" ~ 16,
         categoria == "\u041a\u0430\u0434\u0435\u0442\u0438" ~ 14,
@@ -654,16 +725,38 @@ if (exists("mapa_categorias_competiciones") && nrow(mapa_categorias_competicione
         TRUE ~ NA_real_
       ),
       max_age
-      )
-
+      ),
+      dob_from = coalesce(dob_from_mapa, dob_from_base),
+      dob_to = coalesce(dob_to_mapa, dob_to_base),
+      season_start_mapa = coalesce(season_start_mapa, season_start_base),
+      season_start_target = if ("competicion_temporada" %in% names(.))
+        season_start_from_temporada(competicion_temporada) else NA_integer_,
+      .year_shift = season_start_target - season_start_mapa,
+      dob_from = shift_date_years(dob_from, .year_shift),
+      dob_to = shift_date_years(dob_to, .year_shift)
     ) %>%
     select(
-      -competicion_nombre_raw_for_categoria,
-      -competicion_nombre_key_raw,
-      -categoria_mapa,
-      -vid_natprevaruvanje_mapa,
-      -min_age_mapa,
-      -max_age_mapa
+      -any_of(c(
+        "competicion_nombre_raw_for_categoria",
+        "competicion_nombre_key_raw",
+        "competicion_nombre_base_key",
+        "categoria_mapa",
+        "vid_natprevaruvanje_mapa",
+        "min_age_mapa",
+        "max_age_mapa",
+        "dob_from_mapa",
+        "dob_to_mapa",
+        "season_start_mapa",
+        "categoria_base",
+        "vid_natprevaruvanje_base",
+        "min_age_base",
+        "max_age_base",
+        "dob_from_base",
+        "dob_to_base",
+        "season_start_base",
+        "season_start_target",
+        ".year_shift"
+      ))
     )
 } else {
   warning("Competition category mapping from comps_ffm.xlsx is unavailable. Match categories will remain unknown.")
@@ -1312,13 +1405,130 @@ apariciones_df_raw <- apariciones_df_raw %>%
   mutate(id = if_else(!is.na(final_id), as.character(final_id), generar_id_seguro(nombre))) %>%
   select(-any_of(c("final_id", ".ade_row")))
 
+# --- 10.3.5. DOB eligibility split -----------------------------------------
+# A known birth date must fall inside every competition's DOB window. When one
+# name is shared by two people (e.g. a 20-year-old and a youth player) the
+# appearances outside the known player's window cannot belong to her, so they
+# are moved to a new ID instead of being merged.
+dob_split_player_ids <- character(0)
+dob_split_team_names <- character(0)
+dob_split_comp_keys  <- tibble(competicion_nombre = character(), competicion_temporada = character())
+dob_jugadoras_map <- NULL
+if (exists("jugadoras_bio_raw_df") && !is.null(jugadoras_bio_raw_df) &&
+    nrow(jugadoras_bio_raw_df) > 0 &&
+    all(c("First Name", "Second Name", "Date Of Birth") %in% names(jugadoras_bio_raw_df))) {
+  bio_dob_tmp <- jugadoras_bio_raw_df %>%
+    transmute(
+      fn  = as.character(.data[["First Name"]]),
+      sn  = as.character(.data[["Second Name"]]),
+      dob = as.Date(.data[["Date Of Birth"]])
+    ) %>%
+    filter(!is.na(dob), !is.na(fn), fn != "", !is.na(sn), sn != "")
+
+  if (nrow(bio_dob_tmp) > 0) {
+    dob_jugadoras_map <- bind_rows(
+      bio_dob_tmp %>% transmute(base_id = generar_id_seguro(paste(fn, sn)), dob = dob),
+      bio_dob_tmp %>% transmute(base_id = generar_id_seguro(paste(sn, fn)), dob = dob)
+    ) %>%
+      filter(!is.na(base_id), base_id != "") %>%
+      distinct(base_id, dob)
+  }
+}
+
+if (!is.null(dob_jugadoras_map) && nrow(dob_jugadoras_map) > 0 &&
+    all(c("dob_from", "dob_to") %in% names(partidos_df))) {
+  partidos_ventanas <- partidos_df %>%
+    filter(!is.na(id_partido)) %>%
+    select(id_partido, dob_from, dob_to) %>%
+    distinct(id_partido, .keep_all = TRUE)
+
+  apariciones_elegibilidad <- apariciones_df_raw %>%
+    mutate(
+      .dob_row    = row_number(),
+      base_id_row = str_remove(as.character(id), "_\\d+$")
+    ) %>%
+    left_join(partidos_ventanas, by = "id_partido") %>%
+    left_join(dob_jugadoras_map, by = c("base_id_row" = "base_id"),
+              relationship = "many-to-many") %>%
+    mutate(
+      .dob_ok = is.na(dob) | is.na(dob_from) | is.na(dob_to) |
+        (dob >= dob_from & dob <= dob_to)
+    ) %>%
+    group_by(.dob_row) %>%
+    mutate(.dob_ok_any = any(.dob_ok)) %>%
+    ungroup() %>%
+    group_by(base_id_row) %>%
+    mutate(
+      .has_known_dob = any(!is.na(dob)),
+      .any_ok        = any(.dob_ok_any),
+      .any_bad       = any(!.dob_ok_any),
+      .n_ids         = n_distinct(id)
+    ) %>%
+    ungroup()
+
+  # Only split names the ADE still treats as a single person. If the ADE
+  # already separated homonyms (_1/_2) we cannot safely attribute the DOB.
+  split_bases <- apariciones_elegibilidad %>%
+    filter(.has_known_dob, .any_ok, .any_bad, .n_ids == 1) %>%
+    distinct(base_id_row)
+
+  if (nrow(split_bases) > 0) {
+    suffix_info <- apariciones_elegibilidad %>%
+      distinct(base_id_row, id) %>%
+      mutate(existing_suffix = as.integer(str_extract(id, "(?<=_)\\d+$"))) %>%
+      group_by(base_id_row) %>%
+      summarise(next_suffix = max(c(1L, existing_suffix), na.rm = TRUE) + 1L, .groups = "drop")
+
+    split_map <- split_bases %>%
+      left_join(suffix_info, by = "base_id_row") %>%
+      transmute(base_id_row, new_id = paste0(base_id_row, "_", next_suffix))
+
+    reassigned <- apariciones_elegibilidad %>%
+      left_join(split_map, by = "base_id_row") %>%
+      filter(!.dob_ok_any, !is.na(new_id))
+
+    n_split <- nrow(reassigned)
+    dob_split_player_ids <- unique(c(split_map$base_id_row, split_map$new_id))
+    dob_split_team_names <- unique(stats::na.omit(reassigned$equipo))
+    dob_split_comp_keys  <- reassigned %>%
+      distinct(id_partido) %>%
+      inner_join(
+        partidos_df %>% select(id_partido, competicion_nombre, competicion_temporada),
+        by = "id_partido"
+      ) %>%
+      distinct(competicion_nombre, competicion_temporada)
+
+    apariciones_df_raw <- apariciones_elegibilidad %>%
+      left_join(split_map, by = "base_id_row") %>%
+      mutate(id = if_else(!.dob_ok_any & !is.na(new_id), new_id, as.character(id))) %>%
+      select(-any_of(c(
+        ".dob_row", "base_id_row", "dob", "dob_from", "dob_to",
+        ".dob_ok", ".dob_ok_any", ".has_known_dob", ".any_ok", ".any_bad", ".n_ids", "new_id"
+      )))
+
+    message(paste("   > DOB eligibility split:", n_split,
+                  "appearances moved to", nrow(split_map), "new player ID(s)."))
+  } else {
+    apariciones_df_raw <- apariciones_elegibilidad %>%
+      select(-any_of(c(
+        ".dob_row", "base_id_row", "dob", "dob_from", "dob_to",
+        ".dob_ok", ".dob_ok_any", ".has_known_dob", ".any_ok", ".any_bad", ".n_ids"
+      )))
+  }
+}
+
 # Diccionario seguro de {nombre_jugador + equipo} a ID
+# Ambiguous keys (same name + team mapped to several IDs) are dropped so the
+# match-specific fallbacks below resolve events without duplicating them.
 id_mapping <- apariciones_df_raw %>%
   mutate(
     nombre_key = str_squish(as.character(nombre)),
     equipo_key = str_squish(as.character(equipo))
   ) %>%
   filter(!is.na(nombre_key), nombre_key != "", !is.na(equipo_key), equipo_key != "") %>%
+  group_by(nombre_key, equipo_key) %>%
+  filter(n_distinct(id) == 1) %>%
+  ungroup() %>%
   distinct(nombre_key, equipo_key, canonical_id = id)
 
 id_mapping_dorsal <- apariciones_df_raw %>%
@@ -2112,6 +2322,23 @@ affected_team_ids <- character(0)
 affected_referee_ids <- character(0)
 affected_stadium_ids <- character(0)
 affected_staff_ids <- character(0)
+
+# DOB eligibility reassignments modify player pages outside any changed match,
+# so their players, teams and competitions must enter the incremental scope.
+if (length(dob_split_player_ids) > 0) {
+  hubo_cambios <- TRUE
+  affected_player_ids <- unique(c(affected_player_ids, dob_split_player_ids))
+  affected_team_ids <- unique(c(affected_team_ids, generar_id_seguro(dob_split_team_names)))
+  if (nrow(dob_split_comp_keys) > 0 && exists("competiciones_unicas_df")) {
+    comps_split <- competiciones_unicas_df %>%
+      inner_join(dob_split_comp_keys, by = c("competicion_nombre", "competicion_temporada")) %>%
+      pull(competicion_id) %>%
+      unique()
+    affected_competition_ids <- unique(c(affected_competition_ids, comps_split))
+  }
+  message(paste("   > DOB eligibility changed", length(dob_split_player_ids),
+                "player ID(s); added to the incremental update scope."))
+}
 
 # If any match was just cancelled (by ID or because rules changed), we MUST regenerate its competition hub
 if (length(new_cancelled_ids) > 0 || rules_changed) {
