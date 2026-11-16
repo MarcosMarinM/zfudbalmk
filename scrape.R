@@ -422,12 +422,23 @@ parsear_informe_web <- function(url, id_partido, competicion_info, ss_token = NU
   )
 
   columnas_equipos <- doc %>% html_elements(".ffm-rez__oneteam")
-  if (length(columnas_equipos) < 4) stop("No se hallaron suficientes columnas de alineación")
+  n_columnas <- length(columnas_equipos)
+  if (n_columnas < 2) stop("No se hallaron suficientes columnas de alineación")
 
-  titulares_local <- extraer_info_basica_jugadoras(columnas_equipos[[1]], "Titular")
-  titulares_visitante <- extraer_info_basica_jugadoras(columnas_equipos[[2]], "Titular")
-  suplentes_local <- extraer_info_basica_jugadoras(columnas_equipos[[3]], "Suplente")
-  suplentes_visitante <- extraer_info_basica_jugadoras(columnas_equipos[[4]], "Suplente")
+  jugadoras_vacio <- tibble(nombre_latin = character(), dorsal = integer(), tipo_jugadoras = character())
+
+  if (n_columnas >= 4) {
+    titulares_local <- extraer_info_basica_jugadoras(columnas_equipos[[1]], "Titular")
+    titulares_visitante <- extraer_info_basica_jugadoras(columnas_equipos[[2]], "Titular")
+    suplentes_local <- extraer_info_basica_jugadoras(columnas_equipos[[3]], "Suplente")
+    suplentes_visitante <- extraer_info_basica_jugadoras(columnas_equipos[[4]], "Suplente")
+  } else {
+    # Acta con una sola alineación publicada: ambas columnas pertenecen al local
+    titulares_local <- extraer_info_basica_jugadoras(columnas_equipos[[1]], "Titular")
+    suplentes_local <- extraer_info_basica_jugadoras(columnas_equipos[[2]], "Suplente")
+    titulares_visitante <- jugadoras_vacio
+    suplentes_visitante <- jugadoras_vacio
+  }
 
   creador_alineacion <- function(df_tit, df_sup) {
     bind_rows(df_tit, df_sup) %>%
@@ -443,12 +454,23 @@ parsear_informe_web <- function(url, id_partido, competicion_info, ss_token = NU
   alineacion_local <- creador_alineacion(titulares_local, suplentes_local)
   alineacion_visitante <- creador_alineacion(titulares_visitante, suplentes_visitante)
 
-  eventos_todos <- bind_rows(
-    extraer_eventos(columnas_equipos[[1]]) %>% mutate(equipo = equipo_local),
-    extraer_eventos(columnas_equipos[[2]]) %>% mutate(equipo = equipo_visitante),
-    extraer_eventos(columnas_equipos[[3]]) %>% mutate(equipo = equipo_local),
-    extraer_eventos(columnas_equipos[[4]]) %>% mutate(equipo = equipo_visitante)
-  ) %>% mutate(minuto = parsear_minuto_web(minuto_raw), nombre = latin_to_cyrillic(nombre_latin))
+  columnas_eventos <- if (n_columnas >= 4) {
+    list(
+      list(col = columnas_equipos[[1]], equipo = equipo_local),
+      list(col = columnas_equipos[[2]], equipo = equipo_visitante),
+      list(col = columnas_equipos[[3]], equipo = equipo_local),
+      list(col = columnas_equipos[[4]], equipo = equipo_visitante)
+    )
+  } else {
+    list(
+      list(col = columnas_equipos[[1]], equipo = equipo_local),
+      list(col = columnas_equipos[[2]], equipo = equipo_local)
+    )
+  }
+
+  eventos_todos <- bind_rows(lapply(columnas_eventos, function(x) {
+    extraer_eventos(x$col) %>% mutate(equipo = x$equipo)
+  })) %>% mutate(minuto = parsear_minuto_web(minuto_raw), nombre = latin_to_cyrillic(nombre_latin))
 
   procesar_cambios <- function(subs_in, subs_out, equipo) {
     if (nrow(subs_in) == 0 || nrow(subs_out) == 0 || nrow(subs_in) != nrow(subs_out)) {
