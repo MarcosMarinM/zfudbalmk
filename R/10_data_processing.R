@@ -15,6 +15,17 @@ if (length(ignorados) > 0) {
 }
 web_results <- discard(web_results_raw, ~ isTRUE(.x$ignorado))
 resultados_exitosos <- c(pdf_results, web_results)
+
+# Repair cache entries where an empty roster stored `nombre` as a list column
+resultados_exitosos <- map(resultados_exitosos, function(res) {
+  for (campo in c("alineacion_local", "alineacion_visitante")) {
+    if (!is.null(res[[campo]]) && "nombre" %in% names(res[[campo]])) {
+      res[[campo]]$nombre <- as.character(res[[campo]]$nombre)
+    }
+  }
+  res
+})
+
 message(paste("   > Total unified reports to process:", length(resultados_exitosos)))
 
 # 10.0.2. Standardize all team and stadium names to Cyrillic

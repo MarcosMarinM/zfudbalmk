@@ -46,6 +46,9 @@ leer_rangos_ids <- function(ruta = "rangos_ids.txt") {
 # TRANSLITERACIÓN LATIN → CIRÍLICO
 # ============================================================================
 latin_to_cyrillic <- function(nombres) {
+  if (length(nombres) == 0) {
+    return(character(0))
+  }
   digraph_map <- c("zh" = "ж", "sh" = "ш", "ch" = "ч", "nj" = "њ", "lj" = "љ", "kj" = "ќ", "gj" = "ѓ", "dz" = "ѕ", "dj" = "џ")
   simple_map <- c(
     "a" = "а", "b" = "б", "c" = "ц", "d" = "д", "e" = "е", "f" = "ф", "g" = "г", "h" = "х", "i" = "и",
